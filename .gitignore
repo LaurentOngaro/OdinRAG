@@ -14,7 +14,7 @@ courses/
 
 # Karl Zylinski ebook "Understanding the Odin Programming Language" (paid, do NOT publish)
 # The blog posts are public and shipped in the repo.
-/docs/karl_zylinski/odin-book/*.md
+/docs/karl_zylinski/odin-book/**/*.md
 !/docs/karl_zylinski/odin-book/README.md
 
 # Personal notes (private planning + devlogs)
