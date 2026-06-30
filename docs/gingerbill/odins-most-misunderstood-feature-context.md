@@ -1,4 +1,4 @@
-# context—Odin’s Most Misunderstood Feature
+# context-Odin’s Most Misunderstood Feature
 
 2025-12-15
 
@@ -32,11 +32,11 @@ A good APIs offers a way to specify the allocator to use, e.g. `allocator: runti
 
 There are two allocators on the `context.allocator` and `context.temp_allocator`. I expect most people to never use custom allocators whatsoever (which is empirically true), but I do also want to encourage things like using the `context.temp_allocator` because it allows for many useful benefits, especially those that most people don’t even realize are a thing. For many people, they usually just want to do nothing with the `context` (assuming they know about it) or set the `context.allocator` to the `mem.Tracking_Allocator` and be done; that’s pretty much it.
 
-You could argue that it is “better” to pass allocators 
+You could argue that it is “better” to pass allocators
 
 If you want to disallow `allocator := context.allocator` like defaults in Odin on a per-file basis, you can do so with the get tag `#+vet explicit-allocators`. around explicitly, but from my own experience in C with this exact interface (made and used well before I even made Odin), I found that I got in a very very lazy habit of not actually passing around allocators properly. This overly explicitness with a generalized interface lead to more allocation bugs than if I had used specific allocators on a per-system basis.
 
-When explicit allocators are wanted, you rarely want the generic interface too, and usually a specific allocator instead e.g. `virtual.Arena`. As I have previously expressed in my [Memory Allocation Strategies](https://www.gingerbill.org/series/memory-allocation-strategies/) series, an allocator can be used to represent a specific set of lifetimes for a set of allocations—arenas being the most common kind but other allocators such as pools, basic free lists, etc may be useful.
+When explicit allocators are wanted, you rarely want the generic interface too, and usually a specific allocator instead e.g. `virtual.Arena`. As I have previously expressed in my [Memory Allocation Strategies](https://www.gingerbill.org/series/memory-allocation-strategies/) series, an allocator can be used to represent a specific set of lifetimes for a set of allocations-arenas being the most common kind but other allocators such as pools, basic free lists, etc may be useful.
 
 However because most people will still default to a traditional `malloc`/`free` style of dynamic memory allocation, having a generic interface which can be overridden/intercepted/tracked is extremely useful to be able to do, especially in third-party libraries/code.
 
@@ -84,13 +84,13 @@ Even so, with the *GOOD* C libraries, this macro approach fails across a LIB/DLL
 
 Now some library writers are **REALLY GOOD** and they provide things like an allocation interface, but I probably know all of these library writers personally at this point, so I’d be preaching to the choir with my complaints.
 
-I’ve honestly had a few people effectively tell me that if it’s an bad API then the user should put up with it—“It’s API is bad? Oh well, tough luck”. However, I’ve had a lot the same people then ask “but why does *the language* need to solve that? Isn’t it a library problem?”.
+I’ve honestly had a few people effectively tell me that if it’s an bad API then the user should put up with it-“It’s API is bad? Oh well, tough luck”. However, I’ve had a lot the same people then ask “but why does *the language* need to solve that? Isn’t it a library problem?”.
 
 I’m sorry but telling someone the API is at fault doesn’t help them in the slightest, and if a API/library cannot be easily modified, then how can that be fixed in code? It’s fundamentally only fixable at the language itself.
 
 ### The Evolution of Code
 
-People rarely write things perfect the first time—code evolves. That’s what engineering is all about. Requirements change. The people change. The problem changes entirely. Expecting not to be able to intercept third-party code is pie-in-the-sky thinking. As I’ve said numerous times before, Third-party just means “stuff not written by you”; that’s it. As I stress, it could even be your past self, which is not the same as your present self.
+People rarely write things perfect the first time-code evolves. That’s what engineering is all about. Requirements change. The people change. The problem changes entirely. Expecting not to be able to intercept third-party code is pie-in-the-sky thinking. As I’ve said numerous times before, Third-party just means “stuff not written by you”; that’s it. As I stress, it could even be your past self, which is not the same as your present self.
 
 Point out that shitty APIs exist is the entire point. Just saying “tough luck” doesn’t solve anything, you’re adding to the problem.
 
@@ -98,9 +98,9 @@ This is why `context` exists.
 
 ## ABI Layout
 
-One important aspect about the `context` is that memory layout is **not** user modifiable, and this is another big design choice too. It allows for a consistent and well understood ABI, which means you can—you guessed it—intercept third-party code even across LIB/DLL boundaries.
+One important aspect about the `context` is that memory layout is **not** user modifiable, and this is another big design choice too. It allows for a consistent and well understood ABI, which means you can-you guessed it-intercept third-party code even across LIB/DLL boundaries.
 
-If the user was allowed to add as many custom fields to the `context` as desired, it would not be ABI consistent, and thus not be stable for the use of its interception abilities across LIB/DLL boundaries. At best, allowing for custom fields is allowing you to minimize passing/typing parameters to procedures. Typing is rarely—if ever—the bottleneck in programming.
+If the user was allowed to add as many custom fields to the `context` as desired, it would not be ABI consistent, and thus not be stable for the use of its interception abilities across LIB/DLL boundaries. At best, allowing for custom fields is allowing you to minimize passing/typing parameters to procedures. Typing is rarely-if ever-the bottleneck in programming.
 
 ## Implementation
 

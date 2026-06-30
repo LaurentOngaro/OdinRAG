@@ -4,7 +4,7 @@
 
 **n.b. This is a written version of a dialogue from a YouTube video: [2 Language Creators vs 2 Idiots | The Standup](https://www.youtube.com/watch?v=tXJfS6jI9Z0&t=3860s)**
 
-Package managers (for programming languages) are evil 
+Package managers (for programming languages) are evil
 
 The term “evil” is being used partially hyperbolic to make a point..
 
@@ -15,7 +15,7 @@ To start, I need to make a few distinctions between concepts a lot of programmer
 - Build Systems
 - Package Managers
 
-These are all separate and can have no relation to one another. I have nothing wrong with packages, in fact Odin has packages built into the language. I have nothing wrong with repositories, as that’s how a lot of people discover new packages—a search engine, something I think everyone uses on a daily basis 
+These are all separate and can have no relation to one another. I have nothing wrong with packages, in fact Odin has packages built into the language. I have nothing wrong with repositories, as that’s how a lot of people discover new packages-a search engine, something I think everyone uses on a daily basis
 
 I primarily use [DuckDuckGo](http://duckduckgo.com/), but I also use Google and many others because they are pretty much all bad.. Build systems are usually language dependent/specific, and for Odin I have tried minimize the need for a build system entirely (at least as a separate thing) where most projects will build with `odin build .`, which works due to the linking information being defined in the source code itself with the `foreign` system. This leaves *package managers*; what do they do?
 
@@ -23,7 +23,7 @@ I primarily use [DuckDuckGo](http://duckduckgo.com/), but I also use Google and 
 
 Package managers download packages from a repositories, handles the dependencies and tries to fix them, and then it downloads its dependencies, and its dependencies, and its dependencies… and you can probably see where my criticism is going.
 
-This is the **automation of dependency hell**. The problem is that not everything needs to be automated, especially hell. [Dependency hell](https://en.wikipedia.org/wiki/Dependency_hell) is a real thing which anyone who has worked on a large project has experienced. Projects having thousands, if not tens of thousands, of dependencies where you don’t know if they work properly, where are the bugs, you don’t how anything is being handled—it’s awful.
+This is the **automation of dependency hell**. The problem is that not everything needs to be automated, especially hell. [Dependency hell](https://en.wikipedia.org/wiki/Dependency_hell) is a real thing which anyone who has worked on a large project has experienced. Projects having thousands, if not tens of thousands, of dependencies where you don’t know if they work properly, where are the bugs, you don’t how anything is being handled-it’s awful.
 
 This is the wrong thing to automate. You can do this manually, however it doesn’t stop you getting into hell, rather just slow you down, as you can put yourself into hell (in fact everyone puts themselves into hell voluntarily). The point is it makes you think how you get there, so if you have to download manually, you will start thinking “maybe I don’t want this” or “maybe I can do this instead”. And when you need to update packages, being manual forces you to be very careful.
 
@@ -37,15 +37,15 @@ This is why I am saying it is *evil*, as it will send you to hell quicker.
 
 ## Mitigations in some languages
 
-When using some languages, such as Go, most people don’t seem to need many third-party packages even though Go has a built-in package manager. The entrance to hell seems too far and hard to get to 
+When using some languages, such as Go, most people don’t seem to need many third-party packages even though Go has a built-in package manager. The entrance to hell seems too far and hard to get to
 
-This sentence is a quote from ThePrimeagen from that video.. The reason such languages don’t fall into this trap as quickly is that those languages have a really good core/standard library—batteries included. When using Go for example, you don’t need any third-party libraries to make a web server, Go has it all there and you are done. Go even has Go compiler built into the standard library; in fact it has two, a [high level one](https://github.com/golang/go/tree/master/src/go) for tooling and one which is the [actual compiler itself](https://github.com/golang/go/tree/master/src/cmd/compile) 
+This sentence is a quote from ThePrimeagen from that video.. The reason such languages don’t fall into this trap as quickly is that those languages have a really good core/standard library-batteries included. When using Go for example, you don’t need any third-party libraries to make a web server, Go has it all there and you are done. Go even has Go compiler built into the standard library; in fact it has two, a [high level one](https://github.com/golang/go/tree/master/src/go) for tooling and one which is the [actual compiler itself](https://github.com/golang/go/tree/master/src/cmd/compile)
 
 ThePrimeagen mentioned the “Klingon Approach” as a joke. This refers to Klingons (a species of humanoids in Star Trek) which have redundant organs. A very nerdy joke..
 
 ## The meaning of dependency
 
-In real life, when you have a dependency, you are responsible for it 
+In real life, when you have a dependency, you are responsible for it
 
 This comment was from José Valim (the creator of the [Elixir](https://en.wikipedia.org/wiki/Elixir_(programming_language)) programming language) and this was a very good point which I wanted to add to this article.. If the thing that is dependent on you does something wrong, like a child or business, you might end up in jail, as you are responsible for that. Package dependencies are not that far different but people trust them with little-to-no verification. And when something goes wrong, you are on the hook to maintain it. It is a thing you should worry about and take care of.
 
@@ -71,7 +71,7 @@ You’ll find engineers who will go “some of my coworkers are so horrible, hey
 
 Most people assume programming is like every other industry, like actual engineering which has been around for thousands of years, or modern science which has been around for about half a millenium. People trust who they perceive to be the “experts”, as you see all of these articles, books, conference videos, etc, and they all tell you stuff but for the most part which does not necessarily *seem* true.
 
-I remember trusting those who were perceived to be “experts” which were espousing “wisdom”. However, as I have programmed more over the years, I realized there is very *very* little wisdom in this industry. This industry is 70–75 years old at best, and that is not old enough to have any good evolutionary selection pressure. It is not old enough to get rid of the bad things—it hasn’t evolved quick enough. We will find out in a few HUNDRED years, and I mean *hundreds*, what is actual good wisdom is in programming.
+I remember trusting those who were perceived to be “experts” which were espousing “wisdom”. However, as I have programmed more over the years, I realized there is very *very* little wisdom in this industry. This industry is 70–75 years old at best, and that is not old enough to have any good evolutionary selection pressure. It is not old enough to get rid of the bad things-it hasn’t evolved quick enough. We will find out in a few HUNDRED years, and I mean *hundreds*, what is actual good wisdom is in programming.
 
 There are some laws we know like [Conway’s Law](https://en.wikipedia.org/wiki/Conway's_law), where “organizations which design systems (in the broad sense used here) are constrained to produce designs which are copies of the communication structures of these organizations”. Or to rephrase it in programming terms, the structure of the code will reflect the company that programs it. But that is one of the only laws that we know to exist.
 

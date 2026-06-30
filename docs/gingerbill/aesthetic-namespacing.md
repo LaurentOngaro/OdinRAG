@@ -2,7 +2,7 @@
 
 2026-05-13
 
-Karl Zylinski’s [Tom’s Namespaces: An Odin Fanfic](https://zylinski.se/posts/toms-namespaces/) is an excellent exploration of the namespacing problem in imperative programming languages such as Odin 
+Karl Zylinski’s [Tom’s Namespaces: An Odin Fanfic](https://zylinski.se/posts/toms-namespaces/) is an excellent exploration of the namespacing problem in imperative programming languages such as Odin
 
 I highly recommend reading that article before reading this one!. After sharing it on many comment forum sites, I’ve concluded there’s no real “solution.”
 
@@ -36,7 +36,7 @@ Odin’s [FAQ](https://odin-lang.org/docs/faq/#but-really-why-does-odin-not-have
 
 A related pattern I keep seeing: people’s overuse of `@(private="file")` creating unnecessary friction. The question I always ask is: Who are you hiding code from? *Yourself?!*
 
-I believe this habit usually comes from Java/C#/C++ developers treating private-by-default as self-evident good practice—without ever questioning whether it actually is 
+I believe this habit usually comes from Java/C#/C++ developers treating private-by-default as self-evident good practice-without ever questioning whether it actually is 
 
 There is no shortage of unquestioned dogma in programming, but cataloguing it all is beyond the scope of this article.. Hint: It isn’t, and that’s exactly why Odin is public-by-default at the package level with no struct-level `private`/`protected`.
 
@@ -66,6 +66,6 @@ The reverse also applies: forcing Odin’s ideas onto languages that weren’t d
 
 The *Joy of Programming* is hard to cultivate, and I’ve tried my best to foster it with Odin. Nudging is an aspect of why Odin feels so [ergonomic](https://en.wikipedia.org/wiki/Ergonomics). Most people naturally follow the “happy path”, and typically the subtle *friction* on bad approaches goes unnoticed since people do not fight it. But some people push headlong through that friction anyway, fighting the language/compiler instead of listening to it. Packages, namespaces, and `private`ness are all areas where people do this: misusing features based on unquestioned dogma from other languages.
 
-Sometimes you cannot stop people poking themselves in the eye. You can only hope they eventually realize—on their own or through others—that they’re making things worse for themselves and everyone who has to use their code.
+Sometimes you cannot stop people poking themselves in the eye. You can only hope they eventually realize-on their own or through others-that they’re making things worse for themselves and everyone who has to use their code.
 
 >Source: https://www.gingerbill.org/article/2026/05/13/aesthetic-namespacing

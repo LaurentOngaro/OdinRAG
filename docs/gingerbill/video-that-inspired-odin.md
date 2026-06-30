@@ -8,8 +8,6 @@
 
 Many people may not know this but this video by Sean Barrett [@nothings](https://twitter.com/nothings) is partially the reason why I made the [Odin programming language](https://odin-lang.org/).
 
-  
-
 And I’ll explain what insights it gave me in this thread 🧵.
 
 A lot of these seem “so obvious” but for some reason it never clicked to me before this video. A lot of the “higher level” “scripting” languages are not that much higher level than C. Those languages just have garbage collection and much better standard libraries than C.
@@ -33,7 +31,7 @@ Eventually I realized I couldn’t just add constructs and features to C to “i
 
 Interestingly, “Odin” (which was the original codename which just stuck) started life as a Pascal-like language with begin/end too, but I was trying to make it “C-like” enough for what I wanted. About 3 months later, I had implemented ~70% of Odin; the other ~30% took 7 years.
 
-Odin wasn’t my first programming language that I had designed nor implemented, but it was the first where I actually went “you know what?—this will actually be useful for my general needs”. And now I use it for my living at [JangaFX](https://jangafx.com/), where all of our products are written in it.
+Odin wasn’t my first programming language that I had designed nor implemented, but it was the first where I actually went “you know what?-this will actually be useful for my general needs”. And now I use it for my living at [JangaFX](https://jangafx.com/), where all of our products are written in it.
 
 Other than slices and `defer`, the other things I did for Odin were to solve a few practical issues I had in C:
 

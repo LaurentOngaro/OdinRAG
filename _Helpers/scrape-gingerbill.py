@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-_Helpers/scrape-gingerbill.py — Scrape gingerbill.org articles via RSS.
+_Helpers/scrape-gingerbill.py - Scrape gingerbill.org articles via RSS.
 [Re-entrant: skip if <slug>.md already exists; --force to rewrite]
 
 Fetches ALL articles from the https://www.gingerbill.org/article/ RSS feed and converts them into Markdown under docs/gingerbill/.
@@ -44,7 +44,7 @@ from lib.http_client import (  # noqa: E402
 )
 from lib.html2md import scrape_to_markdown  # noqa: E402
 
-_DESCRIPTION = "Ginger Bill blog scraper (gingerbill.org) — re-entrant via RSS, --force to rewrite."
+_DESCRIPTION = "Ginger Bill blog scraper (gingerbill.org) - re-entrant via RSS, --force to rewrite."
 
 # ─── CONFIG ───────────────────────────────────────────────────────────────────
 OUT = Path(__file__).resolve().parent.parent / "docs" / "gingerbill"
@@ -117,10 +117,10 @@ def generate_readme(articles: list[Article]) -> None:
     """Write or update docs/gingerbill/README.md index."""
     readme_path = OUT / "README.md"
     lines = [
-        "# docs/gingerbill/ — public index of gingerbill.org content",
+        "# docs/gingerbill/ - public index of gingerbill.org content",
         "",
         "> This folder is the **public landing** for the Ginger Bill (`gingerbill.org`) content.",
-        "> The scraped articles themselves are **not** redistributed in this repo — see",
+        "> The scraped articles themselves are **not** redistributed in this repo - see",
         "> [`../../SOURCES.md`](../../SOURCES.md) for licensing and how to obtain them legally on your own.",
         "",
         "## What's here",
@@ -133,7 +133,7 @@ def generate_readme(articles: list[Article]) -> None:
         "If you want the full articles on your machine:",
         "",
         "1. Read [`../../SOURCES.md`](../../SOURCES.md) for licensing.",
-        "2. Authenticate nothing — `gingerbill.org` is public.",
+        "2. Authenticate nothing - `gingerbill.org` is public.",
         "3. Run:",
         "",
         "   ```bash",
@@ -154,7 +154,7 @@ def generate_readme(articles: list[Article]) -> None:
         for a in articles:
             safe_title = _escape_link_text(a.title)
             date_label = f" ({a.date})" if a.date else ""
-            lines.append(f"- **{safe_title}**{date_label} — {a.url}")
+            lines.append(f"- **{safe_title}**{date_label} - {a.url}")
     else:
         lines.append("_Run the scraper to populate this list._")
 
@@ -162,11 +162,11 @@ def generate_readme(articles: list[Article]) -> None:
         "",
         "## See also",
         "",
-        "- [`../official/`](../official/) — Odin official docs (public, included)",
-        "- [`../karl_zylinski/`](../karl_zylinski/) — Karl Zylinski blog index",
-        "- [`../newsletters/`](../newsletters/) — Odin newsletters index",
-        "- [`../../SOURCES.md`](../../SOURCES.md) — source procurement guide",
-        "- [`../../_Helpers/docs/MINIMAX_M3.md`](../../_Helpers/docs/MINIMAX_M3.md) — how MiniMax-M3 powers this repo",
+        "- [`../official/`](../official/) - Odin official docs (public, included)",
+        "- [`../karl_zylinski/`](../karl_zylinski/) - Karl Zylinski blog index",
+        "- [`../newsletters/`](../newsletters/) - Odin newsletters index",
+        "- [`../../SOURCES.md`](../../SOURCES.md) - source procurement guide",
+        "- [`../../_Helpers/docs/MINIMAX_M3.md`](../../_Helpers/docs/MINIMAX_M3.md) - how MiniMax-M3 powers this repo",
         "",
     ]
 
@@ -193,7 +193,7 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     print("=" * 60)
-    print("  Ginger Bill Blog Scraper — RSS coverage")
+    print("  Ginger Bill Blog Scraper - RSS coverage")
     print("=" * 60)
 
     articles = discover_via_rss_extended(RSS_URL)

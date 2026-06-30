@@ -26,7 +26,7 @@ import re
 from pathlib import Path
 from typing import Any
 
-# JSONC: fallback order — env var > this JSONC file in .private/
+# JSONC: fallback order - env var > this JSONC file in .private/
 CONFIG_PATH = Path(
     os.environ.get("ODINRAG_CONFIG")
     or (Path(__file__).resolve().parent.parent / ".private" / "user_config.jsonc")

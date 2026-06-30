@@ -14,13 +14,13 @@ You can check out a minimal demonstration of Metal in Odin here: <https://gist.g
 
 And the automatically generated package documentation here: [`package vendor:darwin/Metal` documentation](https://pkg.odin-lang.org/vendor/darwin/Metal/).
 
-> Metal in Native Odin!!! No need for Objective-C or Swift any more it seems.<https://t.co/v5D2FP1LlB> (I had to do the obligatory RGB triangle)  
->   
-> This means that Odin will ship out of the box with Metal, Vulkan, and OpenGL, and libraries such as GLFW and SDL!  
->   
+> Metal in Native Odin!!! No need for Objective-C or Swift any more it seems.<https://t.co/v5D2FP1LlB> (I had to do the obligatory RGB triangle)
+>
+> This means that Odin will ship out of the box with Metal, Vulkan, and OpenGL, and libraries such as GLFW and SDL!
+>
 > Only D3D to go! [pic.twitter.com/r6BnzDBXXO](https://t.co/r6BnzDBXXO)
 >
-> — gingerBill (@TheGingerBill) [February 15, 2022](https://twitter.com/TheGingerBill/status/1493581485919678472?ref_src=twsrc%5Etfw)
+> - gingerBill (@TheGingerBill) [February 15, 2022](https://twitter.com/TheGingerBill/status/1493581485919678472?ref_src=twsrc%5Etfw)
 
 ### Metal in Objective-C [#](#metal-in-objective-c)
 
@@ -77,11 +77,11 @@ And the automatically generated package documentation here for both D3D11 and D3
 - [`package vendor:directx/d3d11` documentation](https://pkg.odin-lang.org/vendor/directx/d3d11/)
 - [`package vendor:directx/d3d12` documentation](https://pkg.odin-lang.org/vendor/directx/d3d12/)
 
-> I got Metal working natively in [@odinlang](https://twitter.com/odinlang?ref_src=twsrc%5Etfw) the other day. I've now gone and got D3D11 and D3D12 working in Odin!<https://t.co/cHzyfmeBLG>  
->   
+> I got Metal working natively in [@odinlang](https://twitter.com/odinlang?ref_src=twsrc%5Etfw) the other day. I've now gone and got D3D11 and D3D12 working in Odin!<https://t.co/cHzyfmeBLG>
+>
 > Odin shipping out-of-the-box will all of major graphics APIs: Metal, D3D11, D3D12, Vulkan, OpenGL, and WebGL! [pic.twitter.com/60sau6BRqt](https://t.co/60sau6BRqt)
 >
-> — gingerBill (@TheGingerBill) [February 17, 2022](https://twitter.com/TheGingerBill/status/1494429405640335363?ref_src=twsrc%5Etfw)
+> - gingerBill (@TheGingerBill) [February 17, 2022](https://twitter.com/TheGingerBill/status/1494429405640335363?ref_src=twsrc%5Etfw)
 
 Writing Direct3D code is Odin is really simple! The code will be nearly the same as writing it as if you were using the APIs in native C++ with thanks to the [`->` operator](/docs/overview/#--operator-selector-call-expressions):
 

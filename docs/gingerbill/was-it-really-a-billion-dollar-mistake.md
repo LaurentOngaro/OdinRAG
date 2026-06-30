@@ -24,7 +24,7 @@ This issue of null pointers is related to the [drunkard’s search principle](ht
 
 In *theory*, null is still a perfectly valid memory address, but as a practical matter, we have decided on the convention that null being zero is useful for marking a pointer as unset. Modern platforms reserve the first few pages of (virtual) memory to check for these errors. Typically on all modern systems, that memory address is located at `0`  
 
-`#define NULL ((void *)0)` in C99, or `nullptr` in C++11 and C23., but it didn’t always used to be on all platforms 
+`#define NULL ((void *)0)` in C99, or `nullptr` in C++11 and C23., but it didn’t always used to be on all platforms
 
 Historically, the [Prime 50, CDC Cyber 180, and some Honeywell-Bull](https://c-faq.com/null/machexamp.html) machines all had nonzero null, as might DG Eclipse MV, HP 3000, Lisp Machine, some 64-bit Cray,. Meaning that null is just a kind of sentinel value for memory addresses.
 
@@ -50,11 +50,11 @@ Odin does have `Maybe(^T)`, and that’s fine that it does exist, but it’s act
 
 n.b. For the ML/Rust users, Odin’s `Maybe(^T)` is identical to `Option<&T>` in Rust in terms of semantics and optimizations.
 
-The second option is a subtle one: it forces a specific style and architectural practices whilst programming. Odin is designed around two things: to be a C alternative which still feels like C whilst programming and “try to make the zero value useful”, and as such, a lot of the constructs in the language and core library have been structured around this. Odin is trying to be a C alternative, and as such it is not trying to change how most C programmers actually program in the first place. This is why you are allowed to declare variables without an explicit initializer, but the difference to that of C is that variables will be zero-initialized by default 
+The second option is a subtle one: it forces a specific style and architectural practices whilst programming. Odin is designed around two things: to be a C alternative which still feels like C whilst programming and “try to make the zero value useful”, and as such, a lot of the constructs in the language and core library have been structured around this. Odin is trying to be a C alternative, and as such it is not trying to change how most C programmers actually program in the first place. This is why you are allowed to declare variables without an explicit initializer, but the difference to that of C is that variables will be zero-initialized by default
 
-You can do `x: T = —` to make it uninitialized stack memory, if that is necessary for certain optimizations..
+You can do `x: T = -` to make it uninitialized stack memory, if that is necessary for certain optimizations..
 
-Fundamentally this idea of *explicit individual-element based initialization* everywhere is a viral concept which does lead to what I think are bad architectural decisions in the long run. Compilers are dumb—they cannot do everything for you, especially know the cost of the architectural decisions throughout your code, which requires knowing the (global) intent of your code. When people argue that a lot of the explicit initialization can be “optimized” out, this is only thinking from a *local* position of individual-elements, which does total up to being slower in some cases at a more *global* scale.
+Fundamentally this idea of *explicit individual-element based initialization* everywhere is a viral concept which does lead to what I think are bad architectural decisions in the long run. Compilers are dumb-they cannot do everything for you, especially know the cost of the architectural decisions throughout your code, which requires knowing the (global) intent of your code. When people argue that a lot of the explicit initialization can be “optimized” out, this is only thinking from a *local* position of individual-elements, which does total up to being slower in some cases at a more *global* scale.
 
 To give an example of what I mean, take `make([]Some_Struct, N)`. In Odin, it just zeroes the memory because in some cases, it is literally free (i.e. `mmap` must zero). However, when you need to initialize each value of that slice, you are now turning a O(1) problem into a O(N) problem. And it can get worse if each field in the struct also needs its own form of construction.
 
@@ -62,13 +62,13 @@ I do not think the `nil` pointer problem is as much of an empirical problem in p
 
 And I’d argue a lot (not all) of the `NULL` pointer problems in C are caused by the lack of a proper array type. C’s biggest mistake in my opinion is conflating a pointer with an array. Odin has solved this by having different bounds-checked array types.
 
-A general habit of people who criticize newer languages is to say the problems exist in C and therefore must exist in this new language, without even doing basic research if that’s true in the first place 
+A general habit of people who criticize newer languages is to say the problems exist in C and therefore must exist in this new language, without even doing basic research if that’s true in the first place
 
 If you didn’t guess, this is kind of tiresome when I am trying to explain Odin to other people who just want to dismiss it out-right because of some preconceived notion of the problems in C. Most of these people are generally not serious, but they are the loudest on the social media sites..
 
 ## The “Gotcha”
 
-I find this “gotcha” that people bring up 
+I find this “gotcha” that people bring up
 
 I find it mainly as a excuse to not try Odin, which is fine, I don’t care if you use Odin or not, but be honest that it’s just not a language for you rather than finding excuses. is probably one of the most common ones because it *seems* like an “obvious” and “simple” win, and I’d argue it’s the exact opposite of either “simple” and even a “win”. Language design is all about trade-offs and compromises as there is never going to be a perfect language for anyone’s problem. Even if you designed the Domain Specific Language (DSL) for your task, you’ll still have loads of issues, especially with specific semantics (not just syntax).
 
@@ -84,8 +84,6 @@ I believe this general local based thinking leads to poor architectural decision
 
 A good explanation of this general thinking is presented in this [video with Casey Muratori](https://www.youtube.com/watch?v=xt1KNDmOYqA):
 
-  
-
 On this journey/life-cycle, no-one is born knowing how to program: you learn how to do it. And when it comes to programming, you think in stages (at least in my personal experience) that are usually quite consistent in their ordering amongst most people. At some point during this stage of thinking, people reach a point of what I’ll dub the *Individual-Element Mindset*. This mindset is when you think of each specific piece of data (element) as having its own *lifetime*. This leads to common approaches of thinking each element having to be constructed/`malloc`ed individually with its own unique lifetime, then it’s destructed/`free`d individually (or automatically by a garbage collector).
 
 The architectures that arise from this mindset tends to be based around things like:
@@ -95,7 +93,7 @@ The architectures that arise from this mindset tends to be based around things l
 - RAII
 - “Smart” pointers and reference counting
 
-RAII and “smart” pointers 
+RAII and “smart” pointers
 
 I am placing quotes around “smart” to emphasize that they are not really “smart” in their construction nor “smart” in their usage. are both mitigations to get around many of the architectural issues of this mindset. RAII will handle the construction and destruction of elements automatically by the compiler. “Smart” pointers are there to help with the problems with forgetting to free allocations and to prevent use-after-frees, by tying the lifetime of the usage of the object with its allocation.
 
@@ -103,7 +101,7 @@ This architectural mindset does lead to loads of problems as a project scales. U
 
 If you were having to manage these *millions* of individual allocations manually, it does make sense why people recommend things like RAII or “smart” pointers as the compiler will add the constructors and destructors automatically for you. You can see why a person at this stage of their programming journey can think it would be a good thing to do, since it removes a lot of the boilerplate and minimizes the possible errors due to forgetting to write things.
 
-I am not saying people who do this are stupid—far from it! I’ve had this mindset before in my journey as a programmer, as have most programmers. It’s something you either come to naturally or you are taught from the general programming culture on the internet. I cannot think of any one who has shipped software who has NOT been at this phase/stage at some point in their life.
+I am not saying people who do this are stupid-far from it! I’ve had this mindset before in my journey as a programmer, as have most programmers. It’s something you either come to naturally or you are taught from the general programming culture on the internet. I cannot think of any one who has shipped software who has NOT been at this phase/stage at some point in their life.
 
 The problem with this mindset and the solutions it produces is that you are effectively patching over a flaw in your architecture. If two things are inextricably linked such that you have one thing getting automatically freed when the other thing gets freed (in all but the rarest of circumstances) this means that those things should have a combined lifetime. The better approach to this is to have one large “pool”/“arena” that all of those things got created in, so that things from that “pool” get freed together.
 
@@ -113,7 +111,7 @@ n.b. I call myself an idiot/numpty/moron on a daily basis for things that I do, 
 
 ## The Grouped-Element Mindset
 
-When you move from the Individual-Element Mindset to the Grouped-Element Mindset, things like smart-pointers and RAII 
+When you move from the Individual-Element Mindset to the Grouped-Element Mindset, things like smart-pointers and RAII
 
 Note I am *not* saying things like an explicit `defer` statement is not useful, but rather the need for the implicit RAII style of lifetime handling of individual-elements is bad. If I thought `defer` was bad, I would not have added it to Odin. become mostly irrelevant. This is because ownership and lifetime concerns are not as much of a problem any more, like the kind you had in the previous mindset. Ownership is a constant concern and mental overhead when thinking in an individual-element mindset. Whilst ownership is obvious (and usually trivial) in the vast majority (99+%) of cases when you are in the grouped-element mindset.
 
@@ -136,7 +134,7 @@ It’d even argue the individual-element mindset is a reason why a lot of people
 
 As you get a little bit larger and start thinking about *systems* within your code, then you can see how things cohere and bind together much more easily. Once you are at this *systems* level of grouped-elements, you’re at this next phase of thinking.
 
-However, I do not think you can skip past the individual-element mindset and jump straight to the group-element mindset, at least not the majority of people. I think it’s probably a necessary phase of thinking from understanding the fundamental *unit* of data within a problem, from the individual to the group 
+However, I do not think you can skip past the individual-element mindset and jump straight to the group-element mindset, at least not the majority of people. I think it’s probably a necessary phase of thinking from understanding the fundamental *unit* of data within a problem, from the individual to the group
 
 This should probably be its own article, not a footnote, but with a poor analogy, this grouped-element mindset is actually akin to “communism”, and that the individual-element mindset is closer to “capitalism”. Please note I think “communism” is evil, but the analogy of the politico-economics systems mirror quite well due to the thinking of element-based-lifetimes rather than system-based-lifetimes..
 

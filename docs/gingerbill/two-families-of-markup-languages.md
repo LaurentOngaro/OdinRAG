@@ -2,7 +2,7 @@
 
 2026-01-19
 
-There are only two families of *proper arbitrary* markup languages: [TeX](https://tug.org/) and [SGML](https://en.wikipedia.org/wiki/Standard_Generalized_Markup_Language) 
+There are only two families of *proper arbitrary* markup languages: [TeX](https://tug.org/) and [SGML](https://en.wikipedia.org/wiki/Standard_Generalized_Markup_Language)
 
 I would normally link to official thing as reference but it’s behind the “wonderful” ISO paywall: [ISO 8879:1986](https://www.iso.org/standard/16387.html).. By *arbitrary*, I mean the grammar specifically, and how it can be used to *mark* arbitrary plain text with information. And by *proper*, I mean the ability to have standalone nodes, user-definable nodes, nodes with attributes, and the wrapping of plain text. Everything else either lacks one of the these capabilities, or is a derivative or syntactic makeover of TeX or SGML.
 
@@ -38,7 +38,7 @@ Scribe’s syntax is effectively in the family of TeX but there is no need for t
 
 In the two languages, they both have means of using their specific symbols that are used for writing the mark-up. For SGML you do `&lt;` 
 
-For a minimal syntax to prevent escaping issues in an SGML-like language, you need 5 escaped entities:   
+For a minimal syntax to prevent escaping issues in an SGML-like language, you need 5 escaped entities:
  `& → &amp;`, `’ → &apos; or &#39;`, `< → &lt;`, `> → &gt;`, and `" → &quot; or &#34;`. However there are literally thousands of XML/HTML entities out there, and supporting them correctly has been “fun” for [packages](https://pkg.odin-lang.org/core/encoding/entity/) in Odin., and for TeX you do `\\`. The SGML approach differs to TeX as it is a different syntax than regular markup, whilst TeX unifies its syntax.
 
 There is also the second aspect that the TeX family of syntaxes are much easier parse than the SGML family. I’ve written both before and the SGML syntax requires a bit more code to write, because of the named blocks for wrapping and the entity escaping (especially if you want to handle *all* of the XML/HTML entities, of which there are thousands of them).
@@ -52,7 +52,7 @@ SGML wrapping syntax also has the flaw of allowing for overlapping hierarchies:
 ```odin
 TeX syntax does not have this problem as it only uses generic brackets/braces. I cannot think of a case when overlapping hierarchies 
 
-By this, I mean purely the syntax, and not the concept of an overlapping hierarchy, which can exist in things like marking up [Bibles](https://en.wikipedia.org/wiki/Overlapping_markup). this is desired—in fact HTML parsers have to mitigate for this possible typo. A SGML derivative could remove the overlapping hierarchy syntax flaw by having `</>` be the delimiter.
+By this, I mean purely the syntax, and not the concept of an overlapping hierarchy, which can exist in things like marking up [Bibles](https://en.wikipedia.org/wiki/Overlapping_markup). this is desired-in fact HTML parsers have to mitigate for this possible typo. A SGML derivative could remove the overlapping hierarchy syntax flaw by having `</>` be the delimiter.
 
 Real life TeX syntaxes do have their own edge cases, deviating from the general markup syntax 
 

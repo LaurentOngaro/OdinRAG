@@ -9,7 +9,7 @@ The world is a 16x16x16 uniform grid of blocks, and it loops infinitely. Here is
 
 > This is a small boomer shooter prototype I've been working on lately. The world is 16x16x16 blocks and it infinitely repeats itself.[#gamedev](https://twitter.com/hashtag/gamedev?src=hash&ref_src=twsrc%5Etfw) [pic.twitter.com/ONrkzmf5t2](https://t.co/ONrkzmf5t2)
 >
-> — Jakub Tomšů (@jakubtomsu\_) [May 24, 2024](https://twitter.com/jakubtomsu_/status/1794059547146936800?ref_src=twsrc%5Etfw)
+> - Jakub Tomšů (@jakubtomsu\_) [May 24, 2024](https://twitter.com/jakubtomsu_/status/1794059547146936800?ref_src=twsrc%5Etfw)
 
 This clip uses procedurally generated levels. Those are cool, but don’t have that much structure and interesting stuff going on. So I quickly decided I need to hand-craft levels for them to reach the full potential.
 

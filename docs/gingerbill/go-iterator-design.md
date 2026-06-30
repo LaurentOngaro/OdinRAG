@@ -2,14 +2,14 @@
 
 2024-06-17
 
-*NOTE: This is based on, but completely rewritten, from a Twitter post:  
+*NOTE: This is based on, but completely rewritten, from a Twitter post:
 <https://x.com/TheGingerBill/status/1802645945642799423>*
 
 **TL;DR**: It makes Go *feel* too “functional” rather than being an unabashed imperative language.
 
 I recently saw a post on [Twitter](https://x.com/ohmypy/status/1801180323406844062) showing the upcoming Go iterator design for Go 1.23 (August 2024). From what I can gather, many people seem to dislike the design. I wanted to give my thoughts on it as a language designer.
 
-The *merged PR* for the proposal can be found here:  
+The *merged PR* for the proposal can be found here:
 <https://github.com/golang/go/issues/61897>
 
 It has a in-depth explanation of the design explaining why certain approaches were chosen instead, so I do recommend reading it if you are familiar with Go.
@@ -86,7 +86,7 @@ func Pairs[V any](seq iter.Seq[V]) iter.Seq2[V, V] {
 
 **NOTE:** I am not suggesting Go does this whatsoever.
 
-When designing [Odin](https://odin-lang.org/), I wanted the ability for the user to design their own kind of “iterators”, but have them be very simple; in fact, just normal procedures. I didn’t want to add a special construct to the language just for this—this would complicate the language too much which is what I wanted to minimize in Odin.
+When designing [Odin](https://odin-lang.org/), I wanted the ability for the user to design their own kind of “iterators”, but have them be very simple; in fact, just normal procedures. I didn’t want to add a special construct to the language just for this-this would complicate the language too much which is what I wanted to minimize in Odin.
 
 One possible pseudo-proposal I could give for Go iterators would look like the following:
 
@@ -122,7 +122,7 @@ I know some people will this think this approach is a lot more complicated. It i
 
 **NOTE:** I am very much an imperative programmer and I like to know how things actually execute, rather than trying to make it “elegant looking” code. So the approach I wrote above is fundamentally about thinking with regards to execution.
 
-n.b. The typeclass/interface route would not work in Go because this would not be an orthogonal design concept and actually be more confusing than necessary—this is why I did not originally propose it. Different languages have different requirements as to what works in them.
+n.b. The typeclass/interface route would not work in Go because this would not be an orthogonal design concept and actually be more confusing than necessary-this is why I did not originally propose it. Different languages have different requirements as to what works in them.
 
 ## Go’s Apparent Philosophy
 

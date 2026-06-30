@@ -44,7 +44,7 @@ logs/
 # one-shot (never push raw working notes) / RAW docs
 /_Raw/
 
-# Cloned upstream templates (each has its own .git/ — never `git add` the contents)
+# Cloned upstream templates (each has its own .git/ - never `git add` the contents)
 /code/templates/*/
 !/code/templates/README.md
 

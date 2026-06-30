@@ -109,6 +109,6 @@ Q: Any closing remarks about OstrichDB and/or Odin?
 
 A: For any programmers interested in contributing to OstrichDB, I encourage you to check out the repository and get involved. To the Odin programmers out there, let’s continue enhancing this fantastic language, growing our community, and supporting each other in creating great software.
 
-If you’re considering learning Odin but need a nudge, I say go for it. Build something new or revisit an old project and rebuild it using Odin—you might be pleasantly surprised by what you can achieve and how quickly you can achieve it. Thank you for the opportunity to share my thoughts in this interview. I’m both honored and excited to see it published!
+If you’re considering learning Odin but need a nudge, I say go for it. Build something new or revisit an old project and rebuild it using Odin-you might be pleasantly surprised by what you can achieve and how quickly you can achieve it. Thank you for the opportunity to share my thoughts in this interview. I’m both honored and excited to see it published!
 
 >Source: https://odin-lang.org/news/newsletter-2024-09

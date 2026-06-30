@@ -13,7 +13,7 @@ After reading a lot of the comments on numerous social media sites on the [origi
 The main points I wanted to clarify:
 
 - Null pointer dereferences are empirically the easiest class of invalid memory addresses to catch at runtime, and are the least common kind of invalid memory addresses that happen in memory unsafe languages.
-- I do think it was a *costly* mistake but the “obvious solutions” to the problem are probably just as *costly*, if not more so, but in very subtle ways which most people neglected to understand in the article 
+- I do think it was a *costly* mistake but the “obvious solutions” to the problem are probably just as *costly*, if not more so, but in very subtle ways which most people neglected to understand in the article
 
   Most of the bad criticisms just came from people who didn’t read the article or didn’t read past a couple paragraphs. That’s why I wanted to state this comment very clearly..
 - I think that even if Tony Hoare didn’t “invent” `NULL` pointers, within a couple years someone else would have. I don’t think it’s a “mistake” the programming world was ever going to avoid.
@@ -92,7 +92,7 @@ But as a systems programmer, I deal with memory all the time, and null pointers 
 
 In the case of the other invalid memory addresses, linear/affine substructural type systems with lifetime semantics can help with this (e.g. Rust) but they come at another cost in terms of language ergonomics and restrictions. Language design is hard..
 
-For a managed language like Java, the cost of *explicit initialization of every element everywhere* is so little in comparison to the rest of the language, that approach is honestly fine. But for a language like the one I have designed and created—Odin—the cost of non-zero initialization is extremely costly as things scale.
+For a managed language like Java, the cost of *explicit initialization of every element everywhere* is so little in comparison to the rest of the language, that approach is honestly fine. But for a language like the one I have designed and created-Odin-the cost of non-zero initialization is extremely costly as things scale.
 
 This simple/naïve approach looks like this in a pseudo-C:
 
@@ -182,7 +182,7 @@ At the time of writing, I am not sure which approach is the better one: trap or 
 
 But some languages such as [Pony](https://tutorial.ponylang.io/expressions/errors.html?h=exception#try-then-blocks), Coq, Isabelle, etc actually define division by zero of an integer to be `0`. This is because it can help a lot of [theorem provers](https://xenaproject.wordpress.com/2020/07/05/division-by-zero-in-type-theory-a-faq/).
 
-But there is the other question of production code. One of the main arguments against NPEs (especially in languages like Java) is that it causes a crash. So in the case of division by zero, do you want this to happen? Or would you prefer all integer division to be explicitly handled, or default to a predictable/useful value, like `0`?—which prevents crashing in the first place.
+But there is the other question of production code. One of the main arguments against NPEs (especially in languages like Java) is that it causes a crash. So in the case of division by zero, do you want this to happen? Or would you prefer all integer division to be explicitly handled, or default to a predictable/useful value, like `0`?-which prevents crashing in the first place.
 
 Another common example of “panic on failure” is languages with runtime bounds checking. If `x[i]` is out of bounds, most languages just panic. It’s rare to find a language that returns a `Maybe(T)` on every array access to prevent an out of bounds. Not even languages like OCaml do this.
 
@@ -200,6 +200,6 @@ But I’d argue most people are not applying their opinions consistently when it
 
 I know a lot of people view the *explicit individual initialization of every element everywhere* approach as the “obvious solution”, as it seems like low-hanging fruit. As a kid, I was told to not pick low-hanging fruit, especially anything below my waist. Just because it looks easy to pick, a lot of it might not be unpicked for a reason. It does not mean that you should or should not pick that fruit, but rather you need to consider the trade-offs.
 
-If you honestly think the costs of *explicit individual initialization of every element everywhere* are worth it for the language you are working in or developing, then great! But at least know the trade-offs of that approach. For Odin, I thought it was not worth the cost—compared to the alternative ways of mitigating the problem empirically.
+If you honestly think the costs of *explicit individual initialization of every element everywhere* are worth it for the language you are working in or developing, then great! But at least know the trade-offs of that approach. For Odin, I thought it was not worth the cost-compared to the alternative ways of mitigating the problem empirically.
 
 >Source: https://www.gingerbill.org/article/2026/01/11/mitigating-the-billion-dollar-mistake

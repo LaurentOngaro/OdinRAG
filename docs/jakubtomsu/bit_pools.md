@@ -1,4 +1,4 @@
-# You don't need free lists!
+# You don't need free lists
 
 2026-02-20
 
@@ -29,11 +29,11 @@ My approach is inspired by the [TLSF memory allocator](http://www.gii.upv.es/tls
 
 ## Demo
 
-> free-list-based pools have an weird property people don't talk about - at some point the slot allocation pattern becomes almost random.  
->   
+> free-list-based pools have an weird property people don't talk about - at some point the slot allocation pattern becomes almost random.
+>
 > But there are alternative approaches, which don't use free lists at all. Lately I've been using a multi-level bit pool: [pic.twitter.com/zx1zaoT0un](https://t.co/zx1zaoT0un)
 >
-> — Jakub Tomšů (@jakubtomsu\_) [February 23, 2026](https://twitter.com/jakubtomsu_/status/2025892087451816092?ref_src=twsrc%5Etfw)
+> - Jakub Tomšů (@jakubtomsu\_) [February 23, 2026](https://twitter.com/jakubtomsu_/status/2025892087451816092?ref_src=twsrc%5Etfw)
 
 # Bits
 

@@ -6,7 +6,7 @@ Series: [Syntax and how it Matters](/series/syntax-and-how-it-matters)
 
 Yes.
 
-But not necessarily in the ways you might think 
+But not necessarily in the ways you might think
 
 n.b. This article could have been a lot longer than it currently is..
 
@@ -20,7 +20,7 @@ When people talk about concrete syntax, they are referring to the specific struc
 
 Part of the point about declaration syntaxes is that for the most part, the abstract syntax will be mostly the same and not influence the semantics too much. However I was trying my best to focus on just one aspect of a language’s syntax, not the entirety of it.
 
-Odin’s choice of name-focused declaration syntax was not a *mere* aesthetic choice either. It was about unifying different semantic concepts together. `:=` is for the declaration of runtime variables and `::` is for the declaration of compile time constants 
+Odin’s choice of name-focused declaration syntax was not a *mere* aesthetic choice either. It was about unifying different semantic concepts together. `:=` is for the declaration of runtime variables and `::` is for the declaration of compile time constants
 
 Both with inferred types since `:` and `=` are separate operators to begin with so `: =` or `: :` could be written.. But general compile time constant values, types, and procedure values are at the end of the day just constant expressions. They are unified under the same syntax `::`.
 
@@ -148,7 +148,7 @@ Unfortunately as a choice of this syntax choice, it does have the compromise tha
 
 > The choice of the littlest difference between `,` and `;` makes all the difference in the world.
 
-One of Odin’s general philosophies is to keep hierarchies flat as possible, and to not encourage people to make needless taxonomies with their code. Most people think they are organizing code, when in reality they are just taxonomizing it—it does not give you any real benefit. The design of Odin’s record types like `struct`s are an extension of this.
+One of Odin’s general philosophies is to keep hierarchies flat as possible, and to not encourage people to make needless taxonomies with their code. Most people think they are organizing code, when in reality they are just taxonomizing it-it does not give you any real benefit. The design of Odin’s record types like `struct`s are an extension of this.
 
 In Odin, struct fields are separated by a comma rather than a semicolon/newline. This decision might seem *very minor* but the decision was to prevent something I did not want to allow in the syntax at all: nested declarations. Nested declarations naturally lead to people wanting to create hierarchies of declarations; usually as a way to taxonomize things.
 
@@ -481,7 +481,7 @@ What we found was that the more C-like a library was in terms of its design, the
 
 ### Degenerate States
 
-Some people may be a little surprised with my original experimentation with this exception-like shorthand with error values. Especially since I wrote an article (which was originally two GitHub comments) titled: [Exceptions—And Why Odin Will Never Have Them](https://www.gingerbill.org/article/2018/09/05/exceptions---and-why-odin-will-never-have-them/).
+Some people may be a little surprised with my original experimentation with this exception-like shorthand with error values. Especially since I wrote an article (which was originally two GitHub comments) titled: [Exceptions-And Why Odin Will Never Have Them](https://www.gingerbill.org/article/2018/09/05/exceptions---and-why-odin-will-never-have-them/).
 
 One thing I did not comment on in the that article is the cause of the problem (other than the cultural issues). My hypothesis is that if you have a degenerate type (type erasure or automatic inference), then if a value can convert to it implicitly (easily), people will (ab)use it.
 
@@ -499,7 +499,7 @@ I do believe that my general hypotheses are still correct regarding exception-li
 
 - Error value propagation *ACROSS* library boundaries 
 
-  People are lazy and have a tendency to never actually handle errors so having a degenerate state for errors usually causes the errors to “bubble up” so you can “Catch ’em All” in one place—Pokémon error handling.
+  People are lazy and have a tendency to never actually handle errors so having a degenerate state for errors usually causes the errors to “bubble up” so you can “Catch ’em All” in one place-Pokémon error handling.
 - *Degenerate states* due to type erasure or automatic inference
 - Cultural lack of partial success states
 

@@ -169,7 +169,7 @@ These rules apply to every tracked `.md` file in this repo unless the file is ex
 
 ### Punctuation: no em-dash
 
-- **Never use the em-dash character (`-`, U+2014).** Use a plain ASCII hyphen-minus (`-`, U+002D) instead.
+- **Never use the em-dash (Em dash) character (U+2014).** Use a plain ASCII hyphen-minus (`-`, U+002D) instead.
 - Reason: some terminals and markdown renderers mishandle the en-dash / em-dash glyph (Windows terminals can render them as a question mark box), which breaks copy-paste and visual consistency. ASCII hyphen-minus renders the same everywhere.
 - The same applies to other Unicode punctuation: prefer ASCII `'` over `'`, `"` over `"`/`"`, `-` over `-`/`-`, `...` over `...`. The lint config already enforces most of these via `MD026`.
 

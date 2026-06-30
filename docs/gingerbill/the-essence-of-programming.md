@@ -6,7 +6,7 @@ One thing I have noticed a lot when a programmer is struggling to solve a proble
 
 ## Essentially Ordered Aspects
 
-In a [previous article](https://www.gingerbill.org/article/2020/05/31/progamming-pragmatist-proverbs/) of mine, I state that “Programming is a tool to solve problems that you have in the domain of computers”. At the essence of everything to do with programming, it is using and building tools with computers. My honest belief is that studying the concept of a tool itself and its essentially ordered aspects 
+In a [previous article](https://www.gingerbill.org/article/2020/05/31/progamming-pragmatist-proverbs/) of mine, I state that “Programming is a tool to solve problems that you have in the domain of computers”. At the essence of everything to do with programming, it is using and building tools with computers. My honest belief is that studying the concept of a tool itself and its essentially ordered aspects
 
 This is a [Peripatetic](https://wikipedia.org/wiki/Peripatetic_school)/[Aristotelian](https://en.wikipedia.org/wiki/Aristotle) schema. will aid the use into correctly structuring our thinking about how we build tools in general.
 
@@ -66,11 +66,11 @@ Sometimes the implementation of something is difficult to determine, as hard pro
 
 ### “Best Way”
 
-There is no such thing as an unqualified universal *“best way”* to solve a given problem in the abstract. And what is needed to be done is to understand the particular situations that requires one to attend to such problems. Compromise is a given, and the only way to get better is to practice, practice, practice. Abstract solutions are called algorithms, but how that algorithm is implemented depends on what it will be implemented on—the machine.
+There is no such thing as an unqualified universal *“best way”* to solve a given problem in the abstract. And what is needed to be done is to understand the particular situations that requires one to attend to such problems. Compromise is a given, and the only way to get better is to practice, practice, practice. Abstract solutions are called algorithms, but how that algorithm is implemented depends on what it will be implemented on-the machine.
 
 For novices, it should be made clear that being taught tools (e.g algorithms, data structures, paradigms, idioms, etc), does not imply that the “correct way” to do things has been learnt. The “correct way” is heavily specific to the problem domain; this cannot be taught but only learnt through experience over many years. Actualizing abstract ideas into reality is difficult to do, even for veterans to programming.
 
-Aiming to abstract/generalize a problem is a recipe for disaster, especially for novices, because it is rarely ever the case problems are abstract/general. Most problems are particular/specific, and require knowledge of the domain of that problem. Application is should not be separated from the teaching of the topic. Try to solve the *specific* problem that is actually at hand, not a *general* problem that *might* exist 
+Aiming to abstract/generalize a problem is a recipe for disaster, especially for novices, because it is rarely ever the case problems are abstract/general. Most problems are particular/specific, and require knowledge of the domain of that problem. Application is should not be separated from the teaching of the topic. Try to solve the *specific* problem that is actually at hand, not a *general* problem that *might* exist
 
 https://www.gingerbill.org/article/2020/05/31/progamming-pragmatist-proverbs/. Programming is an inherently practical endeavour rather than a theoretical one. And its teaching should reflect that. Theory is important, but most programmers do not want to, nor should they, have to become mathematicians in order to understand the application of anything.
 

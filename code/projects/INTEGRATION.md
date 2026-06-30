@@ -8,8 +8,8 @@ The OdinRAG repo ships the **scaffold** for a project: `code/projects/_TEMPLATE_
 
 **Actual project code is personal and never pushed.** Two options:
 
-1. **Inside the repo (recommended for Kilo context)** — clone `_TEMPLATE_` to `code/projects/<your-project>/`. The folder is gitignored via `/code/projects/*/` in `.gitignore`. Kilo sees your code, you get AI assistance, nothing leaks to git.
-2. **Outside the repo (strict IP isolation)** — clone `_TEMPLATE_` somewhere like `D:\OdinProjects\<your-project>\`. The repo stays 100% clean.
+1. **Inside the repo (recommended for Kilo context)** - clone `_TEMPLATE_` to `code/projects/<your-project>/`. The folder is gitignored via `/code/projects/*/` in `.gitignore`. Kilo sees your code, you get AI assistance, nothing leaks to git.
+2. **Outside the repo (strict IP isolation)** - clone `_TEMPLATE_` somewhere like `D:\OdinProjects\<your-project>\`. The repo stays 100% clean.
 
 Both work. Option 1 is more convenient; option 2 is more IP-secure. The repo's public state is identical in both cases.
 

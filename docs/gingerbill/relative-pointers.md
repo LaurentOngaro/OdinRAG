@@ -7,9 +7,9 @@
 Pointers are a value type in programming languages that store a memory address. A pointer *references* a location in memory, and obtaining the value stored at this location in memory is known as *dereferencing* a pointer.
 Pointers are part and parcel of using languages like C, and are an extremely powerful tool. Pointers can be treated as a form of reference type, a value that refers to another typed value in memory.
 
-When most people think of a pointer, they usually treat them as if the pointer refers a physical memory address. I will call this form of pointer an *absolute* pointer. On most modern machines with virtualized memory, this is rarely the case any more, and for good reasons 
+When most people think of a pointer, they usually treat them as if the pointer refers a physical memory address. I will call this form of pointer an *absolute* pointer. On most modern machines with virtualized memory, this is rarely the case any more, and for good reasons
 
-Virtualized memory has many security, safety, and practical benefits.. In the case of virtualized memory spaces, these pointers do not refer to a physical memory address but rather an alias to a physical memory address, in which usually the operating system handles on a per page basis 
+Virtualized memory has many security, safety, and practical benefits.. In the case of virtualized memory spaces, these pointers do not refer to a physical memory address but rather an alias to a physical memory address, in which usually the operating system handles on a per page basis
 
 I will not discuss how virtual memory works or its benefits in this article.. In a sense, these pointers that belong to virtualized memory spaces can be classed as a form of *relative* pointer.
 
@@ -19,10 +19,10 @@ At the end of the day, a pointer can be treated/encoded as if it was an integer 
 
 In general, there are four forms of relative pointers:
 
-- Virtual memory pointers—relative to the virtualized memory space
-- Global-based pointers—relative to a global variable
-- Offset pointers—relative to an explicitly defined base, such as the beginning of a file
-- Self-Relative/Auto-Relative pointers—relative to its own memory address
+- Virtual memory pointers-relative to the virtualized memory space
+- Global-based pointers-relative to a global variable
+- Offset pointers-relative to an explicitly defined base, such as the beginning of a file
+- Self-Relative/Auto-Relative pointers-relative to its own memory address
 
 ## Global-Based Pointers
 
@@ -192,7 +192,7 @@ Relative pointers allow for a lot more flexibility compared to “traditional”
 
 ### Sergiy Migdalskiy - Performance Optimization, SIMD and Cache (at 26 minutes)
 
-  
+
 
 ### Jonathan Blow - Demo: Relative Pointers
 

@@ -12,23 +12,23 @@ I wanted that explicitly because I know what the alternative is and the problems
 
 I’ll start with a specific example of a need to swap out the default string type. One such case would be the need for a string type that has inlined-data for small strings but still has the same *interaction* syntax as another/default string type. I’d easily argue that this is an “optimization” of a problem that should not have happened in the first place.
 
-It is an indirect consequence of both automatic-memory-management (which means defaulting to “the heap”) *AND* treating strings as an overloaded construct of the string value, string builder, and the backing buffer for a string 
+It is an indirect consequence of both automatic-memory-management (which means defaulting to “the heap”) *AND* treating strings as an overloaded construct of the string value, string builder, and the backing buffer for a string
 
-I’ve written an article on this too: [String Type Distinctions](https://www.gingerbill.org/article/2024/04/05/string-type-distinctions/).. I remember when Facebook did a similar “optimization” for their string 
+I’ve written an article on this too: [String Type Distinctions](https://www.gingerbill.org/article/2024/04/05/string-type-distinctions/).. I remember when Facebook did a similar “optimization” for their string
 
 [CppCon 2016: Nicholas Ormrod “The strange details of std::string at Facebook”](https://www.youtube.com/watch?v=kPR8h4-qZdk%3E) and found a ~1% reduction in memory usage, which is not small at their scale, however it did show how strings were being used. Now that’s because their string type was an amalgamation of a builder and value and backing (`ptr+len+cap`). But it did allow their inlining amount allowed for more embedding because they had so many extra fields to “overlap” with.
 
 A popular user-library in Rust is [`cold_string::ColdString`](https://docs.rs/cold-string/latest/cold_string/), and its approach to this “optimization” is a little more interesting because it’s opting for using only a tagged pointer which is either inline an ASCII or UTF-8 string or points to a Pascal String. As long as the string is <= 8 bytes UTF-8 or ASCII (on 64-bit machines), then the `ColdString` does minimize heap memory usage (assuming a lot of common strings are small).
 
-Odin’s `string` type was chosen as the default because at most it “wastes” an extra 8-9 bytes and allows for trivial substring creation. But because Odin is a manual memory managed language, you are free to choose how that memory is allocated. Whilst in Rust, things are much more assumed to be “automatic” most of the time, and thus heap will be the general default 
+Odin’s `string` type was chosen as the default because at most it “wastes” an extra 8-9 bytes and allows for trivial substring creation. But because Odin is a manual memory managed language, you are free to choose how that memory is allocated. Whilst in Rust, things are much more assumed to be “automatic” most of the time, and thus heap will be the general default
 
 Rust does allow for a global custom allocator, or general manual memory management, but it’s not what is encouraged by the design of the language itself..
 
 Odin also has ways to allow for struct fields to be interpreted at runtime as if they are a string if they want to be used by serializers/formatted-printing, which also helps with the usage. Rust has this too but in a much more specific macro approach (and thus preferred to be compile time). Thus separating the serialization aspects of the type from the type itself.
 
-## Arrays—What Always Happens
+## Arrays-What Always Happens
 
-What is interesting is that the common examples of user-level data structures that people want with what you call “blessed syntax” are virtually always some sort of custom array type. It is rare that people want this for anything BUT an array-like data structure, and when they do want something different, I’d argue it is *always* a bad idea to give it any form of “blessed syntax” 
+What is interesting is that the common examples of user-level data structures that people want with what you call “blessed syntax” are virtually always some sort of custom array type. It is rare that people want this for anything BUT an array-like data structure, and when they do want something different, I’d argue it is *always* a bad idea to give it any form of “blessed syntax”
 
 LISP Enjoyers will clearly disagree with me here, but we do have different philosophical approaches to programming in general, and thus this disagreement..
 
@@ -44,12 +44,12 @@ There is also the question of compound literals to initialize array-like data st
 
 ## Odin’s Alternative to Operator Overloading
 
-When I designed Odin, I thought what do the vast majority of people use operator overloading from in practice, and just implement that directly into the language—solving the common case rather than the general case. And from my research, the general use cases fell into two categories:
+When I designed Odin, I thought what do the vast majority of people use operator overloading from in practice, and just implement that directly into the language-solving the common case rather than the general case. And from my research, the general use cases fell into two categories:
 
 - Overloading for mathematical types
 - Overloading for array-like data structures (including strings and hash maps)
 
-For mathematical types, Odin supports array programming natively, complex numbers, matrices 
+For mathematical types, Odin supports array programming natively, complex numbers, matrices
 
 Matrices are “dense” in Odin and allocated inline “on the stack”. This decision was made because generalized matrices which are larger than a certain size are better optimized with a different memory layout and access patterns., and `#simd` operations. In general, this solved the vast vast majority of needs for mathematical types in the language, and even gets better optimizations for those cases by default because the language has native semantics for them.
 
@@ -64,7 +64,7 @@ For array-like data structures, Odin has a lot of built-in data structures which
 - simd-vectors `#simd[N]T`
 - hash maps `map[K]V`
 - enumerated arrays `[Enum]T`
-- matrices `matrix[R, C]T` 
+- matrices `matrix[R, C]T`
 
   Note there is some overlap with fixed-length arrays, simd-vectors, and matrices which apply to mathematical types too.
 
@@ -84,7 +84,7 @@ Hash maps `map[K]V` are another in which the semantics could not be easily dealt
 - overload operators and/or traits for or comparisons and hashing
 - just rely on a default hashing approach.
 
-Odin’s approach is to deal with the common case but not making too many assumptions due to it being a manual-memory-managed language 
+Odin’s approach is to deal with the common case but not making too many assumptions due to it being a manual-memory-managed language
 
 A good example of this is `map[string]V`. `map` does not “manage” the memory of the `string` based keys. The user is responsible for managing that memory. If it did managed it, it would be an exception of the general case which would not be consistent for other things (e.g. strings within a comparable struct).. The way Odin works is that the comparable types will have a default hash function generated for them any time they are used as a `map` key (this hash function *cannot* be overridden, by design). It does mean that the hashing function might not be the optimal one for every use case, but it will be more than good enough for the vast majority of cases. If a user actually needs something more specialized for the hash map, then it is recommend you do not use the default one and use a custom variant, and have that syntax be obvious it is something custom.
 
@@ -136,7 +136,7 @@ I’m using these languages as examples, not an exhaustive list. This could easi
 - The [Pragmatic Programmer](https://www.gingerbill.org/article/2020/05/31/programming-pragmatist-proverbs/) has defaults which use the “blessed syntax” and then anything else beyond that is clear that it is custom/user-level, and it encourages the usage of the built-in data structures over custom ones, which is better most of the time for most people 
 
   Assuming the language isn’t actually C since that it doesn’t even have a proper non-demoting array type..
-- Whilst the Generalizable Programmer wants to have the same syntax for the built-in features/constructs for their user-level types, in order to be able to *hide* the abstractions—optimizing for things like “refactoring”. This means now the user now has to think which “defaults” to use a little more, even if those defaults may be a bad choice.
+- Whilst the Generalizable Programmer wants to have the same syntax for the built-in features/constructs for their user-level types, in order to be able to *hide* the abstractions-optimizing for things like “refactoring”. This means now the user now has to think which “defaults” to use a little more, even if those defaults may be a bad choice.
 
 Both of these camps have different takes on what “ergonomics” means, and I’d argue it’s not merely *just* a syntax thing. Ergonomics is designing for humans and that does not mean just designing for “syntax” or “typing” or any of that. It can even mean designing to slow people down or nudge them to do something different. The act of making something difficult to do in a language, the latter camp would probably class that as “terrible ergonomics”, but interestingly it could be viewed by the former-camp as “brilliant ergonomics”. It’s all about what you are trying to *optimize* for in the domain of *ergonomics*.
 

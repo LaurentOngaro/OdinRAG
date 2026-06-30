@@ -1,12 +1,12 @@
 // Personal OdinRAG config.
 // Copy this file to _Helpers/.private/user_config.jsonc and fill in your values.
-// The .private/ folder is gitignored — this file stays local.
+// The .private/ folder is gitignored - this file stays local.
 //
 // Usage:
 //   1. cp _Helpers/docs/user_config.example.jsonc _Helpers/.private/user_config.jsonc
 //   2. Edit the copy with your actual paths and credentials.
 //   3. Set SKOOL_PASSWORD as an env var (NEVER commit passwords).
-//   4. Restart your scripts — they read this file on every call.
+//   4. Restart your scripts - they read this file on every call.
 //
 // Fallback chain per value: env var (if listed) > this JSONC > empty string.
 // Scripts that get an empty string will warn you at startup.
@@ -42,7 +42,7 @@
 
   "skool": {
     // Skool credentials for scrape_skool.py.
-    // PASSWORD must NEVER live in this file — use the SKOOL_PASSWORD env var.
+    // PASSWORD must NEVER live in this file - use the SKOOL_PASSWORD env var.
 
     // Env var: SKOOL_EMAIL
     "email": ""

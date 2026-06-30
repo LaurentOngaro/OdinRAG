@@ -212,7 +212,7 @@ add :: proc(
 	if to_write > len(source) {
 		to_write = len(source)
 	}
-	
+
 	for samp_idx in 0..<to_write {
 		t := f32(samp_idx) / f32(to_write)
 		volume := math.lerp(volume_start, volume_end, t)
@@ -458,7 +458,7 @@ Thanks for reading!
 
 If you want to support the creation of Karl2D, then support me by sponsoring me on [GitHub](https://github.com/sponsors/karl-zylinski) or [Patreon](https://www.patreon.com/karl_zylinski).
 
-Further reading on this topic: [Writing a Low-Level Sound System — You Can Do It!](https://ruby0x1.github.io/machinery_blog_archive/post/writing-a-low-level-sound-system/index.html) on the Our Machinery blog archive.
+Further reading on this topic: [Writing a Low-Level Sound System - You Can Do It!](https://ruby0x1.github.io/machinery_blog_archive/post/writing-a-low-level-sound-system/index.html) on the Our Machinery blog archive.
 
 Have a nice day!
 /Karl
@@ -482,7 +482,7 @@ update_audio_mixer :: proc() {
 	if ab.remaining_samples() > (3 * AUDIO_MIX_CHUNK_SIZE)/2 {
 		return
 	}
-	
+
 	// We are going to go past the end of the mix_buffer, so just hop to the start instead. It's
 	// 1 megabyte big, so hopping over a few bytes at the end is OK.
 	if (s.mix_buffer_offset + AUDIO_MIX_CHUNK_SIZE) > len(s.mix_buffer) {
@@ -491,7 +491,7 @@ update_audio_mixer :: proc() {
 
 	// A slice of the mixed samples we are going to output.
 	out := s.mix_buffer[s.mix_buffer_offset:s.mix_buffer_offset + AUDIO_MIX_CHUNK_SIZE]
-	
+
 	// Zero out old mixed data from buffer (the buffer is "circular", there may be old stuff in
 	// the `out` slice).
 	slice.zero(out)
@@ -511,7 +511,7 @@ update_audio_mixer :: proc() {
 		if to_write > len(source) {
 			to_write = len(source)
 		}
-		
+
 		for samp_idx in 0..<to_write {
 			t := f32(samp_idx) / f32(to_write)
 			volume := math.lerp(volume_start, volume_end, t)
@@ -536,12 +536,12 @@ update_audio_mixer :: proc() {
 		pan_start: [2]f32,
 		pan_end: [2]f32,
 	) -> int {
-		
+
 		dest_idx: int
 		for ; dest_idx < num_dest; dest_idx += 1 {
 			src_pos := source_offset + f32(dest_idx) * dest_source_ratio
 			src_idx := int(src_pos)
-			
+
 			if src_idx >= len(source) {
 				break
 			}
@@ -622,11 +622,11 @@ update_audio_mixer :: proc() {
 		if volume_start == volume_end && volume_end == 0 {
 			continue
 		}
-		
+
 		pan_start := clamp(inst.pan, -1, 1)
 		pan_end := clamp(move_towards(inst.pan, inst.target_pan, adjust_parameter_delta), -1, 1)
 		inst.pan = pan_end
-		
+
 		// Use cos/sine to get a constant-power audio curve. This means that the sound won't get
 		// quieter in the middle, but will instead just pan.
 		pan_stereo_start := [2]f32 {
@@ -641,7 +641,7 @@ update_audio_mixer :: proc() {
 
 		interpolate := data.sample_rate != AUDIO_MIX_SAMPLE_RATE || pitch != 1
 		num_mixed: int
-		
+
 		if interpolate {
 			samples_per_mixer_sample := (pitch*f32(data.sample_rate))/f32(AUDIO_MIX_SAMPLE_RATE)
 
@@ -656,14 +656,14 @@ update_audio_mixer :: proc() {
 				pan_stereo_start,
 				pan_stereo_end,
 			)
-			
+
 			num_mixed_f32 := f32(num_mixed) * samples_per_mixer_sample
 			fraction_advance := ps.offset_fraction + num_mixed_f32
 
 			// The fraction advance may become larger than 1, in which case the offset needs to eat
 			// the integer part.
 			ps.offset += int(fraction_advance)
-			
+
 			ps.offset_fraction = linalg.fract(fraction_advance)
 		} else {
 			num_mixed = add(
@@ -675,7 +675,7 @@ update_audio_mixer :: proc() {
 				pan_stereo_start,
 				pan_stereo_end,
 			)
-			
+
 			ps.offset += num_mixed
 			ps.offset_fraction = 0
 		}

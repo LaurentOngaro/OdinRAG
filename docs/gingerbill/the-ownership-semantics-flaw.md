@@ -22,31 +22,31 @@ A general list of definitions of terminology used within this article in order t
 
 ## Foundations of the Object Orientation Paradigm
 
-Though the original conception of the term coined by Alan Kay 
+Though the original conception of the term coined by Alan Kay
 
 “I thought of objects being like biological cells and/or individual computers on a network, only able to communicate with messages (so messaging came at the very beginning – it took a while to see how to do messaging in a programming language efficiently enough to be useful).” - Alan Kay, 2003 <http://userpage.fu-berlin.de/~ram/pub/pub_jf47ht81Ht/doc_kay_oop_en> was never used as he intended it to be, the term *Object Orient(at)ed Programming (OOP)* has been commonly understood to be a paradigm of structuring a program around the concept of *Objects*, commonly through coupling data and code into a single unit. Many languages support multiple paradigms, including aspects for the OOP paradigm, but I would class those as multiparadigm rather than being *solely* an OOP language.
 
 Most languages implement *Objects* and *Classes* in the Simula tradition; most of the notable OOP languages have a similar form by defining methods (member functions) within the class definition. Traditionally languages such as Java can be classed as *solely* an OOP language.
 
-Most traditional OOP languages are based around the concept of *inheritance*, a mechanism of deriving a class data type from another class data type and retaining similar information. Most people generally view inheritance as a combination of [subtyping](https://en.wikipedia.org/wiki/Subtyping) and [dynamic dispatch](https://en.wikipedia.org/wiki/Dynamic_dispatch) through [virtual method tables (vtables)](https://en.wikipedia.org/wiki/Virtual_method_table). This has lead to many discussions asking whether a language can be called as OOP if it does not support inheritance 
+Most traditional OOP languages are based around the concept of *inheritance*, a mechanism of deriving a class data type from another class data type and retaining similar information. Most people generally view inheritance as a combination of [subtyping](https://en.wikipedia.org/wiki/Subtyping) and [dynamic dispatch](https://en.wikipedia.org/wiki/Dynamic_dispatch) through [virtual method tables (vtables)](https://en.wikipedia.org/wiki/Virtual_method_table). This has lead to many discussions asking whether a language can be called as OOP if it does not support inheritance
 
 The [Go programming language](https://golang.org/) does not support inheritance. However under my definition, Go is an OOP language but is designed around (implicit) `interface`s (a form of [type-classes](https://en.wikipedia.org/wiki/Type_class) or [structural typing](https://en.wikipedia.org/wiki/Structural_type_system)) as a way to compose objects, and methods can be applied to any user defined type; not just record types..
 
-In recent times, *inheritance* has been falling out of fashion in favour of *composition* 
+In recent times, *inheritance* has been falling out of fashion in favour of *composition*
 
 <https://en.wikipedia.org/wiki/Composition_over_inheritance>. This is mostly due to the issue of conforming a *class* to a strict (singular) hierarchy of agency when in reality, things can belong to many (if not infinite) categories and hierarchies, as well as another aspect which I will be discussing throughout this article.
 
-There are many criticisms of OOP 
+There are many criticisms of OOP
 
-<https://www.youtube.com/watch?v=QM1iUe6IofM> 
+<https://www.youtube.com/watch?v=QM1iUe6IofM>
 
-<http://www.stlport.org/resources/StepanovUSA.html> 
+<http://www.stlport.org/resources/StepanovUSA.html>
 
-<https://groups.google.com/forum/#!topic/comp.os.plan9/VUUznNK2t4Q%5B151-175%5D> 
+<https://groups.google.com/forum/#!topic/comp.os.plan9/VUUznNK2t4Q%5B151-175%5D>
 
-<https://commandcenter.blogspot.com/2012/06/less-is-exponentially-more.html> 
+<https://commandcenter.blogspot.com/2012/06/less-is-exponentially-more.html>
 
-<http://harmful.cat-v.org/software/OO_programming/> 
+<http://harmful.cat-v.org/software/OO_programming/>
 
 <http://harmful.cat-v.org/software/OO_programming/why_oo_sucks> but my general criticism is that by placing emphasis on trying to solve problem in the type system, it shifts focus from the data structures and algorithms, [the core of what a program fundamentally is](/article/2020/05/31/progamming-pragmatist-proverbs/#the-concept-of-programming).
 
@@ -81,7 +81,7 @@ I will not go into depth about the other main aspects of OOP such as encapsulati
 
 ## Foundations of the Ownership Semantics Paradigm
 
-[C++11](https://en.wikipedia.org/wiki/C%2B%2B) introduced the concept of *move semantics* or *ownership semantics* (OS), a way to minimize the copying of data through copy constructors. It utilizes the added concept of r-value references (`T &&`) as a means to do this. However, the concept began to be used for a lot more than its basic purpose. The concept adds the high level abstraction of “moving” objects rather than “copying” objects. Physically, a computer only ever copies and this high level abstraction, to treat objects *as if* they were “real objects”, is not what actually happens. It is also a [category error](https://en.wikipedia.org/wiki/Category_mistake) to treat them as “real objects” since “real objects” and “programming objects” have little connection with each other ontologically. When a value or object is “moved”, this means is that the *responsibilities* of the resources of that object have been transferred to another object or environment—*agents*. In this case, ownership/move semantics is fundamentally based around the *responsibilities of values* by tracking value usage.
+[C++11](https://en.wikipedia.org/wiki/C%2B%2B) introduced the concept of *move semantics* or *ownership semantics* (OS), a way to minimize the copying of data through copy constructors. It utilizes the added concept of r-value references (`T &&`) as a means to do this. However, the concept began to be used for a lot more than its basic purpose. The concept adds the high level abstraction of “moving” objects rather than “copying” objects. Physically, a computer only ever copies and this high level abstraction, to treat objects *as if* they were “real objects”, is not what actually happens. It is also a [category error](https://en.wikipedia.org/wiki/Category_mistake) to treat them as “real objects” since “real objects” and “programming objects” have little connection with each other ontologically. When a value or object is “moved”, this means is that the *responsibilities* of the resources of that object have been transferred to another object or environment-*agents*. In this case, ownership/move semantics is fundamentally based around the *responsibilities of values* by tracking value usage.
 
 In this model of agency, the arena of agency can take on many forms, such as blocks, procedure bodies, or aggregate values. Therefore some *owned-values* also *own* other values, and thus a value could have agency.
 
@@ -120,7 +120,7 @@ When using Rust (or move semantics to their full extent in C++11), most people w
 
 Getting used bypassing the borrow checker to reduce fighting implies people have just found a way to cope with the constraints it imposes. (especially newcomers to the language or people swapping between different languages). Many people have found approaches to reduce these issues:
 
-- Keep blocks small, structs small, etc—this reduces the size of the arena of agency and thus reduces the amount of responsibility it must take care of
+- Keep blocks small, structs small, etc-this reduces the size of the arena of agency and thus reduces the amount of responsibility it must take care of
 - Minimize self references in structs, i.e. graph-like data structures are difficult to implement using references
 - `Cel`, `RefCell`, `Ref`, and `Rc` are more common than many would like
 - Use indices/handles instead of references
@@ -135,7 +135,7 @@ Ownership semantics are a form of an [affine substructural type system](https://
 
 Whilst writing this article, I did not realize that this was already developed, and I accidentally rediscovered substructural type systems and linear logic, and had my own terminology for it. However, it is more appropriate to the more commonly used terminology. 
 
-`XnYo` (X-use Y-owners), `?` (0/1), `2+` (2 or more), `N` (arbitrary uses)  
+`XnYo` (X-use Y-owners), `?` (0/1), `2+` (2 or more), `N` (arbitrary uses)
 Examples:
 
 - `1u1o` (1-use 1-owner, linear owned-value)

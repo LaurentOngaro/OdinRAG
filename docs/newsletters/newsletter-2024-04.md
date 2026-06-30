@@ -77,7 +77,7 @@ myInput : cstring
 // In main loop
 raylib.GuiTextBox({0, 0, 200, 30}, myInput, 255, true)
 ```odin
-It will segfault the moment you’ll try to type or delete a letter. And you can’t just pass a pointer to this string — the compiler wouldn’t let you.
+It will segfault the moment you’ll try to type or delete a letter. And you can’t just pass a pointer to this string - the compiler wouldn’t let you.
 
 But the friendly community helped me out with that case. All I need to do is create a buffer memory for that string before using it:
 
@@ -131,7 +131,7 @@ cd :: proc(dir: cstring) -> (result: bool) {
     }
     return adir && !bdir
   })
-  filesPtr = raw_data(files)  
+  filesPtr = raw_data(files)
   filesCount = auto_cast len(files)
   fileListScrolling = 0
   fileListActive = -1
@@ -166,7 +166,7 @@ The platforms are constructed in GLSL shader code by projecting and extruding 2D
 
 ### Why Odin [#](#why-odin-1)
 
-I discovered Odin through my research into Data Oriented Programming. This is the 3rd game I’ve programmed in Odin. What I like about Odin is how a lot of the tedious work you had to do manually in C is delegated to the compiler or built into the language—there’s no need for function declarations, no need to worry about the order of definitions, no need to name all the source files and all the libraries as arguments to the build command. A great example of this is the explicit procedure overloading: you can refer to a set of procedures by the same name and the compiler can determine which one you wanted to call by the arguments you provided, or panic otherwise.
+I discovered Odin through my research into Data Oriented Programming. This is the 3rd game I’ve programmed in Odin. What I like about Odin is how a lot of the tedious work you had to do manually in C is delegated to the compiler or built into the language-there’s no need for function declarations, no need to worry about the order of definitions, no need to name all the source files and all the libraries as arguments to the build command. A great example of this is the explicit procedure overloading: you can refer to a set of procedures by the same name and the compiler can determine which one you wanted to call by the arguments you provided, or panic otherwise.
 
 One weakness is that much of the standard library is missing human-language descriptions of what procedures do and examples of how to use them, but they are quite sensibly named and whatever you can’t infer from the type schema and the name, you can find out from reading the source code and Odin code is quite readable.
 

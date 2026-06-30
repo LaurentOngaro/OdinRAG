@@ -4,7 +4,7 @@
 
 It is lovely to see many new programming languages being produced to solve different issues that the designers are trying to address. Many of the new big ones include Rust, Go, and Swift, all of which are trying to solve different problems. There are some not-as-big programming languages that I recommend everyone to checkout:
 
-- [Odin](https://www.gingerbill.org/odin/) 
+- [Odin](https://www.gingerbill.org/odin/)
 
   For those who do not know, I am the creator of the [Odin programming language](https://www.gingerbill.org/odin/).
 - [Scopes](http://scopes.rocks)
@@ -14,8 +14,6 @@ They are all very good languages but with entirely different philosophies behind
 
 Which brings to me to the latest talk by [Andrew Kelley](https://twitter.com/andy_kelley) about his programming language, [Zig](https://ziglang.org/), titled *[The Road to Zig 1.0](https://chariotsolutions.com/screencast/philly-ete-2019-andrew-kelley-the-road-to-zig-1-0/)*. In this talk, Andrew presents the Zig programming language as a programming language for maintaining robust reusable software with a tour of the unique features of that Zig has. I recommend watching the talk before reading this article to make your own decision about it.
 
-  
-
 ## Opening
 
 The talk opens with the [xkcd comic 2030](https://www.xkcd.com/2030/) regarding the fragility and terrifying nature of software compared to engineering disciplines; with Andrew commenting that “we can do better than this”. I agree with this basic premise however, I do not agree with Andrew’s philosophical approach to aid this issue, and in general the entire philosophy behind Zig. Andrew’s two key points to improving the problem are:
@@ -23,11 +21,11 @@ The talk opens with the [xkcd comic 2030](https://www.xkcd.com/2030/) regarding 
 - Write quality software (compared to writing crappy software)
 - Promote code reuse (compared to preventing code reuse)
 
-From experience of programming and the current programming culture, the second should be rephrased to “promote reuse of quality code” as with the rise of package managers and library repositories, code is being reused quite a lot, even if that code is not at all robust. This crappy code reuse as resulted in many of the infamous dependency hells 
+From experience of programming and the current programming culture, the second should be rephrased to “promote reuse of quality code” as with the rise of package managers and library repositories, code is being reused quite a lot, even if that code is not at all robust. This crappy code reuse as resulted in many of the infamous dependency hells
 
 See the Left-Pad Package causing severe issues across many other piece of code, <https://en.wikipedia.org/wiki/Npm_(software)#Notable_breakages>..
 
-However, my biggest gripe is the first point: write quality software. I wholeheartedly believe that writing quality software is not due to the issues of the programming language but the lack of incentives to make quality software and general culture around programming 
+However, my biggest gripe is the first point: write quality software. I wholeheartedly believe that writing quality software is not due to the issues of the programming language but the lack of incentives to make quality software and general culture around programming
 
 For a possible way to improve the culture, please see the [Handmade.Network](https://handmade.network/manifesto). Humans are flawed beings and are incentive focused. Unless we have an incentive to do something, we are very unlikely to do it. There are many languages that are striving for robustness in the code, such as Rust and Ada, but to ensure robustness and quality, a robust and quality culture will be required to enforce it.
 
@@ -42,11 +40,11 @@ Andrew then precedes to talk about many of the things which will prevent softwar
 These points are only mildly related to producing *quality software* and closer to concerns about performance, ease of use, safety, and compatibility. I appreciate the caveats do not fit on the slide but many of these points do seem to be a completely different issue to the what question of *quality software*.
 
 - Garbage collection (and automatic memory management in general) has its uses in certain problem domains and in those domains, it does not reduce the quality of that software.
-- Automatic heap allocation is more of a problem with the language (and third party code) doing things behind the back of the developer which may have performance implications. I have never had a program cause a system to run out of memory in real software (other than artificial stress tests). If you are working in a low-memory environment, you should be extremely aware of its limitations and plan accordingly 
+- Automatic heap allocation is more of a problem with the language (and third party code) doing things behind the back of the developer which may have performance implications. I have never had a program cause a system to run out of memory in real software (other than artificial stress tests). If you are working in a low-memory environment, you should be extremely aware of its limitations and plan accordingly
 
   I have discussed this issue before with Andrew and I really do not see this as much of an issue as he does. If you are a desktop machine and run out of memory, don’t try to recover from the panic, quit the program or even shut-down the computer. As for other machinery, plan accordingly!.
 - A piece of software doesn’t need to be as fast as C to be quality software. If the performance is within a certain margin and/or the performance of your code has little overhead for the problem-at-hand (e.g. a one-off task), then the clarity of the code is much more important than its performance. This is why Python is so popular in the scientific community as prototyping/glue language, with the actual heavy-lifting done by C/FORTRAN bindings to the highly optimized code.
-- A lack of C ABI is an issue if you need your software to interface with other software but as I said, this has nothing to do with quality software itself rather compatibility with other software 
+- A lack of C ABI is an issue if you need your software to interface with other software but as I said, this has nothing to do with quality software itself rather compatibility with other software
 
   And aiding your programming language with interfacing with foreign code and help it get more widely adopted..
 - Complicated build systems is mostly a cultural issue where people are either told to use a certain approach or learn about “best practices”.
@@ -84,7 +82,7 @@ This `when` statement is clearer to read and because it is denoted different, it
 
 My biggest issue with the design of the Zig language, which is demonstrated in this talk, is that “error values” are built into the language itself. In a [previous article](/article/2018/09/05/exceptions-and-why-odin-will-never-have-them/), I discuss the issues with exceptions, error handling, and error propagation. Zig’s *error* types have a similar syntax to exceptions but they do not share the same internals as exceptions in that they are handled as part of the return values rather than through unwinding the stack (or some similar mechanism). Andrew comments that people are lazy (which they are) and will do whatever the default way is, so why not at least get them to handle things “correctly?” and “make handling errors fun”.
 
-Firstly, error handling should not be fun—it should be painless. It’s akin to saying paying taxes should be fun. It will never be fun, but you can remove a lot of the drudge work from it. Secondly, as I previously wrote, my issue with exception-based/exception-like errors is not the syntax but how they encourage error propagation. This encouragement promotes a culture of pass the error up the stack for “someone else” to handle the error. I hate this culture and I do not want to encourage it at the language level. Handle errors there and then and don’t pass them up the stack. *You make your mess; you clean it.*
+Firstly, error handling should not be fun-it should be painless. It’s akin to saying paying taxes should be fun. It will never be fun, but you can remove a lot of the drudge work from it. Secondly, as I previously wrote, my issue with exception-based/exception-like errors is not the syntax but how they encourage error propagation. This encouragement promotes a culture of pass the error up the stack for “someone else” to handle the error. I hate this culture and I do not want to encourage it at the language level. Handle errors there and then and don’t pass them up the stack. *You make your mess; you clean it.*
 
 Error propagation is fine within a library/package/module but you ought not to be encouraging propagation *across* library boundaries. There are so many issues I have seen in real life, which lead to *crappy software*, where errors are just left for “someone else” to handle. Error propagation also has the the tendency to remove information about the type of error as it is reduced to a “simpler” error type up the stack. If you are designing a language to aid in producing *quality software*, don’t add a core feature to the language which encourages sloppy habits.
 

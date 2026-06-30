@@ -17,7 +17,7 @@ EmberGen is currently used in over 150 leading game studios. Our games specific 
 
 [](https://jangafx.com/Q12021Launch/Media_Organized/videos/EmberGen/Games/embergen-iterations.mp4)
 
-We get it: simulations and renders usually take forever to get right. That’s why we built EmberGen. Unlike other software, it uses the full power of your GPU—so you can simulate and render volumetric phenomenon in real-time. Not only does EmberGen produce game-ready flipbooks in seconds, it now allows you to create iterations easier and faster than ever before. Utilize random seeds to generate new iterations with rapidity. Do note that all simulations are deterministic, so you can be sure the simulation is the same each time you open your project.
+We get it: simulations and renders usually take forever to get right. That’s why we built EmberGen. Unlike other software, it uses the full power of your GPU-so you can simulate and render volumetric phenomenon in real-time. Not only does EmberGen produce game-ready flipbooks in seconds, it now allows you to create iterations easier and faster than ever before. Utilize random seeds to generate new iterations with rapidity. Do note that all simulations are deterministic, so you can be sure the simulation is the same each time you open your project.
 
 ### Use in Games [#](#use-in-games)
 

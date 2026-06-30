@@ -9,7 +9,7 @@
 
 > Note: this devlog folder is **per-project**. It is gitignored via `/code/projects/*/` in `.gitignore`,
 > so your notes stay local. For KB-maintenance notes (about the OdinRAG repo itself), use the
-> per-project devlog too — just adjust the path accordingly.
+> per-project devlog too - just adjust the path accordingly.
 
 ---
 

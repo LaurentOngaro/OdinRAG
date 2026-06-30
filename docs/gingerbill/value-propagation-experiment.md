@@ -49,7 +49,7 @@ or_else(x.?, true)
 ```odin
 ## Degenerate States
 
-Some people may be a little surprised with my experimentation with this exception-like shorthand with error values. Especially since I wrote an article (which was originally two github comments) titled: [Exceptions — And Why Odin Will Never Have Them](/article/2018/09/05/exceptions-and-why-odin-will-never-have-them/).
+Some people may be a little surprised with my experimentation with this exception-like shorthand with error values. Especially since I wrote an article (which was originally two github comments) titled: [Exceptions - And Why Odin Will Never Have Them](/article/2018/09/05/exceptions-and-why-odin-will-never-have-them/).
 
 One thing I did not comment on in the that article is the cause of the problem (other than the cultural issues). My hypothesis is that if you have a degenerate type ([type erasure](https://en.wikipedia.org/wiki/Type_erasure) or automatic inference), then if a value can convert to it implicitly (easily), people will (ab)use it.
 

@@ -4,17 +4,17 @@ Series: [Syntax and how it Matters](/series/syntax-and-how-it-matters)
 
 2026-02-19
 
-I am still perplexed by how people judge a language purely by its ***declaration*** syntax, and will decide whether to use the language purely based on whether they like that aspect or not 
+I am still perplexed by how people judge a language purely by its ***declaration*** syntax, and will decide whether to use the language purely based on whether they like that aspect or not
 
 I am specifically talking about ***declaration*** syntax here and not other aspects of concrete syntax. Please do not extrapolate further..
 
 The general categories of declarations can be classified as the following:
 
-- `type name = value`—type-focused
-- `name: type = value`—name-focused
-- `var name type = value`—qualifier-focused
+- `type name = value`-type-focused
+- `name: type = value`-name-focused
+- `var name type = value`-qualifier-focused
 
-When designing a language, if your semantics are pretty clear you can trivially change this declaration syntax and the semantics of the language will be mostly the same (if not identical). People seriously think the declaration syntax is what gives a language its “character”. I do not get this train of thought in the slightest 
+When designing a language, if your semantics are pretty clear you can trivially change this declaration syntax and the semantics of the language will be mostly the same (if not identical). People seriously think the declaration syntax is what gives a language its “character”. I do not get this train of thought in the slightest
 
 I probably do have a bias, in that I know how compilers work, but even when I didn’t understand, I chose languages based on my need, not on whether they “looked good”..
 
@@ -22,11 +22,11 @@ I probably do have a bias, in that I know how compilers work, but even when I di
 
 > **Edit**: Concrete syntax does matter a lot which is why I’ve had to write a follow-up article to explain why: [Does Syntax Matter?](https://www.gingerbill.org/article/2026/02/21/does-syntax-matter/)
 
-A programming language is not *merely* its syntax. *Semantics* actually exist, be that [denotation semantics](https://en.wikipedia.org/wiki/Denotational_semantics) 
+A programming language is not *merely* its syntax. *Semantics* actually exist, be that [denotation semantics](https://en.wikipedia.org/wiki/Denotational_semantics)
 
 I’ve always found that focusing on the denotational semantics of a language is more important than focusing on the operational semantics because (for me at least) the operational semantics are “obvious” once the denotational semantics are decided upon., [operational semantics](https://en.wikipedia.org/wiki/Operational_semantics), or [algebraic semantics](https://en.wikipedia.org/wiki/Algebraic_semantics_(computer_science)). The issue is that many inexperienced programmers don’t have this mental distinction and think all languages are mostly the same but with just differing “syntax”. Just wait until they are exposed to a functional programming language or a database language, or even find out that a spreadsheet is a language.
 
-I wrote an article in 2018 
+I wrote an article in 2018
 
 [On the Aesthetics of the Syntax of Declarations](https://gingerbill.org/article/2018/03/12/on-the-aesthetics-of-the-syntax-of-declarations/) about the different families of declaration syntax, but it is still weird to me how people view things when deciding whether to use a language or not. To use my language Odin as an example, do people think this substantially changes the *semantics* if its declaration syntax had these different looks?
 
