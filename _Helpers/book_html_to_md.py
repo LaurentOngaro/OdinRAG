@@ -33,6 +33,9 @@ import re
 import sys
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
 from bs4 import BeautifulSoup, Tag
 from bs4.element import NavigableString
 
@@ -48,7 +51,7 @@ _DESCRIPTION = (
 # Source HTML of Karl's book. Read in this order:
 #   1. CLI argument --src
 #   2. environment variable BOOK_HTML_SRC
-#   3. _Helpers/.private/user_config.json (field paths.karl_book_html)
+#   3. _Helpers/.private/user_config.jsonc (field paths.karl_book_html)
 #   4. empty string (the script will exit with a clear message)
 DEFAULT_SRC = Path(env_or_config("paths.karl_book_html", "BOOK_HTML_SRC"))
 DEFAULT_OUT = Path(
@@ -674,12 +677,20 @@ def main(argv: list[str] | None = None) -> int:
         print(f"[CHECK OK] Ready to convert.")
         return 0
 
-    print(f"Source  : {args.src}")
-    print(f"Output  : {args.out_dir}")
+    src_path = Path(args.src)
+    out_dir = Path(args.out_dir)
+    if not src_path.is_file():
+        print(f"[ERR] Source is not a file: {src_path}", file=sys.stderr)
+        if str(src_path) == ".":
+            print("[TIP] Set BOOK_HTML_SRC env var or configure _Helpers/.private/user_config.jsonc", file=sys.stderr)
+        return 1
+
+    print(f"Source  : {src_path}")
+    print(f"Output  : {out_dir}")
     print()
 
     try:
-        result = convert_book(args.src, args.out_dir)
+        result = convert_book(src_path, out_dir)
     except FileNotFoundError as e:
         print(f"[ERR] {e}", file=sys.stderr)
         return 1
