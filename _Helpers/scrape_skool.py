@@ -65,6 +65,7 @@ from urllib.request import Request, urlopen
 from urllib.error import URLError, HTTPError
 
 # Helpers réutilisables (lib/ + _Helpers/)
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from lib.text_clean import repair_mojibake  # noqa: E402
 from odin_format import format_path_if_odin  # noqa: E402
