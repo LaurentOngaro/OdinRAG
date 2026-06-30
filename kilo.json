@@ -1,0 +1,53 @@
+{
+  "$schema": "https://app.kilo.ai/config.json",
+  "model": "Minimax/Minimax M3",
+  "small_model": "anthropic/claude-haiku-4-5",
+  "default_agent": "code",
+  "instructions": [
+    "AGENTS.md",
+    "README.md",
+    "TODO.md",
+    ".kilo/agents/odin-gamedev.md"
+  ],
+  "skills": {
+    "paths": [
+      ".kilo/skills"
+    ]
+  },
+  "permission": {
+    "bash": {
+      "python _Helpers/scrape_*.py *": "allow",
+      "python _Helpers/scrape-*.py *": "allow",
+      "python _Helpers/download_*.py *": "allow",
+      "python _Helpers/book_html_to_md.py *": "allow",
+      "python _Helpers/format_odin_in_files.py *": "allow",
+      "python _Helpers/fix_mojibake.py *": "allow",
+      "python _Helpers/audit_public_safety.py *": "allow",
+      "python _Helpers/lint_pylance.py *": "allow",
+      "python _Helpers/build_kb_index.py *": "allow",
+      "& '<PATH_TO_ODINFMT>\\odinfmt.exe' *": "allow",
+      "Get-ChildItem *": "allow",
+      "Get-Content *": "allow",
+      "Test-Path *": "allow",
+      "git status *": "allow",
+      "git diff *": "allow",
+      "git log *": "allow",
+      "Remove-Item -Recurse -Force *": "deny",
+      "rm -rf *": "deny",
+      "git push --force *": "deny"
+    },
+    "edit": {
+      "odin-knowledge-base/courses/**/!README.md": "deny",
+      "docs/official/!README.md": "deny",
+      "docs/karl_zylinski/!README.md": "deny",
+      "_Helpers/logs/**": "deny",
+      "**/.private/**": "deny",
+      "**/__pycache__/**": "deny"
+    }
+  },
+  "compaction": {
+    "auto": true,
+    "prune": true
+  },
+  "snapshot": true
+}

@@ -1,0 +1,17 @@
+.git/**/*
+.github/**
+.vscode/**
+.obsidian/**/*
+node_modules/**
+**/node_modules/**
+_Ignore/**/*
+_Templates/**/*
+_Fichiers/**/*
+_History/**
+_Changelogs/**
+_Helpers/archives/**
+_Helpers/artifacts/**
+_Helpers/backups/**
+_Raw/**
+logs/
+**/backups/**

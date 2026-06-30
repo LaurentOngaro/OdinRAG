@@ -1,0 +1,90 @@
+# Odin / OdinRAG
+build/
+*.exe
+*.dll
+*.pdb
+*.exp
+*.lib
+*.obj
+
+# === COPYRIGHTED SCRAPED CONTENT (do NOT publish publicly) ===
+# Skool courses (behind paywall, ToS prohibits redistribution)
+odin-knowledge-base/courses/
+courses/
+
+# Karl Zylinski ebook "Understanding the Odin Programming Language" (paid, do NOT publish)
+# The blog posts are public and shipped in the repo.
+/docs/karl_zylinski/odin-book/*.md
+!/docs/karl_zylinski/odin-book/README.md
+
+# Personal notes (private planning + devlogs)
+/planning/daily/
+/projects/devlog/
+
+# === END COPYRIGHTED CONTENT ===
+
+# Secrets / state
+.env
+**/.private/
+**/Support Files/
+
+# Python
+**/__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+
+# log files
+*.log
+logs/
+
+# Node (skool-cli, mcp servers)
+**/node_modules/
+
+# one-shot (never push raw working notes) / RAW docs
+/_Raw/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*~
+
+# Kilo runtime state (sessions, worktrees, agent-manager UI)
+.kilo/worktrees/
+.kilo/agent-manager.json
+.kilo/sessions/
+.kilo/cache/
+
+# Skill sandbox
+.kilo/skills/*/_index_*.md
+.kilo/skills/*/local.patch
+
+# Obsidian system files
+/.obsidian
+
+# cache files
+.cache/
+
+# backup folders and files
+BAK/
+*backups/
+*.bak
+*.zip
+
+# secrets and credentials
+.env
+.env.*
+*.credential*
+*secret*
+apikeys*
+
+# MCP server credentials (do not commit)
+.kilo/mcp.json
+.vscode/mcp.json
+.kilo/kilo.json

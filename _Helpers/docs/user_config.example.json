@@ -1,0 +1,66 @@
+{
+  "_about": "Personal OdinRAG config. Copy this file to _Helpers/.private/user_config.json and fill in your values. The .private/ folder is gitignored - this file stays local.",
+  "_how_to_use": [
+    "1. Copy: cp _Helpers/docs/user_config.example.json _Helpers/.private/user_config.json",
+    "2. Edit the copy with your actual paths and credentials",
+    "3. Set SKOOL_PASSWORD as an env var (NEVER commit passwords)",
+    "4. Restart your scripts - they read this file on every call"
+  ],
+  "_fallback_chain": "Each value is read in this order: (1) env var if listed, (2) this JSON, (3) empty string. Scripts that get an empty string will warn you at startup.",
+  "paths": {
+    "_comment": "Absolute paths to your local tools and source files. Use forward slashes or double backslashes in JSON strings.",
+    "odinfmt_exe": "",
+    "_odinfmt_exe_env": "ODINFMT_EXE",
+    "_odinfmt_exe_example": "E:/Apps/ols/odinfmt.exe",
+    "odinfmt_config_system": "",
+    "_odinfmt_config_system_env": "ODINFMT_CONFIG_SYSTEM",
+    "_odinfmt_config_system_example": "E:/Apps/ols/odinfmt.json",
+    "yt_dlp_exe": "",
+    "_yt_dlp_exe_env": "YT_DLP_EXE",
+    "_yt_dlp_exe_example": "E:/Apps/Python/Scripts/yt-dlp.exe",
+    "odin_compiler": "",
+    "_odin_compiler_env": "ODIN_COMPILER",
+    "_odin_compiler_example": "E:/Apps/odin/odin.exe",
+    "python_exe": "",
+    "_python_exe_env": "PYTHON_EXE",
+    "_python_exe_example": "E:/Apps/Python/python.exe",
+    "karl_book_html": "",
+    "_karl_book_html_env": "BOOK_HTML_SRC",
+    "_karl_book_html_example": "E:/books/understanding_the_odin_programming_language.html",
+    "karl_book_out": "",
+    "_karl_book_out_env": "BOOK_HTML_OUT",
+    "_karl_book_out_example": "D:/Projects/OdinRAG/docs/karl_zylinski/odin-book",
+    "_karl_book_out_note": "If empty, _Helpers/book_html_to_md.py uses a path relative to the repo root.",
+    "project_root": "",
+    "_project_root_env": "ODINRAG_ROOT",
+    "_project_root_example": "D:/Projects/OdinRAG",
+    "external_odin_projects_dir": "",
+    "_external_odin_projects_dir_env": "ODIN_PROJECTS_DIR",
+    "_external_odin_projects_dir_example": "E:/Elearning/Odin/",
+    "_external_odin_projects_dir_note": "Where you clone + build Odin projects (this repo is NOT a build target).",
+    "temp_dir": "",
+    "_temp_dir_env": "ODINRAG_TEMP",
+    "_temp_dir_example": "T:/TEMP_L~1/kilo"
+  },
+  "skool": {
+    "_comment": "Skool credentials for scrape_skool.py. PASSWORD must NEVER live in this file - use the SKOOL_PASSWORD env var.",
+    "email": "",
+    "_email_env": "SKOOL_EMAIL",
+    "_password_env": "SKOOL_PASSWORD",
+    "_password_note": "Set this env var in your shell, NOT in this JSON. Example: $env:SKOOL_PASSWORD='your-password' on PowerShell."
+  },
+  "scraper": {
+    "_comment": "Optional scraper settings.",
+    "youtube_cookies_file": "",
+    "_youtube_cookies_file_env": "YOUTUBE_COOKIES_FILE",
+    "_youtube_cookies_file_example": "C:/Users/your-name/AppData/Local/google-chrome/Default/Cookies",
+    "_youtube_cookies_file_note": "Path to a Netscape-format cookies file to bypass YouTube bot checks. Leave empty if not using --download-video."
+  },
+  "kb": {
+    "_comment": "Optional expected counts (purely informational). Populate after your first scrape to help the INDEX.md table stay accurate.",
+    "expected_lessons_skool": 0,
+    "expected_files_karl_book": 0,
+    "expected_articles_zylinski": 0,
+    "expected_official_docs": 0
+  }
+}
