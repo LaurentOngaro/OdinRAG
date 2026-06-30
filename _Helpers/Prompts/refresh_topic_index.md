@@ -7,18 +7,18 @@
 - After running the scrapers and seeing the existing INDEX.md "Index by topic" section reference paths that no longer exist
 - After a major KB restructure (new courses, new chapter splits)
 - After ~30+ new files in `odin-knowledge-base/` since the last manual curation
-- **Not** for every scrape — only when the curated section is meaningfully out of date
+- **Not** for every scrape - only when the curated section is meaningfully out of date
 
 ## Inputs (paste these into your Kilo prompt)
 
 ```
-INPUT A — the current "Index by topic (QUICK SEARCH)" section:
+INPUT A - the current "Index by topic (QUICK SEARCH)" section:
 $(cat odin-knowledge-base/INDEX.md | sed -n '/## Index by topic (QUICK SEARCH)/,/## Skill to navigate/p')
 
-INPUT B — list of .md files in the KB (with topic frontmatter tags):
+INPUT B - list of .md files in the KB (with topic frontmatter tags):
 $(find odin-knowledge-base docs -name '*.md' -type f | xargs -I{} sh -c 'echo "=== {} ==="; head -5 "{}"')
 
-INPUT C — frontmatter summary:
+INPUT C - frontmatter summary:
 $(find odin-knowledge-base docs -name '*.md' -type f | xargs -I{} grep -l "topic/" "{}" | head -30)
 ```
 
@@ -48,7 +48,7 @@ TASK
 6. If a new file isn't covered by any current topic, propose a new topic section.
 
 CONSTRAINTS
-- Use real paths from INPUT B only — do NOT invent paths.
+- Use real paths from INPUT B only - do NOT invent paths.
 - Output format: a single Markdown section in "book style":
     ## Index by topic (QUICK SEARCH)
 
@@ -63,7 +63,7 @@ CONSTRAINTS
 
     - ...
 - One paragraph = one line (no artificial wrap, no manual line breaks).
-- Don't invent descriptions — use one phrase per file from its H1 or first paragraph.
+- Don't invent descriptions - use one phrase per file from its H1 or first paragraph.
 - Preserve the [DEPRECATED] markers verbatim from step 5.
 
 OUTPUT
@@ -81,12 +81,12 @@ DO NOT
 2. Open `odin-knowledge-base/INDEX.md`
 3. Find the block between `<!-- BEGIN MANUAL (your curated content - preserved across scrapes) -->` and `<!-- END MANUAL -->`
 4. Replace the `## Index by topic (QUICK SEARCH)` part (preserve the "How this file is generated" part that comes after)
-5. Save 
+5. Save
 
 ## Alternative: skip the script entirely
 
 If you have Kilo (MiniMax-M3) running, you can just say to Kilo:
 
-> _Read `odin-knowledge-base/INDEX.md`, read all `.md` files in `odin-knowledge-base/`, `docs/`, and `code/projects/_TEMPLATE_/`. Propose an updated `## Index by topic (QUICK SEARCH)` section that covers the current KB. Output the new section as a code block — do NOT modify INDEX.md._
+> _Read `odin-knowledge-base/INDEX.md`, read all `.md` files in `odin-knowledge-base/`, `docs/`, and `code/projects/_TEMPLATE_/`. Propose an updated `## Index by topic (QUICK SEARCH)` section that covers the current KB. Output the new section as a code block - do NOT modify INDEX.md._
 
 Kilo will execute the prompt directly. No script needed.
