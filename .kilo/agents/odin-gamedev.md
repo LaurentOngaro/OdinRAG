@@ -49,15 +49,15 @@ The orchestrator (main `code` agent) delegates questions that match these criter
 6. **If the KB is insufficient**: acknowledge the limit, suggest searching in `docs/official/` or the official Odin docs.
 7. **Always cite file paths** when proposing code: "see `xxx.md` line N" rather than "see a previous example".
 
-## When the user works in `code/projets/<project>/`
+## When the user works in `code/projects/<project>/`
 
-If the question concerns code in `code/projets/<project>/src/`, add to context:
+If the question concerns code in `code/projects/<project>/src/`, add to context:
 
-- Read `code/projets/<project>/AGENTS.md` (patterns already implemented, pitfalls identified)
-- Read 1-2 recent devlogs from `code/projets/<project>/devlog/`
+- Read `code/projects/<project>/AGENTS.md` (patterns already implemented, pitfalls identified)
+- Read 1-2 recent devlogs from `code/projects/<project>/devlog/`
 - Adapt KB patterns to the project's specific context
 
-> **See also**: `code/projets/INTEGRATION.md` for the full convention.
+> **See also**: `code/projects/INTEGRATION.md` for the full convention.
 
 ## Response style
 

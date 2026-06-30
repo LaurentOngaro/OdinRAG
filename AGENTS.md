@@ -43,7 +43,7 @@ OdinRAG/
 │   ├── examples/                    demo.odin (official)
 │   ├── gists/                       Public gists (cloneable)
 │   ├── templates/                   Project templates (cloneable)
-│   └── projets/                     Project conventions + template + integration guide
+│   └── projects/                    Project conventions + template + integration guide
 │
 ├── _Helpers/                        ★ SCRIPTS AND LIBRARY
 │   ├── scrape_skool.py              Active: scrapes the programvideogames Skool group

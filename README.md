@@ -36,7 +36,7 @@ OdinRAG/
 │   ├── examples/              ← official demo.odin (1 file, see SOURCES.md § 9)
 │   ├── gists/                 ← 25 public gists from awesome-odin
 │   ├── templates/             ← README with clone instructions (no templates checked-in - see SOURCES.md)
-│   └── projets/               ← project conventions + template + integration guide
+│   └── projects/              ← project conventions + template + integration guide
 │
 ├── _Helpers/                  ← scrapers + utilities (PUBLIC, runnable on your own data)
 │   ├── scrape_skool.py        ← scrapes the programvideogames Skool group

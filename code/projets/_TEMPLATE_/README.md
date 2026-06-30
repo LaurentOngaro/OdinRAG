@@ -32,7 +32,7 @@ Examples:
 
 ```bash
 # From the repo root:
-cd code/projets/<project>
+cd code/projects/<project>
 ls src/                         # see the sources
 cat AGENTS.md                   # context for the AI
 cat devlog/J_*.md | head -50    # history
