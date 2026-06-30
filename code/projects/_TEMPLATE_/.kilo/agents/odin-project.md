@@ -1,7 +1,6 @@
 ---
 description: Subagent dedicated to this project (focus on project-specific Odin patterns). Same conventions as the root `odin-gamedev` agent, but with tighter project context.
 mode: subagent
-model: anthropic/claude-sonnet-4-5
 steps: 15
 temperature: 0.1
 ---
@@ -32,4 +31,3 @@ The orchestrator (`code` agent) delegates questions specific to this project to 
 ## Anti-patterns
 
 - No tabs in code: `odinfmt.json` at the root, `tabs: false, spaces: 2`.
-- No compilation in this repo (reference material only).
