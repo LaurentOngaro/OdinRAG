@@ -26,7 +26,7 @@ Exposes two functions that the scrapers call after writing `.md` or
 
     The path to the `odinfmt.exe` executable is read in this order:
     1. environment variable ODINFMT_EXE
-    2. `_Helpers/.private/user_config.json` (field paths.odinfmt_exe)
+    2. `_Helpers/.private/user_config.jsonc` (field paths.odinfmt_exe)
     3. empty string (calls will fail with a clear message)
 """
 

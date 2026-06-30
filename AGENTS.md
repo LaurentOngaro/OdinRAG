@@ -88,13 +88,13 @@ OdinRAG/
 
 ### User config (personal paths and credentials)
 
-All machine-specific paths and credentials live in a single gitignored file:`_Helpers/.private/user_config.json`.
+All machine-specific paths and credentials live in a single gitignored file:`_Helpers/.private/user_config.jsonc`.
 The loader is `_Helpers/lib/user_config.py`.
 
 Setup:
 
 ```bash
-cp _Helpers/docs/user_config.example.json _Helpers/.private/user_config.json
+cp _Helpers/docs/user_config.example.jsonc _Helpers/.private/user_config.jsonc
 # edit the copy with your actual paths
 ```
 
@@ -109,7 +109,7 @@ Scripts that need personal info read from this config (with env var override):
 | `_Helpers/book_html_to_md.py` | `paths.karl_book_html` | `BOOK_HTML_SRC`                         |
 | `_Helpers/book_html_to_md.py` | `paths.karl_book_out`  | `BOOK_HTML_OUT`                         |
 
-Chain of resolution per value: **env var > user_config.json > empty string**.
+Chain of resolution per value: **env var > user_config.jsonc > empty string**.
 
 ## Conventions
 

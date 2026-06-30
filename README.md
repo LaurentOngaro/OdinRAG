@@ -88,12 +88,12 @@ Requirements: Python 3.10+, `pip install requests beautifulsoup4 markdownify lxm
 
 ### Personal setup (paths and credentials)
 
-All machine-specific paths and credentials live in a single gitignored file: `_Helpers/.private/user_config.json`.
+All machine-specific paths and credentials live in a single gitignored file: `_Helpers/.private/user_config.jsonc`.
 
 Setup:
 
 ```bash
-cp _Helpers/docs/user_config.example.json _Helpers/.private/user_config.json
+cp _Helpers/docs/user_config.example.jsonc _Helpers/.private/user_config.jsonc
 # edit the copy with your actual paths
 ```
 

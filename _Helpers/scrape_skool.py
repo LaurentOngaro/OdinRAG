@@ -95,7 +95,7 @@ SKOOL_GROUP     = "programvideogames"  # nom du groupe Skool
 OUTPUT_DIR     = ROOT_DIR / "odin-knowledge-base" / "courses" / "programvideogames"
 DELAY_BETWEEN  = 1.0   # secondes entre chaque appel Skool (politesse)
 
-# yt-dlp: read in this order - env var YT_DLP_EXE > user_config.json paths.yt_dlp_exe > empty string
+# yt-dlp: read in this order - env var YT_DLP_EXE > user_config.jsonc paths.yt_dlp_exe > empty string
 from _Helpers.lib.user_config import env_or_config
 YT_DLP_EXE     = env_or_config("paths.yt_dlp_exe", "YT_DLP_EXE")
 
@@ -243,11 +243,11 @@ def _parse_credentials_file(path: Path) -> dict[str, str]:
 
 
 def setup_credentials() -> None:
-    """Initialise SKOOL_EMAIL/SKOOL_PASSWORD (env > user_config.json > file > prompt).
+    """Initialise SKOOL_EMAIL/SKOOL_PASSWORD (env > user_config.jsonc > file > prompt).
 
     Priority order:
     1. Environment variables SKOOL_EMAIL / SKOOL_PASSWORD (CI, containers)
-    2. skool.email field of _Helpers/.private/user_config.json
+    2. skool.email field of _Helpers/.private/user_config.jsonc
     3. File .private/skool_credentials.txt
     4. Interactive prompt (password masked via getpass)
     """
@@ -257,7 +257,7 @@ def setup_credentials() -> None:
     # Priority 1: environment variables
     credentials["SKOOL_EMAIL"] = os.environ.get("SKOOL_EMAIL", credentials.get("SKOOL_EMAIL", ""))
     credentials["SKOOL_PASSWORD"] = os.environ.get("SKOOL_PASSWORD", credentials.get("SKOOL_PASSWORD", ""))
-    # Priority 2: _Helpers/.private/user_config.json (skool.email only - password stays env/file/prompt)
+    # Priority 2: _Helpers/.private/user_config.jsonc (skool.email only - password stays env/file/prompt)
     try:
         from _Helpers.lib.user_config import SKOOL as _SKOOL
         if not credentials["SKOOL_EMAIL"]:
