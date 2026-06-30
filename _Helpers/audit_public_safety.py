@@ -35,7 +35,7 @@ FORBIDDEN_PATTERNS = [
     ("courses/programvideogames/", "Legacy Skool cours doublon"),
     ("docs/karl_zylinski/odin-book/", "Karl Zylinski ebook (paid)"),
     ("planning/daily/", "Daily planning personnel"),
-    ("projects/devlog/", "Devlogs personnels"),
+    ("code/projects/<user-project>/", "Personal Odin project code (not part of the RAG)"),
     ("_Raw/", "Captures brutes / one-shot"),
 ]
 

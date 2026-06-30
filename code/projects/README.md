@@ -10,7 +10,7 @@ This folder is for **your own Odin projects** that share the workspace with the 
 2. **Copy** the `_TEMPLATE_/` folder into a subfolder named after your project
 3. **Customise** the `README.md` and `AGENTS.md` (point to the relevant lessons)
 4. **Code** in `src/`, drawing inspiration from the patterns (never copy-paste from the KB)
-5. **Devlog** every session in `devlog/J_YYYY-MM-DD_<topic>.md`
+5. **Devlog** every session in `<your-project>/devlog/J_YYYY-MM-DD_<topic>.md`
 
 ## Naming convention
 

@@ -17,9 +17,8 @@ courses/
 /docs/karl_zylinski/odin-book/**/*.md
 !/docs/karl_zylinski/odin-book/README.md
 
-# Personal notes (private planning + devlogs)
+# Personal notes (private planning)
 /planning/daily/
-/projects/devlog/
 
 # === END COPYRIGHTED CONTENT ===
 
@@ -44,6 +43,10 @@ logs/
 
 # one-shot (never push raw working notes) / RAW docs
 /_Raw/
+
+# Cloned upstream templates (each has its own .git/ — never `git add` the contents)
+/code/templates/*/
+!/code/templates/README.md
 
 # OS
 .DS_Store
@@ -88,3 +91,9 @@ apikeys*
 .kilo/mcp.json
 .vscode/mcp.json
 .kilo/kilo.json
+
+# === Personal Odin project code (NOT public - per-user, not part of the RAG) ===
+# The _TEMPLATE_/ folder is the public scaffold. Any project the user clones there
+# (e.g. `my-game/`, `rpg-prototype/`) is personal work and must never be pushed.
+/code/projects/*/
+!/code/projects/_TEMPLATE_/

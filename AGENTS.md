@@ -43,8 +43,7 @@ OdinRAG/
 │   ├── examples/                    demo.odin (official)
 │   ├── gists/                       Public gists (cloneable)
 │   ├── templates/                   Project templates (cloneable)
-│   └── projects/                    Project conventions + template + integration guide
-│
+│   │
 ├── _Helpers/                        ★ SCRIPTS AND LIBRARY
 │   ├── scrape_skool.py              Active: scrapes the programvideogames Skool group
 │   ├── scrape-official.py           Re-entrant: scrapes odin-lang.org/docs
@@ -274,7 +273,7 @@ Before any push to `github.com/LaurentOngaro/OdinRAG`:
 
 1. `python _Helpers/audit_public_safety.py` → **must** exit 0.
 2. Verify `.gitignore` `COPYRIGHTED SCRAPED CONTENT` section is intact.
-3. Verify no `planning/daily/`, `projects/devlog/`, or `_Raw/` files are staged.
+3. Verify no `planning/daily/` or `_Raw/` files are staged.
 
 Full procedure in [`_Helpers/docs/PUBLIC_RELEASE_CHECKLIST.md`](_Helpers/docs/PUBLIC_RELEASE_CHECKLIST.md).
 

@@ -2,21 +2,32 @@
 
 Document explaining how the AI assistant (Kilo Code) cross-references **your code** in `code/projects/<your-project>/` with **the knowledge base** elsewhere in the repo.
 
+## Important: project code is personal work, NOT public
+
+The OdinRAG repo ships the **scaffold** for a project: `code/projects/_TEMPLATE_/` (README, AGENTS.md, src/main.odin, devlog template, .kilo/agents/odin-project.md). This template is public.
+
+**Actual project code is personal and never pushed.** Two options:
+
+1. **Inside the repo (recommended for Kilo context)** — clone `_TEMPLATE_` to `code/projects/<your-project>/`. The folder is gitignored via `/code/projects/*/` in `.gitignore`. Kilo sees your code, you get AI assistance, nothing leaks to git.
+2. **Outside the repo (strict IP isolation)** — clone `_TEMPLATE_` somewhere like `D:\OdinProjects\<your-project>\`. The repo stays 100% clean.
+
+Both work. Option 1 is more convenient; option 2 is more IP-secure. The repo's public state is identical in both cases.
+
 ## The global workspace
 
 ```
 OdinRAG/
 ├── code/projects/<your-project>/  <- YOU work here (code, devlogs, AGENTS.md)
-│   ├── README.md                   -> what this project is about
-│   ├── AGENTS.md                   -> project-specific context (patterns used, deps)
-│   ├── src/                        -> your Odin code (.odin)
-│   └── devlog/J_*.md               -> history of your sessions
+│   ├── README.md                  -> what this project is about
+│   ├── AGENTS.md                  -> project-specific context (patterns used, deps)
+│   ├── src/                       -> your Odin code (.odin)
+│   └── devlog/J_*.md              -> history of your sessions
 │
 ├── odin-knowledge-base/           ★ Skool KB (115 programvideogames lessons)
 ├── docs/karl_zylinski/odin-book/  ★ Karl's book (33 chapters on the Odin language)
-├── docs/official/                  ★ Official odin-lang.org docs
-├── code/templates/                  -> hot-reload templates (to clone in a REAL project)
-├── code/examples/                  -> official demo.odin
+├── docs/official/                 ★ Official odin-lang.org docs
+├── code/templates/                -> hot-reload templates (to clone in a REAL project)
+├── code/examples/                 -> official demo.odin
 │
 ├── _Helpers/                      -> scrape / format scripts
 ├── .kilo/                         -> Kilo config (skills, agents)
@@ -81,8 +92,8 @@ Example `code/projects/my-rpg/AGENTS.md`:
 
 ## Patterns already implemented
 
-- [x] Tracking allocator for debug (lesson 088)
-- [x] Entity update loop (lesson 14, 67)
+- Tracking allocator for debug (lesson 088)
+- Entity update loop (lesson 14, 67)
 
 ## Pitfalls identified
 

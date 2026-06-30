@@ -23,7 +23,6 @@ OdinRAG/
 ├── kilo.json                  ← AI agent runtime config
 ├── odinfmt.json               ← Odin formatter config (2-space, LF)
 ├── .markdownlint.json         ← markdown lint config
-│
 ├── docs/                      ← scraped sources (samples shipped; full corpus via scrapers)
 │   ├── official/              ← odin-lang.org/docs/ + awesome-odin (MIT-style, fully shipped)
 │   ├── karl_zylinski/         ← 5 sample articles from zylinski.se (run scraper for full 19)
@@ -36,7 +35,8 @@ OdinRAG/
 │   ├── examples/              ← official demo.odin (1 file, see SOURCES.md § 9)
 │   ├── gists/                 ← 25 public gists from awesome-odin
 │   ├── templates/             ← README with clone instructions (no templates checked-in - see SOURCES.md)
-│   └── projects/              ← project conventions + template + integration guide
+│   ├── projects/              ← public scaffold: INTEGRATION.md + _TEMPLATE_/ (project code is gitignored)
+│   └── templates/             ← README with clone instructions (no templates checked-in - see SOURCES.md)
 │
 ├── _Helpers/                  ← scrapers + utilities (PUBLIC, runnable on your own data)
 │   ├── scrape_skool.py        ← scrapes the programvideogames Skool group

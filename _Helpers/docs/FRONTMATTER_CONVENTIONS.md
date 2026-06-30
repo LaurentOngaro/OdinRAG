@@ -17,15 +17,15 @@ docId: NAV_FM_001
 
 ## Recommended fields
 
-| Field      | Format                  | Example                          | Required?              |
-| ---------- | ----------------------- | -------------------------------- | ---------------------- |
-| `title`    | string                  | `"Daily 2026-06-28 - Kilo setup"`| yes for personal notes |
-| `date`     | ISO 8601 (`YYYY-MM-DD`) | `2026-06-28`                     | yes everywhere         |
-| `tags`     | array                   | `[OdinRAG, planning, daily]`     | yes everywhere         |
-| `type`     | enum (see list)         | `daily`                          | if applicable          |
-| `status`   | enum (see list)         | `active`                         | if applicable          |
-| `priority` | 1-3                     | `2`                              | optional               |
-| `docId`    | string                  | `NAV_FM_001`                     | except for reference docs |
+| Field      | Format                  | Example                           | Required?                 |
+| ---------- | ----------------------- | --------------------------------- | ------------------------- |
+| `title`    | string                  | `"Daily 2026-06-28 - Kilo setup"` | yes for personal notes    |
+| `date`     | ISO 8601 (`YYYY-MM-DD`) | `2026-06-28`                      | yes everywhere            |
+| `tags`     | array                   | `[OdinRAG, planning, daily]`      | yes everywhere            |
+| `type`     | enum (see list)         | `daily`                           | if applicable             |
+| `status`   | enum (see list)         | `active`                          | if applicable             |
+| `priority` | 1-3                     | `2`                               | optional                  |
+| `docId`    | string                  | `NAV_FM_001`                      | except for reference docs |
 
 **Obsidian note**: Obsidian ignores fields it doesn't recognize and displays those it knows (`tags`, `aliases`, `cssclass`). Custom fields (`priority`, `docId`, etc.) don't break anything.
 
@@ -33,27 +33,27 @@ docId: NAV_FM_001
 
 List reduced to the essentials for this project:
 
-| Value      | Usage                                              |
-| ---------- | -------------------------------------------------- |
-| `note`     | Free note, brainstorm, thought                     |
-| `daily`    | Daily note (`J_YYYY-MM-DD`)                        |
-| `weekly`   | Weekly review (`W_YYYY-WW`)                        |
-| `monthly`  | Monthly review (`M_YYYY-MM`)                       |
-| `roadmap`  | Action plan, milestones (e.g. `planning/ROADMAP.md`)|
-| `reference`| Cheatsheet, stable doc (conventions, index)        |
-| `dev_log`  | Development journal (`projects/devlog/`)           |
-| `archive`  | Saved for history, no longer edited                |
-| `template` | Document template (used as a base to create)       |
+| Value       | Usage                                                |
+| ----------- | ---------------------------------------------------- |
+| `note`      | Free note, brainstorm, thought                       |
+| `daily`     | Daily note (`J_YYYY-MM-DD`)                          |
+| `weekly`    | Weekly review (`W_YYYY-WW`)                          |
+| `monthly`   | Monthly review (`M_YYYY-MM`)                         |
+| `roadmap`   | Action plan, milestones (e.g. `planning/ROADMAP.md`) |
+| `reference` | Cheatsheet, stable doc (conventions, index)          |
+| `dev_log`   | Per-project devlog (`code/projects/<p>/devlog/`)     |
+| `archive`   | Saved for history, no longer edited                  |
+| `template`  | Document template (used as a base to create)         |
 
 ## Statuses (`status`)
 
-| Value       | Usage                                       |
-| ----------- | ------------------------------------------- |
-| `draft`     | Draft, not finalised                        |
-| `active`    | In use / kept up to date                    |
-| `done`      | Completed                                   |
-| `archived`  | History kept (no longer actively edited)    |
-| `deprecated`| Obsolete, do not use                        |
+| Value        | Usage                                    |
+| ------------ | ---------------------------------------- |
+| `draft`      | Draft, not finalised                     |
+| `active`     | In use / kept up to date                 |
+| `done`       | Completed                                |
+| `archived`   | History kept (no longer actively edited) |
+| `deprecated` | Obsolete, do not use                     |
 
 ## Tags - nomenclature (Obsidian-compatible)
 

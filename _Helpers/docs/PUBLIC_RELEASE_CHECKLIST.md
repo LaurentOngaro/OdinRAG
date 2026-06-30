@@ -15,7 +15,6 @@ The `COPYRIGHTED SCRAPED CONTENT` section of `.gitignore` is the source of truth
 - `/docs/karl_zylinski/*.md` + `/docs/karl_zylinski/odin-book/*.md` + `!/docs/karl_zylinski/README.md`
 - `/docs/newsletters/*.md` + `!/docs/newsletters/README.md`
 - `/planning/daily/`
-- `/projects/devlog/`
 
 ### 2. Automatic audit
 

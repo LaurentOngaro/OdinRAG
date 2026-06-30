@@ -2,10 +2,14 @@
 
 > How to use this file:
 >
-> 1. Copy this file into `devlog/J_YYYY-MM-DD_<topic>.md`
-> 2. Fill in the date in the frontmatter
+> 1. Copy this file into `code/projects/<your-project>/devlog/J_YYYY-MM-DD_<topic>.md`
+> 2. Fill in the date in the H1 heading
 > 3. Check off tasks as you go
 > 4. Fill in the bilan at end of day
+
+> Note: this devlog folder is **per-project**. It is gitignored via `/code/projects/*/` in `.gitignore`,
+> so your notes stay local. For KB-maintenance notes (about the OdinRAG repo itself), use the
+> per-project devlog too — just adjust the path accordingly.
 
 ---
 

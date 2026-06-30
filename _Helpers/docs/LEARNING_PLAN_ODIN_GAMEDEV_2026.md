@@ -88,7 +88,6 @@ The goal is to consolidate Odin mastery, deepen game-dev-specific patterns, and 
 │   ├── templates/         # hot-reload template, sokol template
 │   ├── gists/             # jakubtomsu gists (collision, curves...)
 │   └── examples/          # demo.odin + core examples
-├── projects/
 │   └── devlog/            # your .md devlogs per project
 ├── courses/
 │   └── programvideogames/ # notes + code from the Skool course
@@ -100,7 +99,7 @@ With RAGnarok, each folder is indexed as a **separate Topic**. At minimum, creat
 1. `Topic: odin-official` -> `docs/official/`
 2. `Topic: zylinski` -> `docs/karl_zylinski/` + `code/templates/`
 3. `Topic: gamedev-libs` -> `awesome-odin.md` + `code/gists/`
-4. `Topic: devlog` -> `projects/devlog/`
+4. `Topic: devlog` -> `code/projects/<p>/devlog/` (per-project)
 
 ---
 
@@ -202,7 +201,7 @@ With RAGnarok, each folder is indexed as a **separate Topic**. At minimum, creat
 
 - Release build with `-o:speed` and strip symbols
 - Test web compilation (Raylib or Sokol)
-- Write the first structured devlog in `projects/devlog/` (indexed in RAG)
+- Write the first structured devlog in `code/projects/<p>/devlog/` (indexed in RAG)
 - Take stock: what questions remain open? -> prioritise for Phase 4
 
 ---

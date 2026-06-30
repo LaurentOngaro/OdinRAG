@@ -158,4 +158,4 @@ Example of a good response:
 - Never return just "see the KB" without a precise path.
 - Never summarise a file without having read its actual content (the KB contains up-to-date Odin code - always cite it).
 - Never ignore the frontmatter (it gives immediate context: module, duration, level).
-- Never mix KB and personal devlog (`projects/devlog/`) - the devlog is user content, not a source.
+- Never mix KB and per-project devlog (`code/projects/<p>/devlog/`) - the devlog is user content, not a source.
