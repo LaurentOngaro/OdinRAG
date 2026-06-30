@@ -42,7 +42,7 @@ To populate the full corpus of any sample source, run the corresponding scraper 
 If you own the ebook:
 
 1. Save the `understanding_the_odin_programming_language.html` file anywhere on disk.
-2. Fill in `paths.karl_book_html` in your `_Helpers/.private/user_config.json` (see [`_Helpers/docs/user_config.example.json`](../_Helpers/docs/user_config.example.json)) or set the `BOOK_HTML_SRC` env var.
+2. Fill in `paths.karl_book_html` in your `_Helpers/.private/user_config.jsonc` (see [`_Helpers/docs/user_config.example.jsonc`](../_Helpers/docs/user_config.example.jsonc)) or set the `BOOK_HTML_SRC` env var.
 3. Run:
 
    ```bash

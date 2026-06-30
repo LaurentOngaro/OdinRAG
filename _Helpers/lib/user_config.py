@@ -1,12 +1,13 @@
 """_Helpers/lib/user_config.py - Personal user config loader.
 
-The config file is gitignored (in `_Helpers/.private/user_config.json`).
-If absent, scripts fall back to environment variables, then to empty
-strings.
+The config file is gitignored (in `_Helpers/.private/user_config.jsonc`).
+If absent, scripts fall back to environment variables, then to empty strings.
+
+Format: JSONC (JSON with // line comments and /* */ block comments).
 
 To create your local config:
 
-    cp _Helpers/docs/user_config.example.json _Helpers/.private/user_config.json
+    cp _Helpers/docs/user_config.example.jsonc _Helpers/.private/user_config.jsonc
 
 Then edit the copy and fill in your paths / credentials.
 
@@ -21,16 +22,18 @@ from __future__ import annotations
 
 import json
 import os
+import re
 from pathlib import Path
 from typing import Any
 
+# JSONC: fallback order — env var > this JSONC file in .private/
 CONFIG_PATH = Path(
     os.environ.get("ODINRAG_CONFIG")
-    or (Path(__file__).resolve().parent.parent / ".private" / "user_config.json")
+    or (Path(__file__).resolve().parent.parent / ".private" / "user_config.jsonc")
 )
 
 EXAMPLE_PATH = (
-    Path(__file__).resolve().parent.parent / "docs" / "user_config.example.json"
+    Path(__file__).resolve().parent.parent / "docs" / "user_config.example.jsonc"
 )
 
 DEFAULTS: dict[str, Any] = {
@@ -60,40 +63,38 @@ DEFAULTS: dict[str, Any] = {
     },
 }
 
+# Strip // line comments and /* */ block comments from JSONC text
+_JSONC_COMMENT_RE = re.compile(
+    r"//.*?$|/\*.*?\*/",
+    re.DOTALL | re.MULTILINE,
+)
 
-def _strip_dunder_keys(d: dict) -> dict:
-    """Strip keys '_comment', '_xxx_env' etc. (metadata, not config)."""
-    return {k: v for k, v in d.items() if not k.startswith("_")}
 
-
-def _deep_merge(base: dict, override: dict) -> dict:
-    """Deep-merge `override` into `base` (override wins). Ignore '_'-prefixed keys."""
-    out = json.loads(json.dumps(base))  # deep copy
-    for k, v in override.items():
-        if k.startswith("_"):
-            continue
-        if isinstance(v, dict) and isinstance(out.get(k), dict):
-            out[k] = _deep_merge(out[k], v)
-        else:
-            out[k] = v
-    return out
+def _strip_jsonc_comments(text: str) -> str:
+    """Strip // line comments and /* */ block comments from a JSONC string."""
+    return _JSONC_COMMENT_RE.sub("", text)
 
 
 def load_config() -> dict:
-    """Load the user config, merging with the DEFAULTS."""
+    """Load the user config from the JSONC file, merging with DEFAULTS."""
     if not CONFIG_PATH.is_file():
         return json.loads(json.dumps(DEFAULTS))
     try:
         with open(CONFIG_PATH, "r", encoding="utf-8") as f:
-            user_data = json.load(f)
+            raw = f.read()
+        stripped = _strip_jsonc_comments(raw)
+        user_data = json.loads(stripped)
     except (OSError, json.JSONDecodeError, UnicodeDecodeError):
         return json.loads(json.dumps(DEFAULTS))
-    return _deep_merge(DEFAULTS, user_data)
+    out = json.loads(json.dumps(DEFAULTS))  # deep copy
+    for section_key in DEFAULTS:
+        if section_key in user_data and isinstance(user_data[section_key], dict):
+            out[section_key].update(user_data[section_key])
+    return out
 
 
 _config = load_config()
 
-# Flat view of common sections for ergonomic access (`PATHS.odinfmt_exe` etc.)
 PATHS = _config.get("paths", {})
 SKOOL = _config.get("skool", {})
 SCRAPER = _config.get("scraper", {})
@@ -101,7 +102,7 @@ KB = _config.get("kb", {})
 
 
 def get(key_path: str, default: Any = "") -> Any:
-    """Acces par chemin pointé. Exemple: get('paths.odinfmt_exe')."""
+    """Acces par chemin pointe. Exemple: get('paths.odinfmt_exe')."""
     cur: Any = _config
     for part in key_path.split("."):
         if isinstance(cur, dict) and part in cur:
@@ -120,9 +121,8 @@ def env_or_config(key_path: str, env_var: str, default: str = "") -> str:
     return cfg_val
 
 
-# Flat view for common usages
 def where_to_create() -> str:
-    """Path where the user_config.json file should be created (displayed if absent)."""
+    """Path where the user_config.jsonc file should be created (displayed if absent)."""
     return str(CONFIG_PATH)
 
 
