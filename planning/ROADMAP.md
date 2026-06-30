@@ -53,7 +53,7 @@ Put in place the tools that make the KB **maintainable** and **queryable** by Ki
 - [x] `_Helpers/lint_pylance.py` zero diagnostics on tracked `.py` files (added pylance-check skill + MAX_VIDEO_RETRIES + SKOOL constant fix)
 - [x] `_Helpers/reflow_md.py` available for "book style" line reflow
 
-> Note: the original item "Add frontmatter to your daily notes" was dropped — dailies are gitignored personal logs that don't need frontmatter. The convention in
+> Note: the original item "Add frontmatter to your daily notes" was dropped - dailies are gitignored personal logs that don't need frontmatter. The convention in
 > [`FRONTMATTER_CONVENTIONS.md`](../_Helpers/docs/FRONTMATTER_CONVENTIONS.md) is reserved for tracked KB files.
 
 ## P2 - KB polish
@@ -74,8 +74,8 @@ The repo must be **minimal and self-explanatory**: no personal data, no copyrigh
 
 > Items **not applicable** (intentionally removed from this phase):
 >
-> - "Index Skool modules in main README.md" — Skool content is paywall + gitignored, indexing it publicly would expose links to paid material. Stays local in `odin-knowledge-base/`.
-> - "Add summary + topic/\* to every Skool lesson" — same reason: applies only to local KB.
+> - "Index Skool modules in main README.md" - Skool content is paywall + gitignored, indexing it publicly would expose links to paid material. Stays local in `odin-knowledge-base/`.
+> - "Add summary + topic/\* to every Skool lesson" - same reason: applies only to local KB.
 
 ## P3 - Templates + bindings
 
@@ -88,10 +88,10 @@ Have the upstream Odin templates and useful gists available locally for cloning 
 - [x] Clone Karl's hot-reload templates into `code/templates/` (Raylib + Sokol, native + Web)
 - [x] Download priority gists into `code/gists/` (25 gists from awesome-odin)
 - [x] `code/templates/*/` and `code/gists/` gitignored so local clones cannot be accidentally committed
-- [ ] Test `c-bindgen` on a small C library (Box2D or FreeType) — **backlog, low priority for P4**
-- [ ] First WASM build with Sokol — **backlog, low priority for P4**
+- [ ] Test `c-bindgen` on a small C library (Box2D or FreeType) - **backlog, low priority for P4**
+- [ ] First WASM build with Sokol - **backlog, low priority for P4**
 
-> Note: `code/gists/` and `code/examples/` (demo.odin + others) are downloader targets — they contain code from external sources and are kept gitignored.
+> Note: `code/gists/` and `code/examples/` (demo.odin + others) are downloader targets - they contain code from external sources and are kept gitignored.
 > The README in each subfolder explains how to populate them locally via `_Helpers/download_gists.py` / `_Helpers/download_odin_examples.py`.
 
 ## P4 - First Odin project: Remake of module 2 (RPG) of the PVG course
@@ -108,9 +108,9 @@ Reimplement from scratch the RPG module of the programvideogames course. This is
 
 ### Why this project (and not the default "iterate state machine + tracking allocator")
 
-The default P5 was too generic for the actual goal. The PVG module 2 RPG covers a much wider scope than a state-machine demo — see the phase breakdown below.
+The default P5 was too generic for the actual goal. The PVG module 2 RPG covers a much wider scope than a state-machine demo - see the phase breakdown below.
 
-### P4.0 — Préparation (1-2 sessions)
+### P4.0 - Préparation (1-2 sessions)
 
 - [x] List the ~42 lessons of module 2 (RPG) in `odin-knowledge-base/courses/programvideogames/`
 - [ ] One recap note per lesson in `code/projects/rpg-remake/devlog/` (the per-project devlog)
@@ -118,28 +118,28 @@ The default P5 was too generic for the actual goal. The PVG module 2 RPG covers 
 - [ ] Clone `_TEMPLATE_/` to a gitignored project location
 - [ ] Wire Kilo to load this project's `AGENTS.md` as the priority context (per `kb-navigator` workflow)
 
-### P4.1 — Foundation (3-4 sessions)
+### P4.1 - Foundation (3-4 sessions)
 
-- [ ] Character system (stats, classes, level-up, equipment slots) — references: KB lesson 067 + Karl 5/13
-- [ ] Inventory system (items, equipment, stacking) — references: KB lesson 038 (inventory)
-- [ ] State machine for character states (idle / moving / attacking / dead) — references: KB lessons 020 + 021
-- [ ] Tracking allocator wired in debug builds only — references: KB lesson 088
-- [ ] Arena for per-frame allocations — references: Karl chapters 13 + zylinski temporary-allocator article
+- [ ] Character system (stats, classes, level-up, equipment slots) - references: KB lesson 067 + Karl 5/13
+- [ ] Inventory system (items, equipment, stacking) - references: KB lesson 038 (inventory)
+- [ ] State machine for character states (idle / moving / attacking / dead) - references: KB lessons 020 + 021
+- [ ] Tracking allocator wired in debug builds only - references: KB lesson 088
+- [ ] Arena for per-frame allocations - references: Karl chapters 13 + zylinski temporary-allocator article
 
-### P4.2 — Core RPG (4-6 sessions)
+### P4.2 - Core RPG (4-6 sessions)
 
-- [ ] Turn-based combat system with party + variable turn order — references: KB lesson 093
-- [ ] NPC + dialogue tree — references: KB lesson 101 + 102
-- [ ] Quest system (objectives, rewards, state machine) — references: KB lessons on FSM + a few KB items
-- [ ] Save / load (binary, versioned) — references: KB lessons 036, 099
-- [ ] UI: HUD + main menu + inventory screen — references: KB intro to Raylib drawing
+- [ ] Turn-based combat system with party + variable turn order - references: KB lesson 093
+- [ ] NPC + dialogue tree - references: KB lesson 101 + 102
+- [ ] Quest system (objectives, rewards, state machine) - references: KB lessons on FSM + a few KB items
+- [ ] Save / load (binary, versioned) - references: KB lessons 036, 099
+- [ ] UI: HUD + main menu + inventory screen - references: KB intro to Raylib drawing
 
-### P4.3 — Polish + shipping (2-3 sessions)
+### P4.3 - Polish + shipping (2-3 sessions)
 
-- [ ] Functional DLL hot reload iteration cycle — references: KB lessons 084 + 085, Karl hot-reload article
+- [ ] Functional DLL hot reload iteration cycle - references: KB lessons 084 + 085, Karl hot-reload article
 - [ ] Battle UI polish (feedback, animations, sound)
 - [ ] Performance profiling: Tracy bindings + mini allocator for hot paths
-- [ ] First WASM build (stretch — uses Sokol, optional)
+- [ ] First WASM build (stretch - uses Sokol, optional)
 - [ ] Final cleanup, README, release notes
 
 ## Update conventions
@@ -152,11 +152,11 @@ The default P5 was too generic for the actual goal. The PVG module 2 RPG covers 
 
 ## Useful links
 
-- `planning/daily/` — daily notes (gitignored)
-- `planning/template/J_YYYY-MM-DD.md` — template to duplicate
-- [`_Helpers/docs/FRONTMATTER_CONVENTIONS.md`](../_Helpers/docs/FRONTMATTER_CONVENTIONS.md) — YAML frontmatter convention
-- [`_Helpers/docs/MINIMAX_M3.md`](../_Helpers/docs/MINIMAX_M3.md) — how MiniMax-M3 powered this project
-- `_Helpers/docs/social/` — Reddit + X drafts (already published on 2026-06-30)
-- [`../../SOURCES.md`](../../SOURCES.md) — how to obtain each scraped source
-- [`../../code/projects/INTEGRATION.md`](../../code/projects/INTEGRATION.md) — project-code privacy convention
-- [`../../TODO.md`](../../TODO.md) — technical backlog (legacy, migrate as needed)
+- `planning/daily/` - daily notes (gitignored)
+- `planning/template/J_YYYY-MM-DD.md` - template to duplicate
+- [`_Helpers/docs/FRONTMATTER_CONVENTIONS.md`](../_Helpers/docs/FRONTMATTER_CONVENTIONS.md) - YAML frontmatter convention
+- [`_Helpers/docs/MINIMAX_M3.md`](../_Helpers/docs/MINIMAX_M3.md) - how MiniMax-M3 powered this project
+- `_Helpers/docs/social/` - Reddit + X drafts (already published on 2026-06-30)
+- [`../../SOURCES.md`](../../SOURCES.md) - how to obtain each scraped source
+- [`../../code/projects/INTEGRATION.md`](../../code/projects/INTEGRATION.md) - project-code privacy convention
+- [`../../TODO.md`](../../TODO.md) - technical backlog (legacy, migrate as needed)
