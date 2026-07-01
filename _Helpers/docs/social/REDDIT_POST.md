@@ -1,3 +1,14 @@
+---
+title: "REDDIT_POST"
+date: 2026-07-01
+tags: [OdinRAG, reference]
+type: reference
+status: active
+version: 1.0.0
+lastUpdated: "2026-07-01"
+updatedBy: "MiniMax-M3 (Kilo Code)"
+---
+
 # REDDIT POST
 
 ## Titre
@@ -25,12 +36,12 @@ Sharing it here since the MiniMax-M3 showcase round 2 is live and this is 100% M
 - **`.kilo/agents/odin-gamedev.md`** - a specialized subagent that loads `INDEX.md` first, picks 2-3 KB files, and cites exact paths (`file:line`).
 - **`.kilo/skills/`** - 6 Kilo skills: `kb-navigator`, `odin-format`, `scraper-runner`, `odin-pattern-finder`, `planning-helper`, `pylance-check` (KB search, re-formatting, scraper orchestration, daily planning, pyright lint).
 - **`planning/`** - day-by-day planning with a strict template, never edited.
-- **`docs/official/`** - 11 pages from odin-lang.org/docs/ (MIT-style license, kept with attribution).
+- **`odin-knowledge-base/docs/official/`** - 11 pages from odin-lang.org/docs/ (MIT-style license, kept with attribution).
 
 ## How MiniMax-M3 is actually used (not just chat)
 
-1. **Subagent delegation** - M3 picks up "what pattern for arena allocators in Odin?" → routes to `odin-gamedev` subagent → returns citations like `docs/karl_zylinski/temporary-allocator-your-first-arena.md:42`.
-2. **Re-entrant scrapers** - I asked M3 to write `_Helpers/scrape_skool.py` with `--check`, dry-run, idempotency, structured logging. Re-running = no-op if files exist.
+1. **Subagent delegation** - M3 picks up "what pattern for arena allocators in Odin?" → routes to `odin-gamedev` subagent → returns citations like `odin-knowledge-base/docs/karl_zylinski/temporary-allocator-your-first-arena.md:42`.
+2. **Re-entrant scrapers** - I asked M3 to write `_Helpers/scripts/scrappers/scrape_skool.py` with `--check`, dry-run, idempotency, structured logging. Re-running = no-op if files exist.
 3. **Skill authoring** - M3 authored the 6 skills above (SKILL.md + workflow) following progressive disclosure.
 4. **Frontmatter discipline** - every lesson has `topic/*` tags so semantic search works in Obsidian too.
 5. **Format gate** - after each scrape, `format_odin_in_files.py` is run to keep ```odin ...``` blocks consistent (no tabs, 2 spaces, LF).

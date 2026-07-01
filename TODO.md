@@ -14,17 +14,6 @@ _None for now._
 
 ### Documentation (last: DOC01)
 
-- [ ] DOC01: normalization
-  - clarify the roles of "/docs" (docs for Odin only ?) and "/_Helpers/docs" (docs for the repository only ?)
-  - if applicable, move following files from `_Helpers/docs/` to `/docs`and fix the related links:
-    - _Helpers\docs\FRONTMATTER_CONVENTIONS.md
-    - _Helpers\docs\MARKDOWN_STYLE.md
-    - _Helpers\docs\002_How MiniMax-M3 is used in this repository.md
-    - _Helpers\docs\PUBLIC_RELEASE_CHECKLIST.md
-  - normalize the names and the frontmatter of the files in the previous list
-  - normalize the names and the frontmatter of the following files:
-    - "MIXING_PUBLIC_AND_PRIVATE_HISTORY.md"
-
 _None for now._
 
 ### Display (last: DISP01)
@@ -59,4 +48,7 @@ _None for now._
 
 ## Completed
 
-_None for now._
+- [x] DOC01: normalization (2026-07-01)
+  - restructured docs into `_Helpers/docs/` (renamed to NNN_*.md) and `odin-knowledge-base/docs/` (scraped sources)
+  - normalized frontmatter (title, date, tags, type, status, version, lastUpdated, updatedBy) per [`_Helpers/docs/003_yaml_frontmatter_conventions.md`](_Helpers/docs/003_yaml_frontmatter_conventions.md)
+  - moved MIXING_PUBLIC_AND_PRIVATE_HISTORY.md to `_Helpers/docs/007_mixing_public_and_private_history.md`

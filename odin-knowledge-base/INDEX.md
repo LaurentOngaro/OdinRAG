@@ -17,13 +17,13 @@ summary: "Compact index (~5 KB) to navigate the ~180 files of the Odin KB withou
 
 ## Overview (by source)
 
-| Source                          | Files | Format                                                                                      | Why                                                   |
-| ------------------------------- | ----- | ------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
-| `odin-knowledge-base/`          | 118   | Skool 'programvideogames' lessons (Markdown with frontmatter)                               | Concrete implementation, complete code, game patterns |
-| `docs/karl_zylinski/odin-book/` | 34    | Karl's book **'Understanding the Odin Programming Language'** split into 1 file per chapter | Language reference, pure concept, minimal example     |
-| `docs/karl_zylinski/*.md`       | 20    | Karl Zylinski blog articles                                                                 | Game dev patterns, opinions, hot take                 |
-| `docs/official/`                | 12    | Official odin-lang.org docs + awesome-odin                                                  | Official language reference                           |
-| `code/examples/demo.odin`       | 1     | Official language demo                                                                      | Exhaustive feature reference                          |
+| Source                                              | Files | Format                                                                                      | Why                                                   |
+| --------------------------------------------------- | ----- | ------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| `odin-knowledge-base/`                              | 118   | Skool 'programvideogames' lessons (Markdown with frontmatter)                               | Concrete implementation, complete code, game patterns |
+| `odin-knowledge-base/docs/karl_zylinski/odin-book/` | 34    | Karl's book **'Understanding the Odin Programming Language'** split into 1 file per chapter | Language reference, pure concept, minimal example     |
+| `odin-knowledge-base/docs/karl_zylinski/*.md`       | 20    | Karl Zylinski blog articles                                                                 | Game dev patterns, opinions, hot take                 |
+| `odin-knowledge-base/docs/official/`                | 12    | Official odin-lang.org docs + awesome-odin                                                  | Official language reference                           |
+| `code/examples/demo.odin`                           | 1     | Official language demo                                                                      | Exhaustive feature reference                          |
 
 **Total**: ~185 files, ~1 MB of MD.
 
@@ -35,44 +35,44 @@ See the detail in [`courses/programvideogames/README.md`](courses/programvideoga
   - `metroidvania-10/`: 1 lessons
   - `vertical-slice-and-dice-v10/`: 1 lessons
 
-> Every lesson has `Cours:` `Module:` `ID:` `Durée:` frontmatter (see `_Helpers/docs/FRONTMATTER_CONVENTIONS.md`).
+> Every lesson has `Cours:` `Module:` `ID:` `Durée:` frontmatter (see `_Helpers/docs/003_yaml_frontmatter_conventions.md`).
 > For the full TOC per chapter, open the module's `README.md`.
 
-## Karl Zylinski book (28 chapters + 4 appendices in `docs/karl_zylinski/odin-book/`)
+## Karl Zylinski book (28 chapters + 4 appendices in `odin-knowledge-base/docs/karl_zylinski/odin-book/`)
 
 **Absolute** reference for the Odin language. For any fundamental question, start here.
 
-| #   | Chapter                                                                                                                                           | Topic                                                         |
-| --- | ------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
-| 1   | [Introduction](docs/karl_zylinski/odin-book/01-introduction.md)                                                                                   |                                                               |
-| 2   | [Hellope! A tiny program](docs/karl_zylinski/odin-book/02-hellope-a-tiny-program.md)                                                              |                                                               |
-| 3   | [Variables and constants](docs/karl_zylinski/odin-book/03-variables-and-constants.md)                                                             |                                                               |
-| 4   | [Some additional basics](docs/karl_zylinski/odin-book/04-some-additional-basics.md)                                                               |                                                               |
-| 5   | [Making new types](docs/karl_zylinski/odin-book/05-making-new-types.md)                                                                           |                                                               |
-| 6   | [Pointers](docs/karl_zylinski/odin-book/06-pointers.md)                                                                                           |                                                               |
-| 7   | [Procedures and scopes](docs/karl_zylinski/odin-book/07-procedures-and-scopes.md)                                                                 |                                                               |
-| 8   | [Fixed-memory containers](docs/karl_zylinski/odin-book/08-fixed-memory-containers.md)                                                             |                                                               |
-| 9   | [Introduction to manual memory management](docs/karl_zylinski/odin-book/09-introduction-to-manual-memory-management.md)                           |                                                               |
-| 10  | [More container types](docs/karl_zylinski/odin-book/10-more-container-types.md)                                                                   |                                                               |
-| 11  | [Strings](docs/karl_zylinski/odin-book/11-strings.md)                                                                                             |                                                               |
-| 12  | [Implicit context](docs/karl_zylinski/odin-book/12-implicit-context.md)                                                                           |                                                               |
-| 13  | [Making manual memory management easier](docs/karl_zylinski/odin-book/13-making-manual-memory-management-easier.md)                               |                                                               |
-| 14  | [Parametric polymorphism: Writing generic code](docs/karl_zylinski/odin-book/14-parametric-polymorphism-writing-generic-code.md)                  |                                                               |
-| 15  | [Bit-related types](docs/karl_zylinski/odin-book/15-bit-related-types.md)                                                                         |                                                               |
-| 16  | [Error handling](docs/karl_zylinski/odin-book/16-error-handling.md)                                                                               |                                                               |
-| 17  | [Package system and code organization](docs/karl_zylinski/odin-book/17-package-system-and-code-organization.md)                                   |                                                               |
-| 18  | [You (probably) don't need a build system](docs/karl_zylinski/odin-book/18-you-probably-dont-need-a-build-system.md)                              |                                                               |
-| 19  | [Reflection and Run-Time Type Information (RTTI)](docs/karl_zylinski/odin-book/19-reflection-and-run-time-type-information-rtti.md)               |                                                               |
-| 20  | [Data-oriented design](docs/karl_zylinski/odin-book/20-data-oriented-design.md)                                                                   |                                                               |
-| 21  | [Making C library bindings (Foreign Function Interface)](docs/karl_zylinski/odin-book/21-making-c-library-bindings-foreign-function-interface.md) |                                                               |
-| 22  | [Debuggers](docs/karl_zylinski/odin-book/22-debuggers.md)                                                                                         |                                                               |
-| 23  | [Odin features you should avoid](docs/karl_zylinski/odin-book/23-odin-features-you-should-avoid.md)                                               |                                                               |
-| 24  | [A tour of the core collection](docs/karl_zylinski/odin-book/24-a-tour-of-the-core-collection.md)                                                 |                                                               |
-| 25  | [Libraries for creating video games](docs/karl_zylinski/odin-book/25-libraries-for-creating-video-games.md)                                       |                                                               |
-| 26  | [A few more things...](docs/karl_zylinski/odin-book/26-a-few-more-things.md)                                                                      |                                                               |
-| 27  | [Where to find more Odin resources](docs/karl_zylinski/odin-book/27-where-to-find-more-odin-resources.md)                                         |                                                               |
-| 28  | [Thanks for reading!](docs/karl_zylinski/odin-book/28-thanks-for-reading.md)                                                                      |                                                               |
-| A-D | Appendices (4 files in `odin-book/appendices/`)                                                                                                   | Handle-based array, fixed arrays only, dropdown, Box2D+Raylib |
+| #   | Chapter                                                                                                                                                               | Topic                                                         |
+| --- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| 1   | [Introduction](odin-knowledge-base/docs/karl_zylinski/odin-book/01-introduction.md)                                                                                   |                                                               |
+| 2   | [Hellope! A tiny program](odin-knowledge-base/docs/karl_zylinski/odin-book/02-hellope-a-tiny-program.md)                                                              |                                                               |
+| 3   | [Variables and constants](odin-knowledge-base/docs/karl_zylinski/odin-book/03-variables-and-constants.md)                                                             |                                                               |
+| 4   | [Some additional basics](odin-knowledge-base/docs/karl_zylinski/odin-book/04-some-additional-basics.md)                                                               |                                                               |
+| 5   | [Making new types](odin-knowledge-base/docs/karl_zylinski/odin-book/05-making-new-types.md)                                                                           |                                                               |
+| 6   | [Pointers](odin-knowledge-base/docs/karl_zylinski/odin-book/06-pointers.md)                                                                                           |                                                               |
+| 7   | [Procedures and scopes](odin-knowledge-base/docs/karl_zylinski/odin-book/07-procedures-and-scopes.md)                                                                 |                                                               |
+| 8   | [Fixed-memory containers](odin-knowledge-base/docs/karl_zylinski/odin-book/08-fixed-memory-containers.md)                                                             |                                                               |
+| 9   | [Introduction to manual memory management](odin-knowledge-base/docs/karl_zylinski/odin-book/09-introduction-to-manual-memory-management.md)                           |                                                               |
+| 10  | [More container types](odin-knowledge-base/docs/karl_zylinski/odin-book/10-more-container-types.md)                                                                   |                                                               |
+| 11  | [Strings](odin-knowledge-base/docs/karl_zylinski/odin-book/11-strings.md)                                                                                             |                                                               |
+| 12  | [Implicit context](odin-knowledge-base/docs/karl_zylinski/odin-book/12-implicit-context.md)                                                                           |                                                               |
+| 13  | [Making manual memory management easier](odin-knowledge-base/docs/karl_zylinski/odin-book/13-making-manual-memory-management-easier.md)                               |                                                               |
+| 14  | [Parametric polymorphism: Writing generic code](odin-knowledge-base/docs/karl_zylinski/odin-book/14-parametric-polymorphism-writing-generic-code.md)                  |                                                               |
+| 15  | [Bit-related types](odin-knowledge-base/docs/karl_zylinski/odin-book/15-bit-related-types.md)                                                                         |                                                               |
+| 16  | [Error handling](odin-knowledge-base/docs/karl_zylinski/odin-book/16-error-handling.md)                                                                               |                                                               |
+| 17  | [Package system and code organization](odin-knowledge-base/docs/karl_zylinski/odin-book/17-package-system-and-code-organization.md)                                   |                                                               |
+| 18  | [You (probably) don't need a build system](odin-knowledge-base/docs/karl_zylinski/odin-book/18-you-probably-dont-need-a-build-system.md)                              |                                                               |
+| 19  | [Reflection and Run-Time Type Information (RTTI)](odin-knowledge-base/docs/karl_zylinski/odin-book/19-reflection-and-run-time-type-information-rtti.md)               |                                                               |
+| 20  | [Data-oriented design](odin-knowledge-base/docs/karl_zylinski/odin-book/20-data-oriented-design.md)                                                                   |                                                               |
+| 21  | [Making C library bindings (Foreign Function Interface)](odin-knowledge-base/docs/karl_zylinski/odin-book/21-making-c-library-bindings-foreign-function-interface.md) |                                                               |
+| 22  | [Debuggers](odin-knowledge-base/docs/karl_zylinski/odin-book/22-debuggers.md)                                                                                         |                                                               |
+| 23  | [Odin features you should avoid](odin-knowledge-base/docs/karl_zylinski/odin-book/23-odin-features-you-should-avoid.md)                                               |                                                               |
+| 24  | [A tour of the core collection](odin-knowledge-base/docs/karl_zylinski/odin-book/24-a-tour-of-the-core-collection.md)                                                 |                                                               |
+| 25  | [Libraries for creating video games](odin-knowledge-base/docs/karl_zylinski/odin-book/25-libraries-for-creating-video-games.md)                                       |                                                               |
+| 26  | [A few more things...](odin-knowledge-base/docs/karl_zylinski/odin-book/26-a-few-more-things.md)                                                                      |                                                               |
+| 27  | [Where to find more Odin resources](odin-knowledge-base/docs/karl_zylinski/odin-book/27-where-to-find-more-odin-resources.md)                                         |                                                               |
+| 28  | [Thanks for reading!](odin-knowledge-base/docs/karl_zylinski/odin-book/28-thanks-for-reading.md)                                                                      |                                                               |
+| A-D | Appendices (4 files in `odin-book/appendices/`)                                                                                                                       | Handle-based array, fixed arrays only, dropdown, Box2D+Raylib |
 
 ## Statistics
 
@@ -103,21 +103,21 @@ And the `odin-gamedev` subagent for pure Odin questions: `.kilo/agents/odin-game
 
 When looking for a specific pattern (e.g. 'how to do a tracking allocator'), look here first. For each topic, the 1-3 most relevant files are listed. Load those, not everything.
 
-> **Refresh hint**: this section is curated, not auto-generated. To refresh when the KB evolves, use the prompt at `_Helpers/Prompts/refresh_topic_index.md` (manual or via Kilo).
+> **Refresh hint**: this section is curated, not auto-generated. To refresh when the KB evolves, use the prompt at `_Helpers/prompts/refresh_topic_index.md` (manual or via Kilo).
 
 ### Memory / allocators
 
-- `docs/karl_zylinski/odin-book/09-introduction-to-manual-memory-management.md` - overview
-- `docs/karl_zylinski/odin-book/13-making-manual-memory-management-easier.md` - tracking + arena (essential)
-- `docs/karl_zylinski/odin-book/10-more-container-types.md` - slices, maps, custom iterators
-- `docs/karl_zylinski/temporary-allocator-your-first-arena.md` - dedicated arena article
+- `odin-knowledge-base/docs/karl_zylinski/odin-book/09-introduction-to-manual-memory-management.md` - overview
+- `odin-knowledge-base/docs/karl_zylinski/odin-book/13-making-manual-memory-management-easier.md` - tracking + arena (essential)
+- `odin-knowledge-base/docs/karl_zylinski/odin-book/10-more-container-types.md` - slices, maps, custom iterators
+- `odin-knowledge-base/docs/karl_zylinski/temporary-allocator-your-first-arena.md` - dedicated arena article
 - `odin-knowledge-base/courses/programvideogames/vertical-slice-and-dice-v10/rpg/088-26-tracking-allocator.md` - tracking in practice
 
 ### State machines (FSM)
 
 - `odin-knowledge-base/courses/programvideogames/vertical-slice-and-dice-v10/metroidvania/020-211-finite-state-machine-movement-0624.md` - FSM for movement
 - `odin-knowledge-base/courses/programvideogames/vertical-slice-and-dice-v10/metroidvania/021-212-attacking-1232.md` - FSM for combat
-- `docs/karl_zylinski/odin-book/05-making-new-types.md` - `Using unions for state machines` (section 5.3.6)
+- `odin-knowledge-base/docs/karl_zylinski/odin-book/05-making-new-types.md` - `Using unions for state machines` (section 5.3.6)
 - `odin-knowledge-base/.../metroidvania/017-208-enemy-behaviors-0826.md` - state applied to enemies
 
 ### Entity system / component
@@ -128,9 +128,9 @@ When looking for a specific pattern (e.g. 'how to do a tracking allocator'), loo
 
 ### Hot reload
 
-- `docs/karl_zylinski/hot-reload-gameplay-code.md` - concept and Karl's demo
+- `odin-knowledge-base/docs/karl_zylinski/hot-reload-gameplay-code.md` - concept and Karl's demo
 - `odin-knowledge-base/.../rpg/084-22-hot-reloading.md` - practical application
-- `docs/karl_zylinski/odin-book/24-a-tour-of-the-core-collection.md` - `core:dynlib`
+- `odin-knowledge-base/docs/karl_zylinski/odin-book/24-a-tour-of-the-core-collection.md` - `core:dynlib`
 
 ### Collision / physics
 
@@ -142,58 +142,58 @@ When looking for a specific pattern (e.g. 'how to do a tracking allocator'), loo
 
 - `odin-knowledge-base/.../introduction/004-drawing-shapes-and-sprites-7min.md` - basics
 - `odin-knowledge-base/.../introduction/001-introduction-to-odin-and-raylib-3min.md` - setup
-- `docs/karl_zylinski/odin-book/25-libraries-for-creating-video-games.md` - Raylib/Sokol overview
+- `odin-knowledge-base/docs/karl_zylinski/odin-book/25-libraries-for-creating-video-games.md` - Raylib/Sokol overview
 
 ### Data-oriented / perf
 
-- `docs/karl_zylinski/odin-book/20-data-oriented-design.md` - SoA vs AoS
-- `docs/karl_zylinski/odin-book/08-fixed-memory-containers.md` - DOD foundations
-- `docs/karl_zylinski/odin-dod-benchmarks.md` - real measurements
+- `odin-knowledge-base/docs/karl_zylinski/odin-book/20-data-oriented-design.md` - SoA vs AoS
+- `odin-knowledge-base/docs/karl_zylinski/odin-book/08-fixed-memory-containers.md` - DOD foundations
+- `odin-knowledge-base/docs/karl_zylinski/odin-dod-benchmarks.md` - real measurements
 
 ### Allocation patterns (general)
 
-- `docs/karl_zylinski/dynamic-arrays-and-arenas.md` - arena patterns
-- `docs/karl_zylinski/handle-based-arrays.md` - handle-based pattern (Karl)
-- `docs/karl_zylinski/handle-based-maps-three-implementations.md` - handle maps
+- `odin-knowledge-base/docs/karl_zylinski/dynamic-arrays-and-arenas.md` - arena patterns
+- `odin-knowledge-base/docs/karl_zylinski/handle-based-arrays.md` - handle-based pattern (Karl)
+- `odin-knowledge-base/docs/karl_zylinski/handle-based-maps-three-implementations.md` - handle maps
 
 ### C bindings / vendor
 
-- `docs/karl_zylinski/generate-odin-bindings-for-c-libraries.md` - c-bindgen for C libs
-- `docs/karl_zylinski/odin-book/21-making-c-library-bindings-foreign-function-interface.md` - FFI manual
+- `odin-knowledge-base/docs/karl_zylinski/generate-odin-bindings-for-c-libraries.md` - c-bindgen for C libs
+- `odin-knowledge-base/docs/karl_zylinski/odin-book/21-making-c-library-bindings-foreign-function-interface.md` - FFI manual
 
 ### Build / compile
 
-- `docs/karl_zylinski/odin-book/18-you-probably-dont-need-a-build-system.md` - no build system
-- `code/templates/` - hot-reload templates (to clone in a REAL project elsewhere)
+- `odin-knowledge-base/docs/karl_zylinski/odin-book/18-you-probably-dont-need-a-build-system.md` - no build system
+- `code/vendored templates/` - hot-reload templates (to clone in a REAL project elsewhere)
 
 ### Language fundamentals (Odin basics)
 
-- `docs/karl_zylinski/odin-book/03-variables-and-constants.md` - types, constants
-- `docs/karl_zylinski/odin-book/04-some-additional-basics.md` - proc, if/for
-- `docs/karl_zylinski/odin-book/05-making-new-types.md` - struct/enum/union/switch/Maybe
-- `docs/karl_zylinski/odin-book/06-pointers.md` - pointers
-- `docs/karl_zylinski/odin-book/07-procedures-and-scopes.md` - defer, named returns
-- `docs/karl_zylinski/odin-book/14-parametric-polymorphism-writing-generic-code.md` - generics
-- `docs/karl_zylinski/odin-book/16-error-handling.md` - error patterns
-- `docs/karl_zylinski/odin-book/18-you-probably-dont-need-a-build-system.md` - packages/imports
-- `docs/karl_zylinski/odin-book/23-odin-features-you-should-avoid.md` - anti-patterns
+- `odin-knowledge-base/docs/karl_zylinski/odin-book/03-variables-and-constants.md` - types, constants
+- `odin-knowledge-base/docs/karl_zylinski/odin-book/04-some-additional-basics.md` - proc, if/for
+- `odin-knowledge-base/docs/karl_zylinski/odin-book/05-making-new-types.md` - struct/enum/union/switch/Maybe
+- `odin-knowledge-base/docs/karl_zylinski/odin-book/06-pointers.md` - pointers
+- `odin-knowledge-base/docs/karl_zylinski/odin-book/07-procedures-and-scopes.md` - defer, named returns
+- `odin-knowledge-base/docs/karl_zylinski/odin-book/14-parametric-polymorphism-writing-generic-code.md` - generics
+- `odin-knowledge-base/docs/karl_zylinski/odin-book/16-error-handling.md` - error patterns
+- `odin-knowledge-base/docs/karl_zylinski/odin-book/18-you-probably-dont-need-a-build-system.md` - packages/imports
+- `odin-knowledge-base/docs/karl_zylinski/odin-book/23-odin-features-you-should-avoid.md` - anti-patterns
 
 ### Workflow / tooling
 
-- `code/templates/` - projects to clone (hot-reload Raylib/Sokol template)
+- `code/vendored templates/` - projects to clone (hot-reload Raylib/Sokol template)
 - `code/examples/demo.odin` - feature demo
-- `docs/karl_zylinski/odin-book/22-debuggers.md` - debug setup
-- `docs/karl_zylinski/odin-book/25-libraries-for-creating-video-games.md` - Raylib/Sokol/libs
+- `odin-knowledge-base/docs/karl_zylinski/odin-book/22-debuggers.md` - debug setup
+- `odin-knowledge-base/docs/karl_zylinski/odin-book/25-libraries-for-creating-video-games.md` - Raylib/Sokol/libs
 
 ## How this file is generated
 
-This INDEX is regenerated by `_Helpers/build_kb_index.py` and split into two zones:
+This INDEX is regenerated by `_Helpers/scripts/indexing/build_kb_index.py` and split into two zones:
 
 **AUTO** (regenerated on every run): `Overview (by source)`, `Skool courses`, `Karl Zylinski book`, `Statistics`, `Skill to navigate`. These derive from the filesystem, so they always reflect the current state of the KB.
 
-**MANUAL** (preserved across scrapes): `Index by topic (QUICK SEARCH)` (human-curated, only updated by re-running the prompt at `_Helpers/Prompts/refresh_topic_index.md` or by hand) and this section.
+**MANUAL** (preserved across scrapes): `Index by topic (QUICK SEARCH)` (human-curated, only updated by re-running the prompt at `_Helpers/prompts/refresh_topic_index.md` or by hand) and this section.
 
-To refresh the MANUAL section after a major KB evolution (new lessons, new chapters), use the prompt at `_Helpers/Prompts/refresh_topic_index.md` - manually or by asking Kilo.
+To refresh the MANUAL section after a major KB evolution (new lessons, new chapters), use the prompt at `_Helpers/prompts/refresh_topic_index.md` - manually or by asking Kilo.
 
 If the INDEX becomes too big (> 10 KB), consider splitting into:
 

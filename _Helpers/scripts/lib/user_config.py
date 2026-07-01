@@ -1,0 +1,141 @@
+"""_Helpers/scripts/lib/user_config.py - Personal user config loader.
+
+The config file is gitignored (in `_Private/.config/user_config.jsonc`).
+If absent, scripts fall back to environment variables, then to empty strings.
+
+Format: JSONC (JSON with // line comments and /* */ block comments).
+
+To create your local config:
+
+    cp _Helpers/templates/user_config.example.jsonc _Private/.config/user_config.jsonc
+
+Then edit the copy and fill in your paths / credentials.
+
+Scripts that depend on the user config:
+
+    - _Helpers/scripts/fixes/odin_format.py       (ODINFMT_EXE)
+    - _Helpers/scripts/scrappers/scrape_skool.py      (yt-dlp path, Skool credentials)
+    - _Helpers/scripts/fixes/book_html_to_md.py   (path to Karl book HTML)
+"""
+
+from __future__ import annotations
+
+import json
+import os
+import re
+from pathlib import Path
+from typing import Any
+
+# JSONC: fallback order - env var > this JSONC file in _Private/.config/
+CONFIG_PATH = Path(
+    os.environ.get("ODINRAG_CONFIG")
+    or (Path(__file__).resolve().parents[3] / "_Private" / ".config" / "user_config.jsonc")
+)
+
+EXAMPLE_PATH = (
+    Path(__file__).resolve().parents[2] / "templates" / "user_config.example.jsonc"
+)
+
+DEFAULTS: dict[str, Any] = {
+    "paths": {
+        "odinfmt_exe": "",
+        "odinfmt_config_system": "",
+        "yt_dlp_exe": "",
+        "odin_compiler": "",
+        "python_exe": "",
+        "karl_book_html": "",
+        "karl_book_out": "",
+        "project_root": "",
+        "external_odin_projects_dir": "",
+        "temp_dir": "",
+    },
+    "skool": {
+        "email": "",
+    },
+    "scraper": {
+        "youtube_cookies_file": "",
+    },
+    "kb": {
+        "expected_lessons_skool": 0,
+        "expected_files_karl_book": 0,
+        "expected_articles_zylinski": 0,
+        "expected_official_docs": 0,
+    },
+}
+
+# Strip // line comments and /* */ block comments from JSONC text
+_JSONC_COMMENT_RE = re.compile(
+    r"//.*?$|/\*.*?\*/",
+    re.DOTALL | re.MULTILINE,
+)
+
+
+def _strip_jsonc_comments(text: str) -> str:
+    """Strip // line comments and /* */ block comments from a JSONC string."""
+    return _JSONC_COMMENT_RE.sub("", text)
+
+
+def load_config() -> dict:
+    """Load the user config from the JSONC file, merging with DEFAULTS."""
+    if not CONFIG_PATH.is_file():
+        return json.loads(json.dumps(DEFAULTS))
+    try:
+        with open(CONFIG_PATH, "r", encoding="utf-8") as f:
+            raw = f.read()
+        stripped = _strip_jsonc_comments(raw)
+        user_data = json.loads(stripped)
+    except (OSError, json.JSONDecodeError, UnicodeDecodeError):
+        return json.loads(json.dumps(DEFAULTS))
+    out = json.loads(json.dumps(DEFAULTS))  # deep copy
+    for section_key in DEFAULTS:
+        if section_key in user_data and isinstance(user_data[section_key], dict):
+            out[section_key].update(user_data[section_key])
+    return out
+
+
+_config = load_config()
+
+PATHS = _config.get("paths", {})
+SKOOL = _config.get("skool", {})
+SCRAPER = _config.get("scraper", {})
+KB = _config.get("kb", {})
+
+
+def get(key_path: str, default: Any = "") -> Any:
+    """Acces par chemin pointe. Exemple: get('paths.odinfmt_exe')."""
+    cur: Any = _config
+    for part in key_path.split("."):
+        if isinstance(cur, dict) and part in cur:
+            cur = cur[part]
+        else:
+            return default
+    return cur
+
+
+def env_or_config(key_path: str, env_var: str, default: str = "") -> str:
+    """Environment variable takes priority, then config, then default."""
+    env_val = os.environ.get(env_var, "").strip()
+    if env_val:
+        return env_val
+    cfg_val = str(get(key_path, default) or default).strip()
+    return cfg_val
+
+
+def where_to_create() -> str:
+    """Path where the user_config.jsonc file should be created (displayed if absent)."""
+    return str(CONFIG_PATH)
+
+
+__all__ = [
+    "CONFIG_PATH",
+    "EXAMPLE_PATH",
+    "DEFAULTS",
+    "load_config",
+    "get",
+    "env_or_config",
+    "PATHS",
+    "SKOOL",
+    "SCRAPER",
+    "KB",
+    "where_to_create",
+]

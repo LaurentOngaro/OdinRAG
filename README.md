@@ -14,55 +14,15 @@ The repo ships **only** the curation workflow (scrapers, agents, skills, indexes
 
 ## Structure
 
-````
-OdinRAG/
-├── README.md                  ← you are here
-├── SOURCES.md                 ← how to obtain the copyrighted sources this KB references
-├── LICENSE                    ← MIT
-├── AGENTS.md                  ← conventions for AI-coding agents (Kilo, Claude Code...)
-├── kilo.json                  ← AI agent runtime config
-├── odinfmt.json               ← Odin formatter config (2-space, LF)
-├── .markdownlint.json         ← markdown lint config
-├── docs/                      ← scraped sources (samples shipped; full corpus via scrapers)
-│   ├── official/              ← odin-lang.org/docs/ + awesome-odin (MIT-style, fully shipped)
-│   ├── karl_zylinski/         ← 5 sample articles from zylinski.se (run scraper for full 19)
-│   ├── gingerbill/            ← 5 sample articles from gingerbill.org (run scraper for full 44)
-│   ├── jakubtomsu/            ← 4 sample articles from jakubtomsu.github.io (run scraper for full 11)
-│   ├── newsletters/           ← 32 odin-lang.org/news/ issues (fully shipped, Odin team)
-│   └── showcase/              ← 7 odin-lang.org/showcase/ pages (fully shipped, Odin team)
-│
-├── code/                      ← public code references
-│   ├── examples/              ← official demo.odin (1 file, see SOURCES.md § 9)
-│   ├── gists/                 ← 25 public gists from awesome-odin
-│   ├── templates/             ← README with clone instructions (no templates checked-in - see SOURCES.md)
-│   ├── projects/              ← public scaffold: INTEGRATION.md + _TEMPLATE_/ (project code is gitignored)
-│   └── templates/             ← README with clone instructions (no templates checked-in - see SOURCES.md)
-│
-├── _Helpers/                  ← scrapers + utilities (PUBLIC, runnable on your own data)
-│   ├── scrape_skool.py        ← scrapes the programvideogames Skool group
-│   ├── scrape-official.py     ← scrapes odin-lang.org/docs/ + awesome-odin
-│   ├── scrape-zylinski.py     ← scrapes zylinski.se (RSS auto-discovery)
-│   ├── scrape-gingerbill.py   ← scrapes gingerbill.org (RSS)
-│   ├── scrape-newsletters.py  ← scrapes odin-lang.org/news/
-│   ├── scrape-jakubtomsu.py   ← scrapes jakubtomsu.github.io (RSS)
-│   ├── scrape-showcase.py     ← scrapes odin-lang.org/showcase/
-│   ├── odin_format.py         ← wrapper over odinfmt (CLI + library)
-│   ├── format_odin_in_files.py← runs odinfmt over .odin + ```odin``` blocks
-│   ├── book_html_to_md.py     ← converts Karl's book HTML → per-chapter MD
-│   ├── build_kb_index.py      ← regenerates odin-knowledge-base/INDEX.md
-│   ├── fix_mojibake.py        ← archival - repair UTF-8/Latin-1 mojibake
-│   ├── reflow_md.py           ← reflow .md into book style (1-paragraph-per-line)
-│   ├── lint_pylance.py        ← pyright-based linter (enforced zero warnings)
-│   ├── audit_public_safety.py ← verifies the working tree is safe to push publicly
-│   ├── download_gists.py      ← downloads public gists from awesome-odin
-│   ├── download_odin_examples.py ← downloads official Odin examples
-│   ├── lib/                   ← shared library (__init__, text_clean, http_client, html2md, user_config)
-│   └── docs/                  ← internal docs + social post templates + user_config.example.json
-│
-└── odinfmt.json               ← formatter config (duplicate listed above for IDE visibility)
-````
+> **The full tree lives in [`_Helpers/docs/001_folder_structure.md`](_Helpers/docs/001_folder_structure.md).**
+> This section gives a one-line summary of each bucket; refer to the structure doc for the complete tree.
 
-> `odin-knowledge-base/` and `courses/` (the local scraped output) are **gitignored** by design - they contain copyrighted content under your own subscription. The repo ships sample articles in `docs/{karl_zylinski,gingerbill,jakubtomsu}/`; run the corresponding scrapers to populate the full corpus on your own machine.
+- `odin-knowledge-base/` - **Bucket 1** (public, partly gitignored) - scraped KB + Skool courses
+- `code/` - public code references (examples, gists, vendored templates, personal projects)
+- `_Helpers/` - **Bucket 2** (public) - scripts, meta docs, internal templates, prompts, logs
+- `_Private/` - **Bucket 3** (gitignored, never pushed) - config, planning, raw notes
+
+> `odin-knowledge-base/courses/` and `odin-knowledge-base/docs/karl_zylinski/odin-book/*.md` are **gitignored** by design - they contain copyrighted content under your own subscription. The repo ships sample articles in `odin-knowledge-base/docs/{karl_zylinski,gingerbill,jakubtomsu}/`; run the corresponding scrapers to populate the full corpus on your own machine.
 
 ## Quick start
 
@@ -71,33 +31,33 @@ git clone https://github.com/LaurentOngaro/OdinRAG.git
 cd OdinRAG
 
 # Audit before any push (idempotent, exit 0 = clean)
-python _Helpers/audit_public_safety.py
+python _Helpers/scripts/diagnostic/audit_public_safety.py
 
 # Scrape the public sources (no paywall, no auth)
-python _Helpers/scrape-official.py
-python _Helpers/scrape-zylinski.py
+python _Helpers/scripts/scrappers/scrape_official.py
+python _Helpers/scripts/scrappers/scrape_zylinski.py
 
 # (Skool requires your own paid membership - see SOURCES.md)
-python _Helpers/scrape_skool.py
+python _Helpers/scripts/scrappers/scrape_skool.py
 
 # Format all .odin + ```odin``` blocks in the working tree
-python _Helpers/format_odin_in_files.py --path odin-knowledge-base
+python _Helpers/scripts/fixes/format_odin_in_files.py --path odin-knowledge-base
 ````
 
 Requirements: Python 3.10+, `pip install requests beautifulsoup4 markdownify lxml`.
 
 ### Personal setup (paths and credentials)
 
-All machine-specific paths and credentials live in a single gitignored file: `_Helpers/.private/user_config.jsonc`.
+All machine-specific paths and credentials live in a single gitignored file: `_Private/.config/user_config.jsonc`.
 
 Setup:
 
 ```bash
-cp _Helpers/docs/user_config.example.jsonc _Helpers/.private/user_config.jsonc
+cp _Helpers/templates/user_config.example.jsonc _Private/.config/user_config.jsonc
 # edit the copy with your actual paths
 ```
 
-The loader `_Helpers/lib/user_config.py` exposes them to the scrapers and `format_odin_in_files.py`. Override any value with an env var (e.g. `ODINFMT_EXE`, `BOOK_HTML_SRC`).
+The loader `_Helpers/scripts/lib/user_config.py` exposes them to the scrapers and `format_odin_in_files.py`. Override any value with an env var (e.g. `ODINFMT_EXE`, `BOOK_HTML_SRC`).
 Keep credentials out of the JSON - use env vars like `SKOOL_PASSWORD` for secrets.
 
 ## Built with MiniMax-M3
@@ -107,7 +67,7 @@ M3 acts as the structural engineer; I act as the domain curator.
 
 Every file in this repo is the result of a prompt + a code review between us. There is no `git blame` you can read to tell which line was M3's first draft and which was my edit - that's the point.
 
-For the technical story of how M3 is used in this repo, see [`_Helpers/docs/002_How MiniMax-M3 is used in this repository.md`](_Helpers/docs/002_How MiniMax-M3 is used in this repository.md).
+For the technical story of how M3 is used in this repo, see [`_Helpers/docs/002_how_minimax-m3_is_used_in_this_repository.md`](_Helpers/docs/002_how_minimax-m3_is_used_in_this_repository.md).
 
 For the social posts around the MiniMax-M3 Showcase Round 2, see [`_Helpers/docs/social/`](_Helpers/docs/social).
 
@@ -134,7 +94,7 @@ See [SOURCES.md](SOURCES.md) for attribution and licensing.
 
 Every dollar funds one of these (in order of priority):
 
-1. **Scraper maintenance** - keeping `scrape_skool.py`, `scrape-official.py`, `scrape-zylinski.py` resilient against site changes, rate limits, and bot detection.
+1. **Scraper maintenance** - keeping `scrape_skool.py`, `scrape_official.py`, `scrape_zylinski.py` resilient against site changes, rate limits, and bot detection.
 2. **New sources** - book ISBN API, dod-benchmarks tracker, official newsletter parser, etc.
 3. **AI integration polish** - more Kilo skills, smarter subagent routing, frontmatter improvements for Obsidian / RAGnarok compatibility.
 4. **Documentation** - English translations of French-only docs, code samples, video walkthroughs for the trickier topics (hot-reload, allocator patterns).

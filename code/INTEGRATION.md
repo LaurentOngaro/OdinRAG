@@ -1,0 +1,132 @@
+# Integration with the KB - how Kilo helps you
+
+Document explaining how the AI assistant (Kilo Code) cross-references **your code** in `code/projects/<your-project>/` with **the knowledge base** elsewhere in the repo.
+
+## Important: project code is personal work, NOT public
+
+The OdinRAG repo ships the **scaffold** for a project: [`_Helpers/templates/odin-project/`](../_Helpers/templates/odin-project/) (README, AGENTS.md, src/main.odin, devlog template, .kilo/agents/odin-project.md). This template is public.
+
+**Actual project code is personal and never pushed.** Two options:
+
+1. **Inside the repo (recommended for Kilo context)** - copy the scaffold from `_Helpers/templates/odin-project/` to `code/projects/<your-project>/`. Add an entry for your project in `.gitignore` (see `PVG03_RPG/` for the pattern). Kilo sees your code, you get AI assistance, nothing leaks to git.
+2. **Outside the repo (strict IP isolation)** - copy the scaffold somewhere like `D:\OdinProjects\<your-project>\`. The repo stays 100% clean.
+
+Both work. Option 1 is more convenient; option 2 is more IP-secure. The repo's public state is identical in both cases.
+
+## The global workspace
+
+When you code in `code/projects/<your-project>/src/`, Kilo sees **the whole workspace**, so it has access to your KB alongside your code. That is exactly what we want.
+
+> **The full tree is documented in [`_Helpers/docs/001_folder_structure.md`](../_Helpers/docs/001_folder_structure.md).**
+> Key parts relevant to coding sessions:
+>
+> - `code/projects/<your-project>/` - your code, devlogs, project AGENTS.md (gitignored)
+> - `odin-knowledge-base/` - Skool KB, Karl's book, official docs
+> - `code/vendored templates/` - upstream hot-reload templates (to clone OUTSIDE this repo for a real project)
+> - `_Helpers/scripts/` - scrapers + utilities
+> - `.kilo/` - Kilo config (skills, agents)
+
+## How Kilo uses the KB while coding
+
+### Workflow: "Kilo helps me code X"
+
+```
+1. You open code/projects/<your-project>/src/main.odin
+2. You write / ask for something
+3. Kilo first reads your project's AGENTS.md
+   -> it knows which patterns you already use
+4. If the question is about an Odin concept:
+   - It consults `odin-knowledge-base/INDEX.md` (1-2 KB, overview)
+   - It loads the 2-3 relevant files identified
+   - It proposes code based on the actual patterns
+```
+
+### Workflow: "I want to learn pattern Y"
+
+```
+1. You ask "how do I do a tracking allocator in Odin?"
+2. Kilo activates the `odin-pattern-finder` skill
+3. It searches in `topic/*` tags + smart grep in `odin-knowledge-base/`
+4. It returns 2-3 sources ordered by relevance
+5. You pick the one to open first
+```
+
+## The 3 key files that Kilo always reads first
+
+1. **`code/projects/<your-project>/AGENTS.md`** -> **PROJECT-PRIORITY context** (patterns used, dependencies, allocator policy, target file structure). **Wired into `kilo.json` `instructions`** so it is loaded **before** the global `AGENTS.md` whenever the user works under that project.
+2. **`AGENTS.md` at the root** -> OdinRAG repo context (where the KB is, how it is organised, conventions).
+3. **`odin-knowledge-base/INDEX.md`** -> semantic index (1-2 KB) for navigating the KB without loading everything.
+
+Kilo NEVER loads the whole KB at once (118+ files). It reads the INDEX, identifies 2-3 relevant files, and loads them on demand.
+
+### Wiring a project's `AGENTS.md` as priority context
+
+Example of wiring, applied to **PVG03_RPG** project:
+
+```jsonc
+// kilo.json -> instructions (top of file)
+"instructions": [
+  "AGENTS.md",                                           // global
+  "README.md",
+  "TODO.md",
+  ".kilo/agents/odin-gamedev.md",                        // global subagent
+  "code/projects/PVG03_RPG/AGENTS.md",                   // PROJECT context (priority)
+  "code/projects/PVG03_RPG/.kilo/agents/odin-project.md" // PROJECT subagent
+]
+```
+
+Steps to add a new project:
+
+1. Copy `_Helpers/templates/odin-project/` to `code/projects/<your-project>/`.
+2. Fill out `code/projects/<your-project>/AGENTS.md` with: goal, stack, file structure, modules, allocator policy, patterns implemented, pitfalls, architectural decisions, KB sources.
+3. Fill out `code/projects/<your-project>/.kilo/agents/odin-project.md` with the project-specific sources-of-truth table (replace `<PROJECT_NAME>`).
+4. Add both files to `kilo.json` `instructions` (above the global `.kilo/agents/odin-gamedev.md` line so it loads first).
+5. Add `code/projects/<your-project>/` to `.gitignore` (see the existing `PVG03_RPG/` entry for the pattern).
+6. Verify with `_Helpers/scripts/diagnostic/audit_public_safety.py` - the new files must be gitignored.
+
+The orchestrator (`code` agent) auto-loads the project's `AGENTS.md` first because it appears earlier in the `instructions` array. The project's `odin-project.md` subagent is then auto-invoked when the question matches the project's topic.
+
+## Context conventions (to respect)
+
+When you write your project's `AGENTS.md`, mention:
+
+- Which Karl chapters you use (references by path)
+- Which Skool lessons you draw inspiration from (references by path)
+- Which patterns you have already implemented
+- Which pitfalls you have already identified (so you don't fall for them again)
+
+Example `code/projects/my-rpg/AGENTS.md`:
+
+```markdown
+# my-rpg - Project context
+
+- Type: top-down 2D RPG
+- Stack: Raylib + ODIN
+- Main inspiration:
+  - `odin-knowledge-base/.../rpg/067-05-entity-system.md` (entity component)
+  - `odin-knowledge-base/docs/karl_zylinski/odin-book/13-making-manual-memory-management-easier.md` (arena)
+
+## Patterns already implemented
+
+- Tracking allocator for debug (lesson 088)
+- Entity update loop (lesson 14, 67)
+
+## Pitfalls identified
+
+- Do NOT use `using` on entity fields (lesson 5 + Karl 23.1)
+- Prefer `arena` over `tracking_allocator` in production
+```
+
+## Limits NOT to exceed
+
+- **RAGnarok**: not enabled (see AGENTS.md at the root). We rely on the Kilo context + frontmatter.
+- **Loading the whole KB**: NEVER. Always go through `INDEX.md`.
+- **KB modifications**: NEVER edit `odin-knowledge-base/` by hand (auto-generated by the scrapers, overwritten on the next run).
+
+## Kilo skills relevant for Odin projects
+
+- `kb-navigator`: navigate the KB by topic/pattern
+- `odin-format`: re-format .odin or `odin` blocks after a modification
+- `odin-pattern-finder`: find a pattern (state machine, allocator, etc.)
+
+The `odin-gamedev` subagent is automatically activated for pure Odin questions (see `.kilo/agents/odin-gamedev.md`).

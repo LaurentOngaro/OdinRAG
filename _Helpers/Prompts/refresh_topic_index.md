@@ -1,3 +1,14 @@
+---
+title: "refresh_topic_index"
+date: 2026-07-01
+tags: [OdinRAG, reference]
+type: reference
+status: active
+version: 1.0.0
+lastUpdated: "2026-07-01"
+updatedBy: "MiniMax-M3 (Kilo Code)"
+---
+
 # Prompt: refresh the "Index by topic" section of `odin-knowledge-base/INDEX.md`
 
 > Use this prompt when the KB has grown significantly (new Skool lessons, new Karl book chapters, new gingerbill/jakubtomsu articles) and the hardcoded "Index by topic" section in `odin-knowledge-base/INDEX.md` is stale.
@@ -87,6 +98,6 @@ DO NOT
 
 If you have Kilo (MiniMax-M3) running, you can just say to Kilo:
 
-> _Read `odin-knowledge-base/INDEX.md`, read all `.md` files in `odin-knowledge-base/`, `docs/`, and `code/projects/_TEMPLATE_/`. Propose an updated `## Index by topic (QUICK SEARCH)` section that covers the current KB. Output the new section as a code block - do NOT modify INDEX.md._
+> _Read `odin-knowledge-base/INDEX.md`, read all `.md` files in `odin-knowledge-base/`, `docs/`, and `_Helpers/templates/odin-project/`. Propose an updated `## Index by topic (QUICK SEARCH)` section that covers the current KB. Output the new section as a code block - do NOT modify INDEX.md._
 
 Kilo will execute the prompt directly. No script needed.

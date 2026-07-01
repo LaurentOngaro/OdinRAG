@@ -1,13 +1,12 @@
 ---
 name: planning-helper
-description: Manage day-by-day planning files (planning/daily/J_YYYY-MM-DD.md). Create today's daily from the template, update a section (objectives, tasks, bilan), list existing dailies.
+description: Manage day-by-day planning files (_Private/planning/daily/J_YYYY-MM-DD.md). Create today's daily from the template, update a section (objectives, tasks, bilan), list existing dailies.
 ---
 
 # Planning helper - daily management
 
-Skill for managing daily notes in `planning/daily/`. The format is detailed in
-[`planning/template/J_YYYY-MM-DD.md`](../../planning/template/J_YYYY-MM-DD.md)
-and the YAML convention in [`_Helpers/docs/FRONTMATTER_CONVENTIONS.md`](../../_Helpers/docs/FRONTMATTER_CONVENTIONS.md).
+Skill for managing daily notes in `_Private/planning/daily/`.
+The format is detailed in [`_Helpers/templates/planning-daily/J_YYYY-MM-DD.md`] and the YAML convention in [`_Helpers/docs/003_yaml_frontmatter_conventions.md`]
 
 ## When to invoke
 
@@ -26,10 +25,10 @@ $today = python -c "from datetime import date; print(date.today().isoformat())"
 # -> "2026-06-28"
 
 # 2. Check it doesn't already exist
-$test -f "planning/daily/J_$today.md" && echo "EXISTS" || echo "OK to create"
+$test -f "_Private/planning/daily/J_$today.md" && echo "EXISTS" || echo "OK to create"
 
 # 3. Copy the template and adapt the frontmatter + H1 title
-$cp planning/template/J_YYYY-MM-DD.md planning/daily/J_$today.md
+$cp _Helpers/templates/planning-daily/J_YYYY-MM-DD.md _Private/planning/daily/J_$today.md
 # Then edit: frontmatter (date) + H1 title ("# Daily YYYY-MM-DD - Subject")
 ```
 
@@ -38,11 +37,11 @@ The H1 title must follow the convention: `# Daily YYYY-MM-DD - <subject>`.
 ### 2. List existing dailies
 
 ```bash
-$ls planning/daily/
+$ls _Private/planning/daily/
 # -> J_2026-06-28.md  J_2026-06-29.md  ...
 
 # With titles (H1 excerpt)
-$grep -h "^# Daily" planning/daily/*.md | sort
+$grep -h "^# Daily" _Private/planning/daily/*.md | sort
 ```
 
 ### 3. Add a task to today's daily
@@ -57,7 +56,7 @@ $today = "J_$(python -c 'from datetime import date; print(date.today().isoformat
 
 ```bash
 # Lists dailies that talk about a topic (grep in title + body)
-$grep -l "hot-reload\|format" planning/daily/*.md
+$grep -l "hot-reload\|format" _Private/planning/daily/*.md
 ```
 
 ### 5. End-of-day bilan
@@ -100,6 +99,6 @@ status: active
 ## Anti-patterns
 
 - **DO NOT** create a daily retroactively (except for exceptional catch-up).
-- **DO NOT** modify the template `planning/template/J_YYYY-MM-DD.md`. It is the reference - to add a section, create a new version of the template + migrate existing dailies.
+- **DO NOT** modify the template `_Helpers/templates/planning-daily/J_YYYY-MM-DD.md`. It is the reference - to add a section, create a new version of the template + migrate existing dailies.
 - **DO NOT** write the bilan **during** the session. The bilan is a retrospective, not a logbook.
 - **DO NOT** leave a daily empty (without any task checked / bilan). If there is nothing to do on a day, do not create the file.

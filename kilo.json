@@ -18,16 +18,16 @@
   },
   "permission": {
     "bash": {
-      "python _Helpers/scrape_*.py *": "allow",
-      "python _Helpers/scrape-*.py *": "allow",
-      "python _Helpers/download_*.py *": "allow",
-      "python _Helpers/book_html_to_md.py *": "allow",
-      "python _Helpers/format_odin_in_files.py *": "allow",
-      "python _Helpers/fix_mojibake.py *": "allow",
-      "python _Helpers/audit_public_safety.py *": "allow",
-      "python _Helpers/lint_pylance.py *": "allow",
-      "python _Helpers/build_kb_index.py *": "allow",
-      "python _Helpers/reflow_md.py *": "allow",
+      "python _Helpers/scripts/scrappers/scrape_*.py *": "allow",
+      "python _Helpers/scripts/scrappers/download_*.py *": "allow",
+      "python _Helpers/scripts/fixes/book_html_to_md.py *": "allow",
+      "python _Helpers/scripts/fixes/format_odin_in_files.py *": "allow",
+      "python _Helpers/scripts/fixes/fix_mojibake.py *": "allow",
+      "python _Helpers/scripts/fixes/reflow_md.py *": "allow",
+      "python _Helpers/scripts/diagnostic/audit_public_safety.py *": "allow",
+      "python _Helpers/scripts/diagnostic/auditReadmeCoherence.py *": "allow",
+      "python _Helpers/scripts/fixes/lint_pylance.py *": "allow",
+      "python _Helpers/scripts/indexing/build_kb_index.py *": "allow",
       "& '<PATH_TO_ODINFMT>\\odinfmt.exe' *": "allow",
       "Get-ChildItem *": "allow",
       "Get-Content *": "allow",
@@ -41,9 +41,9 @@
     },
     "edit": {
       "odin-knowledge-base/courses/**/!README.md": "deny",
-      "docs/official/!README.md": "deny",
-      "docs/karl_zylinski/!README.md": "deny",
+      "odin-knowledge-base/docs/**/!README.md": "deny",
       "_Helpers/logs/**": "deny",
+      "code/projects/PVG03_RPG/**": "deny",
       "**/.private/**": "deny",
       "**/__pycache__/**": "deny"
     }

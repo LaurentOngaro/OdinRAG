@@ -3,7 +3,7 @@
 > This file is read first by AI coding agents to understand the structure, conventions, and tools of the OdinRAG repository.
 > **Keep it up to date** when the structure evolves.
 > Built with **MiniMax-M3** via [Kilo Code](https://kilo.ai).
-> See [`_Helpers/docs/002_How MiniMax-M3 is used in this repository.md`](\_Helpers/docs/002_How MiniMax-M3 is used in this repository.md) for the technical story.
+> See [`_Helpers/docs/002_how_minimax-m3_is_used_in_this_repository.md`](_Helpers/docs/002_how_minimax-m3_is_used_in_this_repository.md) for the technical story.
 
 ## TL;DR
 
@@ -17,65 +17,15 @@ The scraped content of paywalled or copyrighted sources is **never redistributed
 
 ## Repository structure
 
-````
-OdinRAG/
-├── README.md                        Index (read first)
-├── SOURCES.md                       How to obtain the scraped content
-├── LICENSE                          MIT
-├── AGENTS.md                        This file - AI context
-├── kilo.json / .kilo/kilo.jsonc     Kilo runtime config
-├── odinfmt.json                     Odin formatter config (2-space, LF)
-├── .markdownlint.json / .markdownlintignore
-├── .editorconfig                    Base style
-│
-├── planning/                        Day-by-day planning
-│   ├── ROADMAP.md                   Phases + milestones
-│   ├── template/J_YYYY-MM-DD.md     Daily template (DO NOT EDIT)
-│   └── daily/J_YYYY-MM-DD.md        Daily entries (gitignored)
-│
-├── docs/                            External documentation (publicly scrapable)
-│   ├── official/                    odin-lang.org/docs/ (MIT-style, mirrored in repo)
-│   ├── karl_zylinski/               zylinski.se (README only - see SOURCES.md § 2)
-│   ├── newsletters/                 odin-lang.org/news/ (README only - § 4)
-│   ├── gingerbill/                  gingerbill.org articles (public RSS)
-│   ├── jakubtomsu/                  jakubtomsu.github.io articles (public RSS)
-│   ├── showcase/                    odin-lang.org/showcase/ (public)
-│   └── how-to/                      procedural how-to guides written by hand (public)
-│
-├── code/                            Examples and templates
-│   ├── examples/                    demo.odin (official)
-│   ├── gists/                       Public gists (cloneable)
-│   ├── templates/                   Project templates (cloneable)
-│   │
-├── _Helpers/                        ★ SCRIPTS AND LIBRARY
-│   ├── scrape_skool.py              Active: scrapes the programvideogames Skool group
-│   ├── scrape-official.py           Re-entrant: scrapes odin-lang.org/docs
-│   ├── scrape-zylinski.py           Re-entrant: scrapes zylinski.se
-│   ├── scrape-gingerbill.py         RSS: scrapes gingerbill.org (public)
-│   ├── scrape-newsletters.py        Crawl: scrapes odin-lang.org/news/ (public)
-│   ├── scrape-jakubtomsu.py         RSS: scrapes jakubtomsu.github.io (public)
-│   ├── scrape-showcase.py           Crawl: scrapes odin-lang.org/showcase/ (public)
-│   ├── book_html_to_md.py           Converts Karl's HTML ebook → per-chapter MD
-│   ├── format_odin_in_files.py      CLI: format .odin + ```odin``` blocks via odinfmt
-│   ├── build_kb_index.py            Regenerates odin-knowledge-base/INDEX.md
-│   ├── download_gists.py            CLI: download public gists from awesome-odin
-│   ├── download_odin_examples.py    CLI: download official Odin examples
-│   ├── lint_pylance.py              CLI: run pyright on Python files
-│   ├── fix_mojibake.py              CLI: repair UTF-8/Latin-1 mojibake in files
-│   ├── audit_public_safety.py       Public-safety gate (run before any public push)
-│   ├── lib/                         Shared library
-│   │   ├── text_clean.py            repair_mojibake (UTF-8/Latin-1)
-│   │   ├── http_client.py           fetch, normalize_url, sitemap/RSS parsers
-│   │   ├── html2md.py               scrape_to_markdown (BeautifulSoup + markdownify)
-│   │   └── user_config.py           Personal config loader (env > JSON > empty)
-│   ├── archives/                    One-shot scripts (kept for audit, initially empty)
-│   ├── logs/                        Cumulative logs (gitignored)
-│   └── docs/                        Internal docs + social post templates
-│
-└── odinfmt.json                     (duplicate above the _Helpers/ block)
-````
+> **The full tree lives in [`_Helpers/docs/001_folder_structure.md`](_Helpers/docs/001_folder_structure.md).**
+> This section gives a one-line summary of each bucket; refer to the structure doc for the complete tree.
 
-> Note: `odin-knowledge-base/` and the legacy `courses/` folder (containing the paid Skool scrape) are gitignored by design. They live only on the local machine that produced them.
+- `odin-knowledge-base/` - **Bucket 1** (public, partly gitignored) - scraped KB + Skool courses
+- `code/` - public code references (examples, gists, vendored templates, personal projects)
+- `_Helpers/` - **Bucket 2** (public) - scripts, meta docs, internal templates, prompts, logs
+- `_Private/` - **Bucket 3** (gitignored, never pushed) - config, planning, raw notes
+
+> Note: `odin-knowledge-base/courses/` and `odin-knowledge-base/docs/karl_zylinski/odin-book/*.md` are gitignored by design (paywalled sources). They live only on the local machine that produced them.
 
 ## Dependencies
 
@@ -90,34 +40,57 @@ OdinRAG/
 
 ### User config (personal paths and credentials)
 
-All machine-specific paths and credentials live in a single gitignored file:`_Helpers/.private/user_config.jsonc`.
-The loader is `_Helpers/lib/user_config.py`.
+All machine-specific paths and credentials live in a single gitignored file:`_Private/.config/user_config.jsonc`.
+The loader is `_Helpers/scripts/lib/user_config.py`.
 
 Setup:
 
 ```bash
-cp _Helpers/docs/user_config.example.jsonc _Helpers/.private/user_config.jsonc
+cp _Helpers/templates/user_config.example.jsonc _Private/.config/user_config.jsonc
 # edit the copy with your actual paths
 ```
 
 Scripts that need personal info read from this config (with env var override):
 
-| Script                        | Field                  | Env var                                 |
-| ----------------------------- | ---------------------- | --------------------------------------- |
-| `_Helpers/odin_format.py`     | `paths.odinfmt_exe`    | `ODINFMT_EXE`                           |
-| `_Helpers/scrape_skool.py`    | `paths.yt_dlp_exe`     | `YT_DLP_EXE`                            |
-| `_Helpers/scrape_skool.py`    | `skool.email`          | `SKOOL_EMAIL`                           |
-| `_Helpers/scrape_skool.py`    | (password)             | `SKOOL_PASSWORD` (env ONLY, never JSON) |
-| `_Helpers/book_html_to_md.py` | `paths.karl_book_html` | `BOOK_HTML_SRC`                         |
-| `_Helpers/book_html_to_md.py` | `paths.karl_book_out`  | `BOOK_HTML_OUT`                         |
+| Script                                       | Field                  | Env var                                 |
+| -------------------------------------------- | ---------------------- | --------------------------------------- |
+| `_Helpers/scripts/fixes/odin_format.py`      | `paths.odinfmt_exe`    | `ODINFMT_EXE`                           |
+| `_Helpers/scripts/scrappers/scrape_skool.py` | `paths.yt_dlp_exe`     | `YT_DLP_EXE`                            |
+| `_Helpers/scripts/scrappers/scrape_skool.py` | `skool.email`          | `SKOOL_EMAIL`                           |
+| `_Helpers/scripts/scrappers/scrape_skool.py` | (password)             | `SKOOL_PASSWORD` (env ONLY, never JSON) |
+| `_Helpers/scripts/fixes/book_html_to_md.py`  | `paths.karl_book_html` | `BOOK_HTML_SRC`                         |
+| `_Helpers/scripts/fixes/book_html_to_md.py`  | `paths.karl_book_out`  | `BOOK_HTML_OUT`                         |
 
 Chain of resolution per value: **env var > user_config.jsonc > empty string**.
 
 ## Conventions
 
+### File naming (NNN_ prefix)
+
+- **Default** (authored docs under `_Helpers/docs/` and `_Private/planning/`): filename is `NNN_snake_case_slug.md` (3-digit prefix, lowercase + underscores + hyphens). NNN restarts at 001 in each folder. Chronological by creation date.
+- **H1 title = filename exactly** (no leading `NNN_` in the H1 if the filename has one). Examples:
+  - `003_yaml_frontmatter_conventions.md` → H1 `# 003_yaml_frontmatter_conventions`
+  - `002_how_minimax-m3_is_used_in_this_repository.md` → H1 `# 002_how_minimax-m3_is_used_in_this_repository`
+- **FS-unsafe characters forbidden in both filename and H1**: `<`, `>`, `:`, `"`, `/`, `\`, `|`, `?`, `*`. If the natural title would need one, rephrase.
+- **READMEs in authored folders**: filename is `README - <topic>.md` where `<topic>` is the parent directory name. H1 matches the filename (per the rule above). Examples:
+  - `_Helpers/scripts/README - scripts.md` → H1 `# README - scripts`
+  - `_Helpers/docs/README - docs.md` → H1 `# README - docs`
+- **NNN_ prefix is NOT applied** to files in these folder patterns (they keep their natural name):
+  - `**/templates/**` (template files keep their semantic name, e.g. `J_YYYY-MM-DD.md`, `main.odin`, `odin-project.md`)
+  - `**/planning/**` (planning files use semantic names: `J_YYYY-MM-DD.md`, `NNN_odin_learning_plan_*.md`, `NNN_roadmap.md` - the `NNN_` is REQUIRED here as it's the only way to order them; daily files do NOT use `NNN_`)
+  - `**/prompts/**` (prompt files keep their descriptive name, e.g. `refresh_topic_index.md`)
+  - `**/scripts/**` (Python files; the directory itself uses NNN_ ordering via its README only)
+  - `**/social/**` (one-off social posts, no chronological order)
+  - `**/daily/**` (dailies use `J_YYYY-MM-DD.md` - the `J_` prefix is the date tag)
+  - `**/raw/**` (raw notes kept as-is, no frontmatter, no NNN_)
+  - `code/**` (no NNN_ - code files keep their original names)
+  - `odin-knowledge-base/**` (no NNN_ - scraped files keep their original slugs)
+- **Dailies are gitignored**: they never reach the public repo, so their filename is purely personal.
+- The full authoritative tree is in [`_Helpers/docs/001_folder_structure.md`](_Helpers/docs/001_folder_structure.md).
+
 ### Markdown (knowledge base)
 
-- **Frontmatter** - see [`_Helpers/docs/FRONTMATTER_CONVENTIONS.md`](_Helpers/docs/FRONTMATTER_CONVENTIONS.md) for the full schema (5 main fields + hierarchical Obsidian tags).
+- **Frontmatter** - see [`_Helpers/docs/003_yaml_frontmatter_conventions.md`](_Helpers/docs/003_yaml_frontmatter_conventions.md) for the full schema (5 main fields + hierarchical Obsidian tags).
 - Scraped Skool lessons have a scraping frontmatter (`Cours`, `Module`, `ID`, `Durée`) which can be extended with `topic/*` for classification.
 - **2-space** indentation inside `odin ...` blocks (no tabs, no smart tabs). Configured via `odinfmt.json` at repo root.
 - **LF** newlines everywhere (even on Windows).
@@ -126,9 +99,9 @@ Chain of resolution per value: **env var > user_config.jsonc > empty string**.
 
 ### Planning (day-by-day)
 
-- **Daily** entries live in `planning/daily/J_YYYY-MM-DD.md`, created each working day.
-- **Template** in `planning/template/J_YYYY-MM-DD.md` is the reference - duplicate, never edit.
-- **Roadmap** in `planning/ROADMAP.md` covers phases P0-P4.
+- **Daily** entries live in `_Private/planning/daily/J_YYYY-MM-DD.md`, created each working day.
+- **Template** in `_Helpers/templates/planning-daily/J_YYYY-MM-DD.md` is the reference - duplicate, never edit.
+- **Roadmap** in `_Private/planning/002_roadmap.md` covers phases P0-P4.
 - `TODO.md` is legacy - migrate progressively to the daily system.
 - No retroactive dating - only create dailies for days actually worked.
 - End-of-day **bilan** section is mandatory in each daily (never folded into "in progress").
@@ -140,7 +113,7 @@ Chain of resolution per value: **env var > user_config.jsonc > empty string**.
 - Encoding: UTF-8 everywhere. `sys.stdout.reconfigure(encoding="utf-8")` at the top of every CLI script (with `# type: ignore[attr-defined]`).
 - Lint: Pylance-compatible (no flake8/black enforced).
 - No `print()` for debug - use `_log(level, msg)` and a structured logger.
-- **After any edit to a `.py` file, run `python _Helpers/lint_pylance.py <file>` and fix every reported warning before considering the task done.** The script wraps `pyright` (CLI engine behind Pylance) and exits non-zero on remaining warnings.
+- **After any edit to a `.py` file, run `python _Helpers/scripts/fixes/lint_pylance.py <file>` and fix every reported warning before considering the task done.** The script wraps `pyright` (CLI engine behind Pylance) and exits non-zero on remaining warnings.
 
 ### Durable vs one-shot scripts
 
@@ -164,7 +137,7 @@ These scripts must:
 ### Odin (in the KB)
 
 - No compilable Odin source in this repo.
-- `odin ...` blocks in `.md` files are formatted by `odinfmt` automatically after each scrape, or manually via `_Helpers/format_odin_in_files.py --path odin-knowledge-base`.
+- `odin ...` blocks in `.md` files are formatted by `odinfmt` automatically after each scrape, or manually via `_Helpers/scripts/fixes/format_odin_in_files.py --path odin-knowledge-base`.
 
 ## Style rules (project-wide)
 
@@ -179,7 +152,7 @@ These rules apply to every tracked `.md` file in this repo unless the file is ex
 ### Markdown prose
 
 - One paragraph = one physical line. No line break inside a sentence, no matter the line length. Table cells, code blocks, and frontmatter are exempt.
-- Detailed rule, examples, and rationale in [`_Helpers/docs/MARKDOWN_STYLE.md`](_Helpers/docs/MARKDOWN_STYLE.md) (loaded on demand, not in first-context).
+- Detailed rule, examples, and rationale in [`_Helpers/docs/004_markdown_style.md`](_Helpers/docs/004_markdown_style.md) (loaded on demand, not in first-context).
 
 ### Markdown structure: READMEs must reflect their directory
 
@@ -192,7 +165,7 @@ Every `README*.md` in this repo must accurately reflect the structure of its hos
 Verify with:
 
 ```bash
-python _Helpers/01_Diagnostic/auditReadmeCoherence.py
+python _Helpers/scripts/diagnostic/auditReadmeCoherence.py
 ```
 
 Non-zero exit code = issues found. Use `--scope <path>` to scope the audit (for example `--scope docs/official`), and `--quiet` to only show the summary line. Add `--fail-on-error` for CI-style use.
@@ -200,7 +173,7 @@ Non-zero exit code = issues found. Use `--scope <path>` to scope the audit (for 
 ### Language: English only
 
 - **All tracked `.md` files must be in English.** The repo is public and international. Any file authored or translated must be English. The same applies to frontmatter (`title`, `summary`).
-- **Exception** (gitignored, exempt): `planning/daily/J_YYYY-MM-DD.md` - the author's personal daily notes. These never reach the public repo, so the author's preferred language is fine.
+- **Exception** (gitignored, exempt): `_Private/planning/daily/J_YYYY-MM-DD.md` - the author's personal daily notes. These never reach the public repo, so the author's preferred language is fine.
 - Reason: consistency for search, AI tooling (the subagent prompt expects English keywords), and international contributors.
 
 ### Frontmatter / file conventions (unchanged)
@@ -213,21 +186,21 @@ See [`.kilo/agents/odin-gamedev.md`](.kilo/agents/odin-gamedev.md) for the speci
 
 ## Kilo skills
 
-| Skill                               | Usage                                                                 |
-| ----------------------------------- | --------------------------------------------------------------------- |
-| `.kilo/skills/odin-format/`         | Re-format a single Odin file or a `.md`                               |
-| `.kilo/skills/scraper-runner/`      | Run a scraper with the right flags                                    |
-| `.kilo/skills/kb-navigator/`        | Search the KB by topic / frontmatter                                  |
-| `.kilo/skills/odin-pattern-finder/` | Find a precise Odin pattern (state machine, allocator, hot reload...) |
-| `.kilo/skills/planning-helper/`     | Manage `planning/daily/J_YYYY-MM-DD.md` (create, update, list)        |
-| `.kilo/skills/pylance-check/`       | Run pyright on Python files and fix diagnostics                       |
+| Skill                               | Usage                                                                   |
+| ----------------------------------- | ----------------------------------------------------------------------- |
+| `.kilo/skills/odin-format/`         | Re-format a single Odin file or a `.md`                                 |
+| `.kilo/skills/scraper-runner/`      | Run a scraper with the right flags                                      |
+| `.kilo/skills/kb-navigator/`        | Search the KB by topic / frontmatter                                    |
+| `.kilo/skills/odin-pattern-finder/` | Find a precise Odin pattern (state machine, allocator, hot reload...)   |
+| `.kilo/skills/planning-helper/`     | Manage `_Private/planning/daily/J_YYYY-MM-DD.md` (create, update, list) |
+| `.kilo/skills/pylance-check/`       | Run pyright on Python files and fix diagnostics                         |
 
 ## Anti-patterns
 
 - they are auto-generated by `scrape_skool.py`.
 - Editing them → overwritten on next scrape (unless `--force`).
 - **Do NOT manually edit** files under `odin-knowledge-base/courses/*/`
-- **Do NOT touch** `docs/official/` and `docs/karl_zylinski/` by hand for the same reason (README additions are OK).
+- **Do NOT touch** `odin-knowledge-base/docs/official/` and `odin-knowledge-base/docs/karl_zylinski/` by hand for the same reason (README additions are OK).
 - **Do NOT rename** KB folders without updating the generated indexes.
 
 ## Git workflow - always require user validation
@@ -242,11 +215,11 @@ See [`.kilo/agents/odin-gamedev.md`](.kilo/agents/odin-gamedev.md) for the speci
 
 Before any push to `github.com/LaurentOngaro/OdinRAG`:
 
-1. `python _Helpers/audit_public_safety.py` → **must** exit 0.
+1. `python _Helpers/scripts/diagnostic/audit_public_safety.py` → **must** exit 0.
 2. Verify `.gitignore` `COPYRIGHTED SCRAPED CONTENT` section is intact.
-3. Verify no `planning/daily/` or `_Raw/` files are staged.
+3. Verify no `_Private/planning/daily/` or `_Private/raw/` files are staged.
 
-Full procedure in [`_Helpers/docs/PUBLIC_RELEASE_CHECKLIST.md`](_Helpers/docs/PUBLIC_RELEASE_CHECKLIST.md).
+Full procedure in [`_Helpers/docs/005_public_release_checklist.md`](_Helpers/docs/005_public_release_checklist.md).
 
 ## Alternate indexes (Kilo + RAG)
 
