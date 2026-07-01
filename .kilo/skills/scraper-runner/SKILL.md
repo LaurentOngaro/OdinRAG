@@ -1,6 +1,6 @@
 ---
 name: scraper-runner
-description: Run a scraper (_Helpers/scrape_*.py) with the right flags. Covers scrape_skool (Skool programvideogames), scrape-official (odin-lang.org), scrape-zylinski (zylinski.se), scrape-gingerbill.py, scrape-newsletters.py, scrape-jakubtomsu.py, scrape-showcase.py, download_gists.py, download_odin_examples.py. All re-entrant.
+description: Run a scraper (_Helpers/scripts/scrappers/scrape_*.py) with the right flags. Covers scrape_skool (Skool programvideogames), scrape_official (odin-lang.org), scrape_zylinski (zylinski.se), scrape_gingerbill.py, scrape_newsletters.py, scrape_jakubtomsu.py, scrape_showcase.py, download_gists.py, download_odin_examples.py. All re-entrant.
 ---
 
 # Run a scraper
@@ -13,12 +13,12 @@ All scrapers are **re-entrant**: an already exported file is skipped unless `--f
 | Scraper                     | Source                             | Output                                           | Prerequisites            |
 | --------------------------- | ---------------------------------- | ------------------------------------------------ | ------------------------ |
 | `scrape_skool.py`           | Skool "programvideogames"          | `odin-knowledge-base/courses/programvideogames/` | skool-cli + Playwright   |
-| `scrape-official.py`        | odin-lang.org/docs/ + awesome-odin | `docs/official/`                                 | requests + BeautifulSoup |
-| `scrape-zylinski.py`        | zylinski.se blog                   | `docs/karl_zylinski/`                            | requests + BeautifulSoup |
-| `scrape-gingerbill.py`      | gingerbill.org RSS                 | `docs/gingerbill/`                               | requests + BeautifulSoup |
-| `scrape-newsletters.py`     | odin-lang.org/news/                | `docs/newsletters/`                              | requests + BeautifulSoup |
-| `scrape-jakubtomsu.py`      | jakubtomsu.github.io RSS           | `docs/jakubtomsu/`                               | requests + BeautifulSoup |
-| `scrape-showcase.py`        | odin-lang.org/showcase/            | `docs/showcase/`                                 | requests + BeautifulSoup |
+| `scrape-official.py`        | odin-lang.org/docs/ + awesome-odin | `odin-knowledge-base/docs/official/`             | requests + BeautifulSoup |
+| `scrape-zylinski.py`        | zylinski.se blog                   | `odin-knowledge-base/docs/karl_zylinski/`        | requests + BeautifulSoup |
+| `scrape-gingerbill.py`      | gingerbill.org RSS                 | `odin-knowledge-base/docs/gingerbill/`           | requests + BeautifulSoup |
+| `scrape-newsletters.py`     | odin-lang.org/news/                | `odin-knowledge-base/docs/newsletters/`          | requests + BeautifulSoup |
+| `scrape-jakubtomsu.py`      | jakubtomsu.github.io RSS           | `odin-knowledge-base/docs/jakubtomsu/`           | requests + BeautifulSoup |
+| `scrape-showcase.py`        | odin-lang.org/showcase/            | `odin-knowledge-base/docs/showcase/`             | requests + BeautifulSoup |
 | `download_gists.py`         | awesome-odin gist URLs             | `code/gists/`                                    | None (stdlib urllib)     |
 | `download_odin_examples.py` | Odin repo examples/                | `code/examples/`                                 | None (stdlib urllib)     |
 
@@ -27,9 +27,9 @@ All scrapers are **re-entrant**: an already exported file is skipped unless `--f
 ### Re-scrape a source (idempotent skip)
 
 ```bash
-python _Helpers/scrape-official.py
-python _Helpers/scrape-zylinski.py
-python _Helpers/scrape_skool.py
+python _Helpers/scripts/scrappers/scrape_official.py
+python _Helpers/scripts/scrappers/scrape_zylinski.py
+python _Helpers/scripts/scrappers/scrape_skool.py
 ```
 
 -> Skip already-present files, only write new ones.
@@ -37,9 +37,9 @@ python _Helpers/scrape_skool.py
 ### Force a full rewrite
 
 ```bash
-python _Helpers/scrape-official.py --force
-python _Helpers/scrape-zylinski.py --force
-python _Helpers/scrape_skool.py --overwrite-existing-lessons
+python _Helpers/scripts/scrappers/scrape_official.py --force
+python _Helpers/scripts/scrappers/scrape_zylinski.py --force
+python _Helpers/scripts/scrappers/scrape_skool.py --overwrite-existing-lessons
 ```
 
 -> Rewrite ALL files (useful after a KB refactor or an HTML format change on the source side).
@@ -48,21 +48,21 @@ python _Helpers/scrape_skool.py --overwrite-existing-lessons
 
 ```bash
 # A single lesson (fuzzy title filter)
-python _Helpers/scrape_skool.py --lesson "entities state physics"
+python _Helpers/scripts/scrappers/scrape_skool.py --lesson "entities state physics"
 
 # Resume after an interruption (skip the first 50)
-python _Helpers/scrape_skool.py --skip-until 50
+python _Helpers/scripts/scrappers/scrape_skool.py --skip-until 50
 
 # Also download YouTube videos
-python _Helpers/scrape_skool.py --download-video
+python _Helpers/scripts/scrappers/scrape_skool.py --download-video
 
 # Also download the ZIPs attached to lessons
-python _Helpers/scrape_skool.py --download-support-files
+python _Helpers/scripts/scrappers/scrape_skool.py --download-support-files
 
 # With explicit credentials (otherwise interactive prompt)
 export SKOOL_EMAIL="your@email.com"
 export SKOOL_PASSWORD="yourpassword"
-python _Helpers/scrape_skool.py
+python _Helpers/scripts/scrappers/scrape_skool.py
 ```
 
 Exit codes:
@@ -83,13 +83,13 @@ Exit codes:
 - On Windows: `%AppData%\npm\node_modules\skool-cli\dist\core\browser-manager.js`
 - On Windows: `%AppData%\npm\node_modules\skool-cli\dist\core\page-ops.js`
 
-5. **yt-dlp** (if `--download-video`): any directory on your PATH is fine
-6. **Skool credentials**:
+1. **yt-dlp** (if `--download-video`): any directory on your PATH is fine
+2. **Skool credentials**:
 
 - Env var `SKOOL_EMAIL` / `SKOOL_PASSWORD`, OR
-- File `_Helpers/.private/skool_credentials.txt` (gitignored)
+- File `_Private/.config/skool_credentials.txt` (gitignored)
 
-7. **Windows**: disable Defender firewall (Playwright Chromium otherwise fails with `ERR_NETWORK_ACCESS_DENIED`)
+1. **Windows**: disable Defender firewall (Playwright Chromium otherwise fails with `ERR_NETWORK_ACCESS_DENIED`)
 
 ### scrape-official / scrape-zylinski
 
@@ -125,6 +125,6 @@ Errors    : 0
 
 ## Anti-patterns
 
-- Do NOT delete `_Helpers/fix_mojibake.py` even if the KB is clean: it is a safety net if a new scrape introduces mojibake.
+- Do NOT delete `_Helpers/scripts/fixes/fix_mojibake.py` even if the KB is clean: it is a safety net if a new scrape introduces mojibake.
 - Do NOT disable re-entrancy by adding an automatic `force`. Idempotence is valuable for large KBs (Skool courses can run into the hundreds of lessons).
 - Do NOT scrape in `--force` mode without running `--check` first to estimate the scope of the changes.

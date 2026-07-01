@@ -4,14 +4,17 @@
 .obsidian/**/*
 node_modules/**
 **/node_modules/**
-_Ignore/**/*
-_Templates/**/*
-_Fichiers/**/*
-_History/**
-_Changelogs/**
-_Helpers/archives/**
-_Helpers/artifacts/**
-_Helpers/backups/**
+.kilo/node_modules/**
+_Private/**
 _Raw/**
-logs/
-**/backups/**
+_Private/raw/**
+_Private/planning/daily/**
+odin-knowledge-base/courses/**
+_Helpers/logs/**
+.kilo/plans/**
+
+# Scraped content keeps original frontmatter and layout - skip from strict lint
+odin-knowledge-base/docs/**
+
+# Vendored third-party templates - each is its own repo
+code/vendored templates/odin-*/**

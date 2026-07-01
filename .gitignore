@@ -1,4 +1,4 @@
-# Odin / OdinRAG
+# === Odin build outputs ===
 build/
 *.exe
 *.dll
@@ -7,93 +7,66 @@ build/
 *.lib
 *.obj
 
+# === PRIVATE (gitignored - never push) ===
+_Private/
+_Raw/                       # legacy name (post-migration, ensure gitignored)
+
 # === COPYRIGHTED SCRAPED CONTENT (do NOT publish publicly) ===
-# Skool courses (behind paywall, ToS prohibits redistribution)
 odin-knowledge-base/courses/
-courses/
+courses/                    # legacy
+odin-knowledge-base/docs/karl_zylinski/odin-book/**/*.md
+!odin-knowledge-base/docs/karl_zylinski/odin-book/README.md
 
-# Karl Zylinski ebook "Understanding the Odin Programming Language" (paid, do NOT publish)
-# The blog posts are public and shipped in the repo.
-/docs/karl_zylinski/odin-book/**/*.md
-!/docs/karl_zylinski/odin-book/README.md
+# === Personal Odin project code (stays in place but gitignored) ===
+/code/projects/PVG03_RPG/
 
-# Personal notes (private planning)
-/planning/daily/
+# === Vendored third-party templates (each has its own .git/ - never `git add` the contents) ===
+/code/vendored templates/*/
+!/code/vendored templates/README - vendored templates.md
 
-# === END COPYRIGHTED CONTENT ===
-
-# Secrets / state
+# === Secrets / state ===
 .env
 **/.private/
-**/Support Files/
+**/_private/
 
-# Python
+# === Python ===
 **/__pycache__/
 *.pyc
 .venv/
 venv/
 *.egg-info/
 
-# log files
+# === Logs ===
 *.log
-logs/
+_Helpers/logs/
 
-# Node (skool-cli, mcp servers)
+# === Node ===
 **/node_modules/
 
-# one-shot (never push raw working notes) / RAW docs
-/_Raw/
-
-# Cloned upstream templates (each has its own .git/ - never `git add` the contents)
-/code/templates/*/
-!/code/templates/README.md
-
-# OS
+# === OS / IDE ===
 .DS_Store
 Thumbs.db
-
-# IDE
 .vscode/
 .idea/
 *.swp
 *~
 
-# Kilo runtime state (sessions, worktrees, agent-manager UI)
+# === Kilo runtime state ===
 .kilo/worktrees/
 .kilo/agent-manager.json
 .kilo/sessions/
 .kilo/cache/
+.kilo/mcp.json
 
-# Skill sandbox
+# === Skill sandbox ===
 .kilo/skills/*/_index_*.md
 .kilo/skills/*/local.patch
 
-# Obsidian system files
+# === Obsidian ===
 /.obsidian
 
-# cache files
-.cache/
-
-# backup folders and files
+# === Backups ===
 BAK/
 *backups/
 *.bak
 *.zip
-
-# secrets and credentials
-.env
-.env.*
-*.credential*
-*secret*
-apikeys*
-
-# MCP server credentials (do not commit)
-.kilo/mcp.json
-.vscode/mcp.json
-.kilo/kilo.json
-
-# === Personal Odin project code (NOT public - per-user, not part of the RAG) ===
-# The _TEMPLATE_/ folder is the public scaffold. Any project the user clones there
-# (e.g. `my-game/`, `rpg-prototype/`) is personal work and must never be pushed.
-/code/projects/*/
-!/code/projects/_TEMPLATE_/

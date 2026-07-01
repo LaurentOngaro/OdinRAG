@@ -5,7 +5,7 @@ description: Re-format a .odin file or ```odin``` blocks inside a Markdown file 
 
 # Re-format Odin code
 
-Skill for calling `odinfmt` (the official Odin formatter) on a `.odin` file or on the ```odin ...``` blocks of a Markdown file.
+Skill for calling `odinfmt` (the official Odin formatter) on a `.odin` file or on the `odin ...` blocks of a Markdown file.
 
 ## When to invoke
 
@@ -19,21 +19,21 @@ Skill for calling `odinfmt` (the official Odin formatter) on a `.odin` file or o
 
 ````bash
 # Dry-run (check what would be modified)
-python _Helpers/format_odin_in_files.py --file path/to/foo.odin --check
+python _Helpers/scripts/fixes/format_odin_in_files.py --file path/to/foo.odin --check
 
 # Apply
-python _Helpers/format_odin_in_files.py --file path/to/foo.odin
+python _Helpers/scripts/fixes/format_odin_in_files.py --file path/to/foo.odin
 
 # For a .md (only formats the ```odin blocks, not the rest)
-python _Helpers/format_odin_in_files.py --file path/to/foo.md
+python _Helpers/scripts/fixes/format_odin_in_files.py --file path/to/foo.md
 ````
 
 ### Entire folder
 
 ```bash
 # Whole KB (recursively re-format all .md and .odin)
-python _Helpers/format_odin_in_files.py --path odin-knowledge-base --check
-python _Helpers/format_odin_in_files.py --path odin-knowledge-base
+python _Helpers/scripts/fixes/format_odin_in_files.py --path odin-knowledge-base --check
+python _Helpers/scripts/fixes/format_odin_in_files.py --path odin-knowledge-base
 ```
 
 ### Automatic hook
@@ -48,14 +48,14 @@ To change the style, edit `odinfmt.json` (NOT the system-wide config bundled wit
 
 ## Prerequisites
 
-- `odinfmt.exe` must exist somewhere on disk. Set its absolute path in the `ODINFMT_EXE` constant in `_Helpers/odin_format.py` (or expose it via an environment variable).
+- `odinfmt.exe` must exist somewhere on disk. Set its absolute path in the `ODINFMT_EXE` constant in `_Helpers/scripts/fixes/odin_format.py` (or expose it via an environment variable).
 
 ## Error diagnostics
 
 If `odinfmt` returns exit=1, it is likely a **syntax error** in the Odin source. Read the error message (first line), fix the code, retry.
 
 ```text
-$ python _Helpers/format_odin_in_files.py --file foo.odin
+$ python _Helpers/scripts/fixes/format_odin_in_files.py --file foo.odin
 [ERR] odinfmt exit=1 : foo.odin(12:5) Expected ';', got '}'
 ```
 

@@ -1,6 +1,16 @@
 {
   "default": true,
   "extends": null,
+  "globs": [
+    "**/*.md",
+    "!**/node_modules/**",
+    "!.kilo/**",
+    "!**/_Private/**",
+    "!**/odin-knowledge-base/courses/**",
+    "!**/_Helpers/logs/**",
+    "!**/odin-knowledge-base/docs/**",
+    "!**/code/vendored templates/odin-*/**"
+  ],
   "MD001": true,
   "MD003": {
     "style": "consistent"

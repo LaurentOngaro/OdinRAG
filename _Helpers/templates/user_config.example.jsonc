@@ -1,0 +1,69 @@
+// Personal OdinRAG config.
+// Copy this file to _Private/.config/user_config.jsonc and fill in your values.
+// The .private/ folder is gitignored - this file stays local.
+//
+// Usage:
+//   1. cp _Helpers/templates/user_config.example.jsonc _Private/.config/user_config.jsonc
+//   2. Edit the copy with your actual paths and credentials.
+//   3. Set SKOOL_PASSWORD as an env var (NEVER commit passwords).
+//   4. Restart your scripts - they read this file on every call.
+//
+// Fallback chain per value: env var (if listed) > this JSONC > empty string.
+// Scripts that get an empty string will warn you at startup.
+
+{
+  "paths": {
+    // Absolute paths to your local tools and source files.
+    // Use forward slashes or double backslashes in JSON strings.
+
+    // Env var: ODINFMT_EXE
+    "odinfmt_exe": "",
+    // Env var: ODINFMT_CONFIG_SYSTEM
+    "odinfmt_config_system": "",
+    // Env var: YT_DLP_EXE
+    "yt_dlp_exe": "",
+    // Env var: ODIN_COMPILER
+    "odin_compiler": "",
+    // Env var: PYTHON_EXE
+    "python_exe": "",
+    // Env var: BOOK_HTML_SRC
+    "karl_book_html": "",
+    // Env var: BOOK_HTML_OUT
+    // If empty, book_html_to_md.py uses a path relative to the repo root.
+    "karl_book_out": "",
+    // Env var: ODINRAG_ROOT
+    "project_root": "",
+    // Env var: ODIN_PROJECTS_DIR
+    // Where you clone + build Odin projects (this repo is NOT a build target).
+    "external_odin_projects_dir": "",
+    // Env var: ODINRAG_TEMP
+    "temp_dir": ""
+  },
+
+  "skool": {
+    // Skool credentials for scrape_skool.py.
+    // PASSWORD must NEVER live in this file - use the SKOOL_PASSWORD env var.
+
+    // Env var: SKOOL_EMAIL
+    "email": ""
+  },
+
+  "scraper": {
+    // Optional scraper settings.
+
+    // Env var: YOUTUBE_COOKIES_FILE
+    // Path to a Netscape-format cookies file to bypass YouTube bot checks.
+    // Leave empty if not using --download-video.
+    "youtube_cookies_file": ""
+  },
+
+  "kb": {
+    // Optional expected counts (purely informational).
+    // Populate after your first scrape to help the INDEX.md table stay accurate.
+
+    "expected_lessons_skool": 0,
+    "expected_files_karl_book": 0,
+    "expected_articles_zylinski": 0,
+    "expected_official_docs": 0
+  }
+}

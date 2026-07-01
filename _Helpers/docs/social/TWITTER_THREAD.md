@@ -1,3 +1,14 @@
+---
+title: "TWITTER_THREAD"
+date: 2026-07-01
+tags: [OdinRAG, reference]
+type: reference
+status: active
+version: 1.0.0
+lastUpdated: "2026-07-01"
+updatedBy: "MiniMax-M3 (Kilo Code)"
+---
+
 # X / Twitter - thread
 
 ## Full Version (6 tweets)
@@ -25,7 +36,7 @@ What's in the box:
 ```text
 How M3 actually helped:
 - Designed the frontmatter schema (Cours / Module / ID / Durée / topic/\*)
-- Wrote `_Helpers/scrape_skool.py` with re-entrancy + `--check` dry-run
+- Wrote `_Helpers/scripts/scrappers/scrape_skool.py` with re-entrancy + `--check` dry-run
 - Authored the subagent prompt with citation discipline
 - Created 6 skills following progressive disclosure
 ```
@@ -45,7 +56,7 @@ Deliberate non-decisions:
 Real example:
 "What's the Odin pattern for arena allocators?"
 → routes to `odin-gamedev` subagent
-→ cites `docs/karl_zylinski/temporary-allocator-your-first-arena.md:42`
+→ cites `odin-knowledge-base/docs/karl_zylinski/temporary-allocator-your-first-arena.md:42`
 ```
 
 #### Tweet 6/6

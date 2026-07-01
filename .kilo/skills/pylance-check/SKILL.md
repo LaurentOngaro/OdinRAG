@@ -9,7 +9,7 @@ This repo enforces **zero Pylance warnings** on every `.py` file (see `AGENTS.md
 The lint is reproducible via the open-source `pyright` engine wrapped by a durable script:
 
 ```bash
-python _Helpers/lint_pylance.py <path>
+python _Helpers/scripts/fixes/lint_pylance.py <path>
 ```
 
 - `<path>` = a single file, a folder, or omit it to lint the whole repo.
@@ -27,12 +27,12 @@ Also useful as a sanity check before opening a PR / pushing to the public repo.
 ```bash
 # 1. Edit your .py file
 # 2. Run the linter on the same file
-python _Helpers/lint_pylance.py _Helpers/<your_script>.py
+python _Helpers/scripts/fixes/lint_pylance.py _Helpers/<your_script>.py
 
 # 3. Fix every reported diagnostic, loop until clean.
 
 # 4. (optional) Lint the whole repo as a smoke test
-python _Helpers/lint_pylance.py
+python _Helpers/scripts/fixes/lint_pylance.py
 ```
 
 ## Common diagnostic patterns in this repo
