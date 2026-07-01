@@ -173,58 +173,10 @@ These rules apply to every tracked `.md` file in this repo unless the file is ex
 - Reason: some terminals and markdown renderers mishandle the en-dash / em-dash glyph (Windows terminals can render them as a question mark box), which breaks copy-paste and visual consistency. ASCII hyphen-minus renders the same everywhere.
 - The same applies to other Unicode punctuation: prefer ASCII `'` over `'`, `"` over `"`/`"`, `-` over `-`/`-`, `...` over `...`. The lint config already enforces most of these via `MD026`.
 
-### Markdown line length: no auto-wrap (book style, not 80s code style)
+### Markdown prose
 
-- **Do not auto-wrap or truncate Markdown lines at any character limit.** The markdownlint config explicitly disables `MD013` (line length rule). Lines stay as long as they need to be.
-- **Preferred style: prose like a book, not like 80s code.** One sentence can be one line; one paragraph can be one line; only insert a line break where there is a logical separation (paragraph end, list item, heading, table row).
-- When in doubt, write the paragraph as a single line. Editors (VS Code, Obsidian, etc.) can soft-wrap visually without inserting hard breaks.
-- When editing an existing file, do NOT insert line breaks inside sentences, links, or table cells just to fit a magic number.
-
-#### Concrete examples
-
-WRONG (artificial wrap, "code of the 80s"):
-
-```markdown
-This is a paragraph that wraps at 80 chars because the
-formatter or the author thought 80 was a magic number.
-It makes prose harder to read because each line ends
-mid-thought and the eye has to jump to find the
-continuation.
-```
-
-RIGHT (book style, one paragraph = one line):
-
-```markdown
-This is a paragraph that wraps at 80 chars because the formatter or the author thought 80 was a magic number. It makes prose harder to read because each line ends mid-thought and the eye has to jump to find the continuation.
-```
-
-WRONG (truncated table cell):
-
-```markdown
-| Source  | Files |
-| ------- | ----- |
-| foo.md  | 12    |
-| bar.md  | 7     |
-```
-
-RIGHT (table cells may exceed 120 chars if needed):
-
-```markdown
-| Source                | Files | Description                                                                              |
-| --------------------- | ----- | ---------------------------------------------------------------------------------------- |
-| `foo.md` (very long)  | 12    | A long description that legitimately needs more than 120 chars to be clear and complete. |
-| `bar.md`              | 7     | Short description.                                                                       |
-```
-
-#### Why this matters
-
-- Forced wrapping breaks sentence rhythm. Authors wrap where it makes sense; the formatter does not.
-- Forcing a re-flow on every edit churns the git diff and makes code reviews unreadable.
-- Soft-wrap in editors is the right solution when the user wants a narrow visual line.
-
-#### For AI agents
-
-When writing or editing a `.md` file, never break a sentence across multiple lines just to stay under a character limit. Write each paragraph as a single line; use double newlines only between paragraphs.
+- One paragraph = one physical line. No line break inside a sentence, no matter the line length. Table cells, code blocks, and frontmatter are exempt.
+- Detailed rule, examples, and rationale in [`_Helpers/docs/MARKDOWN_STYLE.md`](_Helpers/docs/MARKDOWN_STYLE.md) (loaded on demand, not in first-context).
 
 ### Language: English only
 
