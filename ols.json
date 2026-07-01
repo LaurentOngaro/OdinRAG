@@ -1,18 +1,5 @@
 {
-  "collections": [
-    {
-      "name": "core",
-      "path": "_refs\\core"
-    },
-    {
-      "name": "examples",
-      "path": "_refs\\examples"
-    },
-    {
-      "name": "vendor",
-      "path": "_refs\\vendor"
-    }
-  ],
+  "collections": [],
   "enable_format": true,
   "enable_hover": true,
   "enable_snippets": true,

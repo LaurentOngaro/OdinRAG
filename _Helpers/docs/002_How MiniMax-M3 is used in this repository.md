@@ -1,4 +1,9 @@
-# How MiniMax-M3 is used in this repository
+---
+date: 2026-06-29
+TODO
+---
+
+# 002_How MiniMax-M3 is used in this repository
 
 This document is a quick technical reference for anyone reading the code and wondering "where is M3 actually being invoked, and what does it do here?". It is intentionally kept short.
 

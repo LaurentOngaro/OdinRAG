@@ -22,7 +22,7 @@ priority: 1
 | **P1** Toolbox                  | done   | Maintenance tools (format, scraping re-entry, public-safety audit)                 | 2026-06-28 → 2026-06-29 |
 | **P2** KB polish                | done   | Public release ready (hybrid conservative samples, coherence audit, M3 promo)      | 2026-06-29 → 2026-06-30 |
 | **P3** Templates + bindings     | done   | Clone upstream templates, integrate gists                                          | 2026-06-30              |
-| **P4** First Odin project (RPG) | active | Remake of module 2 (RPG) of the PVG course                                         | TBD                     |
+| **P4** First Odin project (RPG) | active | Remake of Module 3 (RPG) of the PVG course                                         | TBD                     |
 
 > Status values: `TBD` (not started), `active` (in progress), `done` (completed), `backlog` (deferred).
 
@@ -60,14 +60,12 @@ Put in place the tools that make the KB **maintainable** and **queryable** by Ki
 
 ### Goal
 
-Make the public repo ready for the MiniMax-M3 Showcase Round 2 and any future external reader.
-The repo must be **minimal and self-explanatory**: no personal data, no copyrighted bulk, no progression markers.
+Make the public repo ready for the MiniMax-M3 Showcase Round 2 and any future external reader. The repo must be **minimal and self-explanatory**: no personal data, no copyrighted bulk, no progression markers.
 
 ### Milestones
 
 - [x] Hybrid-conservative trim: `docs/{karl_zylinski,gingerbill,jakubtomsu}/` ship 5+5+4 sample articles each (full corpus reproducible via scrapers)
 - [x] All scraped content kept locally is properly listed in [SOURCES.md](../../SOURCES.md) with `©` + "how to obtain" link
-- [x] `_Helpers/docs/ACTION_PLAN.md` + `LEARNING_PLAN_ODIN_GAMEDEV_2026.md` translated to English (no French strings left in tracked files)
 - [x] `.kilo/skills/` (6 skills) and `.kilo/agents/odin-gamedev.md` finalised with citation discipline
 - [x] Coherence audit: `audit_public_safety.py` + `lint_pylance.py` both clean on tracked files
 - [x] `_Helpers/docs/social/{REDDIT_POST.md, TWITTER_THREAD.md, DISCORD_NOTE.md}` ready for the showcase (posted on 2026-06-30)
@@ -94,7 +92,7 @@ Have the upstream Odin templates and useful gists available locally for cloning 
 > Note: `code/gists/` and `code/examples/` (demo.odin + others) are downloader targets - they contain code from external sources and are kept gitignored.
 > The README in each subfolder explains how to populate them locally via `_Helpers/download_gists.py` / `_Helpers/download_odin_examples.py`.
 
-## P4 - First Odin project: Remake of module 2 (RPG) of the PVG course
+## P4 - First Odin project: Remake of Module 3 (RPG) of the PVG course
 
 ### Goal
 
@@ -103,20 +101,19 @@ Reimplement from scratch the RPG module of the programvideogames course. This is
 ### Where the project lives
 
 - Source: `code/projects/_TEMPLATE_/` (public scaffold in this repo)
-- Actual code: clone `_TEMPLATE_/` to a **gitignored** path (e.g. `D:\OdinProjects\rpg-remake\`).
-  See [`code/projects/INTEGRATION.md`](../../code/projects/INTEGRATION.md) for the full convention.
+- Actual code: clone `_TEMPLATE_/` to a **gitignored** path (e.g. `D:\OdinProjects\rpg-remake\`). See [`code/projects/INTEGRATION.md`](../../code/projects/INTEGRATION.md) for the full convention.
 
 ### Why this project (and not the default "iterate state machine + tracking allocator")
 
-The default P5 was too generic for the actual goal. The PVG module 2 RPG covers a much wider scope than a state-machine demo - see the phase breakdown below.
+The default P5 was too generic for the actual goal. The PVG Module 3 RPG covers a much wider scope than a state-machine demo - see the phase breakdown below.
 
 ### P4.0 - Préparation (1-2 sessions)
 
-- [x] List the ~42 lessons of module 2 (RPG) in `odin-knowledge-base/courses/programvideogames/`
-- [ ] One recap note per lesson in `code/projects/rpg-remake/devlog/` (the per-project devlog)
-- [ ] Plan target architecture (file structure, modules, deps) in the project's AGENTS.md
-- [ ] Clone `_TEMPLATE_/` to a gitignored project location
-- [ ] Wire Kilo to load this project's `AGENTS.md` as the priority context (per `kb-navigator` workflow)
+- 1. [x] List the ~42 lessons of Module 3 (RPG) in `odin-knowledge-base/courses/programvideogames/`
+- 2. [x] Clone `_TEMPLATE_/` to a gitignored project location (`code/projects/PVG03_RPG/`)
+- 3. [ ] One recap note per lesson in `code/projects/PVG03_RPG/devlog/` (the per-project devlog)
+- 4. [x] Plan target architecture (file structure, modules, deps) in the project's `AGENTS.md` (see `code/projects/PVG03_RPG/AGENTS.md`: 17-module layered dependency graph, 4-tier allocator policy, src/+source/ split for hot reload, CRLF+2-space local override of the root `odinfmt.json`)
+- 5. [x] Wire Kilo to load this project's `AGENTS.md` as the priority context (per `kb-navigator` workflow): `kilo.json` `instructions` now lists `code/projects/PVG03_RPG/AGENTS.md` and `code/projects/PVG03_RPG/.kilo/agents/odin-project.md` BEFORE the global `.kilo/agents/odin-gamedev.md`; convention documented in [`code/projects/INTEGRATION.md`](../../code/projects/INTEGRATION.md) under "Wiring a project's AGENTS.md as priority context".
 
 ### P4.1 - Foundation (3-4 sessions)
 
@@ -155,7 +152,7 @@ The default P5 was too generic for the actual goal. The PVG module 2 RPG covers 
 - `planning/daily/` - daily notes (gitignored)
 - `planning/template/J_YYYY-MM-DD.md` - template to duplicate
 - [`_Helpers/docs/FRONTMATTER_CONVENTIONS.md`](../_Helpers/docs/FRONTMATTER_CONVENTIONS.md) - YAML frontmatter convention
-- [`_Helpers/docs/MINIMAX_M3.md`](../_Helpers/docs/MINIMAX_M3.md) - how MiniMax-M3 powered this project
+- [`_Helpers/docs/002_How MiniMax-M3 is used in this repository.md`](../_Helpers/docs/002_How MiniMax-M3 is used in this repository.md) - how MiniMax-M3 powered this project
 - `_Helpers/docs/social/` - Reddit + X drafts (already published on 2026-06-30)
 - [`../../SOURCES.md`](../../SOURCES.md) - how to obtain each scraped source
 - [`../../code/projects/INTEGRATION.md`](../../code/projects/INTEGRATION.md) - project-code privacy convention

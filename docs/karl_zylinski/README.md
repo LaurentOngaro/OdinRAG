@@ -45,4 +45,3 @@ Articles that the scraper can pull (specific count depends on your local run):
 - [`../official/`](../official/) - Odin official docs (public, included)
 - [`../newsletters/`](../newsletters/) - Odin newsletters index
 - [`../../SOURCES.md`](../../SOURCES.md) - source procurement guide
-- [`../../_Helpers/docs/MINIMAX_M3.md`](../../_Helpers/docs/MINIMAX_M3.md) - how MiniMax-M3 powers this repo

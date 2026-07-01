@@ -1,7 +1,9 @@
 # AGENTS.md - Context for AI coding agents (Kilo Code, Claude Code, etc.)
 
-> This file is read first by AI coding agents to understand the structure, conventions, and tools of the OdinRAG repository. > **Keep it up to date** when the structure evolves.
-> Built with **MiniMax-M3** via [Kilo Code](https://kilo.ai). See [`_Helpers/docs/MINIMAX_M3.md`](_Helpers/docs/MINIMAX_M3.md) for the technical story.
+> This file is read first by AI coding agents to understand the structure, conventions, and tools of the OdinRAG repository.
+> **Keep it up to date** when the structure evolves.
+> Built with **MiniMax-M3** via [Kilo Code](https://kilo.ai).
+> See [`_Helpers/docs/002_How MiniMax-M3 is used in this repository.md`](\_Helpers/docs/002_How MiniMax-M3 is used in this repository.md) for the technical story.
 
 ## TL;DR
 
@@ -37,7 +39,8 @@ OdinRAG/
 │   ├── newsletters/                 odin-lang.org/news/ (README only - § 4)
 │   ├── gingerbill/                  gingerbill.org articles (public RSS)
 │   ├── jakubtomsu/                  jakubtomsu.github.io articles (public RSS)
-│   └── showcase/                    odin-lang.org/showcase/ (public)
+│   ├── showcase/                    odin-lang.org/showcase/ (public)
+│   └── how-to/                      procedural how-to guides written by hand (public)
 │
 ├── code/                            Examples and templates
 │   ├── examples/                    demo.odin (official)
@@ -116,7 +119,7 @@ Chain of resolution per value: **env var > user_config.jsonc > empty string**.
 
 - **Frontmatter** - see [`_Helpers/docs/FRONTMATTER_CONVENTIONS.md`](_Helpers/docs/FRONTMATTER_CONVENTIONS.md) for the full schema (5 main fields + hierarchical Obsidian tags).
 - Scraped Skool lessons have a scraping frontmatter (`Cours`, `Module`, `ID`, `Durée`) which can be extended with `topic/*` for classification.
-- **2-space** indentation inside ```odin ...``` blocks (no tabs, no smart tabs). Configured via `odinfmt.json` at repo root.
+- **2-space** indentation inside `odin ...` blocks (no tabs, no smart tabs). Configured via `odinfmt.json` at repo root.
 - **LF** newlines everywhere (even on Windows).
 - Inter-file links: relative `./module/lesson.md` or absolute from repo root.
 - Unicode characters in content: OK (curly quotes, em-dashes, box-drawing).
@@ -147,7 +150,7 @@ Chain of resolution per value: **env var > user_config.jsonc > empty string**.
 Examples of durable scripts that already live in `_Helpers/`:
 
 - `build_kb_index.py` - regenerates `odin-knowledge-base/INDEX.md`
-- `format_odin_in_files.py` - reformats `.odin` and  ```odin ...```  blocks
+- `format_odin_in_files.py` - reformats `.odin` and `odin ...` blocks
 - `book_html_to_md.py` - converts Karl's HTML book → per-chapter MD
 - `scrape_*.py` - re-scrape the KB
 
@@ -161,7 +164,7 @@ These scripts must:
 ### Odin (in the KB)
 
 - No compilable Odin source in this repo.
-- ```odin ...```  blocks in `.md` files are formatted by `odinfmt` automatically after each scrape, or manually via `_Helpers/format_odin_in_files.py --path odin-knowledge-base`.
+- `odin ...` blocks in `.md` files are formatted by `odinfmt` automatically after each scrape, or manually via `_Helpers/format_odin_in_files.py --path odin-knowledge-base`.
 
 ## Style rules (project-wide)
 
@@ -177,6 +180,22 @@ These rules apply to every tracked `.md` file in this repo unless the file is ex
 
 - One paragraph = one physical line. No line break inside a sentence, no matter the line length. Table cells, code blocks, and frontmatter are exempt.
 - Detailed rule, examples, and rationale in [`_Helpers/docs/MARKDOWN_STYLE.md`](_Helpers/docs/MARKDOWN_STYLE.md) (loaded on demand, not in first-context).
+
+### Markdown structure: READMEs must reflect their directory
+
+Every `README*.md` in this repo must accurately reflect the structure of its host directory:
+
+- Files referenced via `[[wikilinks]]` must exist (otherwise the link is a 404 in the rendered KB).
+- Files present in the host directory should be mentioned when a "Files produced" / "Structure" / "Files in this folder" section exists in the README.
+- Aspirational READMEs (describing future or planned content) must be marked with a "Structure cible" or "Awaiting content" header so the audit script can skip them.
+
+Verify with:
+
+```bash
+python _Helpers/01_Diagnostic/auditReadmeCoherence.py
+```
+
+Non-zero exit code = issues found. Use `--scope <path>` to scope the audit (for example `--scope docs/official`), and `--quiet` to only show the summary line. Add `--fail-on-error` for CI-style use.
 
 ### Language: English only
 

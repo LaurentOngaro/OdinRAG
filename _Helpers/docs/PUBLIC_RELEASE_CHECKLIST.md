@@ -1,3 +1,8 @@
+---
+date: 2026-06-29
+TODO
+---
+
 # Public release checklist - OdinRAG repo
 
 ## Why this document exists

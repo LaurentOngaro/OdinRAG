@@ -64,11 +64,37 @@ When you code in `code/projects/<your-project>/src/`, Kilo sees **the whole work
 
 ## The 3 key files that Kilo always reads first
 
-1. **`AGENTS.md` at the root** -> OdinRAG project context (where the KB is, how it is organised, conventions)
-2. **`code/projects/<your-project>/AGENTS.md`** -> project-specific context (patterns used, dependencies, state)
-3. **`odin-knowledge-base/INDEX.md`** -> semantic index (1-2 KB) for navigating the KB without loading everything
+1. **`code/projects/<your-project>/AGENTS.md`** -> **PROJECT-PRIORITY context** (patterns used, dependencies, allocator policy, target file structure). **Wired into `kilo.json` `instructions`** so it is loaded **before** the global `AGENTS.md` whenever the user works under that project.
+2. **`AGENTS.md` at the root** -> OdinRAG repo context (where the KB is, how it is organised, conventions).
+3. **`odin-knowledge-base/INDEX.md`** -> semantic index (1-2 KB) for navigating the KB without loading everything.
 
 Kilo NEVER loads the whole KB at once (118+ files). It reads the INDEX, identifies 2-3 relevant files, and loads them on demand.
+
+### Wiring a project's `AGENTS.md` as priority context
+
+Example of wiring, applied to **PVG03_RPG** project:
+
+```jsonc
+// kilo.json -> instructions (top of file)
+"instructions": [
+  "AGENTS.md",                                           // global
+  "README.md",
+  "TODO.md",
+  ".kilo/agents/odin-gamedev.md",                        // global subagent
+  "code/projects/PVG03_RPG/AGENTS.md",                   // PROJECT context (priority)
+  "code/projects/PVG03_RPG/.kilo/agents/odin-project.md" // PROJECT subagent
+]
+```
+
+Steps to add a new project:
+
+1. Clone `code/projects/_TEMPLATE_/` to `code/projects/<your-project>/` (gitignored).
+2. Fill out `code/projects/<your-project>/AGENTS.md` with: goal, stack, file structure, modules, allocator policy, patterns implemented, pitfalls, architectural decisions, KB sources.
+3. Fill out `code/projects/<your-project>/.kilo/agents/odin-project.md` with the project-specific sources-of-truth table (replace `<PROJECT_NAME>`).
+4. Add both files to `kilo.json` `instructions` (above the global `.kilo/agents/odin-gamedev.md` line so it loads first).
+5. Verify with `_Helpers/audit_public_safety.py` - the new files must still be gitignored (`/code/projects/*/` in `.gitignore`, except `_TEMPLATE_/`).
+
+The orchestrator (`code` agent) auto-loads the project's `AGENTS.md` first because it appears earlier in the `instructions` array. The project's `odin-project.md` subagent is then auto-invoked when the question matches the project's topic.
 
 ## Context conventions (to respect)
 
