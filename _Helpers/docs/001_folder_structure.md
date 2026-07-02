@@ -12,8 +12,7 @@ updatedBy: "MiniMax-M3 (Kilo Code)"
 # 001_folder_structure
 
 > **Single source of truth for the OdinRAG folder tree.**
-> Every other document (AGENTS.md, README.md, per-folder READMEs) should reference this file
-> rather than duplicating the tree. Update this file FIRST, then propagate references.
+> Every other document (AGENTS.md, README.md, per-folder READMEs) should reference this file rather than duplicating the tree. Update this file FIRST, then propagate references.
 
 ## Top-level tree
 
@@ -79,19 +78,18 @@ _Helpers/
 ├── scripts/                 <- thematic sub-folders
 │   ├── README - scripts.md
 │   ├── diagnostic/          <- audit_public_safety.py, auditReadmeCoherence.py
-│   ├── fixes/               <- format_odin_in_files, fix_mojibake, reflow_md, odin_format,
-│   │                            book_html_to_md, lint_pylance
+│   ├── fixes/               <- format_odin_in_files, fix_mojibake, reflow_md, odin_format, book_html_to_md, lint_pylance
 │   ├── indexing/            <- build_kb_index.py
 │   ├── scrappers/           <- scrape_*.py + download_*.py
 │   └── lib/                 <- text_clean, http_client, html2md, user_config
 ├── docs/                    <- meta docs about this repo (NNN_*.md)
 │   ├── README - docs.md
+│   ├── 001_folder_structure.md
 │   ├── 002_how_minimax-m3_is_used_in_this_repository.md
 │   ├── 003_yaml_frontmatter_conventions.md
 │   ├── 004_markdown_style.md
 │   ├── 005_public_release_checklist.md
 │   ├── 007_mixing_public_and_private_history.md
-│   ├── 001_folder_structure.md
 │   └── social/              <- social posts (REDDIT_POST.md, TWITTER_THREAD.md, DISCORD_NOTE.md)
 ├── templates/               <- INTERNAL OdinRAG templates (clone these, never edit in place)
 │   ├── README - templates.md
@@ -112,25 +110,21 @@ _Private/
 ├── .config/                 <- user_config.jsonc, cookies.txt, skool_credentials.txt (gitignored)
 ├── archives/                <- archived/superseded docs (gitignored, see README - archives.md)
 │   ├── README - archives.md
-│   └── 007_mixing_public_and_private_history_EN_2026-07-02.md  (archived v1.0.0 English)
+│   └── ...
 ├── docs/                    <- private meta docs (gitignored)
 │   ├── README - docs.md
-│   └── 001_workflow_public_prive.md  (French detailed workflow, replaces 007 v1.0.0)
+│   └── ...
 ├── planning/                <- day-by-day planning (gitignored)
 │   ├── README - planning.md
-│   ├── 001_odin_learning_plan_advanced_game_dev_2026.md
-│   ├── 002_roadmap.md
+│   ├── ...
 │   └── daily/               <- one file per working day, J_YYYY-MM-DD.md (no NNN_ prefix)
 └── raw/                     <- raw research notes, kept as-is (no NNN_ prefix, no frontmatter)
 ```
 
-> The `archives/` subfolder is gitignored like the rest of `_Private/`. It exists to keep
-> evolution of decisions traceable when a doc is rewritten or translated. See
-> [`_Private/archives/README - archives.md`](../../_Private/archives/README%20-%20archives.md)
-> for the convention (when to archive, naming, frontmatter annotations).
+> The `archives/` subfolder is gitignored like the rest of `_Private/`. It exists to keep evolution of decisions traceable when a doc is rewritten or translated.
+> See [`_Private/archives/README - archives.md`](../../_Private/archives/README%20-%20archives.md) for the convention (when to archive, naming, frontmatter annotations).
 >
-> For PUBLIC archives (old versions of public-facing docs that should stay visible to
-> collaborators), use a `_Helpers/archives/` folder instead - to be created on first need.
+> For PUBLIC archives (old versions of public-facing docs that should stay visible to collaborators), use a `_Helpers/archives/` folder instead - to be created on first need.
 
 ## Where this file is referenced
 
@@ -145,7 +139,5 @@ When the tree changes:
 
 1. Edit this file FIRST.
 2. Update the per-folder `README - <topic>.md` to point here for the global view.
-3. Update any path reference that explicitly depends on the changed folder
-   (use a search like `Get-ChildItem -Recurse -Include *.md | Select-String -Pattern "<old_path>"`).
-4. Run the validation suite (see AGENTS.md "Push to the public repo - checklist" plus
-   `markdownlint-cli2` and `auditReadmeCoherence.py`).
+3. Update any path reference that explicitly depends on the changed folder (use a search like `Get-ChildItem -Recurse -Include *.md | Select-String -Pattern "<old_path>"`).
+4. Run the validation suite (see AGENTS.md "Push to the public repo - checklist" plus `markdownlint-cli2` and `auditReadmeCoherence.py`).

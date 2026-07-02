@@ -146,12 +146,16 @@ These rules apply to every tracked `.md` file in this repo unless the file is ex
 ### Punctuation: no em-dash
 
 - **Never use the em-dash (Em dash) character (U+2014).** Use a plain ASCII hyphen-minus (`-`, U+002D) instead.
+- **Never use the en-dash (En dash) character (U+2013).** Use a plain ASCII hyphen-minus (`-`, U+002D) instead.
 - Reason: some terminals and markdown renderers mishandle the en-dash / em-dash glyph (Windows terminals can render them as a question mark box), which breaks copy-paste and visual consistency. ASCII hyphen-minus renders the same everywhere.
 - The same applies to other Unicode punctuation: prefer ASCII `'` over `'`, `"` over `"`/`"`, `-` over `-`/`-`, `...` over `...`. The lint config already enforces most of these via `MD026`.
 
 ### Markdown prose
 
 - One paragraph = one physical line. No line break inside a sentence, no matter the line length. Table cells, code blocks, and frontmatter are exempt.
+- **Before writing or editing any `.md` file**, load the skill `markdown-style` at [`.kilo/skills/markdown-style/SKILL.md`](.kilo/skills/markdown-style/SKILL.md). It bundles all the rules + pre/post checklists in one place.
+- **After writing or editing any `.md` file**, run `python _Helpers/scripts/fixes/reflow_md.py --quiet --check --path <file>` and verify exit code `0`. The `--apply` mode is NEVER invoked automatically — it is manual recovery only and requires explicit user GO.
+- A pre-commit git hook (installed once via `bash .kilo/skills/markdown-style/install.sh`) refuses `git commit` when staged `.md` files have wrapped prose. Bypass per-commit with `git commit --no-verify`. The hook is informational only — never modifies files.
 - Detailed rule, examples, and rationale in [`_Helpers/docs/004_markdown_style.md`](_Helpers/docs/004_markdown_style.md) (loaded on demand, not in first-context).
 
 ### Markdown structure: READMEs must reflect their directory

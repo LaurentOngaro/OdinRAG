@@ -62,6 +62,10 @@ SKIP_DIRS: tuple[str, ...] = (
     "_tools",
     "_private",
 )
+# Pre-computed for case-insensitive matching. Necessary on Windows / macOS where
+# the filesystem preserves case but compares insensitively (and git's
+# core.ignorecase=true keeps the working copy mixed-case like "_Private/").
+SKIP_DIRS_LOWER: frozenset[str] = frozenset(d.lower() for d in SKIP_DIRS)
 
 # Fence delimiters we recognize. A code fence is opened by a line that starts with ``` ``` ``` or `~~~` (optionally followed by an info string) and is closed by the next line that uses the same delimiter with at least as many characters.
 FENCE_CHARS = ("```", "~~~")
@@ -255,8 +259,9 @@ def iter_text_files(root: Path):
             yield root
         return
     for path in sorted(root.rglob("*")):
-        # Skip excluded directories (and everything inside).
-        if any(part in SKIP_DIRS for part in path.parts):
+        # Skip excluded directories (and everything inside). Comparison is
+        # case-insensitive so _Private/ (capital P) is matched against _private.
+        if any(part.lower() in SKIP_DIRS_LOWER for part in path.parts):
             continue
         if not path.is_file():
             continue
@@ -264,8 +269,12 @@ def iter_text_files(root: Path):
             yield path
 
 
-def scan_and_reflow(root: Path, apply: bool) -> tuple[int, int, int]:
+def scan_and_reflow(root: Path, apply: bool, quiet: bool = False) -> tuple[int, int, int]:
     """Walk ``root`` and reflow every Markdown file.
+
+    When ``quiet`` is True and ``apply`` is False (dry-run / --check), the per-file
+    output is reduced to one line per offending path - no banner, no line count,
+    no summary. Suitable for embedding in pre-commit hooks and CI logs.
 
     Returns (scanned, reflowed, unchanged).
     """
@@ -275,8 +284,9 @@ def scan_and_reflow(root: Path, apply: bool) -> tuple[int, int, int]:
         try:
             original = path.read_text(encoding="utf-8")
         except UnicodeDecodeError:
-            rel = path if root.is_file() else path.relative_to(root)
-            print(f"  [SKIP] {rel}  (not valid UTF-8)")
+            if not quiet:
+                rel = path if root.is_file() else path.relative_to(root)
+                print(f"  [SKIP] {rel}  (not valid UTF-8)")
             continue
 
         reflowed_text = _reflow(original)
@@ -284,12 +294,16 @@ def scan_and_reflow(root: Path, apply: bool) -> tuple[int, int, int]:
             unchanged += 1
             continue
 
-        # Count lines saved as a quick visibility metric.
-        orig_lines = original.count("\n")
-        new_lines = reflowed_text.count("\n")
-        saved = orig_lines - new_lines
         rel = path if root.is_file() else path.relative_to(root)
-        print(f"  [REFLOW] {rel}  (-{saved} line(s))")
+        if quiet:
+            # Quiet mode: one line per offending path. No line count, no banner.
+            print(rel, flush=True)
+        else:
+            # Count lines saved as a quick visibility metric.
+            orig_lines = original.count("\n")
+            new_lines = reflowed_text.count("\n")
+            saved = orig_lines - new_lines
+            print(f"  [REFLOW] {rel}  (-{saved} line(s))")
         reflowed += 1
 
         if apply:
@@ -302,7 +316,16 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=_DESCRIPTION)
     parser.add_argument( "--path", type=Path, default=DEFAULT_ROOT, help=f"Root to scan (default: repo root = {DEFAULT_ROOT.relative_to(ROOT_DIR)}). Accepts a single file or a directory.", )
     parser.add_argument( "--apply", action="store_true", help="Apply the reflow (without this flag: dry-run)", )
-    parser.add_argument( "--check", action="store_true", help="Exit non-zero if any file would change (for CI / pre-commit)", )
+    parser.add_argument( "--check", action="store_true", help="Exit non-zero if any file would change (for CI / pre-commit). Combine with --quiet for signal-only output.", )
+    parser.add_argument(
+        "--quiet", "-q",
+        action="store_true",
+        help=(
+            "Suppress banners, summaries, and per-file detail. With --check (or a plain "
+            "dry-run), print ONLY the file paths that need reflow, one per line. Recommended "
+            "for pre-commit hooks and CI where stdout must be machine-parseable."
+        ),
+    )
     args = parser.parse_args(argv)
 
     root: Path = args.path
@@ -311,25 +334,31 @@ def main(argv: list[str] | None = None) -> int:
         return 2
 
     apply = args.apply and not args.check
-    print(f"Scan  : {root}")
-    print(f"Mode  : {'APPLY (writes to disk)' if apply else 'CHECK (would change)' if args.check else 'DRY-RUN (no writes)'}")
-    print()
+    quiet = args.quiet
 
-    scanned, reflowed, unchanged = scan_and_reflow(root, apply=apply)
+    if not quiet:
+        print(f"Scan  : {root}")
+        print(f"Mode  : {'APPLY (writes to disk)' if apply else 'CHECK (would change)' if args.check else 'DRY-RUN (no writes)'}")
+        print()
 
-    print()
-    print("-" * 60)
-    print(f"Scanned   : {scanned}")
-    print(f"Reflowed  : {reflowed}")
-    print(f"Unchanged : {unchanged}")
+    scanned, reflowed, unchanged = scan_and_reflow(root, apply=apply, quiet=quiet)
+
+    if not quiet:
+        print()
+        print("-" * 60)
+        print(f"Scanned   : {scanned}")
+        print(f"Reflowed  : {reflowed}")
+        print(f"Unchanged : {unchanged}")
 
     if args.check and reflowed:
-        print()
-        print("Reflow needed. Re-run with --apply to fix, or run without --check to preview.")
+        if not quiet:
+            print()
+            print("Reflow needed. Re-run with --apply to fix, or run without --check to preview.")
         return 1
     if not args.apply and reflowed and not args.check:
-        print()
-        print("Re-run with --apply to write the fixes.")
+        if not quiet:
+            print()
+            print("Re-run with --apply to write the fixes.")
     return 0
 
 

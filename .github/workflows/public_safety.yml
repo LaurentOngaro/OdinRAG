@@ -1,0 +1,68 @@
+name: public_safety
+
+# Verifies that the `public` branch of the repo is free of forbidden paths before any push to GitHub. Mirrors `audit_public_safety.py --scope branch` but runs in CI so a leak is caught even if the local pre-push hook is bypassed or out of date.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  audit-public:
+    name: Audit refs/heads/public
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (full history)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # filter-branch needs the full commit graph
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Regenerate local public branch from main
+        env:
+          # `git filter-branch` is deprecated in modern git and prints a multi-line gotcha warning.
+          # Set this to silence it; the workflow is intentional.
+          FILTER_BRANCH_SQUELCH_WARNING: "1"
+          # Older git uses GIT_DIR for the backup location; not strictly required.
+        run: |
+          set -euo pipefail
+          echo "[+] Reset refs/heads/public to main tip"
+          git branch -f public main
+
+          echo "[+] Filter-branch with personal paths removed"
+          git filter-branch -f \
+            --index-filter 'git rm --cached -r --ignore-unmatch code/projects/PVG03_RPG
+              || git rm --cached -r --ignore-unmatch _Private
+              || git rm --cached -r --ignore-unmatch odin-knowledge-base/courses
+              || git rm --cached -r --ignore-unmatch odin-knowledge-base/docs/karl_zylinski/odin-book' \
+            --prune-empty \
+            -- public
+
+          echo "[+] Clean up filter-branch backup"
+          git update-ref -d refs/original/refs/heads/public || true
+
+          echo "[+] Resulting public tree (top-level):"
+          git ls-tree public --name-only
+
+      - name: Audit the rewritten public branch
+        run: |
+          python _Helpers/scripts/diagnostic/audit_public_safety.py \
+            --scope branch \
+            --verbose
+
+      - name: Summary
+        if: always()
+        run: |
+          if [ "${{ job.status }}" = "success" ]; then
+            echo "OK - public branch is clean"
+          else
+            echo "FAIL - public branch has forbidden paths. See logs above."
+          fi
