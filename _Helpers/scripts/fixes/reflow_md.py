@@ -213,7 +213,19 @@ def _reflow(text: str) -> str:
             continue
 
         # --- Continuation line (indented): glue to previous block ---------
-        if _is_continuation(line) and out and out[-1].strip():
+        # Only glue to a previous PROSE line, and only if the current line is
+        # itself prose. If the current line is a block start (e.g. a new list
+        # item, even at the same indent), it is a NEW block, not a continuation
+        # of the previous one. Without this guard, a sequence of list items at
+        # the same indent under a parent would be incorrectly merged into one
+        # line by --apply.
+        if (
+            _is_continuation(line)
+            and out
+            and out[-1].strip()
+            and not _is_block_start(out[-1])
+            and not _is_block_start(line.lstrip())
+        ):
             out[-1] = out[-1].rstrip() + " " + line.strip()
             i += 1
             continue

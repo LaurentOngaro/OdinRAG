@@ -58,19 +58,22 @@ if [ ! -f "$REFLOW" ]; then
 fi
 
 # Get staged .md files (added, copied, modified, renamed — but not deleted).
-staged_md=$(git diff --cached --name-only --diff-filter=ACMR -- '*.md' '*.markdown' 2>/dev/null || true)
+staged_md=$(git diff --cached --name-only --null --diff-filter=ACMR -- '*.md' '*.markdown' 2>/dev/null || true)
 
 if [ -z "$staged_md" ]; then
   exit 0
 fi
 
+# NUL-separated iteration is required to handle paths with spaces (e.g. "README - diagnostic.md").
+# `git diff --name-only -z` emits NUL-terminated names; `read -d ''` consumes one at a time.
 needs_reflow=""
-for f in $staged_md; do
+while IFS= read -r -d '' f; do
+  [ -z "$f" ] && continue
   output=$(python "$REFLOW" --quiet --check --path "$f" 2>&1) || true
   if [ -n "$output" ]; then
     needs_reflow="$needs_reflow$output"$'\n'
   fi
-done
+done < <(printf '%s\0' "$staged_md")
 
 if [ -n "$needs_reflow" ]; then
   echo "[pre-commit] Reflow needed on these staged .md files:" >&2

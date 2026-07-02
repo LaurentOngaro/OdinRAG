@@ -43,8 +43,7 @@ This file contains:
 - **Table of contents of Karl's book chapters** (28 + appendices)
 - **Statistics**
 
-If the requested topic is in the INDEX -> load the listed files directly.
-If the topic is NOT listed -> fall back to grep (Step 3).
+If the requested topic is in the INDEX -> load the listed files directly. If the topic is NOT listed -> fall back to grep (Step 3).
 
 > **Rule**: never load the whole KB. Always go through the INDEX first.
 
