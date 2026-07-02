@@ -28,7 +28,7 @@ SKIP:
 
 ### 1. One paragraph = one physical line (THE rule I keep breaking)
 
-NEVER wrap prose at any column width. Long sentences are ONE LINE, even if they exceed 200 characters. The project uses "book style" paragraphs — every prose paragraph collapsed to a single physical line.
+NEVER wrap prose at any column width. Long sentences are ONE LINE, even if they exceed 200 characters. The project uses "book style" paragraphs - every prose paragraph collapsed to a single physical line.
 
 ```
 # CORRECT (one paragraph = one line, however long):
@@ -53,7 +53,7 @@ python _Helpers/scripts/fixes/reflow_md.py --quiet --check --path <file>
 
 | Wrong                         | Right              | Notes                    |
 | ----------------------------- | ------------------ | ------------------------ |
-| `—` (em-dash)                 | `-` (hyphen-minus) | U+2014 → U+002D          |
+| `-` (em-dash)                 | `-` (hyphen-minus) | U+2014 → U+002D          |
 | `–` (en-dash)                 | `-`                | U+2013 → U+002D          |
 | `'` `'` (curly quotes)        | `'`                | U+2019 / U+2018 → U+0027 |
 | `"` `"` (curly double quotes) | `"`                | U+201C / U+201D → U+0022 |
@@ -89,33 +89,33 @@ Quick rules:
 - [ ] Frontmatter planned for authored docs (`title`, `date`, `tags`, `type`, `status`, `version`, `lastUpdated`, `updatedBy`)?
 - [ ] No em-dash, smart quotes, ellipsis in draft?
 
-## POST-FLIGHT checklist (after writing — MANDATORY)
+## POST-FLIGHT checklist (after writing - MANDATORY)
 
 1. Run reflow check (THE primary signal for rule 1):
 
-  ```bash
-  python _Helpers/scripts/fixes/reflow_md.py --quiet --check --path <file>
-  ```
+```bash
+python _Helpers/scripts/fixes/reflow_md.py --quiet --check --path <file>
+```
 
-  - Exit `0` → clean.
-  - Exit `1` → reflow needed (paths printed one per line). I wrapped when I shouldn't have → fix my source. Reflow (`--apply`) is MANUAL recovery controlled by the user; I do NOT invoke it without explicit GO.
-  - Exit `2` → tool error (root not found, etc.).
+- Exit `0` → clean.
+- Exit `1` → reflow needed (paths printed one per line). I wrapped when I shouldn't have → fix my source. Reflow (`--apply`) is MANUAL recovery controlled by the user; I do NOT invoke it without explicit GO.
+- Exit `2` → tool error (root not found, etc.).
 
 2. Run markdownlint-cli2 (catches MD024, MD025, etc.):
 
-  ```bash
-  npx markdownlint-cli2 <file>
-  ```
+```bash
+npx markdownlint-cli2 <file>
+```
 
 3. Loop until both exit `0`.
 
 ## Tools reference
 
-| Tool                                          | Use                                    | When                                                    |
-| --------------------------------------------- | -------------------------------------- | ------------------------------------------------------- |
-| `reflow_md.py --quiet --check --path <file>`  | Detect wrapped paragraphs (rule 1)     | every write                                             |
-| `reflow_md.py --apply --path <file>`          | Auto-fix rule 1                        | MANUAL only, never automated, requires explicit user GO |
-| `npx markdownlint-cli2 <file>`                | Catch other MD rules                   | every write                                             |
+| Tool                                         | Use                                | When                                                    |
+| -------------------------------------------- | ---------------------------------- | ------------------------------------------------------- |
+| `reflow_md.py --quiet --check --path <file>` | Detect wrapped paragraphs (rule 1) | every write                                             |
+| `reflow_md.py --apply --path <file>`         | Auto-fix rule 1                    | MANUAL only, never automated, requires explicit user GO |
+| `npx markdownlint-cli2 <file>`               | Catch other MD rules               | every write                                             |
 
 ## Never-automated list (read-and-respect)
 

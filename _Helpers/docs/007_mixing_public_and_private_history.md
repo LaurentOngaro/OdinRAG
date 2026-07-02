@@ -46,11 +46,11 @@ working tree (single folder, one .git/)
 
 Layered safety net (in order, before any leak escapes the workstation):
 
-1. **Local hook** — `.git/hooks/pre-push` refuses any push of `main` to the `public` remote.
-2. **Audit script** — `_Helpers/scripts/diagnostic/audit_public_safety.py` verifies the `public` branch is free of forbidden paths before you push.
-3. **Refresh helper** — `_Helpers/scripts/diagnostic/refresh_public_branch.py` regenerates the sanitised `public` branch in one command (idempotent, refuses a dirty working tree).
-4. **GitHub Action** — `.github/workflows/public_safety.yml` re-runs the audit on every push and pull request targeting `main`, blocking leaks even if the local hook is bypassed.
-5. **CI auto-cleanup** — the GitHub Action also prunes the filter-branch backup ref so no orphan state survives in CI.
+1. **Local hook** - `.git/hooks/pre-push` refuses any push of `main` to the `public` remote.
+2. **Audit script** - `_Helpers/scripts/diagnostic/audit_public_safety.py` verifies the `public` branch is free of forbidden paths before you push.
+3. **Refresh helper** - `_Helpers/scripts/diagnostic/refresh_public_branch.py` regenerates the sanitised `public` branch in one command (idempotent, refuses a dirty working tree).
+4. **GitHub Action** - `.github/workflows/public_safety.yml` re-runs the audit on every push and pull request targeting `main`, blocking leaks even if the local hook is bypassed.
+5. **CI auto-cleanup** - the GitHub Action also prunes the filter-branch backup ref so no orphan state survives in CI.
 
 ## Why not the alternatives
 
@@ -64,19 +64,19 @@ One repo, one working tree, two branches, one or two remotes gives you all of: l
 
 - `git` 2.30 or newer (for `--orphan`, modern `filter-branch`, and refspec syntax).
 - A public remote you already push to. This guide renames it to `public` in step 1; pick any consistent name.
-- (Optional but recommended) A private remote you control — a self-hosted Gitea, a private repo on a trusted forge, a `git` daemon over SSH. The URL only lives in your local git config; never in any tracked file.
+- (Optional but recommended) A private remote you control - a self-hosted Gitea, a private repo on a trusted forge, a `git` daemon over SSH. The URL only lives in your local git config; never in any tracked file.
 - The audit script `_Helpers/scripts/diagnostic/audit_public_safety.py` present and lint-clean on its current branch.
 
 ## Step 1 - rename the public remote (and optionally add a private remote)
 
-The rename is purely cosmetic — stay consistent. Rename `origin` to `public`:
+The rename is purely cosmetic - stay consistent. Rename `origin` to `public`:
 
 ```bash
 git remote rename origin public
 git remote -v
 ```
 
-If you have a private remote, add it now (otherwise skip — local history is enough on its own):
+If you have a private remote, add it now (otherwise skip - local history is enough on its own):
 
 ```bash
 git remote add private <URL_OF_YOUR_PRIVATE_REMOTE>
@@ -120,7 +120,7 @@ And put the precise personal patterns in `.git/info/exclude`:
 /odin-knowledge-base/docs/karl_zylinski/odin-book/
 ```
 
-Adapt the patterns to your own private folders. Keep them in sync with `FORBIDDEN_PATTERNS` in `audit_public_safety.py` and `STRIP_RULES` in `refresh_public_branch.py` — three places to update when the set of personal paths changes.
+Adapt the patterns to your own private folders. Keep them in sync with `FORBIDDEN_PATTERNS` in `audit_public_safety.py` and `STRIP_RULES` in `refresh_public_branch.py` - three places to update when the set of personal paths changes.
 
 ## Step 3 - import personal content under the override
 
@@ -138,7 +138,7 @@ git status
 git commit -m "chore: import personal history into private main"
 ```
 
-`_Private/.config/` is permanently gitignored. Do **not** stage it, even with `-f` — credentials must never reach history at all. If credentials have ever been committed by accident, see the "Recovery" section below.
+`_Private/.config/` is permanently gitignored. Do **not** stage it, even with `-f` - credentials must never reach history at all. If credentials have ever been committed by accident, see the "Recovery" section below.
 
 After this, `git log -- <your-personal-path>/` shows full project history locally. The public remote has not been touched.
 
@@ -176,7 +176,7 @@ git ls-tree -r public-orphan | wc -l   # -> 0
 
 ### Step 4b - regenerate `public` from `main` via the helper script
 
-The wrapper at `_Helpers/scripts/diagnostic/refresh_public_branch.py` is the durable entry point. It is **idempotent** (no-op when the `public` branch is already in sync) and **refuses to run on a dirty working tree** (filter-branch limitation — stash first, then `git stash pop`).
+The wrapper at `_Helpers/scripts/diagnostic/refresh_public_branch.py` is the durable entry point. It is **idempotent** (no-op when the `public` branch is already in sync) and **refuses to run on a dirty working tree** (filter-branch limitation - stash first, then `git stash pop`).
 
 ```bash
 # Dry-run: show what would happen, do nothing
@@ -228,7 +228,7 @@ You should see nothing starting with `_Private/`, nothing under `code/projects/<
 
 ### Why filter-branch and not filter-repo
 
-`git filter-repo` is the modern, faster, safer replacement recommended by upstream. It is a separate Python tool (`pip install git-filter-repo`) and not bundled with `git`. Until filter-repo is a dependency of this repo, we rely on filter-branch. The migration is mechanical when the time comes — see [Trade-offs](#trade-offs).
+`git filter-repo` is the modern, faster, safer replacement recommended by upstream. It is a separate Python tool (`pip install git-filter-repo`) and not bundled with `git`. Until filter-repo is a dependency of this repo, we rely on filter-branch. The migration is mechanical when the time comes - see [Trade-offs](#trade-offs).
 
 ## Step 5 - install the pre-push hook
 
@@ -291,7 +291,7 @@ python _Helpers/scripts/diagnostic/audit_public_safety.py
 # Only the working tree. Used to verify ignore-pattern hygiene.
 python _Helpers/scripts/diagnostic/audit_public_safety.py --scope tree
 
-# Both. Used for paranoid double-checks. NOTE: with the public/private split workflow the working tree will always show personal files because main is supposed to carry them — this scope is for diagnosis, not for the push gate.
+# Both. Used for paranoid double-checks. NOTE: with the public/private split workflow the working tree will always show personal files because main is supposed to carry them - this scope is for diagnosis, not for the push gate.
 python _Helpers/scripts/diagnostic/audit_public_safety.py --scope both
 
 # List every file examined (useful when chasing a false positive).
@@ -300,9 +300,9 @@ python _Helpers/scripts/diagnostic/audit_public_safety.py --verbose
 
 Exit codes:
 
-- `0` — clean.
-- `1` — forbidden paths found. Re-run `refresh_public_branch.py` if it's a branch issue, or update `.gitignore` / `.git/info/exclude` if it's a tree issue.
-- `2` — git missing, branch absent, etc.
+- `0` - clean.
+- `1` - forbidden paths found. Re-run `refresh_public_branch.py` if it's a branch issue, or update `.gitignore` / `.git/info/exclude` if it's a tree issue.
+- `2` - git missing, branch absent, etc.
 
 The script's `FORBIDDEN_PATTERNS` list drives both the audit scan and the inline display. Keep it in sync with the `personal_pattern` regex in the hook and the `STRIP_RULES` list in `refresh_public_branch.py`.
 
@@ -312,9 +312,9 @@ Add `.github/workflows/public_safety.yml`. It re-runs the refresh + audit on Git
 
 Key behaviour:
 
-- `actions/checkout@v4` with `fetch-depth: 0` — filter-branch needs the full commit graph.
-- `actions/setup-python@v5` — only needed for the audit script (stdlib-only).
-- `FILTER_BRANCH_SQUELCH_WARNING=1` — silences the multi-line gotcha warning; the workflow is intentional.
+- `actions/checkout@v4` with `fetch-depth: 0` - filter-branch needs the full commit graph.
+- `actions/setup-python@v5` - only needed for the audit script (stdlib-only).
+- `FILTER_BRANCH_SQUELCH_WARNING=1` - silences the multi-line gotcha warning; the workflow is intentional.
 - The "Regenerate local public branch from main" step is essentially a copy of the script in step 4b, inlined so the workflow does not depend on the helper script being present at the time the GH Action runs.
 - The final audit step fails the job on any violation, blocking the PR / push.
 
@@ -361,7 +361,7 @@ git push private main
 
 ### Pre-push hook blocks a legitimate push
 
-Inspect the diff the hook printed. If the paths are genuinely public, amend `.gitignore` and `.git/info/exclude`, recommit on `main`, run `refresh_public_branch.py --verify`, retry. If the paths are personal, you caught a mistake — do not bypass the hook.
+Inspect the diff the hook printed. If the paths are genuinely public, amend `.gitignore` and `.git/info/exclude`, recommit on `main`, run `refresh_public_branch.py --verify`, retry. If the paths are personal, you caught a mistake - do not bypass the hook.
 
 ### `_Private/.config/` (credentials) ever gets committed
 

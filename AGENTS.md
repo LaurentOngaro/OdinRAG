@@ -154,7 +154,7 @@ These rules apply to every tracked `.md` file in this repo unless the file is ex
 
 - One paragraph = one physical line. No line break inside a sentence, no matter the line length. Table cells, code blocks, and frontmatter are exempt.
 - **Before writing or editing any `.md` file**, load the skill `markdown-style` at [`.kilo/skills/markdown-style/SKILL.md`](.kilo/skills/markdown-style/SKILL.md). It bundles all the rules + pre/post checklists in one place.
-- **After writing or editing any `.md` file**, run `python _Helpers/scripts/fixes/reflow_md.py --quiet --check --path <file>` and verify exit code `0`. The `--apply` mode is NEVER invoked automatically — it is manual recovery only and requires explicit user GO.
+- **After writing or editing any `.md` file**, run `python _Helpers/scripts/fixes/reflow_md.py --quiet --check --path <file>` and verify exit code `0`. The `--apply` mode is NEVER invoked automatically - it is manual recovery only and requires explicit user GO.
 - Detailed rule, examples, and rationale in [`_Helpers/docs/004_markdown_style.md`](_Helpers/docs/004_markdown_style.md) (loaded on demand, not in first-context).
 
 ### Markdown structure: READMEs must reflect their directory
@@ -179,9 +179,9 @@ Non-zero exit code = issues found. Use `--scope <path>` to scope the audit (for 
 - **Why**: the `public` branch is what gets pushed to github.com. That repo is public and international. The rule exists for search consistency, AI tooling (the subagent prompt expects English keywords), and international contributors.
 
 - **Exempted from this rule** (any language is fine):
-  - Everything under `_Private/` (Bucket 3, gitignored) — never reaches the `public` branch.
-  - Files under any `**/raw/**` folder — raw notes are kept as-is by convention (no frontmatter, no NNN_ prefix).
-  - Personal logs, planning notes, daily entries — always private.
+  - Everything under `_Private/` (Bucket 3, gitignored) - never reaches the `public` branch.
+  - Files under any `**/raw/**` folder - raw notes are kept as-is by convention (no frontmatter, no NNN_ prefix).
+  - Personal logs, planning notes, daily entries - always private.
 
 - **Rare public non-English doc**: annotate in frontmatter with `exception: <reason>` so the convention violation is explicit.
 
