@@ -3,6 +3,14 @@
 > A personal RAG knowledge base for the [Odin programming language](https://odin-lang.org/) applied to game development (Raylib, Sokol, hot-reload, allocators).
 > Built and curated end-to-end with **MiniMax-M3** as the structural engineering agent.
 
+## Branches
+
+> **This repo deliberately has no `main` branch on GitHub** - the default branch is `public` (sanitized subset).
+> The author maintains a parallel `main` branch on a separate **private** remote with full content (personal notes, dailies, paywalled scraped sources). That private branch never reaches GitHub.
+>
+> - **For users**: `git clone` defaults to `public`. That's what you want.
+> - **For contributors**: the split rationale is documented in [_Helpers/docs/007_mixing_public_and_private_history.md](_Helpers/docs/007_mixing_public_and_private_history.md).
+
 ## What is this
 
 OdinRAG aggregates, formats, and indexes learning material about Odin game dev so it can be navigated quickly by either:
