@@ -1,6 +1,6 @@
 ---
 name: markdown-style
-description: Distills all markdown style rules (project + personal) into one place. Use BEFORE creating or editing any .md file. Post-write: run reflow_md.py --quiet --check and lint fixes before considering the task done. Enforced by AGENTS.md § Markdown prose plus the local pre-commit hook installed by this skill's installer.
+description: Distills all markdown style rules (project + personal) into one place. Use BEFORE creating or editing any .md file. Post-write: run reflow_md.py --quiet --check and lint fixes before considering the task done. Enforced by AGENTS.md § Markdown prose.
 ---
 
 # Markdown style enforcer
@@ -17,7 +17,6 @@ LOAD AFTER (when relevant):
 
 - the user asks "is this markdown compliant?"
 - after a batch of markdown edits, before declaring the batch done
-- when the pre-commit hook blocks a commit and the user wants help fixing it
 
 SKIP:
 
@@ -94,19 +93,19 @@ Quick rules:
 
 1. Run reflow check (THE primary signal for rule 1):
 
-   ```bash
-   python _Helpers/scripts/fixes/reflow_md.py --quiet --check --path <file>
-   ```
+  ```bash
+  python _Helpers/scripts/fixes/reflow_md.py --quiet --check --path <file>
+  ```
 
-   - Exit `0` → clean.
-   - Exit `1` → reflow needed (paths printed one per line). I wrapped when I shouldn't have → fix my source. Reflow (`--apply`) is MANUAL recovery controlled by the user; I do NOT invoke it without explicit GO.
-   - Exit `2` → tool error (root not found, etc.).
+  - Exit `0` → clean.
+  - Exit `1` → reflow needed (paths printed one per line). I wrapped when I shouldn't have → fix my source. Reflow (`--apply`) is MANUAL recovery controlled by the user; I do NOT invoke it without explicit GO.
+  - Exit `2` → tool error (root not found, etc.).
 
 2. Run markdownlint-cli2 (catches MD024, MD025, etc.):
 
-   ```bash
-   npx markdownlint-cli2 <file>
-   ```
+  ```bash
+  npx markdownlint-cli2 <file>
+  ```
 
 3. Loop until both exit `0`.
 
@@ -117,20 +116,6 @@ Quick rules:
 | `reflow_md.py --quiet --check --path <file>`  | Detect wrapped paragraphs (rule 1)     | every write                                             |
 | `reflow_md.py --apply --path <file>`          | Auto-fix rule 1                        | MANUAL only, never automated, requires explicit user GO |
 | `npx markdownlint-cli2 <file>`                | Catch other MD rules                   | every write                                             |
-| `bash .kilo/skills/markdown-style/install.sh` | Install the pre-commit hook (one-time) | first-time setup                                        |
-| `git commit --no-verify`                      | Bypass the pre-commit hook             | per-commit escape hatch                                 |
-
-## Pre-commit hook
-
-A local git hook (NOT version-controlled) refuses `git commit` when staged `.md` files have wrapped prose. The hook is INFORMATIONAL — it never modifies files; the user controls reflow decisions.
-
-Install once:
-
-```bash
-bash .kilo/skills/markdown-style/install.sh
-```
-
-After install, every `git commit` checks staged `.md` files. Bypass per-commit with `git commit --no-verify`. Re-run install to repair the hook if it gets deleted.
 
 ## Never-automated list (read-and-respect)
 
