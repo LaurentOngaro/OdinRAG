@@ -240,9 +240,25 @@ def run(args: argparse.Namespace) -> int:
     _ok("public branch is clean (no personal paths)")
 
     # Step 4: push public.
+    # The local `public` branch is regenerated from `main` every run, so it
+    # naturally diverges from the remote `public` (which is from a previous
+    # run, or from an older workflow). Non-fast-forward is the expected case.
+    # We try a normal push first (clean case for the very first publish), then
+    # fall back to --force-with-lease (safer than --force: refuses if someone
+    # else pushed in the meantime).
     _step(f"push {PUBLIC_REF} -> {PUBLIC_REMOTE}")
-    _git("push", PUBLIC_REMOTE, PUBLIC_REF)
-    _ok(f"pushed {public_after_sha[:12]} to {PUBLIC_REMOTE}")
+    result = _git("push", PUBLIC_REMOTE, PUBLIC_REF, check=False)
+    if result.returncode == 0:
+        _ok(f"pushed {public_after_sha[:12]} to {PUBLIC_REMOTE} (fast-forward)")
+    else:
+        if "non-fast-forward" not in result.stderr and "! [rejected]" not in result.stderr:
+            _fail(f"git push {PUBLIC_REMOTE} {PUBLIC_REF} failed:")
+            print(result.stderr)
+            return 3
+        _warn("remote public has diverged; this is expected (each run regenerates from main)")
+        _warn("retrying with --force-with-lease to overwrite the remote with the local version")
+        _git("push", "--force-with-lease", PUBLIC_REMOTE, PUBLIC_REF)
+        _ok(f"pushed {public_after_sha[:12]} to {PUBLIC_REMOTE} (force-with-lease)")
 
     print()
     print("[OK] publish complete.")
