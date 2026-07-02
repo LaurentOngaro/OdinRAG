@@ -45,9 +45,8 @@ A single-repo / two-branch / two-remote workflow keeps full personal history loc
 ```bash
 # Refresh the public branch from main (with personal paths filtered out)
 git filter-branch -f --index-filter '
-  git rm --cached -r --ignore-unmatch code/projects/PVG03_RPG/
-  git rm --cached -r --ignore-unmatch _Private/planning/daily
-  git rm --cached -r --ignore-unmatch _Private/raw
+  git rm --cached -r --ignore-unmatch code/projects/PVG03_RPG
+  git rm --cached -r --ignore-unmatch _Private
   git rm --cached -r --ignore-unmatch odin-knowledge-base/courses
   git rm --cached -r --ignore-unmatch odin-knowledge-base/docs/karl_zylinski/odin-book
 ' --prune-empty -- public
