@@ -46,10 +46,12 @@ _Helpers/logs/
 # === OS / IDE ===
 .DS_Store
 Thumbs.db
-.vscode/
 .idea/
 *.swp
 *~
+.vscode/*
+# but user tasks.json is tracked for the benefit of collaborators, so we don't ignore it:
+!.vscode/tasks.json
 
 # === Kilo runtime state ===
 .kilo/worktrees/

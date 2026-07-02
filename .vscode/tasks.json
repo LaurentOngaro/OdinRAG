@@ -1,0 +1,106 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Odin: Build Debug",
+      "type": "shell",
+      "command": "odin build ./src -out:build/game_debug -debug -vet -strict-style",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Odin: Build Release",
+      "type": "shell",
+      "command": "odin build ./src -out:build/game -o:speed -no-bounds-check",
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "Odin: Hot Reload — Build DLL",
+      "type": "shell",
+      "command": "odin build ./src -build-mode:dll -out:build/game.dll -debug -vet",
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "Odin: Run Debug",
+      "type": "shell",
+      "command": "./build/game_debug",
+      "dependsOn": "Odin: Build Debug",
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Odin: Check (vet only)",
+      "type": "shell",
+      "command": "odin check ./src -vet -strict-style",
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "[DIAG] Audit Cohérence READMEs",
+      "type": "shell",
+      "command": "python _Helpers/scripts/diagnostic/auditReadmeCoherence.py",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": [],
+      "detail": "Audit README <-> filesystem coherence (wikilinks, missing files, unlisted files). Use --fail-on-error in CI."
+    },
+    {
+      "label": "[PUBLISH] --check (dry-run)",
+      "type": "shell",
+      "command": "python _Helpers/scripts/diagnostic/publish_public.py --check",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      },
+      "problemMatcher": [],
+      "detail": "Dry-run: regenerate public from main locally, audit, no pushes. Use to preview before the real publish.",
+      "group": "test"
+    },
+    {
+      "label": "[PUBLISH] full (private + regen + public)",
+      "type": "shell",
+      "command": "python _Helpers/scripts/diagnostic/publish_public.py",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      },
+      "problemMatcher": [],
+      "detail": "Daily publish flow: push main to private, regenerate public (filtered), push public to remote. Refuses on dirty working tree. Uses --force-with-lease on the public push.",
+      "group": "build"
+    },
+    {
+      "label": "[PUBLISH] --skip-private",
+      "type": "shell",
+      "command": "python _Helpers/scripts/diagnostic/publish_public.py --skip-private",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      },
+      "problemMatcher": [],
+      "detail": "Same as [PUBLISH] full but skip the private push (use when you already pushed main to private manually).",
+      "group": "build"
+    }
+  ]
+}
