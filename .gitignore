@@ -7,18 +7,19 @@ build/
 *.lib
 *.obj
 
-# === PRIVATE (gitignored - never push) ===
-_Private/
-_Raw/                       # legacy name (post-migration, ensure gitignored)
-
-# === COPYRIGHTED SCRAPED CONTENT (do NOT publish publicly) ===
-odin-knowledge-base/courses/
-courses/                    # legacy
-odin-knowledge-base/docs/karl_zylinski/odin-book/**/*.md
-!odin-knowledge-base/docs/karl_zylinski/odin-book/README.md
-
-# === Personal Odin project code (stays in place but gitignored) ===
-/code/projects/PVG03_RPG/
+# === Personal / private paths ===
+# Personal content (PVG03_RPG/, _Private/, paywalled scraped content) is tracked on
+# LOCAL main via `git add -f`, never on the public branch.
+# See _Helpers/docs/007_mixing_public_and_private_history.md for the full workflow.
+#
+# Collaborators cloning this repo should copy the corresponding patterns from
+# .git/info/exclude (this file is LOCAL only, not version-controlled) if they want
+# a clean `git status`. The pre-push hook (.git/hooks/pre-push) is the real
+# enforcement - it refuses pushes of personal paths to the public remote.
+#
+# Only the secrets pattern is kept in this tracked .gitignore as defense in depth,
+# so credentials never reach any remote even if a private one is added later.
+/_Private/.config/
 
 # === Vendored third-party templates (each has its own .git/ - never `git add` the contents) ===
 /code/vendored templates/*/
