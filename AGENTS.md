@@ -170,11 +170,19 @@ python _Helpers/scripts/diagnostic/auditReadmeCoherence.py
 
 Non-zero exit code = issues found. Use `--scope <path>` to scope the audit (for example `--scope docs/official`), and `--quiet` to only show the summary line. Add `--fail-on-error` for CI-style use.
 
-### Language: English only
+### Language: English only (PUBLIC docs)
 
-- **All tracked `.md` files must be in English.** The repo is public and international. Any file authored or translated must be English. The same applies to frontmatter (`title`, `summary`).
-- **Exception** (gitignored, exempt): `_Private/planning/daily/J_YYYY-MM-DD.md` - the author's personal daily notes. These never reach the public repo, so the author's preferred language is fine.
-- Reason: consistency for search, AI tooling (the subagent prompt expects English keywords), and international contributors.
+- **Rule**: all **PUBLIC** tracked `.md` files must be in English. This includes top-level files (README.md, AGENTS.md, SOURCES.md, etc.), anything under `_Helpers/`, `odin-knowledge-base/`, `code/`, and any other path that ends up in the `public` branch. The same applies to frontmatter (`title`, `summary`) of public docs.
+- **Why**: the `public` branch is what gets pushed to github.com. That repo is public and international. The rule exists for search consistency, AI tooling (the subagent prompt expects English keywords), and international contributors.
+
+- **Exempted from this rule** (any language is fine):
+  - Everything under `_Private/` (Bucket 3, gitignored) — never reaches the `public` branch.
+  - Files under any `**/raw/**` folder — raw notes are kept as-is by convention (no frontmatter, no NNN_ prefix).
+  - Personal logs, planning notes, daily entries — always private.
+
+- **Rare public non-English doc**: annotate in frontmatter with `exception: <reason>` so the convention violation is explicit.
+
+- **Verification**: no automated language check today (convention-based). If a non-English public doc sneaks in, only a human review would catch it.
 
 ### Frontmatter / file conventions (unchanged)
 
