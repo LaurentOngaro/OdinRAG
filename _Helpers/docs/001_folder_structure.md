@@ -110,8 +110,12 @@ _Helpers/
 _Private/
 ├── README - private.md
 ├── .config/                 <- user_config.jsonc, cookies.txt, skool_credentials.txt (gitignored)
-├── docs/                    <- private meta docs (gitignored, currently just README - docs.md)
-│   └── README - docs.md
+├── archives/                <- archived/superseded docs (gitignored, see README - archives.md)
+│   ├── README - archives.md
+│   └── 007_mixing_public_and_private_history_EN_2026-07-02.md  (archived v1.0.0 English)
+├── docs/                    <- private meta docs (gitignored)
+│   ├── README - docs.md
+│   └── 001_workflow_public_prive.md  (French detailed workflow, replaces 007 v1.0.0)
 ├── planning/                <- day-by-day planning (gitignored)
 │   ├── README - planning.md
 │   ├── 001_odin_learning_plan_advanced_game_dev_2026.md
@@ -119,6 +123,14 @@ _Private/
 │   └── daily/               <- one file per working day, J_YYYY-MM-DD.md (no NNN_ prefix)
 └── raw/                     <- raw research notes, kept as-is (no NNN_ prefix, no frontmatter)
 ```
+
+> The `archives/` subfolder is gitignored like the rest of `_Private/`. It exists to keep
+> evolution of decisions traceable when a doc is rewritten or translated. See
+> [`_Private/archives/README - archives.md`](../../_Private/archives/README%20-%20archives.md)
+> for the convention (when to archive, naming, frontmatter annotations).
+>
+> For PUBLIC archives (old versions of public-facing docs that should stay visible to
+> collaborators), use a `_Helpers/archives/` folder instead - to be created on first need.
 
 ## Where this file is referenced
 

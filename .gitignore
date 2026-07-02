@@ -28,7 +28,6 @@ build/
 # === Secrets / state ===
 .env
 **/.private/
-**/_private/
 
 # === Python ===
 **/__pycache__/
