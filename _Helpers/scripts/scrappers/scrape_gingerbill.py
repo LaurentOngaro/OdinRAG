@@ -166,7 +166,7 @@ def generate_readme(articles: list[Article]) -> None:
         "- [`../karl_zylinski/`](../karl_zylinski/) - Karl Zylinski blog index",
         "- [`../newsletters/`](../newsletters/) - Odin newsletters index",
         "- [`../../SOURCES.md`](../../SOURCES.md) - source procurement guide",
-        "- [`../../_Helpers/docs/002_how_minimax-m3_is_used_in_this_repository.md`](../../_Helpers/docs/002_how_minimax-m3_is_used_in_this_repository.md) - how MiniMax-M3 powers this repo",
+        "- [`../../_Helpers/docs/002_how_minimax_m3_is_used_in_this_repository.md`](../../_Helpers/docs/002_how_minimax_m3_is_used_in_this_repository.md) - how MiniMax-M3 powers this repo",
         "",
     ]
 
