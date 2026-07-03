@@ -1,21 +1,21 @@
 """
 _Helpers/scripts/fixes/reflow_md.py - Reflow Markdown into the "book style" the repo uses.
 
-Walks a directory tree and rewrites every ``.md`` file so that prose paragraphs become a single physical line (one paragraph = one line). This matches the convention documented in the root ``AGENTS.md`` and enforced by ``MD013: false`` in ``.markdownlint.json``: do not auto-wrap prose, tables, or URLs at any character limit.
+Walks a directory tree and rewrites every `.md` file so that prose paragraphs become a single physical line (one paragraph = one line). This matches the convention documented in the root `AGENTS.md` and enforced by `MD013: false` in `.markdownlint.json`: do not auto-wrap prose, tables, or URLs at any character limit.
 
 Idempotent: re-running on an already-reflowed file is a no-op (the file is not rewritten unless at least one paragraph would change).
 
 Blocks preserved verbatim (never joined across them):
 
-- YAML frontmatter (between leading ``---`` markers)
+- YAML frontmatter (between leading `---` markers)
 - Fenced code blocks (```` ``` ```` and `~~~`)
-- Tables (lines starting with ``|``)
-- ATX headings (lines starting with ``#``)
-- Blockquotes (lines starting with ``>``)
-- Lists (lines starting with ``-``, ``*``, ``+``, or ``N.``/``N)``)
-- Setext heading underlines (a line of ``===`` or ``---`` immediately after a non-special line is treated as the underline of that heading and kept on its own line)
-- Thematic breaks (a line of ``---`` / ``***`` / ``___`` after a blank line)
-- Reference link definitions (``[label]: url``)
+- Tables (lines starting with `|`)
+- ATX headings (lines starting with `#`)
+- Blockquotes (lines starting with `>`)
+- Lists (lines starting with `-`, `*`, `+`, or `N.`/`N)`)
+- Setext heading underlines (a line of `===` or `---` immediately after a non-special line is treated as the underline of that heading and kept on its own line)
+- Thematic breaks (a line of `---` / `***` / `___` after a blank line)
+- Reference link definitions (`[label]: url`)
 - Indented continuation lines (a line starting with 2+ spaces or a tab is treated as a continuation of the previous block)
 
 Usage:
@@ -71,7 +71,7 @@ FENCE_CHARS = ("```", "~~~")
 
 
 def _is_fence_open(line: str) -> str | None:
-    """Return the fence delimiter (`` ``` `` or `~~~`) if ``line`` opens one."""
+    """Return the fence delimiter (`` ``` `` or `~~~`) if `line` opens one."""
     stripped = line.lstrip()
     for delim in FENCE_CHARS:
         if stripped.startswith(delim):
@@ -102,7 +102,7 @@ def _is_continuation(line: str) -> bool:
 
 
 def _looks_like_setext_underline(line: str) -> bool:
-    """A line that is only ``=`` or ``-`` (with at least one char)."""
+    """A line that is only `=` or `-` (with at least one char)."""
     s = line.rstrip()
     if not s:
         return False
@@ -110,7 +110,7 @@ def _looks_like_setext_underline(line: str) -> bool:
 
 
 def _looks_like_thematic_break(line: str) -> bool:
-    """A line of repeated ``-`` / ``*`` / ``_`` (Markdown spec)."""
+    """A line of repeated `-` / `*` / `_` (Markdown spec)."""
     s = line.strip()
     if len(s) < 3:
         return False
@@ -146,7 +146,7 @@ def _is_block_start(line: str) -> bool:
 
 
 def _reflow(text: str) -> str:
-    """Return ``text`` with paragraphs collapsed to a single line each."""
+    """Return `text` with paragraphs collapsed to a single line each."""
     lines = text.splitlines()
     out: list[str] = []
     in_frontmatter = False
@@ -261,9 +261,9 @@ def _reflow(text: str) -> str:
 
 
 def iter_text_files(root: Path):
-    """Yield ``.md`` / ``.markdown`` files under ``root`` (recursive).
+    """Yield `.md` / `.markdown` files under `root` (recursive).
 
-    If ``root`` is a single file, yield it directly (if it has the right extension).
+    If `root` is a single file, yield it directly (if it has the right extension).
     """
     if root.is_file():
         if root.suffix.lower() in TEXT_EXTENSIONS:
@@ -281,9 +281,9 @@ def iter_text_files(root: Path):
 
 
 def scan_and_reflow(root: Path, apply: bool, quiet: bool = False) -> tuple[int, int, int]:
-    """Walk ``root`` and reflow every Markdown file.
+    """Walk `root` and reflow every Markdown file.
 
-    When ``quiet`` is True and ``apply`` is False (dry-run / --check), the per-file
+    When `quiet` is True and `apply` is False (dry-run / --check), the per-file
     output is reduced to one line per offending path - no banner, no line count,
     no summary. Suitable for embedding in pre-commit hooks and CI logs.
 

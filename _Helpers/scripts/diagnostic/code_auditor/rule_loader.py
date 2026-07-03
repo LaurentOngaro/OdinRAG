@@ -2,13 +2,13 @@
 
 Public surface:
 
-- ``strip_jsonc_comments(text)`` - strip ``//`` line comments and ``/* */`` block comments from JSONC text, returning JSON-parseable text.
-- ``load_rules(path)`` - read a `.jsonc` rules file, strip comments, validate against the schema, return the parsed ``dict``.
-- ``load_schema(path)`` - load the JSON Schema from disk.
-- ``validate_rules(rules, schema)`` - raise ``jsonschema.ValidationError`` if invalid, otherwise return ``None``.
-- ``RuleLoadError`` - exception class for reporting parse / validate failures with context.
+- `strip_jsonc_comments(text)` - strip `//` line comments and `/* */` block comments from JSONC text, returning JSON-parseable text.
+- `load_rules(path)` - read a `.jsonc` rules file, strip comments, validate against the schema, return the parsed `dict`.
+- `load_schema(path)` - load the JSON Schema from disk.
+- `validate_rules(rules, schema)` - raise `jsonschema.ValidationError` if invalid, otherwise return `None`.
+- `RuleLoadError` - exception class for reporting parse / validate failures with context.
 
-Stdlib only (``json``, ``re``, ``pathlib``, ``dataclasses``) plus the optional third-party ``jsonschema`` package. Cross-platform (Windows / Unix).
+Stdlib only (`json`, `re`, `pathlib`, `dataclasses`) plus the optional third-party `jsonschema` package. Cross-platform (Windows / Unix).
 """
 
 from __future__ import annotations
@@ -35,12 +35,12 @@ except Exception:
 
 
 def strip_jsonc_comments(text: str) -> str:
-    """Return ``text`` with ``//`` line comments and ``/* */`` block comments removed.
+    """Return `text` with `//` line comments and `/* */` block comments removed.
 
-    A correct JSONC stripper must understand string literals: a ``//`` inside a JSON string is NOT a comment, it is part of the value.
+    A correct JSONC stripper must understand string literals: a `//` inside a JSON string is NOT a comment, it is part of the value.
     We implement this with a small state machine that walks the input character by character, tracking whether we are inside a double-quoted string.
-    Backslash escapes inside a string are respected, so a literal ``\"`` does not toggle the string state.
-    This is stdlib-only and matches the behaviour expected by the ``odin_rules.jsonc`` file shipped with the auditor, whose KB-001 title legitimately contains the literal text ``// lesson NNN`` between backticks.
+    Backslash escapes inside a string are respected, so a literal `\"` does not toggle the string state.
+    This is stdlib-only and matches the behaviour expected by the `odin_rules.jsonc` file shipped with the auditor, whose KB-001 title legitimately contains the literal text `// lesson NNN` between backticks.
     """
     if not text:
         return text
@@ -90,7 +90,7 @@ class RuleLoadError(Exception):
 
     Attributes:
         message: human-readable summary.
-        path: rules file path (may be ``None``).
+        path: rules file path (may be `None`).
         issues: list of structured diagnostics (line / col / msg when available).
     """
 
@@ -107,7 +107,7 @@ class RuleLoadError(Exception):
 
 
 def load_schema(path: Path | str) -> dict[str, Any]:
-    """Load and return the JSON Schema from ``path`` as a Python dict."""
+    """Load and return the JSON Schema from `path` as a Python dict."""
     schema_path = Path(path)
     if not schema_path.is_file():
         raise RuleLoadError(f"Schema file not found: {schema_path}", path=schema_path)
@@ -122,7 +122,7 @@ def load_schema(path: Path | str) -> dict[str, Any]:
 
 
 def _collect_schema_issues(exc: jsonschema.ValidationError) -> list[str]:
-    """Walk a ``ValidationError`` tree and emit one human-readable line per leaf error."""
+    """Walk a `ValidationError` tree and emit one human-readable line per leaf error."""
     issues: list[str] = []
 
     def walk(err: jsonschema.ValidationError, prefix: str) -> None:
@@ -142,7 +142,7 @@ def _collect_schema_issues(exc: jsonschema.ValidationError) -> list[str]:
 
 
 def validate_rules(rules: dict[str, Any], schema: dict[str, Any]) -> None:
-    """Validate ``rules`` against ``schema``. Raise ``RuleLoadError`` on failure."""
+    """Validate `rules` against `schema`. Raise `RuleLoadError` on failure."""
     validator_cls = jsonschema.Draft7Validator
     validator = validator_cls(schema)
     errors = sorted(validator.iter_errors(rules), key=lambda e: list(e.absolute_path))
@@ -164,10 +164,10 @@ def load_rules(
 
     Args:
         path: path to the `.jsonc` file to load.
-        schema_path: optional path to the JSON Schema. If ``None``, no validation is performed and the raw dict is returned.
+        schema_path: optional path to the JSON Schema. If `None`, no validation is performed and the raw dict is returned.
 
     Returns:
-        Parsed rules dict, with at least the keys ``version`` (str) and ``rules`` (list).
+        Parsed rules dict, with at least the keys `version` (str) and `rules` (list).
     """
     rules_path = Path(path)
     if not rules_path.is_file():

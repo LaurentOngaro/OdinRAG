@@ -22,7 +22,7 @@ Output:
     odin-knowledge-base/docs/karl_zylinski/<slug>.md (one file per article, with footer ">Source: <url>")
 
 Behaviour:
-    - Re-entrant: a .md already present (size > 0) is SKIPPED unless ``--force``.
+    - Re-entrant: a .md already present (size > 0) is SKIPPED unless `--force`.
     - Delay between requests: REQUEST_DELAY = 0.5s (politeness).
     - Crawl capped at 20 pages (safeguard against infinite loops).
 
@@ -37,7 +37,7 @@ import sys
 import time
 from pathlib import Path
 
-# Allow importing the ``_Helpers/lib`` package from the archive.
+# Allow importing the `_Helpers/lib` package from the archive.
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from lib.http_client import (  # noqa: E402
     crawl_links,

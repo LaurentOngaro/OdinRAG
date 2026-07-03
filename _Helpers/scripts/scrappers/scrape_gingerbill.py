@@ -20,9 +20,9 @@ Output:
     odin-knowledge-base/docs/gingerbill/<slug>.md (one file per article, with footer ">Source: <url>")
 
 Behaviour:
-    - Re-entrant: a .md already present (size > 0) is SKIPPED unless ``--force``.
+    - Re-entrant: a .md already present (size > 0) is SKIPPED unless `--force`.
     - Delay between requests: REQUEST_DELAY = 0.5s (politeness).
-    - ``--check`` dry-run lists articles without downloading.
+    - `--check` dry-run lists articles without downloading.
 
 Exit codes:
     0   full success

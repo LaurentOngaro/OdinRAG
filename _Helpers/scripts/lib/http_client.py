@@ -1,13 +1,13 @@
 """Shared HTTP utilities (fetch, sitemap, RSS, URLs).
 
 Centralises:
-- ``fetch(url)``                          - GET with timeout + error handling
-- ``normalize_url(url)``                  - drop fragment / query / trailing slash
-- ``discover_via_sitemap(sitemap_url, …)`` - parse sitemap.xml
-- ``discover_via_rss(rss_url, …)``         - parse RSS feed (Hugo <link>)
+- `fetch(url)`                          - GET with timeout + error handling
+- `normalize_url(url)`                  - drop fragment / query / trailing slash
+- `discover_via_sitemap(sitemap_url, …)` - parse sitemap.xml
+- `discover_via_rss(rss_url, …)`         - parse RSS feed (Hugo <link>)
 
-All the shared code for ``scrape-official.py`` and ``scrape-zylinski.py``
-(archived) lives here. ``scrape_skool.py`` only uses ``normalize_url`` (and
+All the shared code for `scrape-official.py` and `scrape-zylinski.py`
+(archived) lives here. `scrape_skool.py` only uses `normalize_url` (and
 indirectly the User-Agent convention).
 """
 
@@ -34,7 +34,7 @@ def fetch(
     headers: dict[str, str] | None = None,
     timeout: int = DEFAULT_TIMEOUT,
 ) -> requests.Response | None:
-    """GET with timeout. Returns ``None`` and prints the error on failure."""
+    """GET with timeout. Returns `None` and prints the error on failure."""
     try:
         return requests.get(url, headers=headers or DEFAULT_HEADERS, timeout=timeout)
     except requests.RequestException as exc:
@@ -63,7 +63,7 @@ def path_to_filename(path: str, *, prefix_to_strip: str = "", ext: str = ".md") 
 
 
 def slug_from_url(url: str, *, segment: str) -> str:
-    """Extract the last URL segment after ``segment``.
+    """Extract the last URL segment after `segment`.
 
     >>> slug_from_url("https://zylinski.se/posts/odin-sokol-web/", "posts")
     'odin-sokol-web'
@@ -84,9 +84,9 @@ def discover_via_sitemap(
 
     Args:
         sitemap_url : full sitemap.xml URL.
-        base_host   : host (e.g. ``"https://odin-lang.org"``) used as a filter.
-        path_prefix : path prefix to keep (e.g. ``"/docs/"``).
-        exclude_path: exact path to exclude (e.g. the ``/posts/`` index).
+        base_host   : host (e.g. `"https://odin-lang.org"`) used as a filter.
+        path_prefix : path prefix to keep (e.g. `"/docs/"`).
+        exclude_path: exact path to exclude (e.g. the `/posts/` index).
     """
     resp = fetch(sitemap_url)
     if not resp or resp.status_code != 200:
@@ -114,11 +114,11 @@ def discover_via_rss(
     must_contain: str,
     exclude_path: str | None = None,
 ) -> list[str]:
-    """Parse an RSS feed (Hugo ``<link>`` inside ``<item>``) and filter.
+    """Parse an RSS feed (Hugo `<link>` inside `<item>`) and filter.
 
     Args:
         rss_url      : feed URL.
-        must_contain : substring each URL must contain (e.g. ``"/posts/"``).
+        must_contain : substring each URL must contain (e.g. `"/posts/"`).
         exclude_path : exact URL (normalised) to exclude.
     """
     resp = fetch(rss_url)
@@ -156,14 +156,14 @@ def crawl_links(
     max_pages: int = 20,
     delay: float = 0.0,
 ) -> list[str]:
-    """BFS crawl from ``start_url``; collect links matching ``predicate``.
+    """BFS crawl from `start_url`; collect links matching `predicate`.
 
     Args:
         start_url       : starting URL.
-        predicate       : ``predicate(full_url, parsed_path) -> bool``.
-                          Returns ``True`` to add the URL to the result.
-        follow_predicate: optional, ``follow_predicate(parsed_path) -> bool``.
-                          If ``False``, the page is not re-crawled.
+        predicate       : `predicate(full_url, parsed_path) -> bool`.
+                          Returns `True` to add the URL to the result.
+        follow_predicate: optional, `follow_predicate(parsed_path) -> bool`.
+                          If `False`, the page is not re-crawled.
         max_pages       : safeguard against infinite loops.
         delay           : seconds between each request.
     """

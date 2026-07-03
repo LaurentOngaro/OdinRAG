@@ -2,24 +2,24 @@
 
 Two detection layers, both deterministic and stdlib-only:
 
-- **L1 - Regex** - one regex per line, evaluated with ``re.search`` against the file content. Implemented by matching the rule's ``pattern`` field as a Python regex string. Anchored regexes (e.g. ``^\\\\s*using\\\\s+\\\\w+\\\\s*[:=]``) match per-line against each non-comment line.
-- **L2 - Heuristic** - named detectors dispatched by the rule's ``detect`` field. The current set covers the four heuristics outlined in ``_Private/raw/2026-07-01_code_auditor_odin_preconisations.md`` §5.3:
-    - ``alloc-in-loop`` - ``make/new/alloc`` called while a ``for``/``while`` loop body is open.
-    - ``defer-in-loop`` - a ``defer`` statement whose nearest enclosing loop has not yet closed.
-    - ``small-map`` - ``map[K]V`` literal with simple K and V that reappears more than 1 time in the file.
-    - ``large-struct-mixed-access`` - a struct with >8 fields where at least two procedures each access <40% of the fields.
-    - ``unfreed-slice`` - ``make([]T, ...)`` whose bound variable name has no ``delete(...)`` or arena context inside the visible window.
-    - ``lesson-ref-validation`` - ``// lesson NNN`` comments not pointing to an existing file under ``odin-knowledge-base/courses/``.
+- **L1 - Regex** - one regex per line, evaluated with `re.search` against the file content. Implemented by matching the rule's `pattern` field as a Python regex string. Anchored regexes (e.g. `^\\\\s*using\\\\s+\\\\w+\\\\s*[:=]`) match per-line against each non-comment line.
+- **L2 - Heuristic** - named detectors dispatched by the rule's `detect` field. The current set covers the four heuristics outlined in `_Private/raw/2026-07-01_code_auditor_odin_preconisations.md` §5.3:
+    - `alloc-in-loop` - `make/new/alloc` called while a `for`/`while` loop body is open.
+    - `defer-in-loop` - a `defer` statement whose nearest enclosing loop has not yet closed.
+    - `small-map` - `map[K]V` literal with simple K and V that reappears more than 1 time in the file.
+    - `large-struct-mixed-access` - a struct with >8 fields where at least two procedures each access <40% of the fields.
+    - `unfreed-slice` - `make([]T, ...)` whose bound variable name has no `delete(...)` or arena context inside the visible window.
+    - `lesson-ref-validation` - `// lesson NNN` comments not pointing to an existing file under `odin-knowledge-base/courses/`.
 
 Public surface:
 
-- ``Finding`` - dataclass describing one violation.
-- ``scan_file(path, rules, *, kb_root, build_mode)`` - run L1 + L2 against one file.
-- ``apply_heuristic(name, content, file_path, rule, *, kb_root)`` - dispatch one named heuristic (used by tests and unit checks).
+- `Finding` - dataclass describing one violation.
+- `scan_file(path, rules, *, kb_root, build_mode)` - run L1 + L2 against one file.
+- `apply_heuristic(name, content, file_path, rule, *, kb_root)` - dispatch one named heuristic (used by tests and unit checks).
 
 Cross-platform (Windows / Unix). Odin comments are stripped before any
-analysis, with string literals (``"..."`` and backtick raw strings) honored so
-that ``//`` inside a string does not get treated as a comment.
+analysis, with string literals (`"..."` and backtick raw strings) honored so
+that `//` inside a string does not get treated as a comment.
 """
 
 from __future__ import annotations
@@ -62,13 +62,13 @@ class Finding:
 
 
 def _strip_odin_comments(text: str) -> str:
-    """Strip Odin ``//`` and ``/* */`` comments, respecting string literals.
+    """Strip Odin `//` and `/* */` comments, respecting string literals.
 
-    Two string flavours are honored: regular double quotes ``"..."`` and Odin's
+    Two string flavours are honored: regular double quotes `"..."` and Odin's
     backtick raw strings ``\\`...\\```. Inside a string we copy bytes verbatim
-    except for ``\\\\<char>`` escapes in double-quoted strings. Comments are
+    except for `\\\\<char>` escapes in double-quoted strings. Comments are
     replaced by an equal number of newlines so line numbers stay aligned with
-    the input text - this is important for ``Finding.line`` accuracy.
+    the input text - this is important for `Finding.line` accuracy.
     """
     if not text:
         return text
@@ -131,7 +131,7 @@ def _strip_odin_comments(text: str) -> str:
 
 
 def _matches_scope(rule: dict[str, Any], file_path: Path) -> bool:
-    """Return True if the rule's glob-like ``scope`` array includes this file."""
+    """Return True if the rule's glob-like `scope` array includes this file."""
     import fnmatch
 
     scope = rule.get("scope") or ["*.odin"]
@@ -140,12 +140,12 @@ def _matches_scope(rule: dict[str, Any], file_path: Path) -> bool:
 
 
 def _applies_when(rule: dict[str, Any], build_mode: str) -> bool:
-    """Return True if the rule's ``applies_when`` conditions are satisfied.
+    """Return True if the rule's `applies_when` conditions are satisfied.
 
-    Supports one key today: ``build_mode`` (case-insensitive equality).
-    Rules without ``applies_when`` are always active. We lowercase both
-    sides so the spec example ``"build_mode": "release"`` matches the CLI
-    value ``"--build-mode Release"``.
+    Supports one key today: `build_mode` (case-insensitive equality).
+    Rules without `applies_when` are always active. We lowercase both
+    sides so the spec example `"build_mode": "release"` matches the CLI
+    value `"--build-mode Release"`.
     """
     cond = rule.get("applies_when")
     if not cond:
@@ -222,11 +222,11 @@ def _make_slice_pat() -> re.Pattern[str]:
 def _lessons_in_loop_or_while(
     stripped: str,
 ) -> tuple[list[tuple[int, int]], list[int]]:
-    """Walk the file tracking ``for``/``while`` blocks.
+    """Walk the file tracking `for`/`while` blocks.
 
-    Returns ``(open_spans, defer_lines)`` where each open span is
-    ``(line_top, line_bottom)`` and ``defer_lines`` are line numbers that
-    contain a bare ``defer`` keyword. Brace counting is approximate (good
+    Returns `(open_spans, defer_lines)` where each open span is
+    `(line_top, line_bottom)` and `defer_lines` are line numbers that
+    contain a bare `defer` keyword. Brace counting is approximate (good
     enough for an 80/20 heuristic).
     """
     opens: list[tuple[int, int]] = []
@@ -254,7 +254,7 @@ def _lessons_in_loop_or_while(
 def detect_alloc_in_loop(
     stripped: str, file_path: Path, rule: dict[str, Any]
 ) -> list[Finding]:
-    """``make/new/alloc`` appearing inside a ``for``/``while`` block."""
+    """`make/new/alloc` appearing inside a `for`/`while` block."""
     opens, _ = _lessons_in_loop_or_while(stripped)
     if not opens:
         return []
@@ -288,7 +288,7 @@ def detect_alloc_in_loop(
 def detect_defer_in_loop(
     stripped: str, file_path: Path, rule: dict[str, Any]
 ) -> list[Finding]:
-    """A ``defer`` line that lies between a loop's opening and closing brace."""
+    """A `defer` line that lies between a loop's opening and closing brace."""
     opens, defer_lines = _lessons_in_loop_or_while(stripped)
     findings: list[Finding] = []
     raw_lines = stripped.splitlines()
@@ -322,7 +322,7 @@ _SMALL_MAP_PRIMITIVE_VALUES = {"int", "u32", "u64", "i32", "i64", "f32", "f64", 
 def detect_small_map(
     stripped: str, file_path: Path, rule: dict[str, Any]
 ) -> list[Finding]:
-    """Detect ``map[K]V`` literals with simple K, simple V."""
+    """Detect `map[K]V` literals with simple K, simple V."""
     findings: list[Finding] = []
     raw_lines = stripped.splitlines()
     seen_pairs: set[tuple[str, str]] = set()
@@ -445,7 +445,7 @@ def detect_large_struct_mixed_access(
 def detect_unfreed_slice(
     stripped: str, file_path: Path, rule: dict[str, Any]
 ) -> list[Finding]:
-    """Flag ``make([]T, ...)`` whose bound variable has no ``delete(...)`` nearby."""
+    """Flag `make([]T, ...)` whose bound variable has no `delete(...)` nearby."""
     findings: list[Finding] = []
     raw_lines = stripped.splitlines()
     for idx, line in enumerate(raw_lines, start=1):
@@ -495,7 +495,7 @@ def detect_lesson_ref_validation(
     *,
     kb_root: Path | None = None,
 ) -> list[Finding]:
-    """Find ``// lesson NNN`` comments that resolve to NO file in the KB.
+    """Find `// lesson NNN` comments that resolve to NO file in the KB.
 
     Unlike other heuristics, this one runs against the ORIGINAL file content,
     not the comment-stripped content: lesson references live in line comments
@@ -533,7 +533,7 @@ def detect_lesson_ref_validation(
 
 
 def _lesson_exists(lesson_id: str, file_path: Path, *, kb_root: Path | None) -> bool:
-    """Heuristically check whether ``lesson_id`` matches a known KB file."""
+    """Heuristically check whether `lesson_id` matches a known KB file."""
     if kb_root is None:
         return True
     kb_root = kb_root.resolve()
@@ -586,11 +586,11 @@ def scan_file(
     kb_root: Path | None = None,
     build_mode: str = "Debug",
 ) -> list[Finding]:
-    """Run all applicable rules from ``rules`` against one file.
+    """Run all applicable rules from `rules` against one file.
 
-    ``build_mode`` controls the ``applies_when.build_mode`` filter. Rules
-    declaring ``applies_when: { build_mode: 'release' }`` are skipped when
-    this value is ``'Debug'`` (and vice versa).
+    `build_mode` controls the `applies_when.build_mode` filter. Rules
+    declaring `applies_when: { build_mode: 'release' }` are skipped when
+    this value is `'Debug'` (and vice versa).
     """
     file_path = Path(path)
     if not file_path.is_file():

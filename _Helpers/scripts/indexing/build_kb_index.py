@@ -65,7 +65,7 @@ _DESCRIPTION = "Regenerate odin-knowledge-base/INDEX.md from the KB."
 
 # ─── HELPERS ─────────────────────────────────────────────────────────────────
 def count_md_files(root: Path) -> tuple[int, int]:
-    """Return (count, total size in bytes) for .md files under ``root``."""
+    """Return (count, total size in bytes) for .md files under `root`."""
     if not root.exists():
         return 0, 0
     count = 0
@@ -81,7 +81,7 @@ def count_md_files(root: Path) -> tuple[int, int]:
 
 
 def parse_karl_readme(readme: Path) -> list[dict]:
-    """Parse ``odin-book/README.md`` to extract the chapter table.
+    """Parse `odin-book/README.md` to extract the chapter table.
 
     Returns:
         [{"number": "1", "title": "Introduction", "path": "01-introduction.md"}, ...]
@@ -109,7 +109,7 @@ def parse_karl_readme(readme: Path) -> list[dict]:
 
 
 def parse_karl_appendices(out_dir: Path) -> list[dict]:
-    """List appendix files from ``odin-book/appendices/``."""
+    """List appendix files from `odin-book/appendices/`."""
     appx_dir = out_dir / "odin-book" / "appendices"
     if not appx_dir.exists():
         return []

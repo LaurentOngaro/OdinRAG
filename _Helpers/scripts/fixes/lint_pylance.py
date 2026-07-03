@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """_Helpers/scripts/fixes/lint_pylance.py - Run pyright (Pylance engine) on Python files.
 
-Wraps the ``pyright`` CLI (the open-source engine behind VSCode Pylance) into a durable, repo-friendly command that matches this project's "durable scripts" rules (idempotent, ``--check`` dry-run, clear logging, non-zero exit on remaining warnings).
+Wraps the `pyright` CLI (the open-source engine behind VSCode Pylance) into a durable, repo-friendly command that matches this project's "durable scripts" rules (idempotent, `--check` dry-run, clear logging, non-zero exit on remaining warnings).
 
 Usage:
     python _Helpers/scripts/fixes/lint_pylance.py                          # whole repo
@@ -39,14 +39,14 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 
 
 def _resolve_pyright() -> list[str]:
-    """Return the command to invoke pyright. Prefer ``pyright`` on PATH, fall back to ``python -m pyright``."""
+    """Return the command to invoke pyright. Prefer `pyright` on PATH, fall back to `python -m pyright`."""
     if shutil.which("pyright") is not None:
         return ["pyright"]
     return [sys.executable, "-m", "pyright"]
 
 
 def _format_diag(diag: dict) -> str:
-    """Format one pyright diagnostic as ``path:line:col - severity - rule - message``."""
+    """Format one pyright diagnostic as `path:line:col - severity - rule - message`."""
     file = diag.get("file", "?")
     line = diag.get("range", {}).get("start", {}).get("line", 0) + 1
     col = diag.get("range", {}).get("start", {}).get("character", 0) + 1
@@ -63,7 +63,7 @@ def _format_diag(diag: dict) -> str:
 
 
 def run_pyright(target: Path, strict: bool) -> tuple[int, dict]:
-    """Invoke pyright on ``target`` and return (returncode, parsed_json_dict).
+    """Invoke pyright on `target` and return (returncode, parsed_json_dict).
 
     pyright exit-code convention:
       0 - clean (or only info-level diagnostics)
@@ -73,12 +73,12 @@ def run_pyright(target: Path, strict: bool) -> tuple[int, dict]:
 
     Empty stdout is always a tool-level failure - either the target was not
     found, pyrightconfig is invalid, or pyright rejected an option. We surface
-    those to the caller and normalize them to rc=2 so ``lint()`` can short
+    those to the caller and normalize them to rc=2 so `lint()` can short
     circuit cleanly.
 
     Project-wide exclude rules (e.g. vendored templates) live in
-    ``pyrightconfig.json`` at the repo root; this wrapper no longer passes a
-    ``--ignore`` CLI flag because pyright >= 1.1 removed it.
+    `pyrightconfig.json` at the repo root; this wrapper no longer passes a
+    `--ignore` CLI flag because pyright >= 1.1 removed it.
     """
     cmd = _resolve_pyright() + [str(target), "--outputjson"]
     proc = subprocess.run(
@@ -109,7 +109,7 @@ def run_pyright(target: Path, strict: bool) -> tuple[int, dict]:
 
 
 def lint(target: Path, strict: bool, check: bool) -> int:
-    """Run the linter on ``target`` and return the appropriate exit code."""
+    """Run the linter on `target` and return the appropriate exit code."""
     if not target.exists():
         print(f"[ERR] Target not found: {target}", file=sys.stderr)
         return 2

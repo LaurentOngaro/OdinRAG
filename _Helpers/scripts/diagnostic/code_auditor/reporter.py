@@ -11,8 +11,8 @@ Tables are reserved for the file-list summary (the only place a real spec templa
 
 Public surface:
 
-- ``ReportTarget`` - dataclass describing the audit context.
-- ``build_report(target, findings, rule_count)`` - return the Markdown text.
+- `ReportTarget` - dataclass describing the audit context.
+- `build_report(target, findings, rule_count)` - return the Markdown text.
 """
 
 from __future__ import annotations

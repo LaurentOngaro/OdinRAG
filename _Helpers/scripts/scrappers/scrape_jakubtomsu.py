@@ -22,7 +22,7 @@ Output:
     odin-knowledge-base/docs/jakubtomsu/README.md (index with titles, dates, source URLs)
 
 Behaviour:
-    - Re-entrant: a .md already present (size > 0) is SKIPPED unless ``--force``.
+    - Re-entrant: a .md already present (size > 0) is SKIPPED unless `--force`.
     - --check: prints what would be scraped/skipped without writing anything.
     - Delay between requests: REQUEST_DELAY = 0.5s (politeness).
 

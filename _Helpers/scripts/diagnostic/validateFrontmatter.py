@@ -5,11 +5,11 @@ Adapted from TerraBloom's `validateFrontmatter.py` (H:/Sync/PKM_PROJECTS/TerraBl
 
 What it does:
 
-- Walks the repo (default) or specific files/paths (via ``--files``).
+- Walks the repo (default) or specific files/paths (via `--files`).
 - For each file: extracts YAML frontmatter, validates against the schema, and optionally runs content-quality checks (long-dash auto-replacement, CJK warning).
-- Auto-fixes long dashes (``-``, ``-``, ``-``) to ASCII ``-`` in the file body.
+- Auto-fixes long dashes (`-`, `-`, `-`) to ASCII `-` in the file body.
 - Reports errors / warnings / info by category with colored output.
-- Honors ``vaultConfigOdinRAG.should_validate`` for skip rules.
+- Honors `vaultConfigOdinRAG.should_validate` for skip rules.
 
 Usage:
 
@@ -60,7 +60,7 @@ from vaultConfigOdinRAG import (  # noqa: E402
 )
 
 # Sanity: this script must not contain literal long-dash characters either,
-# for the same reason documented in ``vaultConfigOdinRAG.LONG_DASH_PATTERN``.
+# for the same reason documented in `vaultConfigOdinRAG.LONG_DASH_PATTERN`.
 # A global search-and-replace of U+2014 / U+2013 / U+2015 across the repo
 # would otherwise turn the literal help text into broken replacement code.
 for _literal in ("\u2013", "\u2014", "\u2015"):
@@ -74,7 +74,7 @@ for _literal in ("\u2013", "\u2014", "\u2015"):
 def check_content(text: str, do_content_check: bool) -> tuple[list[str], list[str], str]:
     """Run content quality checks. Returns (warnings, info, new_text).
 
-    Auto-replaces ``-``, ``-``, ``-`` with ASCII ``-`` when ``do_content_check`` is True. Warns about CJK characters (informational only).
+    Auto-replaces `-`, `-`, `-` with ASCII `-` when `do_content_check` is True. Warns about CJK characters (informational only).
     """
     warnings: list[str] = []
     info: list[str] = []
@@ -109,7 +109,7 @@ def check_content(text: str, do_content_check: bool) -> tuple[list[str], list[st
 
 
 def _detect_line_ending(raw_bytes: bytes) -> str:
-    """Return the dominant line ending found in ``raw_bytes`` ('\r\n' or '\n')."""
+    """Return the dominant line ending found in `raw_bytes` ('\r\n' or '\n')."""
     crlf = raw_bytes.count(b"\r\n")
     lf_only = raw_bytes.count(b"\n") - crlf
     return "\r\n" if crlf > lf_only else "\n"
@@ -118,7 +118,7 @@ def _detect_line_ending(raw_bytes: bytes) -> str:
 def check_file(path: Path, do_content_check: bool = True) -> tuple[list[str], list[str], list[str]]:
     """Validate one file. Returns (errors, warnings, info).
 
-    Reads the file in binary mode to preserve the original line endings; only writes back when ``do_content_check`` produces a different body. The auto-fix path must NOT silently flip CRLF -> LF or vice versa (this was a real bug on 2026-07-03).
+    Reads the file in binary mode to preserve the original line endings; only writes back when `do_content_check` produces a different body. The auto-fix path must NOT silently flip CRLF -> LF or vice versa (this was a real bug on 2026-07-03).
     """
     try:
         raw_bytes = path.read_bytes()
@@ -160,10 +160,10 @@ def find_targets(
     ignore_dirs: bool = False,
     ignore_files: bool = False,
 ) -> list[Path]:
-    """Resolve CLI ``--files`` targets (mix of files / dirs / globs) into a sorted unique list.
+    """Resolve CLI `--files` targets (mix of files / dirs / globs) into a sorted unique list.
 
     The two ignore flags mirror the CLI options. Both default to False (scan everything).
-    Pass ``ignore_dirs=True`` to apply ``IGNORE_DIRS`` and/or ``ignore_files=True`` to apply ``IGNORE_FILES``.
+    Pass `ignore_dirs=True` to apply `IGNORE_DIRS` and/or `ignore_files=True` to apply `IGNORE_FILES`.
     """
     def _is_filtered(p: Path) -> bool:
         if ignore_dirs and should_ignore_dir(p):

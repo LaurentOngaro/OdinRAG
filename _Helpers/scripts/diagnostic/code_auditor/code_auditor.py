@@ -177,7 +177,7 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 
 
 def _detect_profile(path: Path) -> str:
-    """Return the active profile name based on ``path``."""
+    """Return the active profile name based on `path`."""
     try:
         resolved = path.resolve()
     except OSError:
@@ -194,7 +194,7 @@ def _matches_profile(rule: dict, profile: str) -> bool:
     Spec §4.2 only defines the profile names at a high level; Phase 2 treats
     every rule as active for every profile (the JSON file is small enough that
     additional filtering rules belong in a later phase). Keeps the doors open
-    for an explicit ``profile`` field on each rule without shipping a buggy
+    for an explicit `profile` field on each rule without shipping a buggy
     filter today.
     """
     if profile == "default":

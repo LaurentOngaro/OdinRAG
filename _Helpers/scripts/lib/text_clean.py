@@ -67,11 +67,11 @@ def repair_mojibake(text: str) -> str:
          positives: none of them makes sense in real Latin-1 for French/English
          educational content).
       2. For the remainder (rarer accents or symbols not listed),
-         try the round-trip ``text.encode('latin-1').decode('utf-8')``.
+         try the round-trip `text.encode('latin-1').decode('utf-8')`.
          Silently abandoned if the string already contains real Latin-1
          (UnicodeEncodeError / UnicodeDecodeError).
 
-    Returns ``text`` unchanged if no marker (``â`` / ``Â`` / ``Ã``) is
+    Returns `text` unchanged if no marker (`â` / `Â` / `Ã`) is
     detected.
     """
     if not text:
@@ -106,7 +106,7 @@ def repair_mojibake(text: str) -> str:
     # (typically: an Â or Ã at end of line, or followed by an ASCII
     # character). Conservative: we only touch when followed by
     # whitespace, punctuation, quotes/backticks, or end-of-line/string.
-    # So real French words like ``Âge`` / ``Aîné`` are NOT affected
+    # So real French words like `Âge` / `Aîné` are NOT affected
     # (Â followed by a letter = preserved).
     _stray_pattern = re.compile(
         r"[\u00c2\u00c3\u00e2]"

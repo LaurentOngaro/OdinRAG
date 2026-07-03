@@ -114,6 +114,10 @@ Chain of resolution per value: **env var > user_config.jsonc > empty string**.
 - Lint: Pylance-compatible (no flake8/black enforced).
 - No `print()` for debug - use `_log(level, msg)` and a structured logger.
 - **After any edit to a `.py` file, run `python _Helpers/scripts/fixes/lint_pylance.py <file>` and fix every reported warning before considering the task done.** The script wraps `pyright` (CLI engine behind Pylance) and exits non-zero on remaining warnings.
+- **Backticks in docstrings: use single** (`foo`), not double. The double form is RST markup; pyright rejects it.
+- Reserve double backticks for Markdown files. Bulk-fix legacy Python: `_Helpers/scripts/fixes/single_backtick_md.py --apply`.
+- **Path separators: prefer `/`** in Python string literals. `pathlib.Path` accepts both on Windows, but `/` is cross-platform.
+- Avoids escape-sequence pitfalls (`"\\n"` is a newline, `"\n"` is a backslash + `n`). Build paths via `pathlib.Path("a") / "b"`.
 
 ### Durable vs one-shot scripts
 

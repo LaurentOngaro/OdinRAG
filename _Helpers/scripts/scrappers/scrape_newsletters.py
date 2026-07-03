@@ -23,8 +23,8 @@ Output:
     odin-knowledge-base/docs/newsletters/README.md   (updated with scraper info if needed)
 
 Behaviour:
-    - Re-entrant: a .md already present (size > 0) is SKIPPED unless ``--force``.
-    - ``--check`` dry-run: prints what would be scraped, exits 0, never writes.
+    - Re-entrant: a .md already present (size > 0) is SKIPPED unless `--force`.
+    - `--check` dry-run: prints what would be scraped, exits 0, never writes.
     - Delay between requests: REQUEST_DELAY = 0.5s (politeness).
 
 Exit codes:
@@ -40,7 +40,7 @@ import time
 from pathlib import Path
 from urllib.parse import urljoin, urlparse
 
-# Allow importing the ``_Helpers/lib`` package from the archive.
+# Allow importing the `_Helpers/lib` package from the archive.
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from lib.http_client import (  # noqa: E402
     DEFAULT_HEADERS,

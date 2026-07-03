@@ -22,7 +22,7 @@ Output:
     odin-knowledge-base/docs/official/awesome-odin.md  (raw README from jakubtomsu/awesome-odin)
 
 Behaviour:
-    - Re-entrant: a .md already present (size > 0) is SKIPPED unless ``--force``.
+    - Re-entrant: a .md already present (size > 0) is SKIPPED unless `--force`.
     - Delay between requests: REQUEST_DELAY = 0.5s (politeness).
     - User-Agent: "Mozilla/5.0 (compatible; OdinRAG/1.0)".
 
@@ -36,7 +36,7 @@ import time
 from pathlib import Path
 import argparse
 
-# Allow importing the ``_Helpers/lib`` package from the archive.
+# Allow importing the `_Helpers/lib` package from the archive.
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from lib.http_client import (  # noqa: E402
     DEFAULT_HEADERS,

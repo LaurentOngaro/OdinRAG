@@ -1,8 +1,8 @@
 """
 _Helpers/scripts/fixes/fix_mojibake.py - Fix 'UTF-8 read as Latin-1' mojibake
 
-Walks ``odin-knowledge-base/`` and applies ``repair_mojibake()`` (shared
-lib ``_Helpers/scripts/lib/text_clean``) on every text file (Markdown).
+Walks `odin-knowledge-base/` and applies `repair_mojibake()` (shared
+lib `_Helpers/scripts/lib/text_clean`) on every text file (Markdown).
 
 Symptoms fixed:
 - Broken Unicode ASCII-art: â”œ â”€ â”‚ â”” â”Œ â”˜ â”¤ â”¬ â”´ â”¼
@@ -29,7 +29,7 @@ try:
 except Exception:
     pass
 
-# Allow importing ``lib`` from the parent folder (_Helpers/scripts/).
+# Allow importing `lib` from the parent folder (_Helpers/scripts/).
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from lib.text_clean import repair_mojibake  # noqa: E402
 
@@ -42,7 +42,7 @@ TEXT_EXTENSIONS: tuple[str, ...] = (".md", ".markdown", ".txt", ".rst")
 
 
 def iter_text_files(root: Path):
-    """Yield text files under ``root`` (recursive)."""
+    """Yield text files under `root` (recursive)."""
     for path in sorted(root.rglob("*")):
         if not path.is_file():
             continue
@@ -51,7 +51,7 @@ def iter_text_files(root: Path):
 
 
 def scan_and_fix(root: Path, apply: bool) -> tuple[int, int, int]:
-    """Walk ``root`` and repair mojibake.
+    """Walk `root` and repair mojibake.
 
     Returns (scanned, fixed, unchanged).
     """

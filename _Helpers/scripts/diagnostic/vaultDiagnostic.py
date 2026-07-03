@@ -3,10 +3,10 @@
 
 Adapted from TerraBloom's `vaultDiagnostic.py` (H:/Sync/PKM_PROJECTS/TerraBloom/_Helpers/01_Diagnostic/vaultDiagnostic.py) for the OdinRAG layout. Walks the repo (default) or a custom source folder, and reports issues in four categories:
 
-- ``filename`` - structural filename problems (e.g., forbidden chars, wrong README pattern).
-- ``frontmatter`` - delegated to ``validateFrontmatter.check_file`` (8-field schema + auto-fix).
-- ``content`` - H1 must match the filename (per AGENTS.md), no long dashes, no extra blank lines.
-- ``system`` - files too large, unreadable, etc.
+- `filename` - structural filename problems (e.g., forbidden chars, wrong README pattern).
+- `frontmatter` - delegated to `validateFrontmatter.check_file` (8-field schema + auto-fix).
+- `content` - H1 must match the filename (per AGENTS.md), no long dashes, no extra blank lines.
+- `system` - files too large, unreadable, etc.
 
 Usage:
 
@@ -21,7 +21,7 @@ Exit codes:
     1 - issues found (no error)
     2 - tool error (missing config, bad args)
 
-Cross-platform (Windows / Unix). Depends on PyYAML (delegated through ``validateFrontmatter``).
+Cross-platform (Windows / Unix). Depends on PyYAML (delegated through `validateFrontmatter`).
 """
 
 from __future__ import annotations

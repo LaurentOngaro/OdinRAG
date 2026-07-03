@@ -168,19 +168,19 @@ TAG_HIERARCHY_PATTERN = re.compile(r"^[a-z][a-z0-9]*(/[a-z0-9]+)?$|^OdinRAG$|^Sk
 #
 # Implementation notes:
 #
-# - We use **named Unicode escapes** (``\N{EM DASH}``) instead of bare
-#   hex escapes (``\u2014``) so the source stays visible as ASCII text.
-#   Editors that render ``\u2014`` as a glyph can fool a maintainer into
+# - We use **named Unicode escapes** (`\N{EM DASH}`) instead of bare
+#   hex escapes (`\u2014`) so the source stays visible as ASCII text.
+#   Editors that render `\u2014` as a glyph can fool a maintainer into
 #   thinking a literal em-dash is in the pattern; the named form reads as
-#   ``\N{EM DASH}`` in any viewer.
+#   `\N{EM DASH}` in any viewer.
 # - The same reasoning forbids storing the LITERAL characters here: a
 #   global search-and-replace across the repo (e.g. cleaning up content
 #   after a PDF import) would silently destroy the pattern. Editing tools
 #   that work on the rendered bytes would not touch this constant because
 #   the source bytes are ASCII.
-# - ``LONG_DASH_REPLACEMENT`` is the canonical ASCII dash (U+002D) used by
-#   the auto-fix in ``validateFrontmatter``. It is intentionally a separate
-#   constant so a future change (e.g. ``"\N{EN DASH}"`` for round-trip
+# - `LONG_DASH_REPLACEMENT` is the canonical ASCII dash (U+002D) used by
+#   the auto-fix in `validateFrontmatter`. It is intentionally a separate
+#   constant so a future change (e.g. `"\N{EN DASH}"` for round-trip
 #   safety) has one single place to edit.
 LONG_DASH_CHARS = (
     "\N{EN DASH}"           # U+2013

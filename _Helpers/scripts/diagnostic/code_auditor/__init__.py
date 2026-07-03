@@ -2,7 +2,7 @@
 
 Bundles the headless Odin code auditor:
 
-- `code_auditor` - CLI entry point (run with ``python -m code_auditor`` from ``_Helpers/scripts/diagnostic`` or invoke ``code_auditor.py`` directly).
+- `code_auditor` - CLI entry point (run with `python -m code_auditor` from `_Helpers/scripts/diagnostic` or invoke `code_auditor.py` directly).
 - `rule_loader` - JSONC parsing + JSON Schema validation.
 - `scanner` - regex L1 + heuristic L2 detectors.
 - `reporter` - Markdown output per spec §6.2.
