@@ -1,15 +1,15 @@
 ---
 title: "How MiniMax-M3 is used in this repository"
 date: 2026-06-29
-tags: [OdinRAG, meta, how-to]
-type: how-to
+tags: [OdinRAG, meta, howto]
+type: note
 status: active
 version: 1.0.0
 lastUpdated: "2026-07-01"
 updatedBy: "MiniMax-M3 (Kilo Code)"
 ---
 
-# 002_how_minimax-m3_is_used_in_this_repository
+# 002_how_minimax_m3_is_used_in_this_repository
 
 This document is a quick technical reference for anyone reading the code and wondering "where is M3 actually being invoked, and what does it do here?". It is intentionally kept short.
 
@@ -59,7 +59,7 @@ Post drafts prepared (with M3) for the MiniMax-M3 Showcase Round 2 (June 29 - Ju
 
 - [`social/REDDIT_POST.md`](social/REDDIT_POST.md) - draft for `r/odinlang`
 - [`social/TWITTER_THREAD.md`](social/TWITTER_THREAD.md) - thread for X
-- [`social/DISCORD_NOTE.md`](social/DISCORD_NOTE.md) - note for `🧩丨show-your-case`
+- [`social/DISCORD_NOTE.md`](social/DISCORD_NOTE.md) - note for `show-your-case`
 
 ## What M3 is _not_ used for
 

@@ -77,7 +77,7 @@ _Helpers/
 ├── README - helpers.md
 ├── scripts/                 <- thematic sub-folders
 │   ├── README - scripts.md
-│   ├── diagnostic/          <- audit_public_safety.py, auditReadmeCoherence.py, publish_public.py
+│   ├── diagnostic/          <- audit_public_safety.py, auditReadmeCoherence.py, publish_public.py, vaultConfigOdinRAG.py + vaultDiagnostic.py + validateFrontmatter.py (R2 TerraBloom port)
 │   │   └── code_auditor/    <- code_auditor.py + odin_rules.{jsonc,schema.json} + rule_loader.py + scanner.py + reporter.py + README - code_auditor.md (self-contained package)
 │   ├── fixes/               <- format_odin_in_files, fix_mojibake, reflow_md, odin_format, book_html_to_md, lint_pylance
 │   ├── indexing/            <- build_kb_index.py
@@ -86,7 +86,7 @@ _Helpers/
 ├── docs/                    <- meta docs about this repo (NNN_*.md)
 │   ├── README - docs.md
 │   ├── 001_folder_structure.md
-│   ├── 002_how_minimax-m3_is_used_in_this_repository.md
+│   ├── 002_how_minimax_m3_is_used_in_this_repository.md
 │   ├── 003_yaml_frontmatter_conventions.md
 │   ├── 004_markdown_style.md
 │   ├── 005_public_release_checklist.md

@@ -3,7 +3,7 @@
 > This file is read first by AI coding agents to understand the structure, conventions, and tools of the OdinRAG repository.
 > **Keep it up to date** when the structure evolves.
 > Built with **MiniMax-M3** via [Kilo Code](https://kilo.ai).
-> See [`_Helpers/docs/002_how_minimax-m3_is_used_in_this_repository.md`](_Helpers/docs/002_how_minimax-m3_is_used_in_this_repository.md) for the technical story.
+> See [`_Helpers/docs/002_how_minimax_m3_is_used_in_this_repository.md`](_Helpers/docs/002_how_minimax_m3_is_used_in_this_repository.md) for the technical story.
 
 ## TL;DR
 
@@ -70,7 +70,7 @@ Chain of resolution per value: **env var > user_config.jsonc > empty string**.
 - **Default** (authored docs under `_Helpers/docs/` and `_Private/planning/`): filename is `NNN_snake_case_slug.md` (3-digit prefix, lowercase + underscores + hyphens). NNN restarts at 001 in each folder. Chronological by creation date.
 - **H1 title = filename exactly** (no leading `NNN_` in the H1 if the filename has one). Examples:
   - `003_yaml_frontmatter_conventions.md` → H1 `# 003_yaml_frontmatter_conventions`
-  - `002_how_minimax-m3_is_used_in_this_repository.md` → H1 `# 002_how_minimax-m3_is_used_in_this_repository`
+  - `002_how_minimax_m3_is_used_in_this_repository.md` → H1 `# 002_how_minimax_m3_is_used_in_this_repository`
 - **FS-unsafe characters forbidden in both filename and H1**: `<`, `>`, `:`, `"`, `/`, `\`, `|`, `?`, `*`. If the natural title would need one, rephrase.
 - **READMEs in authored folders**: filename is `README - <topic>.md` where `<topic>` is the parent directory name. H1 matches the filename (per the rule above). Examples:
   - `_Helpers/scripts/README - scripts.md` → H1 `# README - scripts`

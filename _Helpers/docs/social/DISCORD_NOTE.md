@@ -9,7 +9,7 @@ lastUpdated: "2026-07-01"
 updatedBy: "MiniMax-M3 (Kilo Code)"
 ---
 
-# Note Discord - `🧩丨show-your-case`
+# Note Discord - `show-your-case`
 
 ```
 🧵 Showcase entry - OdinRAG

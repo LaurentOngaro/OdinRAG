@@ -2,7 +2,7 @@
 title: "Mixing public and private history in a single repo"
 date: "2026-07-01"
 tags: [OdinRAG, reference, git, workflow]
-type: how-to
+type: reference
 status: active
 version: 3.0.0
 lastUpdated: "2026-07-02"
