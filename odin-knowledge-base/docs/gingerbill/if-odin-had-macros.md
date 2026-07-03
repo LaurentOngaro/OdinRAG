@@ -86,7 +86,7 @@ for k, v in my_string_map_iterator(m) {
 
 This approach to iterators is very imperative and not very “composable” in the functional sense. You cannot chain multiple iterators together using this approach. I personally don’t have much need for composing iterators in practice and I usually just want the ability to iterate across a custom data structure and that’s it. I honestly don’t think the composability of iterators is an actual need most programmers have, but rather something that “seems cool” 
 
-Remember, you’re a bunch of programmers–you’re not cool. to use.
+Remember, you’re a bunch of programmers-you’re not cool. to use.
 
 I don’t think I can think of a case when I’ve actually wanted to use reusable composable iterators either, and when I’ve had something near to that, I’ve just written the code in-line since it was always a one-off.
 

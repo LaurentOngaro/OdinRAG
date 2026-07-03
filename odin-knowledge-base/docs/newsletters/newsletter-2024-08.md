@@ -64,7 +64,7 @@ Q: Let’s start at the beginning. How did you find out about Odin and what
 appealed to you about it?
 
 A: Let me spin you a tale. It was October of 2023. I was getting the urge to
-start on a couple grand projects – something of real substance. So, I
+start on a couple grand projects - something of real substance. So, I
 evaluated the languages I knew against the new ones I hadn’t yet tried.
 
 I needed something that could support a large project worthy of spending months

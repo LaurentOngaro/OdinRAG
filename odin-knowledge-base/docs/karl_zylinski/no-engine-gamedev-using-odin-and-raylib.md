@@ -169,7 +169,7 @@ And the joy doesn’t stop there: Odin is also a C-like and fairly low-level lan
 
 > I usually say that Odin is “low level with high-level feeling”.
 
-I created a game called CAT & ONION using Odin and Raylib, and put it on Steam: <https://store.steampowered.com/app/2781210/CAT__ONION/> – This shows that it is a *production ready* combination. The most important part of getting it done was that I had fun while doing it, because that kept me productive.
+I created a game called CAT & ONION using Odin and Raylib, and put it on Steam: <https://store.steampowered.com/app/2781210/CAT__ONION/> - This shows that it is a *production ready* combination. The most important part of getting it done was that I had fun while doing it, because that kept me productive.
 
 > The game is also available on itch.io. That version comes with the full source code: <https://zylinski.itch.io/cat-and-onion>
 

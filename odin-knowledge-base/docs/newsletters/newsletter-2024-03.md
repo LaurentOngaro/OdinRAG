@@ -22,7 +22,7 @@ We’re trying something new this month, let us know what you think! We’ll foc
 
 ## Homeshift [#](#homeshift)
 
-Homeshift (title in progress) is a 2D-platformer inspired by games such as Kye by Colin Garbutt and Super Meat Boy. Its main goals are, firstly, to provide challenging platforming with simple to grasp controls, and more importantly, to be easily moddable. This has been achieved with the help of Tilengine – an open source retro graphics library written in C.
+Homeshift (title in progress) is a 2D-platformer inspired by games such as Kye by Colin Garbutt and Super Meat Boy. Its main goals are, firstly, to provide challenging platforming with simple to grasp controls, and more importantly, to be easily moddable. This has been achieved with the help of Tilengine - an open source retro graphics library written in C.
 
 ### Level editing and easy modding [#](#level-editing-and-easy-modding)
 

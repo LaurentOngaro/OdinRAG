@@ -4,7 +4,7 @@
 
 Article was originally posted here: <https://odin.handmade.network/blogs/p/2994-on_the_aesthetics_of_the_syntax_of_declarations>
 
-n.b. This is a philosophical article and not a technical article. There are no correct answers to the questions that I will pose – only compromises.
+n.b. This is a philosophical article and not a technical article. There are no correct answers to the questions that I will pose - only compromises.
 
 I’m considering what the “best” declaration syntax would be. Historically, there have been two categories: which I will call qualifier-focused and type-focused.
 An example of qualifier-focused would be the Pascal family. An example of type-focused would be the C family. Odin, like Jai, have been experimenting with an name-focused declaration syntax. These categories place emphasis on different aspects of the declarations.

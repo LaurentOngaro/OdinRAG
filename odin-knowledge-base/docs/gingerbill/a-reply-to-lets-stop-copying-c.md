@@ -245,7 +245,7 @@ A lot of the issues in C come from C’s poor and lacking type system. I am not 
 
 A lot of C’s mistakes are only mistakes in retrospective, but C is still an extremely useful language to use, and I am still extremely productive in it.
 
-To quote Fred Brooks in his book *No Silver Bullet – Essence and Accident in Software Engineering*:
+To quote Fred Brooks in his book *No Silver Bullet - Essence and Accident in Software Engineering*:
 
 > There is no single development, in either technology or management technique, which by itself promises even one order of magnitude [tenfold] improvement within a decade in productivity, in reliability, in simplicity.
 

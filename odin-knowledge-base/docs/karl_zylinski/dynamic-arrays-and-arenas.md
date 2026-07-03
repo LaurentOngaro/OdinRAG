@@ -181,7 +181,7 @@ dyn_arr.allocator = mem.panic_allocator()
 ```odin
 This will construct a dynamic array with capacity for `2000` elements. That amount of memory will immediately get allocated into the arena. The `0` is the *length* of the dynamic array. That’s how many of those `2000` elements that are used.
 
-This means that you can `append` as usual into this dynamic array. Note the line `dyn_arr.allocator = mem.panic_allocator()` – This will make your program panic (crash on purpose) if the dynamic array tries to grow, as that would litter the arena in the ways we’ve talked about. If you run into that crash, then perhaps you should increase the capacity.
+This means that you can `append` as usual into this dynamic array. Note the line `dyn_arr.allocator = mem.panic_allocator()` - This will make your program panic (crash on purpose) if the dynamic array tries to grow, as that would litter the arena in the ways we’ve talked about. If you run into that crash, then perhaps you should increase the capacity.
 
 If the size of the dynamic arrays in your program vary wildly depending on what the user does, then perhaps you should not use an arena. An example is if you’re making a video editing software: Some users may use 10 megabytes of memory, while others may use 200 gigabytes, depending on their project sizes. Pre-allocating for the worst-case scenario in these cases is probably not a great idea. The software is used in a very dynamic way, so you’ll have to be more dynamic with your memory usage.
 

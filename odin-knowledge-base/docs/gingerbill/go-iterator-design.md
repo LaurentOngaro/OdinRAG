@@ -118,7 +118,7 @@ for it := Backward(s);; {
 ```odin
 This is similar what I do in Odin **BUT** Odin does not support stack-frame-scope-capturing closures, only non-scope-capturing procedure literals. Because Go is garbage-collected, I see little need to no utilize them like this. The main difference is that Odin does not try to unify the ideas into one construct.
 
-I know some people will this think this approach is a lot more complicated. It is doing the opposite of what Cox prefers with storing data in control flow, and store the data outside of it. But this is usually what I want from an iterator rather than what Go is going to do. And this is the problem: it removes the elegance of storing the data in the control flow–the push/pull distinction that Cox explains.
+I know some people will this think this approach is a lot more complicated. It is doing the opposite of what Cox prefers with storing data in control flow, and store the data outside of it. But this is usually what I want from an iterator rather than what Go is going to do. And this is the problem: it removes the elegance of storing the data in the control flow-the push/pull distinction that Cox explains.
 
 **NOTE:** I am very much an imperative programmer and I like to know how things actually execute, rather than trying to make it “elegant looking” code. So the approach I wrote above is fundamentally about thinking with regards to execution.
 

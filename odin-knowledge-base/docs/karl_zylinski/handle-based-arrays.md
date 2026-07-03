@@ -714,7 +714,7 @@ But like I said, I have not tried this, but perhaps it’s a nice way for you.
 
 I’ve published a “handle map” library where all the items live within a growing virtual arena, making the pointers stable. Check it out: <https://github.com/karl-zylinski/odin-handle-map>
 
-It also works on web, see this live demo: <https://zylinski.se/odin-handle-map-example/> – Note that on web it can’t use virtual memory (WASM does not support it). Instead it uses a “Dynamic Arena” on web, which is slightly less memory efficient. With that in mind I use smaller arena blocks on web compared to non-web.
+It also works on web, see this live demo: <https://zylinski.se/odin-handle-map-example/> - Note that on web it can’t use virtual memory (WASM does not support it). Instead it uses a “Dynamic Arena” on web, which is slightly less memory efficient. With that in mind I use smaller arena blocks on web compared to non-web.
 
 ## This got complicated! What are your recommendations?[#](#this-got-complicated-what-are-your-recommendations)
 

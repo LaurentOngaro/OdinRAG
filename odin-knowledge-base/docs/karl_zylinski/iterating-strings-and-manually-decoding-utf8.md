@@ -4,7 +4,7 @@ September 23, 2025
 
 ![](https://zylinski.se/strings/cover.png)
 
-**This post is an adapted excerpt from *Understanding the Odin Programming Language* – the acclaimed eBook on learning Odin and understanding low-level concepts. Visit <https://odinbook.com> for more information.**
+**This post is an adapted excerpt from *Understanding the Odin Programming Language* - the acclaimed eBook on learning Odin and understanding low-level concepts. Visit <https://odinbook.com> for more information.**
 
 Text strings in Odin use Unicode. Unicode is a standard that makes it possible to use characters from most languages. You can mix different languages within the same string, and even use exotic things such as emojis!
 

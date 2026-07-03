@@ -110,7 +110,7 @@ The following concepts express the school of thought that I subscribe to which I
 
 > We must consider it, however, in the light not only of our conclusion and our premisses, but also of what is commonly said about it; for with a true view all the facts harmonize, but with a false one they soon clash.
 
-> Excellence is never an accident. It is always the result of high intention, sincere effort, and intelligent execution; it represents the wise choice of many alternatives – choice, not chance, determines your destiny.
+> Excellence is never an accident. It is always the result of high intention, sincere effort, and intelligent execution; it represents the wise choice of many alternatives - choice, not chance, determines your destiny.
 
 > The pleasures arising from thinking and learning will make us think and learn all the more.
 
@@ -180,6 +180,6 @@ The following concepts express the school of thought that I subscribe to which I
 
 > … we do not consider it as good engineering practice to consume a resource lavishly just because it happens to be cheap
 
-> Increasingly, people seem to interpret complexity as sophistication, which is baffling – the incomprehensible should cause suspicion, not admiration. Possibly this results from the mistaken belief that using a mysterious device confers [extra] power on the user.
+> Increasingly, people seem to interpret complexity as sophistication, which is baffling - the incomprehensible should cause suspicion, not admiration. Possibly this results from the mistaken belief that using a mysterious device confers [extra] power on the user.
 
 >Source: https://www.gingerbill.org/article/2020/05/31/programming-pragmatist-proverbs

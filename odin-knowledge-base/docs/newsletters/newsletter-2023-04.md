@@ -28,7 +28,7 @@ I came at all of this as a self-taught web-dev that had been frustrated over the
 
 Q: I feel that a lot of programmers try their hands at games because of the immediate and visceral feedback. You make thing A move and you know right away if you succeeded. And as the game grows there is plenty of room to become more serious about performance and learn more. Why a side scroller and not a platform, or why *this* game?
 
-A: First, I agree entirely – the quick feedback and fun factor of programming games make it an especially good avenue to learn and grow as a programmer.
+A: First, I agree entirely - the quick feedback and fun factor of programming games make it an especially good avenue to learn and grow as a programmer.
 
 When I first started learning, I was excited and curious about everything. It was really hard to know where to begin, and I think the progression of my videos captures that a little.
 
@@ -36,12 +36,12 @@ My first hurdle was to develop an understanding of how to open a window and get 
 
 The game was just simple enough to complete but hard enough that I would learn.
 
-As for why I started the YouTube channel – I’m not interested in becoming another dev YouTuber, but I started because I suspected there were other beginner programmers frustrated with the web-dev path as I was. I wanted to show that programming games was a great way to become a better programmer.
+As for why I started the YouTube channel - I’m not interested in becoming another dev YouTuber, but I started because I suspected there were other beginner programmers frustrated with the web-dev path as I was. I wanted to show that programming games was a great way to become a better programmer.
 
 Q: What would you say your favorite thing about Odin is, and what would you say could be improved? This could be a feature, syntax, the community, documentation, tooling, anything and everything related to working with Odin that you really like, and conversely think could use some love, and why?
 
 A: My favorite thing about Odin is its simplicity. I hope that never changes. I’m always glad to see Bill say that the language is done. I don’t want any fancy features, abstractions, or whatever. I want as little as possible between me and the machine.
 
-As for improvements, I would like to see more learning material. Specifically, how to do various low-level things using the language. Learning the syntax and standard lib isn’t too tough – you can learn a lot from reading the source code. But I would love to see more examples of using the language to build something. Further, I would love to see Odin code to demonstrate things like Bill’s blog posts on memory allocation strategies. I think there are many programmers struggling with this sort of low-level understanding, and Odin is simple enough to be a great teaching tool.
+As for improvements, I would like to see more learning material. Specifically, how to do various low-level things using the language. Learning the syntax and standard lib isn’t too tough - you can learn a lot from reading the source code. But I would love to see more examples of using the language to build something. Further, I would love to see Odin code to demonstrate things like Bill’s blog posts on memory allocation strategies. I think there are many programmers struggling with this sort of low-level understanding, and Odin is simple enough to be a great teaching tool.
 
 >Source: https://odin-lang.org/news/newsletter-2023-04

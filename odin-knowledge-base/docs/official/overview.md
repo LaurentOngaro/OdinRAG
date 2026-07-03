@@ -2445,8 +2445,8 @@ Odin supports the following calling conventions:
 
 - **odin** - default convention used for an Odin **proc**. It passes all parameters larger than 16 bytes by reference and passes an implicit `context` pointer on each call. (**Note:** This is subject to change)
 - **contextless** - This is the same as **odin** but without the implicit `context` pointer.
-- **stdcall** or **std** – This is the stdcall convention as specified by Microsoft.
-- **cdecl** or **c** – This is the default calling convention generated of a procedure in C.
+- **stdcall** or **std** - This is the stdcall convention as specified by Microsoft.
+- **cdecl** or **c** - This is the default calling convention generated of a procedure in C.
 - **fastcall** or **fast** - This is a compiler dependent calling convention.
 - **none** - This is a compiler dependent calling convention which will do nothing to parameters.
 
@@ -3377,10 +3377,10 @@ Enables a specific feature or changes the behaviour of a specific aspect of the 
   - Enables dynamic-literals for types `map` and `[dynamic]T`
 - `#+feature integer-division-by-zero:<option>`
   - Makes all integer division within this file operation a specific way
-  - `#+feature integer-division-by-zero:trap` – Trap on division/modulo/remainder by zero
-  - `#+feature integer-division-by-zero:zero` – `x/0 == 0` and `x%0 == x` and `x%%0 == x`
-  - `#+feature integer-division-by-zero:self` – `x/0 == x` and `x%0 == 0` and `x%%0 == 0`
-  - `#+feature integer-division-by-zero:all-bits` – `x/0 == ~T(0)` and `x%0 == x` and `x%%0 == x`
+  - `#+feature integer-division-by-zero:trap` - Trap on division/modulo/remainder by zero
+  - `#+feature integer-division-by-zero:zero` - `x/0 == 0` and `x%0 == x` and `x%%0 == x`
+  - `#+feature integer-division-by-zero:self` - `x/0 == x` and `x%0 == 0` and `x%%0 == 0`
+  - `#+feature integer-division-by-zero:all-bits` - `x/0 == ~T(0)` and `x%0 == x` and `x%%0 == x`
 - `#+feature global-context`
   - Enable the use of globals that require the `context` to be defined in the global scope
   - The `context` by default does not exist in the global scope
@@ -3966,7 +3966,7 @@ Attributes modify the compilation details or behaviour of declarations.
 
 #### User tag which is ignored by the compiler [#](#user-tag-which-is-ignored-by-the-compiler)
 
-- [`@(tag=<string>)`](#tagstring) – works on ANY declaration
+- [`@(tag=<string>)`](#tagstring) - works on ANY declaration
 
 #### Non-User Code [#](#non-user-code)
 
@@ -3974,11 +3974,11 @@ Attributes modify the compilation details or behaviour of declarations.
 
 #### Foreign Blocks [#](#foreign-blocks)
 
-- [`@(default_calling_convention=<string>)`](#default_calling_conventionstring) – `foreign` blocks
-- [`@(link_prefix=<string>)`](#link_prefixstring) – `foreign` blocks and declarations within `foreign` blocks
-- [`@(link_suffix=<string>)`](#link_suffixstring) – `foreign` blocks and declarations within `foreign` blocks
-- [`@(private=<string?>)`](#privatestring)– all declarations except `import` statements
-- [`@(require_results)`](#require_results) – procedure declarations and `foreign` blocks
+- [`@(default_calling_convention=<string>)`](#default_calling_conventionstring) - `foreign` blocks
+- [`@(link_prefix=<string>)`](#link_prefixstring) - `foreign` blocks and declarations within `foreign` blocks
+- [`@(link_suffix=<string>)`](#link_suffixstring) - `foreign` blocks and declarations within `foreign` blocks
+- [`@(private=<string?>)`](#privatestring)- all declarations except `import` statements
+- [`@(require_results)`](#require_results) - procedure declarations and `foreign` blocks
 
 #### Procedure Groups [#](#procedure-groups)
 
@@ -4033,10 +4033,10 @@ Attributes modify the compilation details or behaviour of declarations.
 - [`@(link_section=<string>)`](#link_sectionstring)
 - [`@(link_suffix=<string>)`](#link_suffixstring)
 - [`@(linkage=<string>)`](#linkagestring)
-- [`@(private=<string>?)`](#privatestring) – globals only
+- [`@(private=<string>?)`](#privatestring) - globals only
 - [`@(require=<boolean?>)`](#requireboolean)
 - [`@(rodata)`](#rodata)
-- [`@(static)`](#static) – locals variable declarations only
+- [`@(static)`](#static) - locals variable declarations only
 - [`@(thread_local=<string?>)`](#thread_localstring)
 
 #### Constant Value Declarations [#](#constant-value-declarations)
