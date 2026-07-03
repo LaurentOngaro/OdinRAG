@@ -20,6 +20,8 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0   # filter-branch needs the full commit graph
+          lfs: true        # *.zip are LFS-tracked; without this the runner checks
+                           # out text pointers and filter-branch sees "unstaged changes"
 
       - name: Set up Python
         uses: actions/setup-python@v5
