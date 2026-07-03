@@ -16,8 +16,7 @@ Exit codes:
     2  - tool error (pyright missing, bad target, ...)
 
 Why this exists:
-    AGENTS.md mandates: "After any edit to a .py file, run pyright and
-    fix every reported warning before considering the task done."
+    AGENTS.md mandates: "After any edit to a .py file, run pyright and fix every reported warning before considering the task done."
     This script is the single command an agent (or human) runs.
 """
 from __future__ import annotations
@@ -40,8 +39,7 @@ REPO_ROOT = Path(__file__).resolve().parents[3]
 
 
 def _resolve_pyright() -> list[str]:
-    """Return the command to invoke pyright. Prefer ``pyright`` on PATH,
-    fall back to ``python -m pyright``."""
+    """Return the command to invoke pyright. Prefer ``pyright`` on PATH, fall back to ``python -m pyright``."""
     if shutil.which("pyright") is not None:
         return ["pyright"]
     return [sys.executable, "-m", "pyright"]
@@ -65,11 +63,24 @@ def _format_diag(diag: dict) -> str:
 
 
 def run_pyright(target: Path, strict: bool) -> tuple[int, dict]:
-    """Invoke pyright on ``target`` and return (returncode, parsed_json_dict)."""
+    """Invoke pyright on ``target`` and return (returncode, parsed_json_dict).
+
+    pyright exit-code convention:
+      0 - clean (or only info-level diagnostics)
+      1 - one or more warnings/errors reported
+      2 - invalid arguments / bad config
+      4 - target / pyrightconfig issue
+
+    Empty stdout is always a tool-level failure - either the target was not
+    found, pyrightconfig is invalid, or pyright rejected an option. We surface
+    those to the caller and normalize them to rc=2 so ``lint()`` can short
+    circuit cleanly.
+
+    Project-wide exclude rules (e.g. vendored templates) live in
+    ``pyrightconfig.json`` at the repo root; this wrapper no longer passes a
+    ``--ignore`` CLI flag because pyright >= 1.1 removed it.
+    """
     cmd = _resolve_pyright() + [str(target), "--outputjson"]
-    # Skip vendored third-party templates (each is its own repo, gitignored).
-    if target == REPO_ROOT:
-        cmd += ["--ignore", "code/vendored templates"]
     proc = subprocess.run(
         cmd,
         cwd=str(REPO_ROOT),
@@ -78,14 +89,23 @@ def run_pyright(target: Path, strict: bool) -> tuple[int, dict]:
         encoding="utf-8",
     )
     if not proc.stdout.strip():
-        return proc.returncode, {"generalDiagnostics": [], "summary": {}}
+        if proc.stderr.strip():
+            print(f"[ERR] pyright: {proc.stderr.strip()}", file=sys.stderr)
+        else:
+            print(f"[ERR] pyright produced no output (rc={proc.returncode})", file=sys.stderr)
+        return 2, {"generalDiagnostics": [], "summary": {}}
     try:
-        return proc.returncode, json.loads(proc.stdout)
+        payload = json.loads(proc.stdout)
     except json.JSONDecodeError:
-        print(f"[ERR] pyright returned non-JSON output:", file=sys.stderr)
+        print("[ERR] pyright returned non-JSON output:", file=sys.stderr)
         print(proc.stdout, file=sys.stderr)
         print(proc.stderr, file=sys.stderr)
         return 2, {}
+    if proc.returncode not in (0, 1):
+        if proc.stderr.strip():
+            print(f"[ERR] pyright (rc={proc.returncode}): {proc.stderr.strip()}", file=sys.stderr)
+        return proc.returncode, payload
+    return proc.returncode, payload
 
 
 def lint(target: Path, strict: bool, check: bool) -> int:
@@ -102,9 +122,8 @@ def lint(target: Path, strict: bool, check: bool) -> int:
     print(f"[lint] pyright on {rel} (strict={strict}, check={check})")
 
     rc, payload = run_pyright(target, strict=strict)
-    if rc == 2:
-        # Tool-level error (pyright missing, bad config, etc.)
-        return 2
+    if rc != 0 and rc != 1:
+        return rc if rc != 0 else 2
 
     diagnostics = payload.get("generalDiagnostics", [])
     summary = payload.get("summary", {})

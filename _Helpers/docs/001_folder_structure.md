@@ -77,11 +77,12 @@ _Helpers/
 ├── README - helpers.md
 ├── scripts/                 <- thematic sub-folders
 │   ├── README - scripts.md
-│   ├── diagnostic/          <- audit_public_safety.py, auditReadmeCoherence.py, publish_public.py, odin_rules.jsonc, odin_rules.schema.json, README - code_auditor.md (code_auditor.py lands in Phase 2)
+│   ├── diagnostic/          <- audit_public_safety.py, auditReadmeCoherence.py, publish_public.py
+│   │   └── code_auditor/    <- code_auditor.py + odin_rules.{jsonc,schema.json} + rule_loader.py + scanner.py + reporter.py + README - code_auditor.md (self-contained package)
 │   ├── fixes/               <- format_odin_in_files, fix_mojibake, reflow_md, odin_format, book_html_to_md, lint_pylance
 │   ├── indexing/            <- build_kb_index.py
 │   ├── scrappers/           <- scrape_*.py + download_*.py
-│   └── lib/                 <- text_clean, http_client, html2md, user_config
+│   └── lib/                 <- text_clean, http_client, html2md, user_config (shared libs; per-package modules stay inside their own folder)
 ├── docs/                    <- meta docs about this repo (NNN_*.md)
 │   ├── README - docs.md
 │   ├── 001_folder_structure.md

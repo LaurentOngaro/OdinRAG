@@ -58,6 +58,34 @@
       "detail": "Audit README <-> filesystem coherence (wikilinks, missing files, unlisted files). Use --fail-on-error in CI."
     },
     {
+      "label": "[AUDIT] Odin Code Audit (PVG03_RPG)",
+      "type": "shell",
+      "command": "python _Helpers/scripts/diagnostic/code_auditor/code_auditor.py --path code/projects/PVG03_RPG/src --report _Helpers/scripts/diagnostic/code_auditor/latest_audit.md",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      },
+      "problemMatcher": [],
+      "detail": "Run the headless Odin code auditor against PVG03_RPG/src. Writes the Markdown report to _Helpers/scripts/diagnostic/code_auditor/latest_audit.md. Exit code is non-zero on error (2) or warning+--strict (1)."
+    },
+    {
+      "label": "[AUDIT] Odin Code Audit (single file prompt)",
+      "type": "shell",
+      "command": "python _Helpers/scripts/diagnostic/code_auditor/code_auditor.py",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      },
+      "problemMatcher": [],
+      "detail": "Prompts for a file or path then runs code_auditor.py against it (use Run -> Input variant). Default: prints to stdout."
+    },
+    {
       "label": "[PUBLISH] --check (dry-run)",
       "type": "shell",
       "command": "python _Helpers/scripts/diagnostic/publish_public.py --check",
