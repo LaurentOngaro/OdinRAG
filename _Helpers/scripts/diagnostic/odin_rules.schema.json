@@ -1,0 +1,117 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "./odin_rules.schema.json",
+  "title": "Odin Code Auditor rules file",
+  "description": "Schema for odin_rules.jsonc. Edit the rules file freely; this schema validates it.",
+  "type": "object",
+  "required": ["version", "rules"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Semver of this rules file."
+    },
+    "extends": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Optional preset profile names (odin-core, odin-pvg03-rpg, odin-cli, odin-strict). Phase 2 resolves these."
+    },
+    "rules": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/rule" }
+    },
+    "project_overrides": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "extra_rules": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "IDs of project-local rules to add on top of the extends profile."
+          }
+        },
+        "required": ["extra_rules"],
+        "additionalProperties": false
+      }
+    }
+  },
+  "$defs": {
+    "rule": {
+      "type": "object",
+      "required": ["id", "title", "category", "severity", "static", "explanation"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Z]+-\\d{3}$",
+          "description": "Stable uppercase identifier (e.g. ALLOC-001, DS-002, ODIN-003)."
+        },
+        "title": {
+          "type": "string",
+          "minLength": 10,
+          "description": "Human-readable short description."
+        },
+        "category": {
+          "type": "string",
+          "enum": ["style", "allocator", "data-structure", "anti-pattern", "architecture", "kb-compliance"],
+          "description": "Bucket for grouping in the report."
+        },
+        "severity": {
+          "type": "string",
+          "enum": ["error", "warning", "info"],
+          "description": "error blocks strict-mode CI, warning shows in report, info is informational."
+        },
+        "static": {
+          "type": "boolean",
+          "description": "True if a regex/heuristic can detect it without LLM. Phase 2 implements the static detectors."
+        },
+        "scope": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^\\*\\.[a-z]+$"
+          },
+          "description": "Glob patterns (e.g. ['*.odin']) this rule applies to."
+        },
+        "pattern": {
+          "type": "string",
+          "description": "Optional regex (Python re syntax). Mutually exclusive with 'detect' in practice, but schema allows either."
+        },
+        "detect": {
+          "type": "string",
+          "description": "Optional named heuristic to implement in scanner.py (e.g. alloc-in-loop, defer-in-loop)."
+        },
+        "applies_when": {
+          "type": "object",
+          "additionalProperties": { "type": ["string", "boolean", "number"] },
+          "description": "Optional conditions (e.g. {'build_mode': 'release'}). Phase 2 evaluates these."
+        },
+        "explanation": {
+          "type": "string",
+          "minLength": 20,
+          "description": "Why this rule exists. Citable, explains the underlying principle."
+        },
+        "kb_sources": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Repo-relative paths to KB files that justify this rule."
+        },
+        "lesson_refs": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Skool / programvideogames lesson IDs (e.g. '088'). Phase 3 links these to INDEX.md."
+        },
+        "fix_suggestion": {
+          "type": "string",
+          "description": "Optional code-level hint on how to fix the violation."
+        }
+      }
+    }
+  }
+}

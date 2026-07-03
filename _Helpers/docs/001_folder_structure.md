@@ -77,7 +77,7 @@ _Helpers/
 ├── README - helpers.md
 ├── scripts/                 <- thematic sub-folders
 │   ├── README - scripts.md
-│   ├── diagnostic/          <- audit_public_safety.py, auditReadmeCoherence.py
+│   ├── diagnostic/          <- audit_public_safety.py, auditReadmeCoherence.py, publish_public.py, odin_rules.jsonc, odin_rules.schema.json, README - code_auditor.md (code_auditor.py lands in Phase 2)
 │   ├── fixes/               <- format_odin_in_files, fix_mojibake, reflow_md, odin_format, book_html_to_md, lint_pylance
 │   ├── indexing/            <- build_kb_index.py
 │   ├── scrappers/           <- scrape_*.py + download_*.py

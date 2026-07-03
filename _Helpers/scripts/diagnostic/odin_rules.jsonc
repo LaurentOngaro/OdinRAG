@@ -1,0 +1,179 @@
+{
+  "$schema": "./odin_rules.schema.json",
+  "version": "1.0.0",
+  "extends": ["odin-core"],
+  "rules": [
+    // ============================================================
+    // ALLOCATORS
+    // ============================================================
+    {
+      "id": "ALLOC-001",
+      "title": "tracking_allocator must only be active in Debug builds",
+      "category": "allocator",
+      "severity": "error",
+      "static": true,
+      "scope": ["*.odin"],
+      "applies_when": {
+        "build_mode": "release"
+      },
+      "pattern": "tracking_allocator\\s*\\(",
+      "explanation": "tracking_allocator instruments every alloc/free; in release it costs 2-3x and reports false leaks from initialization-time allocations. Reserve it for Debug builds only.",
+      "kb_sources": [
+        "odin-knowledge-base/docs/karl_zylinski/odin-book/13-making-manual-memory-management-easier.md",
+        "odin-knowledge-base/courses/programvideogames/vertical-slice-and-dice-v10/rpg/088-26. Tracking Allocator.md"
+      ],
+      "lesson_refs": ["088"],
+      "fix_suggestion": "Wrap the instantiation in `when ODIN_RUN_MODE == .Debug { ... }`"
+    },
+    {
+      "id": "ALLOC-002",
+      "title": "Allocations in hot loops should use arena or pre-allocated buffers",
+      "category": "allocator",
+      "severity": "error",
+      "static": true,
+      "scope": ["*.odin"],
+      "detect": "alloc-in-loop",
+      "explanation": "Per-frame allocations are cache-unfriendly and signal a missing arena or pool. Use a per-frame arena or pre-allocated buffer.",
+      "kb_sources": [
+        "odin-knowledge-base/docs/karl_zylinski/odin-book/09-introduction-to-manual-memory-management.md",
+        "odin-knowledge-base/docs/karl_zylinski/temporary-allocator-your-first-arena.md",
+        "odin-knowledge-base/courses/programvideogames/vertical-slice-and-dice-v10/rpg/087-25. Scenes, Transitions, Allocations.md"
+      ],
+      "lesson_refs": ["087"],
+      "fix_suggestion": "Move the allocation outside the loop, or use a per-frame arena."
+    },
+    {
+      "id": "ALLOC-003",
+      "title": "Allocated slices must be freed or arena-scoped",
+      "category": "allocator",
+      "severity": "warning",
+      "static": true,
+      "scope": ["*.odin"],
+      "detect": "unfreed-slice",
+      "explanation": "Dynamic arrays allocated with `make([]T, ...)` must either be arena-scoped (freed at frame/scene end) or explicitly deleted. Otherwise they leak until process exit.",
+      "kb_sources": [
+        "odin-knowledge-base/docs/karl_zylinski/odin-book/13-making-manual-memory-management-easier.md",
+        "odin-knowledge-base/docs/karl_zylinski/dynamic-arrays-and-arenas.md"
+      ],
+      "fix_suggestion": "Wrap the slice in an arena, or `defer delete(slice)` in the owning scope."
+    },
+    // ============================================================
+    // DATA STRUCTURES (DOD)
+    // ============================================================
+    {
+      "id": "DS-001",
+      "title": "Avoid map for small collections (< 50 entries)",
+      "category": "data-structure",
+      "severity": "warning",
+      "static": true,
+      "scope": ["*.odin"],
+      "detect": "small-map",
+      "explanation": "For < 50 entries, a sorted `[]Entry` with binary search is faster than a hash map, has no hash overhead, and is more cache-friendly. For tiny sets (under 10), a linear scan on a small slice wins.",
+      "kb_sources": [
+        "odin-knowledge-base/docs/karl_zylinski/data-oriented-ideas-for-small-gamedev-teams.md",
+        "odin-knowledge-base/docs/karl_zylinski/odin-book/20-data-oriented-design.md",
+        "odin-knowledge-base/docs/karl_zylinski/handle-based-maps-three-implementations.md"
+      ],
+      "fix_suggestion": "Replace with a `[]Entry` sorted by key, or use `core:hash/dynamic` if ordering is not needed."
+    },
+    {
+      "id": "DS-002",
+      "title": "Entity struct with > 8 fields suggests SoA split",
+      "category": "data-structure",
+      "severity": "info",
+      "static": true,
+      "scope": ["*.odin"],
+      "detect": "large-struct-mixed-access",
+      "explanation": "When only a subset of fields are accessed per system (e.g. physics reads pos/vel, render reads sprite), AoS hurts cache. Split into SoA slices.",
+      "kb_sources": [
+        "odin-knowledge-base/docs/karl_zylinski/odin-book/20-data-oriented-design.md",
+        "odin-knowledge-base/docs/karl_zylinski/data-oriented-ideas-for-small-gamedev-teams.md",
+        "odin-knowledge-base/docs/karl_zylinski/handle-based-arrays.md"
+      ]
+    },
+    {
+      "id": "DS-003",
+      "title": "Linear search in hot path suggests index array or sort",
+      "category": "data-structure",
+      "severity": "warning",
+      "static": false,
+      "scope": ["*.odin"],
+      "detect": "linear-lookup-hot-path",
+      "explanation": "Repeated `for x in slice { if x.id == id { ... } }` is O(n) per call. Sort the slice by id and binary search, or maintain a `map[int]int` from id to index updated alongside the slice.",
+      "kb_sources": [
+        "odin-knowledge-base/docs/karl_zylinski/odin-book/20-data-oriented-design.md",
+        "odin-knowledge-base/docs/karl_zylinski/data-oriented-ideas-for-small-gamedev-teams.md"
+      ]
+    },
+    // ============================================================
+    // ODIN ANTI-PATTERNS
+    // ============================================================
+    {
+      "id": "ODIN-001",
+      "title": "No `using` on Entity-style structs",
+      "category": "anti-pattern",
+      "severity": "error",
+      "static": true,
+      "scope": ["*.odin"],
+      "pattern": "^\\s*using\\s+\\w+\\s*[:=]",
+      "explanation": "`using` pollutes scope and breaks named access. Especially harmful on Entity, Character, Battle_State where field names collide (e.g. `pos` in Transform vs Sprite).",
+      "kb_sources": [
+        "odin-knowledge-base/docs/karl_zylinski/odin-book/23-odin-features-you-should-avoid.md",
+        "odin-knowledge-base/docs/karl_zylinski/know-why-you-dont-like-oop.md"
+      ],
+      "fix_suggestion": "Use explicit dotted access: `entity.pos.x += dt`."
+    },
+    {
+      "id": "ODIN-002",
+      "title": "No mutable package-level state",
+      "category": "anti-pattern",
+      "severity": "error",
+      "static": true,
+      "scope": ["*.odin"],
+      "pattern": "^\\s*var\\s+\\w+\\s*[:=]",
+      "explanation": "Package-level mutable state breaks the 'no globals' rule and makes hot-reload unsafe. Pass state through the Game struct.",
+      "kb_sources": [
+        "odin-knowledge-base/docs/karl_zylinski/odin-book/23-odin-features-you-should-avoid.md",
+        "odin-knowledge-base/docs/karl_zylinski/odin-book/17-package-system-and-code-organization.md"
+      ],
+      "fix_suggestion": "Move the variable into the Game struct, pass it by pointer."
+    },
+    {
+      "id": "ODIN-003",
+      "title": "No `defer` inside loops",
+      "category": "anti-pattern",
+      "severity": "error",
+      "static": true,
+      "scope": ["*.odin"],
+      "detect": "defer-in-loop",
+      "explanation": "`defer` in a loop accumulates until the enclosing scope ends, not the loop iteration. Memory leaks and unexpected shutdown ordering result.",
+      "kb_sources": [
+        "odin-knowledge-base/docs/karl_zylinski/odin-book/23-odin-features-you-should-avoid.md"
+      ],
+      "fix_suggestion": "Extract the loop body to a procedure; the deferred call is released when the procedure returns."
+    },
+    // ============================================================
+    // KB COMPLIANCE
+    // ============================================================
+    {
+      "id": "KB-001",
+      "title": "Comment `// lesson NNN` must point to an existing KB file",
+      "category": "kb-compliance",
+      "severity": "info",
+      "static": true,
+      "scope": ["*.odin", "*.md"],
+      "detect": "lesson-ref-validation",
+      "explanation": "Lesson references should be traceable. A broken reference signals KB drift or a typo. Helps onboarding and KB evolution.",
+      "kb_sources": []
+    }
+  ],
+
+  // ============================================================
+  // PROJECT-SPECIFIC OVERRIDES (per-project extra rules)
+  // ============================================================
+  "project_overrides": {
+    "PVG03_RPG": {
+      "extra_rules": []
+    }
+  }
+}
