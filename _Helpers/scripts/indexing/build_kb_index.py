@@ -49,9 +49,9 @@ MANUAL_END = "<!-- END MANUAL -->"
 # ─── CONFIG ───────────────────────────────────────────────────────────────────
 KB_PATHS = {
     "skool":   ROOT / "odin-knowledge-base",
-    "karl":    ROOT / "docs" / "karl_zylinski",
-    "zylinski":ROOT / "docs" / "karl_zylinski",
-    "official":ROOT / "docs" / "official",
+    "karl":    ROOT / "odin-knowledge-base" / "docs" / "karl_zylinski",
+    "zylinski":ROOT / "odin-knowledge-base" / "docs" / "karl_zylinski",
+    "official":ROOT / "odin-knowledge-base" / "docs" / "official",
     "examples":ROOT / "code" / "examples",
 }
 INDEX_PATH = ROOT / "odin-knowledge-base" / "INDEX.md"
