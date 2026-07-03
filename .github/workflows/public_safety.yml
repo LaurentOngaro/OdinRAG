@@ -20,8 +20,13 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0   # filter-branch needs the full commit graph
-          lfs: true        # *.zip are LFS-tracked; without this the runner checks
-                           # out text pointers and filter-branch sees "unstaged changes"
+          # LFS is intentionally OFF here. The .zip under Support Files/ are
+          # LFS-tracked in main, but:
+          #   1. the LFS server on OdinRAG-private does not host the blobs
+          #      (404 on every fetch), and
+          #   2. the workflow immediately strips them via filter-branch anyway.
+          # Checking out the text LFS pointers is fine - filter-branch removes
+          # them with `git rm --cached` and the audit confirms the leak is gone.
 
       - name: Set up Python
         uses: actions/setup-python@v5
