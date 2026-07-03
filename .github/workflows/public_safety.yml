@@ -31,23 +31,18 @@ jobs:
           # `git filter-branch` is deprecated in modern git and prints a multi-line gotcha warning.
           # Set this to silence it; the workflow is intentional.
           FILTER_BRANCH_SQUELCH_WARNING: "1"
-          # Older git uses GIT_DIR for the backup location; not strictly required.
         run: |
           set -euo pipefail
-          echo "[+] Reset refs/heads/public to main tip"
-          git branch -f public main
+          # filter-branch refuses to run on a dirty working tree. A fresh
+          # actions/checkout can leave stray files (e.g. .git/refs/heads/refs/
+          # from a previous failed run), so reset to a known-clean state first.
+          git reset --hard HEAD
+          git clean -fd
 
-          echo "[+] Filter-branch with personal paths removed"
-          git filter-branch -f \
-            --index-filter 'git rm --cached -r --ignore-unmatch code/projects/PVG03_RPG
-              || git rm --cached -r --ignore-unmatch _Private
-              || git rm --cached -r --ignore-unmatch odin-knowledge-base/courses
-              || git rm --cached -r --ignore-unmatch odin-knowledge-base/docs/karl_zylinski/odin-book' \
-            --prune-empty \
-            -- public
-
-          echo "[+] Clean up filter-branch backup"
-          git update-ref -d refs/original/refs/heads/public || true
+          # Delegate the regen to the durable Python script so CI and local
+          # apply the same STRIP_RULES + dangling-ref cleanup. The runner has
+          # no remotes configured, so we pass --no-preflight.
+          python _Helpers/scripts/diagnostic/publish_public.py --check --no-preflight
 
           echo "[+] Resulting public tree (top-level):"
           git ls-tree public --name-only

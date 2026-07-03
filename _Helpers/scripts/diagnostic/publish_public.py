@@ -177,25 +177,35 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         action="store_true",
         help="Skip the push to the private remote (use when you already pushed manually).",
     )
+    parser.add_argument(
+        "--no-preflight",
+        action="store_true",
+        help=(
+            "Skip the preflight checks (dirty working tree, remote presence). "
+            "Intended for CI runners that have no remotes configured and may "
+            "have stray refs left by a previous failed filter-branch."
+        ),
+    )
     return parser.parse_args(argv)
 
 
 def run(args: argparse.Namespace) -> int:
-    # Preflight: dirty tree, missing remotes.
-    if _working_tree_is_dirty():
-        _fail("working tree has unstaged changes; commit or stash first.")
-        result = _git("status", "--porcelain", check=False)
-        for line in result.stdout.splitlines()[:5]:
-            print(f"        {line}")
-        return 1
-
-    for remote in (MAIN_REMOTE, PUBLIC_REMOTE):
-        if not _remote_exists(remote):
-            _fail(f"remote '{remote}' is not configured. Run `git remote add {remote} <url>`.")
+    # Preflight: dirty tree, missing remotes. Skippable for CI via --no-preflight.
+    if not args.no_preflight:
+        if _working_tree_is_dirty():
+            _fail("working tree has unstaged changes; commit or stash first.")
+            result = _git("status", "--porcelain", check=False)
+            for line in result.stdout.splitlines()[:5]:
+                print(f"        {line}")
             return 1
 
+        for remote in (MAIN_REMOTE, PUBLIC_REMOTE):
+            if not _remote_exists(remote):
+                _fail(f"remote '{remote}' is not configured. Run `git remote add {remote} <url>`.")
+                return 1
+
     main_sha = _git("rev-parse", MAIN_REF).stdout.strip()
-    public_before_sha = _git("rev-parse", PUBLIC_REF).stdout.strip() if _remote_exists(PUBLIC_REMOTE) else ""
+    public_before_sha = _git("rev-parse", PUBLIC_REF, check=False).stdout.strip()
 
     if args.check:
         _step("[check] dry-run: regenerate locally, audit, no pushes")
