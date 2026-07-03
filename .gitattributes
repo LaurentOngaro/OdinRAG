@@ -1,4 +1,17 @@
+# gitattributes
+#
+# Note: as of 2026-07-03 (commit 0ad618f / filter-repo run), no file in this
+# repo is LFS-tracked. The .blend and .zip under Support Files/ have been
+# removed from history by filter-repo --invert-paths. The rules below are
+# kept for safety in case a contributor accidentally re-adds a large
+# binary file: gitattributes still marks them as binary (no line-ending
+# mangling, no diff), but the LFS filter is OFF so the blob is stored
+# directly in git.
+#
+# If you re-introduce LFS for a new path, add a line like:
+#   <glob> filter=lfs diff=lfs merge=lfs -text
+# and ensure the remote (OdinRAG-private) has LFS storage configured
+# (it does not, as of 2026-07-03).
+
 *.blend binary
 *.zip binary
-*.blend filter=lfs diff=lfs merge=lfs -text
-*.zip filter=lfs diff=lfs merge=lfs -text
