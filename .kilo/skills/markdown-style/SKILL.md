@@ -51,13 +51,13 @@ python _Helpers/scripts/fixes/reflow_md.py --quiet --check --path <file>
 
 ### 2. ASCII punctuation only
 
-| Wrong                         | Right              | Notes                    |
-| ----------------------------- | ------------------ | ------------------------ |
-| `-` (em-dash)                 | `-` (hyphen-minus) | U+2014 → U+002D          |
-| `–` (en-dash)                 | `-`                | U+2013 → U+002D          |
-| `'` `'` (curly quotes)        | `'`                | U+2019 / U+2018 → U+0027 |
-| `"` `"` (curly double quotes) | `"`                | U+201C / U+201D → U+0022 |
-| `…` (ellipsis)                | `...`              | U+2026 → three dots      |
+| Wrong                         | Right | Notes                    |
+| ----------------------------- | ----- | ------------------------ |
+| em-dash                       | `-`   | U+2014 → U+002D          |
+| en-dash                       | `-`   | U+2013 → U+002D          |
+| `'` `'` (curly quotes)        | `'`   | U+2019 / U+2018 → U+0027 |
+| `"` `"` (curly double quotes) | `"`   | U+201C / U+201D → U+0022 |
+| `…` (ellipsis)                | `...` | U+2026 → three dots      |
 
 ### 3. English only for PUBLIC docs (`AGENTS.md`)
 

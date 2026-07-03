@@ -29,7 +29,7 @@
       "python _Helpers/scripts/diagnostic/auditReadmeCoherence.py *": "allow",
       "python _Helpers/scripts/fixes/lint_pylance.py *": "allow",
       "python _Helpers/scripts/indexing/build_kb_index.py *": "allow",
-      "& '<PATH_TO_ODINFMT>\\odinfmt.exe' *": "allow",
+      "& '<PATH_TO_ODINFMT>/odinfmt.exe' *": "allow",
       "Get-ChildItem *": "allow",
       "Get-Content *": "allow",
       "Test-Path *": "allow",
