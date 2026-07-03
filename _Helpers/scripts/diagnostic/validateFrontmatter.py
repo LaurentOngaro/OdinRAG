@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """_Helpers/scripts/diagnostic/validateFrontmatter.py - YAML frontmatter validator for OdinRAG.
 
-Adapted from TerraBloom's `validateFrontmatter.py` (H:\\Sync\\PKM_PROJECTS\\TerraBloom\\_Helpers\\01_Diagnostic\\validateFrontmatter.py) for the OdinRAG 8-field schema documented in `_Helpers/docs/003_yaml_frontmatter_conventions.md`.
+Adapted from TerraBloom's `validateFrontmatter.py` (H:/Sync/PKM_PROJECTS/TerraBloom/_Helpers/01_Diagnostic/validateFrontmatter.py) for the OdinRAG 8-field schema documented in `_Helpers/docs/003_yaml_frontmatter_conventions.md`.
 
 What it does:
 
@@ -48,6 +48,7 @@ from vaultConfigOdinRAG import (  # noqa: E402
     IGNORE_DIRS,
     IGNORE_FILES,
     LONG_DASH_PATTERN,
+    LONG_DASH_REPLACEMENT,
     REQUIRED_FIELDS,
     cprint,
     extract_frontmatter,
@@ -57,6 +58,17 @@ from vaultConfigOdinRAG import (  # noqa: E402
     should_validate,
     validate_frontmatter,
 )
+
+# Sanity: this script must not contain literal long-dash characters either,
+# for the same reason documented in ``vaultConfigOdinRAG.LONG_DASH_PATTERN``.
+# A global search-and-replace of U+2014 / U+2013 / U+2015 across the repo
+# would otherwise turn the literal help text into broken replacement code.
+for _literal in ("\u2013", "\u2014", "\u2015"):
+    assert _literal not in __file__, (
+        "validateFrontmatter.py must not contain a literal long-dash byte; "
+        "use named Unicode escapes or LONG_DASH_REPLACEMENT instead."
+    )
+    del _literal
 
 
 def check_content(text: str, do_content_check: bool) -> tuple[list[str], list[str], str]:
@@ -73,9 +85,9 @@ def check_content(text: str, do_content_check: bool) -> tuple[list[str], list[st
 
     long_dash_matches = LONG_DASH_PATTERN.findall(text)
     if long_dash_matches:
-        new_text = LONG_DASH_PATTERN.sub("-", text)
+        new_text = LONG_DASH_PATTERN.sub(LONG_DASH_REPLACEMENT, text)
         info.append(
-            f"Auto-replaced {len(long_dash_matches)} long dash(es) with '-' "
+            f"Auto-replaced {len(long_dash_matches)} long dash(es) with ASCII '-' "
             f"(en-dash / em-dash / horizontal bar)"
         )
 
@@ -119,7 +131,7 @@ def check_file(path: Path, do_content_check: bool = True) -> tuple[list[str], li
         return [f"Cannot decode file as UTF-8: {exc}"], [], []
 
     (fm, _body_start) = extract_frontmatter(text)
-    errors = validate_frontmatter(fm)
+    errors: list[str] = validate_frontmatter(fm)
 
     warnings: list[str] = []
     info: list[str] = []

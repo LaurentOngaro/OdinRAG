@@ -162,7 +162,42 @@ DATE_PATTERN = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 VERSION_PATTERN = re.compile(r"^\d+\.\d+\.\d+$")
 DOCID_PATTERN = re.compile(r"^[A-Z][A-Z0-9_]*[A-Z0-9]$")
 TAG_HIERARCHY_PATTERN = re.compile(r"^[a-z][a-z0-9]*(/[a-z0-9]+)?$|^OdinRAG$|^Skool$|^PVG03_RPG$")
-LONG_DASH_PATTERN = re.compile(r"[\u2013\u2014\u2015]")
+
+
+# Long-dash detection (en-dash / em-dash / horizontal bar).
+#
+# Implementation notes:
+#
+# - We use **named Unicode escapes** (``\N{EM DASH}``) instead of bare
+#   hex escapes (``\u2014``) so the source stays visible as ASCII text.
+#   Editors that render ``\u2014`` as a glyph can fool a maintainer into
+#   thinking a literal em-dash is in the pattern; the named form reads as
+#   ``\N{EM DASH}`` in any viewer.
+# - The same reasoning forbids storing the LITERAL characters here: a
+#   global search-and-replace across the repo (e.g. cleaning up content
+#   after a PDF import) would silently destroy the pattern. Editing tools
+#   that work on the rendered bytes would not touch this constant because
+#   the source bytes are ASCII.
+# - ``LONG_DASH_REPLACEMENT`` is the canonical ASCII dash (U+002D) used by
+#   the auto-fix in ``validateFrontmatter``. It is intentionally a separate
+#   constant so a future change (e.g. ``"\N{EN DASH}"`` for round-trip
+#   safety) has one single place to edit.
+LONG_DASH_CHARS = (
+    "\N{EN DASH}"           # U+2013
+    + "\N{EM DASH}"         # U+2014
+    + "\N{HORIZONTAL BAR}"  # U+2015
+)
+LONG_DASH_PATTERN = re.compile("[" + LONG_DASH_CHARS + "]")
+LONG_DASH_REPLACEMENT = "\N{HYPHEN-MINUS}"  # U+002D ASCII '-'
+
+# Sanity: the source bytes of this module must never contain a literal
+# long-dash character. If a future edit breaks this invariant, fail at
+# import time rather than silently allowing the pattern to drift.
+assert all(ch not in __file__ for ch in ("\u2013", "\u2014", "\u2015")), (
+    "vaultConfigOdinRAG.py must not contain literal en-dash / em-dash / "
+    "horizontal-bar bytes; use named Unicode escapes instead."
+)
+
 CJK_PATTERN = re.compile(
     r"[\u3000-\u303f\u3040-\u309f\u30a0-\u30ff"
     r"\u3400-\u4dbf\u4e00-\u9fff\uac00-\ud7af"
@@ -435,6 +470,8 @@ __all__ = [
     "DOCID_PATTERN",
     "TAG_HIERARCHY_PATTERN",
     "LONG_DASH_PATTERN",
+    "LONG_DASH_CHARS",
+    "LONG_DASH_REPLACEMENT",
     "CJK_PATTERN",
     "FRONTMATTER_RE",
     "should_ignore",
