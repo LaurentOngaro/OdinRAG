@@ -38,10 +38,11 @@ The scraped content of paywalled or copyrighted sources is **never redistributed
 | `skool-cli`          | `npm install -g skool-cli`                                                         | Optional - Skool scraping         |
 | Playwright/Chromium  | `npx playwright install chromium`                                                  | Optional - Skool auth UI          |
 
+> For scraper flags, prereqs per source, and common diagnostics: load the [`scraper-runner`](.kilo/skills/scraper-runner/SKILL.md) skill.
+
 ### User config (personal paths and credentials)
 
-All machine-specific paths and credentials live in a single gitignored file:`_Private/.config/user_config.jsonc`.
-The loader is `_Helpers/scripts/lib/user_config.py`.
+All machine-specific paths and credentials live in a single gitignored file:`_Private/.config/user_config.jsonc`. The loader is `_Helpers/scripts/lib/user_config.py`.
 
 Setup:
 
@@ -92,19 +93,18 @@ Chain of resolution per value: **env var > user_config.jsonc > empty string**.
 
 - **Frontmatter** - see [`_Helpers/docs/003_yaml_frontmatter_conventions.md`](_Helpers/docs/003_yaml_frontmatter_conventions.md) for the full schema (5 main fields + hierarchical Obsidian tags).
 - Scraped Skool lessons have a scraping frontmatter (`Cours`, `Module`, `ID`, `Durée`) which can be extended with `topic/*` for classification.
-- **2-space** indentation inside `odin ...` blocks (no tabs, no smart tabs). Configured via `odinfmt.json` at repo root.
+- **2-space** indentation inside `odin ...` blocks (no tabs, no smart tabs). Configured via `odinfmt.json` at repo root. Re-format procedure + flags: load the [`odin-format`](.kilo/skills/odin-format/SKILL.md) skill after any Odin edit.
 - **LF** newlines everywhere (even on Windows).
 - Inter-file links: relative `./module/lesson.md` or absolute from repo root.
 - Unicode characters in content: OK (curly quotes, em-dashes, box-drawing).
 
 ### Planning (day-by-day)
 
-- **Daily** entries live in `_Private/planning/daily/J_YYYY-MM-DD.md`, created each working day.
-- **Template** in `_Helpers/templates/planning-daily/J_YYYY-MM-DD.md` is the reference - duplicate, never edit.
-- **Roadmap** in `_Private/planning/002_roadmap.md` covers phases P0-P4.
-- `TODO.md` is legacy - migrate progressively to the daily system.
-- No retroactive dating - only create dailies for days actually worked.
-- End-of-day **bilan** section is mandatory in each daily (never folded into "in progress").
+- **Dailies** live in `_Private/planning/daily/J_YYYY-MM-DD.md` (gitignored). Created from the template in `_Helpers/templates/planning-daily/` (duplicate, never edit the template).
+- **Roadmap** in `_Private/planning/002_roadmap.md` covers phases P0-P4. `TODO.md` is legacy - migrate progressively to the daily system.
+- **No retroactive dating** - only create dailies for days actually worked.
+- **End-of-day `bilan` section is mandatory** in each daily (never folded into "in progress"). It is a retrospective, not a logbook.
+- Full format spec + CLI for create/update/list: load the [`planning-helper`](.kilo/skills/planning-helper/SKILL.md) skill.
 
 ### Python (scrapers)
 
@@ -113,7 +113,7 @@ Chain of resolution per value: **env var > user_config.jsonc > empty string**.
 - Encoding: UTF-8 everywhere. `sys.stdout.reconfigure(encoding="utf-8")` at the top of every CLI script (with `# type: ignore[attr-defined]`).
 - Lint: Pylance-compatible (no flake8/black enforced).
 - No `print()` for debug - use `_log(level, msg)` and a structured logger.
-- **After any edit to a `.py` file, run `python _Helpers/scripts/fixes/lint_pylance.py <file>` and fix every reported warning before considering the task done.** The script wraps `pyright` (CLI engine behind Pylance) and exits non-zero on remaining warnings.
+- **After any edit to a `.py` file, run `python _Helpers/scripts/fixes/lint_pylance.py <file>` and fix every reported warning before considering the task done.** The script wraps `pyright` (CLI engine behind Pylance) and exits non-zero on remaining warnings. Common diagnostics + workflow: load the [`pylance-check`](.kilo/skills/pylance-check/SKILL.md) skill.
 - **Backticks in docstrings: use single** (`foo`), not double. The double form is RST markup; pyright rejects it.
 - Reserve double backticks for Markdown files. Bulk-fix legacy Python: `_Helpers/scripts/fixes/single_backtick_md.py --apply`.
 - **Path separators: prefer `/`** in Python string literals. `pathlib.Path` accepts both on Windows, but `/` is cross-platform.
@@ -147,19 +147,18 @@ These scripts must:
 
 These rules apply to every tracked `.md` file in this repo unless the file is explicitly excluded (see notes below).
 
-### Punctuation: no em-dash
+### Punctuation: ASCII only
 
-- **Never use the em-dash (Em dash) character (U+2014).** Use a plain ASCII hyphen-minus (`-`, U+002D) instead.
-- **Never use the en-dash (En dash) character (U+2013).** Use a plain ASCII hyphen-minus (`-`, U+002D) instead.
-- Reason: some terminals and markdown renderers mishandle the en-dash / em-dash glyph (Windows terminals can render them as a question mark box), which breaks copy-paste and visual consistency. ASCII hyphen-minus renders the same everywhere.
-- The same applies to other Unicode punctuation: prefer ASCII `'` over `'`, `"` over `"`/`"`, `-` over `-`/`-`, `...` over `...`. The lint config already enforces most of these via `MD026`.
+- **Never use em-dash (U+2014) or en-dash (U+2013).** Use plain ASCII hyphen-minus (`-`, U+002D). Reason: Windows terminals render them as a `?` box, breaking copy-paste and visual consistency.
+- Same rule for smart quotes / ellipsis: ASCII `'` `"` `-` `...` instead of curly variants. Mostly enforced automatically by `MD026` in `markdownlint`.
+- Full rationale + edge cases: load the [`markdown-style`](.kilo/skills/markdown-style/SKILL.md) skill before any `.md` edit.
 
 ### Markdown prose
 
-- One paragraph = one physical line. No line break inside a sentence, no matter the line length. Table cells, code blocks, and frontmatter are exempt.
-- **Before writing or editing any `.md` file**, load the skill `markdown-style` at [`.kilo/skills/markdown-style/SKILL.md`](.kilo/skills/markdown-style/SKILL.md). It bundles all the rules + pre/post checklists in one place.
-- **After writing or editing any `.md` file**, run `python _Helpers/scripts/fixes/reflow_md.py --quiet --check --path <file>` and verify exit code `0`. The `--apply` mode is NEVER invoked automatically - it is manual recovery only and requires explicit user GO.
-- Detailed rule, examples, and rationale in [`_Helpers/docs/004_markdown_style.md`](_Helpers/docs/004_markdown_style.md) (loaded on demand, not in first-context).
+- **One paragraph = one physical line.** No line break inside a sentence, no matter the line length. Tables, code blocks, and frontmatter are exempt.
+- **Before** writing or editing any `.md` file, load the [`markdown-style`](.kilo/skills/markdown-style/SKILL.md) skill (pre/post checklists in one place).
+- **After** writing or editing any `.md` file, run `python _Helpers/scripts/fixes/reflow_md.py --quiet --check --path <file>` → exit `0` = clean. `--apply` is MANUAL recovery only (explicit user GO).
+- Detailed rule + examples: [`_Helpers/docs/004_markdown_style.md`](_Helpers/docs/004_markdown_style.md) (loaded on demand, not in first-context).
 
 ### Markdown structure: READMEs must reflect their directory
 
@@ -169,13 +168,7 @@ Every `README*.md` in this repo must accurately reflect the structure of its hos
 - Files present in the host directory should be mentioned when a "Files produced" / "Structure" / "Files in this folder" section exists in the README.
 - Aspirational READMEs (describing future or planned content) must be marked with a "Structure cible" or "Awaiting content" header so the audit script can skip them.
 
-Verify with:
-
-```bash
-python _Helpers/scripts/diagnostic/auditReadmeCoherence.py
-```
-
-Non-zero exit code = issues found. Use `--scope <path>` to scope the audit (for example `--scope docs/official`), and `--quiet` to only show the summary line. Add `--fail-on-error` for CI-style use.
+Verify with `python _Helpers/scripts/diagnostic/auditReadmeCoherence.py` (non-zero exit = drift detected). Flags (`--scope`, `--quiet`, `--fail-on-error`) + fix patterns: load the [`readme-coherence`](.kilo/skills/readme-coherence/SKILL.md) skill.
 
 ### Language: English only (PUBLIC docs)
 
@@ -201,20 +194,22 @@ See [`.kilo/agents/odin-gamedev.md`](.kilo/agents/odin-gamedev.md) for the speci
 
 ## Kilo skills
 
-| Skill                               | Usage                                                                   |
-| ----------------------------------- | ----------------------------------------------------------------------- |
-| `.kilo/skills/odin-format/`         | Re-format a single Odin file or a `.md`                                 |
-| `.kilo/skills/scraper-runner/`      | Run a scraper with the right flags                                      |
-| `.kilo/skills/kb-navigator/`        | Search the KB by topic / frontmatter                                    |
-| `.kilo/skills/odin-pattern-finder/` | Find a precise Odin pattern (state machine, allocator, hot reload...)   |
-| `.kilo/skills/planning-helper/`     | Manage `_Private/planning/daily/J_YYYY-MM-DD.md` (create, update, list) |
-| `.kilo/skills/pylance-check/`       | Run pyright on Python files and fix diagnostics                         |
+| Skill                                     | Usage                                                                   |
+| ----------------------------------------- | ----------------------------------------------------------------------- |
+| `.kilo/skills/audit-public-safety/`       | Pre-push audit of the `public` branch (leak detection)                  |
+| `.kilo/skills/kb-navigator/`              | Search the KB by topic / frontmatter                                    |
+| `.kilo/skills/markdown-style/`            | Pre/post checklists for any `.md` edit                                  |
+| `.kilo/skills/odin-format/`               | Re-format a single Odin file or a `.md`                                 |
+| `.kilo/skills/odin-pattern-finder/`       | Find a precise Odin pattern (state machine, allocator, hot reload...)   |
+| `.kilo/skills/planning-helper/`           | Manage daily planning files (create, update, list)                      |
+| `.kilo/skills/pylance-check/`             | Run pyright on Python files and fix diagnostics                         |
+| `.kilo/skills/readme-coherence/`          | Audit that every `README*.md` matches its host directory                |
+| `.kilo/skills/scraper-runner/`            | Run a scraper with the right flags                                      |
 
 ## Anti-patterns
 
-- they are auto-generated by `scrape_skool.py`.
-- Editing them → overwritten on next scrape (unless `--force`).
 - **Do NOT manually edit** files under `odin-knowledge-base/courses/*/`
+- they are auto-generated by `scrape_skool.py`. Editing them → overwritten on next scrape (unless `--force`).
 - **Do NOT touch** `odin-knowledge-base/docs/official/` and `odin-knowledge-base/docs/karl_zylinski/` by hand for the same reason (README additions are OK).
 - **Do NOT rename** KB folders without updating the generated indexes.
 
@@ -234,7 +229,7 @@ Before any push to `github.com/LaurentOngaro/OdinRAG`:
 2. Verify `.gitignore` `COPYRIGHTED SCRAPED CONTENT` section is intact.
 3. Verify no `_Private/planning/daily/` or `_Private/raw/` files are staged.
 
-Full procedure in [`_Helpers/docs/005_public_release_checklist.md`](_Helpers/docs/005_public_release_checklist.md).
+The full pre-push procedure (refresh branch, audit, push, post-push verification, CI rollback): load the [`audit-public-safety`](.kilo/skills/audit-public-safety/SKILL.md) skill. Canonical reference: [`_Helpers/docs/005_public_release_checklist.md`](_Helpers/docs/005_public_release_checklist.md).
 
 ## Alternate indexes (Kilo + RAG)
 
