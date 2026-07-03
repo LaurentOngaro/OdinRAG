@@ -1,6 +1,6 @@
 ---
 name: planning-helper
-description: Manage day-by-day planning files (_Private/planning/daily/J_YYYY-MM-DD.md). Create today's daily from the template, update a section (objectives, tasks, bilan), list existing dailies.
+description: "Manage day-by-day planning files (_Private/planning/daily/J_YYYY-MM-DD.md). Create today's daily from the template, update a section (objectives, tasks, bilan), list existing dailies."
 ---
 
 # Planning helper - daily management

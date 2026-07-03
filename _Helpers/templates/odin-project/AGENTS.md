@@ -1,14 +1,3 @@
----
-title: "Odin project template - AGENTS context"
-date: 2026-07-01
-tags: [OdinRAG, template, odin-project, agent-context]
-type: template
-status: active
-version: 1.0.0
-lastUpdated: "2026-07-01"
-updatedBy: "MiniMax-M3 (Kilo Code)"
----
-
 # AGENTS
 
 ## Goal

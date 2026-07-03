@@ -1,6 +1,6 @@
 ---
 name: odin-pattern-finder
-description: Find a precise Odin pattern (state machine, allocator, hot reload, etc.) by cross-referencing the Skool KB + Karl's book + Zylinski articles. Returns at most 2-4 files, ordered by relevance, with code excerpts.
+description: "Find a precise Odin pattern (state machine, allocator, hot reload, etc.) by cross-referencing the Skool KB + Karl's book + Zylinski articles. Returns at most 2-4 files, ordered by relevance, with code excerpts."
 ---
 
 # odin-pattern-finder

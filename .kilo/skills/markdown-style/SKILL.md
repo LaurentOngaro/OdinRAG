@@ -1,6 +1,6 @@
 ---
 name: markdown-style
-description: Distills all markdown style rules (project + personal) into one place. Use BEFORE creating or editing any .md file. Post-write: run reflow_md.py --quiet --check and lint fixes before considering the task done. Enforced by AGENTS.md § Markdown prose.
+description: "Distills all markdown style rules (project + personal) into one place. Use BEFORE creating or editing any .md file. Post-write: run reflow_md.py --quiet --check and lint fixes before considering the task done. Enforced by AGENTS.md § Markdown prose."
 ---
 
 # Markdown style enforcer

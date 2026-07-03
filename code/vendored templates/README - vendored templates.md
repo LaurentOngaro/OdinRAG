@@ -1,14 +1,3 @@
----
-title: "README - vendored templates"
-date: "2026-07-01"
-tags: [OdinRAG, reference]
-type: reference
-status: active
-version: 1.0.0
-lastUpdated: "2026-07-01"
-updatedBy: "MiniMax-M3 (Kilo Code)"
----
-
 # README - vendored templates
 
 ## Contents

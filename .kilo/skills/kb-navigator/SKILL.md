@@ -1,6 +1,6 @@
 ---
 name: kb-navigator
-description: Search the OdinRAG KB (odin-knowledge-base + docs/ + code/) by topic, frontmatter, keyword, or module. Returns precise file paths with context (module, duration, source).
+description: "Search the OdinRAG KB (odin-knowledge-base + docs/ + code/) by topic, frontmatter, keyword, or module. Returns precise file paths with context (module, duration, source)."
 ---
 
 # Navigate the OdinRAG KB

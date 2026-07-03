@@ -1,14 +1,3 @@
----
-title: "Odin project template - README"
-date: 2026-07-01
-tags: [OdinRAG, template, odin-project, reference]
-type: template
-status: active
-version: 1.0.0
-lastUpdated: "2026-07-01"
-updatedBy: "MiniMax-M3 (Kilo Code)"
----
-
 # README
 
 > One sentence describing this project in 2-30 words. e.g. "Top-down 2D RPG with Raylib - entity system, arena allocator, hot-reload DLL."

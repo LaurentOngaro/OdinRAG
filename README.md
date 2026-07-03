@@ -75,7 +75,7 @@ M3 acts as the structural engineer; I act as the domain curator.
 
 Every file in this repo is the result of a prompt + a code review between us. There is no `git blame` you can read to tell which line was M3's first draft and which was my edit - that's the point.
 
-For the technical story of how M3 is used in this repo, see [`_Helpers/docs/002_how_minimax-m3_is_used_in_this_repository.md`](_Helpers/docs/002_how_minimax-m3_is_used_in_this_repository.md).
+For the technical story of how M3 is used in this repo, see [`_Helpers/docs/002_how_minimax_m3_is_used_in_this_repository.md`](_Helpers/docs/002_how_minimax_m3_is_used_in_this_repository.md).
 
 For the social posts around the MiniMax-M3 Showcase Round 2, see [`_Helpers/docs/social/`](_Helpers/docs/social).
 

@@ -1,6 +1,6 @@
 ---
 name: scraper-runner
-description: Run a scraper (_Helpers/scripts/scrappers/scrape_*.py) with the right flags. Covers scrape_skool (Skool programvideogames), scrape_official (odin-lang.org), scrape_zylinski (zylinski.se), scrape_gingerbill.py, scrape_newsletters.py, scrape_jakubtomsu.py, scrape_showcase.py, download_gists.py, download_odin_examples.py. All re-entrant.
+description: "Run a scraper (_Helpers/scripts/scrappers/scrape_*.py) with the right flags. Covers scrape_skool (Skool programvideogames), scrape_official (odin-lang.org), scrape_zylinski (zylinski.se), scrape_gingerbill.py, scrape_newsletters.py, scrape_jakubtomsu.py, scrape_showcase.py, download_gists.py, download_odin_examples.py. All re-entrant."
 ---
 
 # Run a scraper

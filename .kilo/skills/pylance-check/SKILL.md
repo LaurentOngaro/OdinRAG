@@ -1,6 +1,6 @@
 ---
 name: pylance-check
-description: Run pyright (Pylance engine) on Python files and fix every reported diagnostic. Use after any .py edit, before considering the task done. Enforced by AGENTS.md § Python (scrapers).
+description: "Run pyright (Pylance engine) on Python files and fix every reported diagnostic. Use after any .py edit, before considering the task done. Enforced by AGENTS.md § Python (scrapers)."
 ---
 
 # Pylance check

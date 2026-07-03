@@ -1,4 +1,4 @@
-# TODOs
+# TODO
 
 Track open bugs, improvements, and active tickets.
 

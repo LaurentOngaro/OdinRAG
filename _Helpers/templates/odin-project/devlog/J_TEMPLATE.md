@@ -1,14 +1,3 @@
----
-title: "Odin project template - devlog entry"
-date: 2026-07-01
-tags: [OdinRAG, template, odin-project, devlog]
-type: template
-status: active
-version: 1.0.0
-lastUpdated: "2026-07-01"
-updatedBy: "MiniMax-M3 (Kilo Code)"
----
-
 # J_TEMPLATE
 
 > How to use this file:
