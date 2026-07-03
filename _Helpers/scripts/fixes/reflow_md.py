@@ -55,12 +55,11 @@ SKIP_DIRS: tuple[str, ...] = (
     ".kilo/sessions",
     ".kilo/worktrees",
     "build",
-    "_logs",
-    "_raw",
-    "_archives",
-    "_refs",
-    "_tools",
-    "_private",
+    "logs",
+    "raw",
+    "archives",
+    "refs",
+    "tools",
 )
 # Pre-computed for case-insensitive matching. Necessary on Windows / macOS where
 # the filesystem preserves case but compares insensitively (and git's
