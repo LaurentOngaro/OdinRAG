@@ -1,11 +1,11 @@
 # README - code_auditor
 
-> User-facing doc for the Odin code auditor rules system. The CLI is now functional (Phase 2).
-> LLM-enhanced reviews (Phase 4) and `--fix-safe` (Phase 5) are still ahead. Phase 1 + Phase 2 are both delivered in this package.
+> User-facing doc for the Odin code auditor rules system. The CLI is now functional (Phase 2 + Phase 3).
+> LLM-enhanced reviews (Phase 4) and `--fix-safe` (Phase 5) are still ahead. Phase 1 + Phase 2 + Phase 3 are delivered in this package.
 
 ## What this is
 
-A static + heuristic audit of Odin code against project conventions and KB-cited best practices. It detects allocator misuse, wrong data structures, anti-patterns, and KB-citation drift. The rules are user-editable JSONC, validated against a JSON Schema.
+A static + heuristic audit of Odin code against project conventions and KB-cited best practices. It detects allocator misuse, wrong data structures, anti-patterns, and KB-citation drift. The rules are user-editable JSONC, validated against a JSON Schema. Phase 3 adds KB context blocks under every finding: short excerpts from the cited KB files so a human reading the report can see why the rule applies without opening the sources themselves.
 
 The auditor is split in three layers:
 
@@ -13,7 +13,7 @@ The auditor is split in three layers:
 - **L2 - Heuristic multi-line** - ~50 ms/file - allocations in loops, `defer` in `for`, struct field count, lesson references
 - **L3 - LLM via subagent** - 2-5 s/file - map vs slice tradeoff, SoA suggestion, allocator mismatch (Phase 4)
 
-L1+L2 run in headless mode (`code_auditor.py`) and are deterministic. L3 runs in conversational mode and is non-deterministic.
+L1+L2 run in headless mode (`code_auditor.py`) and are deterministic. L3 runs in conversational mode and is non-deterministic. Phase 3 attaches KB excerpts between L1+L2 and the report renderer.
 
 ## Location
 
@@ -27,11 +27,13 @@ _Helpers/scripts/diagnostic/code_auditor/
 ├── odin_rules.schema.json        <- JSON Schema draft-07 that validates odin_rules.jsonc
 ├── rule_loader.py                <- JSONC parsing + jsonschema validation
 ├── scanner.py                    <- regex L1 + heuristics L2
-├── reporter.py                   <- Markdown output per spec §6.2
+├── kb_index.py                   <- lazy in-memory index of odin-knowledge-base/INDEX.md (Phase 3)
+├── context_builder.py            <- per-finding KB context extractor (Phase 3)
+├── reporter.py                   <- Markdown output per spec §6.2 (renders KB context)
 └── README - code_auditor.md      <- this file
 ```
 
-The package is self-contained: no other module in the repo imports its siblings today. If Phase 3 introduces `kb_index.py` / `context_builder.py` that want to share `scanner.Finding` or `reporter.build_report`, those helpers can be promoted back to `_Helpers/scripts/lib/` without breaking the CLI.
+The package is self-contained: no other module in the repo imports its siblings today.
 
 ## CLI usage
 
@@ -62,6 +64,15 @@ python _Helpers/scripts/diagnostic/code_auditor/code_auditor.py --check
 
 # CI: non-zero exit when any warning or error is found
 python _Helpers/scripts/diagnostic/code_auditor/code_auditor.py --path src --strict
+
+# Phase 3: disable KB context enrichment (default is ON when INDEX.md is found)
+python _Helpers/scripts/diagnostic/code_auditor/code_auditor.py --path src --no-kb-context
+
+# Phase 3: tune the KB context excerpt length per cited source (default 5 lines)
+python _Helpers/scripts/diagnostic/code_auditor/code_auditor.py --path src --kb-context-lines 8
+
+# Phase 3: point to a custom INDEX.md (e.g. a pruned test fixture)
+python _Helpers/scripts/diagnostic/code_auditor/code_auditor.py --path src --kb-index T:/fixtures/INDEX.md
 ```
 
 Or invoke as a module (`python -m` adds the parent dir to `sys.path`):
@@ -90,6 +101,16 @@ Six heuristics are wired to the rules file via the `detect` field. They run afte
 - `lesson-ref-validation` - `// lesson NNN` comments that resolve to NO file in `odin-knowledge-base/`
 
 L1 regex rules (ALLOC-001, ODIN-001, ODIN-002) run straight against the rule's `pattern` field, line by line on the comment-stripped content. The `applies_when.build_mode` clause is honored (case-insensitive): rules declaring `{"build_mode": "release"}` are skipped in Debug mode.
+
+## KB context enrichment (Phase 3)
+
+After L1+L2 detection, every finding is enriched with a `KB context` block rendered between `Snippet` and `Why` in the report. The block is built by:
+
+1. `kb_index.KBIndex` parses `odin-knowledge-base/INDEX.md` (lazy, cached) and exposes `lesson_to_file()`, `topic_to_files()`, `category_to_files()`, and `files_for_finding()` lookups.
+2. `context_builder.ContextBuilder` reads the cited KB files and picks the most relevant paragraph per source, preferring lesson-anchored matches first, then rule-title keyword matches, then the first heading as a fallback.
+3. The reporter renders one blockquote per source, trimmed to `--kb-context-lines` (default 5) lines and capped at 160 chars per line.
+
+Disable enrichment with `--no-kb-context`. The CLI logs the number of files indexed and findings enriched to stderr (suppressed with `--quiet`). A missing or malformed `INDEX.md` degrades gracefully: findings are reported without context, no error is raised.
 
 ## Rule file anatomy
 

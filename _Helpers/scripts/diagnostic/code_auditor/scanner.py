@@ -55,6 +55,7 @@ class Finding:
     lesson_refs: list[str] = field(default_factory=list)
     fix_suggestion: str = ""
     why: str = ""
+    kb_context: str = ""
 
     @property
     def severity_rank(self) -> int:

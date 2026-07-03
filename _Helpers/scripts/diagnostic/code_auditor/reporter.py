@@ -80,6 +80,10 @@ def _finding_block(finding, target: ReportTarget) -> list[str]:
         if len(snippet) > 200:
             snippet = snippet[:197] + "..."
         lines.append(f"- **Snippet** : `{snippet}`")
+    if finding.kb_context:
+        lines.append("- **KB context** :")
+        for block_line in finding.kb_context.splitlines():
+            lines.append(f"  {block_line}")
     if finding.explanation:
         lines.append(f"- **Why** : {finding.explanation}")
     if finding.kb_sources:

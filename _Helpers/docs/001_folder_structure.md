@@ -78,7 +78,7 @@ _Helpers/
 ├── scripts/                 <- thematic sub-folders
 │   ├── README - scripts.md
 │   ├── diagnostic/          <- audit_public_safety.py, auditReadmeCoherence.py, publish_public.py, vaultConfigOdinRAG.py + vaultDiagnostic.py + validateFrontmatter.py (R2 TerraBloom port)
-│   │   └── code_auditor/    <- code_auditor.py + odin_rules.{jsonc,schema.json} + rule_loader.py + scanner.py + reporter.py + README - code_auditor.md (self-contained package)
+│   │   └── code_auditor/    <- code_auditor.py + odin_rules.{jsonc,schema.json} + rule_loader.py + scanner.py + kb_index.py + context_builder.py + reporter.py + README - code_auditor.md (self-contained package, Phase 1+2+3)
 │   ├── fixes/               <- format_odin_in_files, fix_mojibake, reflow_md, odin_format, book_html_to_md, lint_pylance
 │   ├── indexing/            <- build_kb_index.py
 │   ├── scrappers/           <- scrape_*.py + download_*.py

@@ -50,6 +50,8 @@ from rule_loader import (
 )
 from scanner import Finding, scan_file
 from reporter import ReportTarget, build_report
+from kb_index import KBIndex, build_default_index
+from context_builder import ContextBuilder
 
 
 DEFAULT_RULES = _PKG_DIR / "odin_rules.jsonc"
@@ -82,10 +84,10 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         epilog=textwrap.dedent(
             """\
             exit codes:
-              0 - no error (only info, or no findings)
-              1 - at least one warning, or rule-loading problem
-              2 - at least one error
-              3 - unrecoverable setup error
+                0 - no error (only info, or no findings)
+                1 - at least one warning, or rule-loading problem
+                2 - at least one error
+                3 - unrecoverable setup error
             """
         ),
     )
@@ -147,6 +149,28 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--no-color",
         action="store_true",
         help="Disable terminal colors (placeholder for future colored output).",
+    )
+    parser.add_argument(
+        "--no-kb-context",
+        action="store_true",
+        help="Disable Phase 3 KB context enrichment under each finding.",
+    )
+    parser.add_argument(
+        "--kb-context-lines",
+        type=int,
+        default=5,
+        help=(
+            "Max lines of KB context to quote per cited source "
+            "(default: 5). Requires KB context enabled (Phase 3)."
+        ),
+    )
+    parser.add_argument(
+        "--kb-index",
+        default=None,
+        help=(
+            "Path to odin-knowledge-base/INDEX.md. "
+            f"Default: {DEFAULT_KB_ROOT / 'INDEX.md'}"
+        ),
     )
     parser.add_argument(
         "--check",
@@ -265,6 +289,71 @@ def _exit_code(findings: list[Finding], strict: bool) -> int:
     return 0
 
 
+def _build_kb_index(args: argparse.Namespace, kb_root: Path | None) -> KBIndex | None:
+    """Construct the Phase 3 `KBIndex`, or `None` if no INDEX is reachable.
+
+    Resolution order:
+
+    1. `--kb-index` CLI override.
+    2. `<kb_root>/INDEX.md` when the existing KB root has one.
+    3. The default `<repo>/odin-knowledge-base/INDEX.md` for the local repo.
+
+    A missing file is not fatal: the auditor falls back to L1+L2 without context, and a one-line warning is printed to stderr.
+    """
+    candidates: list[Path] = []
+    if args.kb_index:
+        candidates.append(Path(args.kb_index))
+    if kb_root is not None:
+        candidates.append(kb_root / "INDEX.md")
+    candidates.append(DEFAULT_KB_ROOT / "INDEX.md")
+
+    for cand in candidates:
+        try:
+            if cand.is_file():
+                index = KBIndex(index_path=cand, kb_root=kb_root)
+                index.ensure_loaded()
+                if index.all_files():
+                    if not args.quiet:
+                        print(
+                            f"[kb] Phase 3 context enabled "
+                            f"({len(index.all_files())} file(s) indexed from {cand})",
+                            file=sys.stderr,
+                        )
+                    return index
+        except OSError:
+            continue
+    if not args.quiet:
+        print("[kb] Phase 3 context disabled: no INDEX.md found.", file=sys.stderr)
+    return None
+
+
+def _enrich_findings_with_kb_context(
+    findings: list[Finding],
+    kb_index: KBIndex | None,
+    args: argparse.Namespace,
+) -> None:
+    """Attach a `kb_context` Markdown block to each finding (Phase 3).
+
+    Mutates `findings` in place. Silently does nothing when `kb_index` is `None` (KB context disabled or no INDEX available).
+    """
+    if kb_index is None or not findings:
+        return
+    max_lines = max(1, int(getattr(args, "kb_context_lines", 5) or 5))
+    builder = ContextBuilder(kb_index, max_lines=max_lines)
+    enriched = 0
+    for finding in findings:
+        context = builder.extract(finding)
+        if context:
+            finding.kb_context = context
+            enriched += 1
+    if not args.quiet:
+        print(
+            f"[kb] KB context attached to {enriched}/{len(findings)} finding(s) "
+            f"(max {max_lines} lines/source)",
+            file=sys.stderr,
+        )
+
+
 def _cmd_check(rules: list[dict], rule_path: Path) -> int:
     """Print active rules and exit. Used by --check."""
     print(f"[check] {len(rules)} active rule(s) in {rule_path}")
@@ -276,7 +365,7 @@ def _cmd_check(rules: list[dict], rule_path: Path) -> int:
             flags.append(f"heuristic:{rule['detect']}")
         suffix = f" [{', '.join(flags)}]" if flags else ""
         print(f"  - {rule['id']:<12} {rule.get('severity', ''):<8} "
-              f"{rule.get('category', ''):<14} {rule.get('title', '')}{suffix}")
+                f"{rule.get('category', ''):<14} {rule.get('title', '')}{suffix}")
     return 0
 
 
@@ -374,6 +463,10 @@ def main(argv: list[str] | None = None) -> int:
     else:
         kb_root = None
 
+    kb_index: KBIndex | None = None
+    if not args.no_kb_context:
+        kb_index = _build_kb_index(args, kb_root)
+
     files = _walk_for_odin(targets, quiet=args.quiet)
     if not files:
         print(f"[warn] No .odin files found under {targets}", file=sys.stderr)
@@ -384,6 +477,8 @@ def main(argv: list[str] | None = None) -> int:
         if not args.quiet:
             print(f"[scan] {path}", file=sys.stderr)
         findings.extend(scan_file(path, rules, kb_root=kb_root, build_mode=args.build_mode))
+
+    _enrich_findings_with_kb_context(findings, kb_index, args)
 
     summaries = _summaries_by_file(findings, files)
     report_target = ReportTarget(
