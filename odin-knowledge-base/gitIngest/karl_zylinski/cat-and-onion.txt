@@ -1,0 +1,1173 @@
+Directory structure:
+└── cat-and-onion/
+    ├── LICENSE
+    ├── README.txt
+    ├── build.bat
+    ├── build_game.bat
+    ├── build_main.bat
+    ├── build_no_hot_reload.bat
+    ├── build_release.bat
+    ├── build_release.sh
+    ├── build_release_debug.bat
+    ├── build_release_debug.sh
+    ├── build_release_debug_memory.sh
+    ├── build_release_demo.bat
+    ├── build_release_demo_no_steam.bat
+    ├── build_release_dev.bat
+    ├── build_release_dev.sh
+    ├── build_release_no_steam.bat
+    ├── build_release_no_steam.sh
+    ├── count_lines.bat
+    ├── debug.bat
+    ├── make_source_drop.bat
+    ├── pixel_filter.fs
+    ├── run-game
+    ├── run.bat
+    ├── steam_appid.txt
+    ├── assets_builder/
+    ├── builds/
+    ├── game/
+    ├── levels/
+    ├── main/
+    │   ├── main.odin
+    │   └── tracking_allocator.odin
+    ├── main_release/
+    │   ├── log_darwin.odin
+    │   ├── log_linux.odin
+    │   ├── log_windows.odin
+    │   ├── main_release.odin
+    │   └── tracking_allocator.odin
+    ├── music/
+    ├── notes/
+    ├── object_art/
+    ├── odin/
+    ├── sounds/
+    ├── source_data/
+    ├── texture_builder/
+    ├── textures/
+    └── unused/
+
+================================================
+File: LICENSE
+================================================
+Copyright (c) 2023-2024 Karl Zylinski. All rights reserved.
+
+The files in this directory and its sub-directories are provided for educational purposes. You may not redistribute or sell them without the explicit permission from Karl Zylinski. The odin and steamworks subdirectories contain their own license files.
+
+
+================================================
+File: README.txt
+================================================
+Hi! Thanks for supporting me!
+
+This is the source code and all the source assets of CAT & ONION.
+
+Please read the LICENSE file! You may not redistribute or sell any of these files. They are provided for educational purposes. This project is not open source.
+
+NOTE: As this is a one-person-game, the code is quite messy, and files such as game/game.odin are very big. Nevertheless, I would say there are some good things in the source code such as the gameplay code hot reloading and the homemade editor tools. The entity system and all the physics stuff isn't very well made, so I wouldn't look at that for any kind of inspiration.
+
+/Karl Zylinski 2024-02-02
+
+HOW TO BUILD THE GAME
+---------------------
+
+This game is programmed using Odin Programming Language. To ensure that you have the same compiler version as me, I've simply included the whole compiler in the odin subdirectory. Another reason is that I've made a few small modifications to Odin's standard library. Before building the game you need to build the Odin compiler. You can follow the instructions on this website: https://odin-lang.org/docs/install/ with the modification that you pretend that you already downloaded the source and put it in the odin subdirectory.
+
+NOTE: If you already have an Odin compiler installed, then you can probably use that one. The copy I provide have some small changes to the json outputting and it also contains updated raylib DLLs and libraries, in order to fix some high DPI issues that I found in raylib. You'll need to modify the build scripts I mention below in order to use your own compiler.
+
+When you've managed to build the Odin compiler, then you can build the game:
+
+- Windows Dev exe: Run build.bat. Will output the development exe as cat-game.exe. Only works on Windows. This exe contains the in-game editor and all that stuff.
+- Windows Release exe: Run build_release_no_steam.bat. It will be outputted somewhere in the release_builds subdirectory. This is a one-file-exe with all assets embedded inside it.
+- Linux/Mac Release exe: Run build_release_no_steam.sh. It will be outputted somewhere in the release_builds subdirectory. This is a one-file-exe with all assets embedded inside it.
+
+MAKING YOUR FIRST MODIFICATION TO THE SOURCE
+--------------------------------------------
+
+1. Open game/game.odin
+2. Search for "Cat & Onion"
+3. Modify the string to whatever you like
+4. Run build.bat
+5. Run cat-game.exe, not how the title of the window is different
+6. Happy game programming!
+
+USING THE LEVEL EDITOR
+----------------------
+
+1. Run build.bat
+2. Start cat-game.exe
+3. Press F2 while playing game (not main menu)
+4. The editor shows. You can place tiles and entities and edit dialogues. Press Ctrl + S or Save button to serialize state to disk.
+5. Press F2 to leave editor
+
+The level editor lives in game/editor.odin, it uses a homemade scrappy IMGUI built on top of Raylib. There is also quite a fancy dialogue editor, which is implemented in game/dialogue.odin
+
+USING HOT RELOAD
+----------------
+
+Make modifications to the game source code and run build.bat, the game will automatically reload the game.dll and continue playing. This only works if you run the cat-game.exe development executable provided by build.bat.
+
+LIMITATIONS: If you change struct layouts then the game might restart (it checks if the memory size of GameMemory is different) or it might just crash or misbehave.
+
+If you add textures to textures or object_art folder then you also need to recompile so that game/assets.odin is regenerated. Currently there is a bug that you might have to reset the game as well (F6).
+
+For debugging I recommend using RAD Debugger as it can be attached while doing hot reload.
+
+Look in main/main.odin to see the wrapper application that handles the hot reloading. I've written a blog post on how all of this works here: http://zylinski.se/posts/hot-reload-gameplay-code/
+
+DEBUG HOT KEYS (MOST OF THESE ONLY WORK IN GAME, NOT IN THE MAIN MENU)
+----------------------------------------------------------------------
+
+* F2 - start level editor
+* F4 - reload all textures
+* F5 - hot reload
+* F6 - full reset (like restarting game)
+* L - debug camera (control with WASD)
+* T - teleport player
+
+DIALOGUE EDITOR HOTKEYS
+-----------------------
+
+* WASD/Middle Mouse - move camera
+* SPACE - add normal node
+* ENTER - add start node
+* BACKSPACE - add progress check node
+* P - add set progress node
+* I - add give player item node
+* E - add trigger event node
+* T - add take item from player node
+* C - add check if player has item node
+
+
+
+================================================
+File: build.bat
+================================================
+@echo off
+
+odin\odin.exe build assets_builder
+IF %ERRORLEVEL% NEQ 0 pause && exit
+
+assets_builder.exe
+
+QPROCESS "cat-game.exe">NUL
+IF %ERRORLEVEL% EQU 0 build_game && exit
+
+build_game && build_main
+
+
+
+================================================
+File: build_game.bat
+================================================
+@echo off
+
+odin\odin.exe build game -show-timings -use-separate-modules -define:CatDemo=false -define:CatProfile=true -define:CatDev=true -define:RAYLIB_SHARED=true -build-mode:dll -out:game.dll -strict-style -vet-unused -vet-using-stmt -vet-using-param -vet-style -vet-semicolon -debug
+
+
+================================================
+File: build_main.bat
+================================================
+@echo off
+odin\odin.exe build main -use-separate-modules -define:RAYLIB_SHARED=true -out:cat-game.exe -strict-style -debug
+copy odin\vendor\raylib\windows\raylib.dll .
+
+
+================================================
+File: build_no_hot_reload.bat
+================================================
+@echo off
+odin\odin.exe build main_release -define=RAYLIB_SHARED=true -define:EmbedAssets=false -collection:cat=. -out:cat-game-no-hot-reload.exe -use-separate-modules -debug
+
+
+
+================================================
+File: build_release.bat
+================================================
+@echo off
+mkdir release_builds
+set out_folder=release_builds\cat_and_onion_%date:/=%
+mkdir %out_folder%
+
+odin\odin.exe build main_release -define:EnableSteamWorks=true -define:CatDev=false -define:RAYLIB_SHARED=false -define:EmbedAssets=true -collection:cat=. -out:%out_folder%\cat_and_onion.exe -no-bounds-check -subsystem:windows
+
+echo Single exe release built to %out_folder%
+copy steamworks\redistributable_bin\win64\steam_api64.dll %out_folder%
+copy steam_appid.txt %out_folder%
+pause
+
+
+================================================
+File: build_release.sh
+================================================
+#!/bin/bash
+datestr="$(date '+%Y-%m-%d')"
+mkdir release_builds
+outfolder="release_builds/cat-and-onion-$datestr"
+mkdir $outfolder
+odin/odin build main_release -define:EnableSteamWorks=true -define:UseTrackingAllocator=false -define:EmbedAssets=true -out:$outfolder/cat-and-onion -no-bounds-check
+echo "Build release build in $outfolder"
+
+
+
+================================================
+File: build_release_debug.bat
+================================================
+@echo off
+mkdir debug_release_builds
+set out_folder=debug_release_builds\cat_and_onion_%date:/=%
+mkdir %out_folder%
+
+odin\odin.exe build main_release -define:EnableSteamWorks=false -define:UseTrackingAllocator=true -define:EmbedAssets=true -collection:cat=. -out:%out_folder%\cat_and_onion.exe -subsystem:console -debug
+
+echo Single exe release built to %out_folder%
+rem copy steamworks\redistributable_bin\win64\steam_api64.dll %out_folder%
+rem copy steam_appid.txt %out_folder%
+pause
+
+
+================================================
+File: build_release_debug.sh
+================================================
+#!/bin/bash
+datestr="$(date '+%Y-%m-%d')"
+outfolder="release_debug_builds/cat-and-onion-$datestr"
+mkdir $outfolder
+odin/odin build main_release -define:EmbedAssets=true -out:$outfolder/cat-and-onion -debug
+echo "Build release build in $outfolder"
+
+
+
+================================================
+File: build_release_debug_memory.sh
+================================================
+#!/bin/bash
+datestr="$(date '+%Y-%m-%d')"
+mkdir release_debug_builds
+out_file="release_debug_builds/cat-and-onion-$datestr"
+odin/odin build main_release -define:UseTrackingAllocator=true -sanitize:address -define:EmbedAssets=true -out:$out_file -no-bounds-check -debug
+
+
+
+================================================
+File: build_release_demo.bat
+================================================
+@echo off
+mkdir release_builds
+set out_folder=release_builds\cat_and_onion_demo_%date:/=%
+mkdir %out_folder%
+
+odin\odin.exe build main_release -define:EnableSteamWorks=true -define:CatDemo=true -define:CatDev=false -define:RAYLIB_SHARED=false -define:EmbedAssets=true -collection:cat=. -out:%out_folder%\cat_and_onion.exe -no-bounds-check -subsystem:windows
+
+echo Single exe release built to %out_folder%
+copy steamworks\redistributable_bin\win64\steam_api64.dll %out_folder%
+copy steam_appid.txt %out_folder%
+pause
+
+
+================================================
+File: build_release_demo_no_steam.bat
+================================================
+@echo off
+mkdir release_builds
+set out_folder=release_builds\cat_and_onion_demo_no_steam_%date:/=%
+mkdir %out_folder%
+
+odin\odin.exe build main_release -define:EnableSteamWorks=false -define:CatDemo=true -define:CatDev=false -define:RAYLIB_SHARED=false -define:EmbedAssets=true -collection:cat=. -out:%out_folder%\cat_and_onion.exe -no-bounds-check -subsystem:windows
+
+echo Single exe release built to %out_folder%
+pause
+
+
+================================================
+File: build_release_dev.bat
+================================================
+@echo off
+odin\odin.exe build main_release -define:CatDev=true -define:EmbedAssets=true -collection:cat=. -out:cat_and_onion_release_dev.exe -no-bounds-check -subsystem:windows
+
+
+
+================================================
+File: build_release_dev.sh
+================================================
+#!/bin/bash
+datestr="$(date '+%Y-%m-%d')"
+mkdir release_builds
+outfolder="release_builds/cat-and-onion-$datestr"
+mkdir $outfolder
+odin/odin build main_release -define:CatDev=true -define:EnableSteamWorks=true -debug -define:UseTrackingAllocator=false -define:EmbedAssets=true -out:$outfolder/cat-and-onion -no-bounds-check
+echo "Build release build in $outfolder"
+
+
+
+================================================
+File: build_release_no_steam.bat
+================================================
+@echo off
+mkdir release_builds
+set out_folder=release_builds\cat_and_onion_no_steam_%date:/=%
+mkdir %out_folder%
+
+odin\odin.exe build main_release -define:EnableSteamWorks=false -define:CatDev=false -define:RAYLIB_SHARED=false -define:EmbedAssets=true -collection:cat=. -out:%out_folder%\cat_and_onion.exe -no-bounds-check -subsystem:windows
+
+echo Single exe release built to %out_folder%
+pause
+
+
+================================================
+File: build_release_no_steam.sh
+================================================
+#!/bin/bash
+datestr="$(date '+%Y-%m-%d')"
+mkdir release_builds
+outfolder="release_builds/cat-and-onion-no-steam-$datestr"
+mkdir $outfolder
+odin/odin build main_release -define:EnableSteamWorks=false -define:UseTrackingAllocator=false -define:EmbedAssets=true -out:$outfolder/cat-and-onion
+echo "Build release build in $outfolder"
+
+
+
+================================================
+File: count_lines.bat
+================================================
+cloc *.odin main main_release
+pause
+
+
+================================================
+File: debug.bat
+================================================
+@echo off
+
+QPROCESS "cat-game.exe">NUL
+IF %ERRORLEVEL% EQU 0 exit
+
+c:\programs\raddbg\raddbg.exe -auto_run c:\repos\cat-game\cat-game.exe
+rem c:\repos\cat-game\cat-game.exe
+
+if %ERRORLEVEL% NEQ 0 pause
+
+exit
+
+
+================================================
+File: make_source_drop.bat
+================================================
+@echo off
+set out_folder=source_drops\cat_and_onion_source_%date:/=%
+mkdir %out_folder%
+copy *.odin %out_folder%
+mkdir %out_folder%\assets_builder
+copy assets_builder\assets_builder.odin %out_folder%\assets_builder
+xcopy main /i %out_folder%\main
+xcopy game /i %out_folder%\game
+xcopy main_release /i %out_folder%\main_release
+xcopy music /i %out_folder%\music
+xcopy object_art /i %out_folder%\object_art
+xcopy sounds /i %out_folder%\sounds
+xcopy levels /i %out_folder%\levels
+xcopy source_data /i %out_folder%\source_data
+xcopy textures /i %out_folder%\textures
+xcopy game\steamworks /i %out_folder%\game\steamworks
+copy *.cat_level %out_folder%
+copy *.cat_dialogues %out_folder%
+copy *.cat_entity_types %out_folder%
+copy LICENSE %out_folder%
+copy *.fs %out_folder%
+copy build_release* %out_folder%
+copy README.txt %out_folder%
+copy *.ttf %out_folder%
+copy build* %out_folder%
+xcopy /E /H /C /I odin %out_folder%\odin 
+del %out_folder%\odin\odin.exe
+del %out_folder%\odin\odin.pdb
+del %out_folder%\odin\demo.exe
+
+
+================================================
+File: pixel_filter.fs
+================================================
+#version 330
+
+in vec2 fragTexCoord;
+in vec4 fragColor;
+uniform sampler2D texture0;
+out vec4 finalColor;
+
+vec2 uv_aa_smoothstep(vec2 uv, vec2 res, float width) {
+    vec2 pixels = uv * res;
+    
+    vec2 pixels_floor = floor(pixels + 0.5);
+    vec2 pixels_fract = fract(pixels + 0.5);
+    vec2 pixels_aa = fwidth(pixels) * width * 0.5;
+    pixels_fract = smoothstep( vec2(0.5) - pixels_aa, vec2(0.5) + pixels_aa, pixels_fract );
+    
+    return (pixels_floor + pixels_fract - 0.5) / res;
+}
+
+void main()
+{
+    finalColor = fragColor * texture(texture0, uv_aa_smoothstep(fragTexCoord, ivec2(textureSize(texture0, 0)), 1.5));
+}
+
+
+================================================
+File: run-game
+================================================
+#!/bin/sh
+./cat-and-onion
+
+
+================================================
+File: run.bat
+================================================
+@echo off
+
+QPROCESS "cat-game.exe">NUL
+IF %ERRORLEVEL% EQU 0 exit
+
+rem c:\programs\raddbg\raddbg.exe -auto_run c:\repos\cat-game\cat-game.exe
+c:\repos\cat-game\cat-game.exe
+
+if %ERRORLEVEL% NEQ 0 pause
+
+exit
+
+
+================================================
+File: steam_appid.txt
+================================================
+2781210
+
+
+
+
+
+
+================================================
+File: main/main.odin
+================================================
+/*
+Hot reload EXE. See this template for an updated example of how to do these things:
+https://github.com/karl-zylinski/odin-raylib-hot-reload-game-template
+
+and also this blog post:
+https://zylinski.se/posts/hot-reload-gameplay-code/
+*/
+
+package main
+
+import "core:dynlib"
+import "core:fmt"
+import "core:c/libc"
+import "core:os"
+import "core:time"
+import "core:strings"
+import "core:log"
+
+import rl "vendor:raylib"
+
+GameAPI :: struct {
+	lib: dynlib.Library,
+	init_window: proc(),
+	init: proc(level_name_int: int),
+	update: proc() -> bool,
+	shutdown: proc(),
+	shutdown_window: proc(),
+	memory: proc() -> rawptr,
+	memory_size: proc() -> int,
+	level_name: proc() -> int,
+	hot_reloaded: proc(mem: rawptr),
+	modification_time: os.File_Time,
+	api_version: int,
+}
+
+load_game_api :: proc(api_version: int) -> (api: GameAPI, ok: bool) {
+	mod_time, mod_time_error := os.last_write_time_by_name("game.dll")
+
+	if mod_time_error != os.ERROR_NONE {
+		return
+	}
+
+	game_dll_name := fmt.tprintf("game_{0}.dll", api_version)
+
+	if libc.system(fmt.ctprintf("copy game.dll {0}", game_dll_name)) != 0 {
+		fmt.println("Failed to copy game.dll to {0}", game_dll_name)
+		return
+	}
+
+	gamelib, gamelib_ok := dynlib.load_library(game_dll_name)
+
+	if !gamelib_ok {
+		fmt.println("Failed to load game library")
+		return
+	}
+
+	init_window_func := cast(proc())(dynlib.symbol_address(gamelib, "game_init_window") or_else nil)
+
+	if init_window_func == nil {
+		fmt.println("Failed to load init_window func")
+		return
+	}
+
+	init_func := cast(proc(int))(dynlib.symbol_address(gamelib, "game_init") or_else nil)
+
+	if init_func == nil {
+		fmt.println("Failed to load init func")
+		return
+	}
+
+	update_func := cast(proc() -> bool)(dynlib.symbol_address(gamelib, "game_update") or_else nil)
+
+	if update_func == nil {
+		fmt.println("Failed to load update func")
+		return
+	}
+
+	shutdown_func := cast(proc())(dynlib.symbol_address(gamelib, "game_shutdown") or_else nil)
+
+	if shutdown_func == nil {
+		fmt.println("Failed to load shutdown func")
+		return
+	}
+
+	shutdown_window_func := cast(proc())(dynlib.symbol_address(gamelib, "game_shutdown_window") or_else nil)
+
+	if shutdown_window_func == nil {
+		fmt.println("Failed to load shutdown_window func")
+		return
+	}
+
+	memory_func := cast(proc() -> rawptr)(dynlib.symbol_address(gamelib, "game_memory") or_else nil)
+
+	if memory_func == nil {
+		fmt.println("Failed to load memory func")
+		return
+	}
+
+	memory_size_func := cast(proc() -> int)(dynlib.symbol_address(gamelib, "game_memory_size") or_else nil)
+
+	if memory_size_func == nil {
+		fmt.println("Failed to load memory_size func")
+		return
+	}
+
+	level_name_func := cast(proc() -> int)(dynlib.symbol_address(gamelib, "game_level_name") or_else nil)
+
+	if level_name_func == nil {
+		fmt.println("Failed to load level_name func")
+		return
+	}
+
+	hot_reloaded_func := cast(proc(rawptr))(dynlib.symbol_address(gamelib, "game_hot_reloaded") or_else nil)
+
+	if hot_reloaded_func == nil {
+		fmt.println("Failed to load hot_reloaded func")
+		return
+	}
+
+
+	api = {
+		lib = gamelib,
+		init = init_func,
+		init_window = init_window_func,
+		update = update_func,
+		shutdown = shutdown_func,
+		shutdown_window = shutdown_window_func,
+		modification_time = mod_time,
+		api_version = api_version,
+		memory = memory_func,
+		memory_size = memory_size_func,
+		level_name = level_name_func,
+		hot_reloaded = hot_reloaded_func,
+	}
+
+	ok = true
+
+	return
+}
+
+unload_game_api :: proc(api: ^GameAPI) {
+	if api.lib != nil {
+		dynlib.unload_library(api.lib)
+	}
+
+	if libc.system(fmt.ctprintf("del game_{0}.dll", api.api_version)) != 0 {
+		fmt.println("Failed to remove game_{0}.dll copy", api.api_version)
+	}
+}
+
+main :: proc() {
+	context.logger = log.create_console_logger()
+	
+	default_allocator := context.allocator
+	tracking_allocator: Tracking_Allocator
+	tracking_allocator_init(&tracking_allocator, default_allocator)
+	context.allocator = allocator_from_tracking_allocator(&tracking_allocator)
+
+	reset_tracking_allocator :: proc(a: ^Tracking_Allocator) -> bool {
+		err := false
+
+		for key, value in a.allocation_map {
+			fmt.printf("%v: Leaked %v bytes\n", value.location, value.size)
+			err = true
+		}
+
+		tracking_allocator_clear(a)
+		return err
+	}
+
+	game_api_version := 0
+	game_api, game_api_ok := load_game_api(game_api_version)
+
+	if !game_api_ok {
+		fmt.println("Failed to load Game API")
+		return
+	}
+
+	game_api_version += 1
+
+	game_api.init_window()
+	game_api.init(-1)
+
+	old_game_apis := make([dynamic]GameAPI, default_allocator)
+
+	ft_avg: [60]f32
+	ft_avg_i: int
+	last_spike: f32
+
+	window_open := true
+	for window_open {
+		window_open = game_api.update()
+		force_reload := rl.IsKeyPressed(.F5)
+		force_restart := rl.IsKeyPressed(.F6)
+		reload := force_reload || force_restart
+		game_dll_mod, game_dll_mod_err := os.last_write_time_by_name("game.dll")
+
+		if game_dll_mod_err == os.ERROR_NONE && game_api.modification_time != game_dll_mod {
+			reload = true
+		}
+
+		if reload {
+			new_game_api, new_game_api_ok := load_game_api(game_api_version)
+			
+			if new_game_api_ok {
+				if game_api.memory_size() != new_game_api.memory_size() || force_restart {
+					level_name := game_api.level_name()
+					game_api.shutdown()
+					reset_tracking_allocator(&tracking_allocator)
+
+					for &g in old_game_apis {
+						unload_game_api(&g)
+					}
+
+					clear(&old_game_apis)
+					unload_game_api(&game_api)
+					game_api = new_game_api
+					game_api.init(level_name)
+				} else {
+					append(&old_game_apis, game_api)
+					game_memory := game_api.memory()
+					game_api = new_game_api
+					game_api.hot_reloaded(game_memory)
+				}
+
+				game_api_version += 1
+			}
+		}
+
+		free_all(context.temp_allocator)
+	}
+
+	free_all(context.temp_allocator)
+	game_api.shutdown()
+	
+	if reset_tracking_allocator(&tracking_allocator) {
+		for rl.IsKeyPressed(.SPACE) == false {
+		}
+	}
+
+	for &g in old_game_apis {
+		unload_game_api(&g)
+	}
+
+	delete(old_game_apis)
+
+	game_api.shutdown_window()
+	unload_game_api(&game_api)
+	tracking_allocator_destroy(&tracking_allocator)
+}
+
+// not needed? Runs fine on integrated GPU.
+/*
+@(export)
+NvOptimusEnablement: u32 = 1
+
+@(export)
+AmdPowerXpressRequestHighPerformance: i32 = 1
+*/
+
+
+================================================
+File: main/tracking_allocator.odin
+================================================
+/*
+A copy of Odin's tracking allocator that panics on bad frees instead of adding it to a list
+*/
+
+package main
+
+import "core:runtime"
+import "core:mem"
+import "core:sync"
+import "core:fmt"
+
+Tracking_Allocator_Entry :: struct {
+	memory:    rawptr,
+	size:      int,
+	alignment: int,
+	mode:      mem.Allocator_Mode,
+	err:       mem.Allocator_Error,
+	location:  runtime.Source_Code_Location,
+}
+
+Tracking_Allocator :: struct {
+	backing:           mem.Allocator,
+	allocation_map:    map[rawptr]Tracking_Allocator_Entry,
+	mutex:             sync.Mutex,
+	clear_on_free_all: bool,
+}
+
+tracking_allocator_init :: proc(t: ^Tracking_Allocator, backing_allocator: mem.Allocator, internals_allocator := context.allocator) {
+	t.backing = backing_allocator
+	t.allocation_map.allocator = internals_allocator
+
+	if .Free_All in mem.query_features(t.backing) {
+		t.clear_on_free_all = true
+	}
+}
+
+tracking_allocator_destroy :: proc(t: ^Tracking_Allocator) {
+	delete(t.allocation_map)
+}
+
+
+tracking_allocator_clear :: proc(t: ^Tracking_Allocator) {
+	sync.mutex_lock(&t.mutex)
+	clear(&t.allocation_map)
+	sync.mutex_unlock(&t.mutex)
+}
+
+
+@(require_results)
+allocator_from_tracking_allocator :: proc(data: ^Tracking_Allocator) -> mem.Allocator {
+	return mem.Allocator{
+		data = data,
+		procedure = tracking_allocator_proc,
+	}
+}
+
+tracking_allocator_proc :: proc(allocator_data: rawptr, mode: mem.Allocator_Mode,
+                                size, alignment: int,
+                                old_memory: rawptr, old_size: int, loc := #caller_location) -> (result: []byte, err: mem.Allocator_Error) {
+	data := (^Tracking_Allocator)(allocator_data)
+
+	sync.mutex_guard(&data.mutex)
+
+	if mode == .Query_Info {
+		info := (^mem.Allocator_Query_Info)(old_memory)
+		if info != nil && info.pointer != nil {
+			if entry, ok := data.allocation_map[info.pointer]; ok {
+				info.size = entry.size
+				info.alignment = entry.alignment
+			}
+			info.pointer = nil
+		}
+
+		return
+	}
+
+	if mode == .Free && old_memory != nil && old_memory not_in data.allocation_map {
+		fmt.panicf("At %v: Bad free!", loc)
+	} else {
+		result = data.backing.procedure(data.backing.data, mode, size, alignment, old_memory, old_size, loc) or_return
+	}
+	result_ptr := raw_data(result)
+
+	if data.allocation_map.allocator.procedure == nil {
+		data.allocation_map.allocator = context.allocator
+	}
+
+	switch mode {
+	case .Alloc, .Alloc_Non_Zeroed:
+		data.allocation_map[result_ptr] = Tracking_Allocator_Entry{
+			memory = result_ptr,
+			size = size,
+			mode = mode,
+			alignment = alignment,
+			err = err,
+			location = loc,
+		}
+	case .Free:
+		delete_key(&data.allocation_map, old_memory)
+	case .Free_All:
+		if data.clear_on_free_all {
+			clear_map(&data.allocation_map)
+		}	
+	case .Resize, .Resize_Non_Zeroed:
+		if old_memory != result_ptr {
+			delete_key(&data.allocation_map, old_memory)
+		}
+		data.allocation_map[result_ptr] = Tracking_Allocator_Entry{
+			memory = result_ptr,
+			size = size,
+			mode = mode,
+			alignment = alignment,
+			err = err,
+			location = loc,
+		}
+
+	case .Query_Features:
+		set := (^mem.Allocator_Mode_Set)(old_memory)
+		if set != nil {
+			set^ = {.Alloc, .Alloc_Non_Zeroed, .Free, .Free_All, .Resize, .Query_Features, .Query_Info}
+		}
+		return nil, nil
+
+	case .Query_Info:
+		unreachable()
+	}
+
+	return
+}
+
+
+
+
+================================================
+File: main_release/log_darwin.odin
+================================================
+package main_release
+
+import "core:path/filepath"
+import "core:fmt"
+import "core:os"
+import "core:strings"
+
+config_dir :: proc() -> (dir: string) {
+	dir = os.get_env("HOME", context.temp_allocator)
+	if dir != "" {
+		dir, _ = strings.concatenate({dir, "/Library/Application Support"}, context.temp_allocator)
+	}
+	return
+}
+
+log_filename :: proc() -> string {
+	filename :: "log.txt"
+	cd := filepath.clean(config_dir(), context.temp_allocator)
+	return fmt.tprint(cd, "cat-and-onion", filename, sep = filepath.SEPARATOR_STRING)
+}
+
+
+================================================
+File: main_release/log_linux.odin
+================================================
+package main_release
+
+import "core:path/filepath"
+import "core:fmt"
+import "core:os"
+import "core:strings"
+
+config_dir :: proc() -> (dir: string) {
+	dir = os.get_env("XDG_CONFIG_HOME", context.temp_allocator)
+	if dir == "" {
+		dir = os.get_env("HOME", context.temp_allocator)
+		if dir == "" {
+			return
+		}
+		dir, _ = strings.concatenate({dir, "/.config"}, context.temp_allocator)
+	}
+	return
+}
+
+log_filename :: proc() -> string {
+	filename :: "log.txt"
+	cd := filepath.clean(config_dir(), context.temp_allocator)
+	return fmt.tprint(cd, "cat-and-onion", filename, sep = filepath.SEPARATOR_STRING)
+}
+
+
+================================================
+File: main_release/log_windows.odin
+================================================
+package main_release
+
+import win "core:sys/windows"
+import "core:fmt"
+import "core:path/filepath"
+
+wstring_len :: proc(s: [^]win.WCHAR) -> int {
+	i := 0
+
+	for i < 512 {
+		if s[i] == 0 {
+			return i
+		}
+
+		i += 1
+	}
+
+	return 0
+}
+
+log_filename :: proc() -> string {
+	filename :: "log.txt"
+
+	when ODIN_OS == .Windows {
+		folder: win.LPWSTR
+		path_id := win.FOLDERID_RoamingAppData
+		if win.SHGetKnownFolderPath(&path_id, u32(win.KNOWN_FOLDER_FLAG.CREATE), nil, &folder) == 0 {
+			if str, err := win.wstring_to_utf8(folder, wstring_len(folder)); err == .None {
+				appdata_base := filepath.clean(str, context.temp_allocator)
+				return fmt.tprint(appdata_base, "CAT & ONION", filename, sep = filepath.SEPARATOR_STRING)
+			}
+		}
+	}
+
+	return filename
+}
+
+
+================================================
+File: main_release/main_release.odin
+================================================
+/*
+Release build exe. Does not have hot reload. Just imports the game package and runs things the init
+and updates procs on it.
+*/
+
+package main_release
+
+import "core:log"
+import "core:os"
+import "core:fmt"
+import "core:path/filepath"
+import c "core:c/libc"
+import "base:runtime"
+
+import cat "../game"
+
+UseTrackingAllocator :: #config(UseTrackingAllocator, false)
+
+main :: proc() {
+	if !cat.steam_init() {
+		return
+	}
+
+	when UseTrackingAllocator {
+		default_allocator := context.allocator
+		tracking_allocator: Tracking_Allocator
+		tracking_allocator_init(&tracking_allocator, default_allocator)
+		context.allocator = allocator_from_tracking_allocator(&tracking_allocator)
+	}
+
+	log_fn := log_filename()
+	os.make_directory(filepath.dir(log_fn, context.temp_allocator))
+
+	mode: int = 0
+	when ODIN_OS == .Linux || ODIN_OS == .Darwin {
+		mode = os.S_IRUSR | os.S_IWUSR | os.S_IRGRP | os.S_IROTH
+	}
+
+	logh, logh_err := os.open(log_fn, (os.O_CREATE | os.O_TRUNC | os.O_RDWR), mode)
+
+	if logh_err == os.ERROR_NONE {
+		os.stdout = logh
+		os.stderr = logh
+	}
+
+	logger := logh_err == os.ERROR_NONE ? log.create_file_logger(logh) : log.create_console_logger()
+	context.logger = logger
+	
+	cat.game_init_window()
+	cat.game_init(-1)
+
+	window_open := true
+	for window_open {
+		cat.steam_update()
+		window_open = cat.game_update()
+		free_all(context.temp_allocator)
+	}
+
+	free_all(context.temp_allocator)
+	cat.game_shutdown()
+	cat.game_shutdown_window()
+	
+	if logh_err == os.ERROR_NONE {
+		log.destroy_file_logger(&logger)
+		os.close(logh)
+	}
+
+	when UseTrackingAllocator {
+		for key, value in tracking_allocator.allocation_map {
+			log.error("%v: Leaked %v bytes\n", value.location, value.size)
+		}
+
+		tracking_allocator_destroy(&tracking_allocator)
+	}
+
+	cat.steam_deinit()
+}
+
+@(export)
+NvOptimusEnablement: u32 = 1
+
+@(export)
+AmdPowerXpressRequestHighPerformance: i32 = 1
+
+
+================================================
+File: main_release/tracking_allocator.odin
+================================================
+/*
+A copy of Odin's tracking allocator that panics on bad frees instead of adding it to a list
+*/
+
+package main_release
+
+import "core:runtime"
+import "core:mem"
+import "core:sync"
+import "core:fmt"
+
+Tracking_Allocator_Entry :: struct {
+	memory:    rawptr,
+	size:      int,
+	alignment: int,
+	mode:      mem.Allocator_Mode,
+	err:       mem.Allocator_Error,
+	location:  runtime.Source_Code_Location,
+}
+
+Tracking_Allocator :: struct {
+	backing:           mem.Allocator,
+	allocation_map:    map[rawptr]Tracking_Allocator_Entry,
+	mutex:             sync.Mutex,
+	clear_on_free_all: bool,
+}
+
+tracking_allocator_init :: proc(t: ^Tracking_Allocator, backing_allocator: mem.Allocator, internals_allocator := context.allocator) {
+	t.backing = backing_allocator
+	t.allocation_map.allocator = internals_allocator
+
+	if .Free_All in mem.query_features(t.backing) {
+		t.clear_on_free_all = true
+	}
+}
+
+tracking_allocator_destroy :: proc(t: ^Tracking_Allocator) {
+	delete(t.allocation_map)
+}
+
+
+tracking_allocator_clear :: proc(t: ^Tracking_Allocator) {
+	sync.mutex_lock(&t.mutex)
+	clear(&t.allocation_map)
+	sync.mutex_unlock(&t.mutex)
+}
+
+
+@(require_results)
+allocator_from_tracking_allocator :: proc(data: ^Tracking_Allocator) -> mem.Allocator {
+	return mem.Allocator{
+		data = data,
+		procedure = tracking_allocator_proc,
+	}
+}
+
+tracking_allocator_proc :: proc(allocator_data: rawptr, mode: mem.Allocator_Mode,
+                                size, alignment: int,
+                                old_memory: rawptr, old_size: int, loc := #caller_location) -> (result: []byte, err: mem.Allocator_Error) {
+	data := (^Tracking_Allocator)(allocator_data)
+
+	sync.mutex_guard(&data.mutex)
+
+	if mode == .Query_Info {
+		info := (^mem.Allocator_Query_Info)(old_memory)
+		if info != nil && info.pointer != nil {
+			if entry, ok := data.allocation_map[info.pointer]; ok {
+				info.size = entry.size
+				info.alignment = entry.alignment
+			}
+			info.pointer = nil
+		}
+
+		return
+	}
+
+	if mode == .Free && old_memory != nil && old_memory not_in data.allocation_map {
+		fmt.panicf("At %v: Bad free!", loc)
+	} else {
+		result = data.backing.procedure(data.backing.data, mode, size, alignment, old_memory, old_size, loc) or_return
+	}
+	result_ptr := raw_data(result)
+
+	if data.allocation_map.allocator.procedure == nil {
+		data.allocation_map.allocator = context.allocator
+	}
+
+	switch mode {
+	case .Alloc, .Alloc_Non_Zeroed:
+		data.allocation_map[result_ptr] = Tracking_Allocator_Entry{
+			memory = result_ptr,
+			size = size,
+			mode = mode,
+			alignment = alignment,
+			err = err,
+			location = loc,
+		}
+	case .Free:
+		delete_key(&data.allocation_map, old_memory)
+	case .Free_All:
+		if data.clear_on_free_all {
+			clear_map(&data.allocation_map)
+		}	
+	case .Resize, .Resize_Non_Zeroed:
+		if old_memory != result_ptr {
+			delete_key(&data.allocation_map, old_memory)
+		}
+		data.allocation_map[result_ptr] = Tracking_Allocator_Entry{
+			memory = result_ptr,
+			size = size,
+			mode = mode,
+			alignment = alignment,
+			err = err,
+			location = loc,
+		}
+
+	case .Query_Features:
+		set := (^mem.Allocator_Mode_Set)(old_memory)
+		if set != nil {
+			set^ = {.Alloc, .Alloc_Non_Zeroed, .Free, .Free_All, .Resize, .Query_Features, .Query_Info}
+		}
+		return nil, nil
+
+	case .Query_Info:
+		unreachable()
+	}
+
+	return
+}
+
+
+
+
+
+
+
+
+
+
+
+

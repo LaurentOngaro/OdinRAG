@@ -1,0 +1,1662 @@
+Directory structure:
+└── odin-raylib-hot-reload-game-template/
+    ├── README.md
+    ├── LICENSE
+    ├── build_debug.bat
+    ├── build_debug.sh
+    ├── build_hot_reload.bat
+    ├── build_hot_reload.sh
+    ├── build_release.bat
+    ├── build_release.sh
+    ├── build_web.bat
+    ├── build_web.sh
+    ├── assets/
+    ├── source/
+    │   ├── game.odin
+    │   ├── utils.odin
+    │   ├── utils_default.odin
+    │   ├── utils_web.odin
+    │   ├── main_hot_reload/
+    │   │   └── main_hot_reload.odin
+    │   ├── main_release/
+    │   │   └── main_release.odin
+    │   └── main_web/
+    │       ├── emscripten_allocator.odin
+    │       ├── emscripten_logger.odin
+    │       ├── index_template.html
+    │       └── main_web.odin
+    └── .github/
+        └── workflows/
+            └── build.yml
+
+================================================
+File: README.md
+================================================
+# Odin + Raylib + Hot Reload template
+
+This is an [Odin](https://github.com/odin-lang/Odin) + [Raylib](https://github.com/raysan5/raylib) game template with [Hot Reloading](http://zylinski.se/posts/hot-reload-gameplay-code/) pre-setup. It makes it possible to reload gameplay code while the game is running.
+
+Supported platforms: Windows, macOS, Linux and [web](#web-build).
+
+Supported editors and debuggers: [Sublime Text](#sublime-text), [VS Code](#vs-code) and [RAD Debugger](#rad-debugger).
+
+![hot_reload gif](https://github.com/user-attachments/assets/18059ab2-0878-4617-971d-e629a969fc93)
+
+See The Legend of Tuna repository for an example project that also uses Box2D: https://github.com/karl-zylinski/the-legend-of-tuna
+
+I used this kind of hot reloading while developing my game [CAT & ONION](https://store.steampowered.com/app/2781210/CAT__ONION/).
+
+## Hot reload quick start
+
+> [!NOTE]
+> These instructions use some Windows terminology. If you are on mac / linux, then replace these words:
+> - `bat` -> `sh`
+> - `exe` -> `bin`
+> - `dll` -> `dylib` (mac), `so` (linux)
+
+1. Run `build_hot_reload.bat` to create `game_hot_reload.exe` (located at the root of the project) and `game.dll` (located in `build/hot_reload`). Note: It expects odin compiler to be part of your PATH environment variable.
+2. Run `game_hot_reload.exe`, leave it running.
+3. Make changes to the gameplay code in `source/game.odin`. For example, change the line `rl.ClearBackground(rl.BLACK)` so that it instead uses `rl.BLUE`. Save the file.
+4. Run `build_hot_reload.bat`, it will recompile `game.dll`.
+5. The running `game_hot_reload.exe` will see that `game.dll` changed and reload it. But it will use the same `Game_Memory` (a struct defined in `source/game.odin`) as before. This will make the game use your new code without having to restart.
+
+Note, in step 4: `build_hot_reload.bat` does not rebuild `game_hot_reload.exe`. It checks if `game_hot_reload.exe` is already running. If it is, then it skips compiling it.
+
+## Release builds
+
+Run `build_release.bat` to create a release build in `build/release`. That exe does not have the hot reloading stuff, since you probably do not want that in the released version of your game. This means that the release version does not use `game.dll`, instead it imports the `source` folder as a normal Odin package.
+
+`build_debug.bat` is like `build_release.bat` but makes a debuggable executable, in case you need to debug your non-hot-reload-exe.
+
+## Web build
+
+`build_web.bat` builds a release web executable (no hot reloading!).
+
+### Web build requirements
+
+- Emscripten. Download and install somewhere on your computer. Follow the instructions here: https://emscripten.org/docs/getting_started/downloads.html (follow the stuff under "Installation instructions using the emsdk (recommended)").
+- Recent Odin compiler: This uses Raylib binding changes that were done on January 1, 2025.
+
+### Web build quick start
+
+1. Point `EMSCRIPTEN_SDK_DIR` in `build_web.bat/sh` to where you installed emscripten.
+2. Run `build_web.bat/sh`.
+3. Web game is in the `build/web` folder.
+
+> [!NOTE]
+> `build_web.bat` is for windows, `build_web.sh` is for Linux / macOS.
+
+> [!WARNING]
+> You can't run `build/web/index.html` directly due to "CORS policy" javascript errors. You can work around that by running a small python web server:
+> - Go to `build/web` in a console.
+> - Run `python -m http.server`
+> - Go to `localhost:8000` in your browser.
+>
+> _For those who don't have python: Emscripten comes with it. See the `python` folder in your emscripten installation directory._
+
+Build a desktop executable using `build_desktop.bat/sh`. It will end up in the `build/desktop` folder.
+
+There's a wrapper for `read_entire_file` and `write_entire_file` from `core:os` that can files from `assets` directory, even on web. See `source/utils.odin`
+
+### Web build troubleshooting
+
+See the README of the [Odin + Raylib on the web repository](https://github.com/karl-zylinski/odin-raylib-web?tab=readme-ov-file#troubleshooting) for troubleshooting steps.
+
+## Assets
+You can put assets such as textures, sounds and music in the `assets` folder. That folder will be copied when a release build is created and also integrated into the web build.
+
+The hot reload build doesn't do any copying, because the hot reload executable lives in the root of the repository, alongside the `assets` folder.
+
+## Sublime Text
+
+For those who use Sublime Text there's a project file: `project.sublime-project`.
+
+How to use:
+- Open the project file in sublime
+- Choose the build system `Main Menu -> Tools -> Build System -> Odin + Raylib + Hot Reload template` (you can rename the build system by editing `project.sublime-project` manually)
+- Compile and run by pressing using F7 / Ctrl + B / Cmd + B
+- After you make code changes and want to hot reload, just hit F7 / Ctrl + B / Cmd + B again
+
+## RAD Debugger
+You can hot reload while attached to [RAD Debugger](https://github.com/EpicGamesExt/raddebugger). Attach to your `game_hot_reload` executable, make code changes in your code editor and re-run the the `build_hot_reload` script to build and hot reload.
+
+## VS Code
+
+You can build, debug and hot reload from within VS Code. Open the template using `File -> Open Folder...`.
+
+Requirements for debugging to work:
+- Windows: [C++ build tools](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools)
+- Linux / Mac: [CodeLLDB](https://marketplace.visualstudio.com/items?itemName=vadimcn.vscode-lldb)
+
+<img alt="Image showing  how to start debugging session by selecting Build Hot Reload from the dropdown in the Run and Debug sidebar" src="https://github.com/user-attachments/assets/e62d710b-06f1-4833-bb2a-ab95527cf38c" width="50%" title="Start debugging session by chooing 'Run Hot Reload' and pressing the green arrow button">
+
+Launch with `Run Hot Reload` launch task, see image above. After you make code changes press `Ctrl + Shift + B` to rebuild and hot reload.
+
+## Windows Debugging hacks
+On Windows the degugging while hot reloading works by outputting a new PDB each time the game DLL is built. It cleans up the PDBs when you do a fresh start. See `build_hot_reload.bat` for details.
+
+## Demo streams
+
+Streams that start from this template:
+- 48 hour "Odin Holiday Gamejam": https://www.youtube.com/playlist?list=PLxE7SoPYTef2XC-ObA811vIefj02uSGnB Every minute of the development is documented. The resulting game of the gamejam is here: https://zylinski.itch.io/the-legend-of-tuna
+- CAR RACER prototype: https://www.youtube.com/watch?v=KVbHJ_CLdkA
+- "point & click" prototype: https://www.youtube.com/watch?v=iRvs1Xr1W6o
+- Metroidvania / platform prototype: https://www.youtube.com/watch?v=kIxEMchPc3Y
+- Top-down adventure prototype: https://www.youtube.com/watch?v=cl8EOjOaoXc
+
+## Atlas builder
+
+The template works nicely together with my [atlas builder](https://github.com/karl-zylinski/atlas-builder). The atlas builder can build an atlas texture from a folder of png or aseprite files. Using an atlas can drastically reduce the number of draw calls your game uses. There's an example in that repository on how to set it up. The atlas generation step can easily be integrated into the build `bat` / `sh` files such as `build_hot_reload.bat`
+
+## Questions?
+
+Ask questions in my gamedev Discord: https://discord.gg/4FsHgtBmFK
+
+I have a blog post about Hot Reloading here: http://zylinski.se/posts/hot-reload-gameplay-code/
+
+## Have a nice day! /Karl Zylinski
+
+
+
+================================================
+File: LICENSE
+================================================
+Copyright (c) 2024-2026 Karl Zylinski. All rights reserved.
+
+This software is provided 'as-is', without any express or implied
+warranty. In no event will the authors be held liable for any damages
+arising from the use of this software.
+
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it
+freely, subject to the following restrictions:
+
+1. The origin of this software must not be misrepresented; you must not
+   claim that you wrote the original software. If you use this software
+   in a product, an acknowledgment in the product documentation would be
+   appreciated but is not required.
+2. Altered source versions must be plainly marked as such, and must not be
+   misrepresented as being the original software.
+3. This notice may not be removed or altered from any source distribution.
+
+
+
+================================================
+File: build_debug.bat
+================================================
+@echo off
+
+:: This creates a build that is similar to a release build, but it's debuggable.
+:: There is no hot reloading and no separate game library.
+
+set OUT_DIR=build\debug
+
+if not exist %OUT_DIR% mkdir %OUT_DIR%
+
+odin build source\main_release -out:%OUT_DIR%\game_debug.exe -strict-style -vet -debug
+IF %ERRORLEVEL% NEQ 0 exit /b 1
+
+xcopy /y /e /i assets %OUT_DIR%\assets > nul
+IF %ERRORLEVEL% NEQ 0 exit /b 1
+
+echo Debug build created in %OUT_DIR%
+
+
+================================================
+File: build_debug.sh
+================================================
+#!/usr/bin/env bash
+set -eu
+
+# This creates a build that is similar to a release build, but it is debuggable.
+# There is no hot reloading and no separate game library.
+
+OUT_DIR="build/debug"
+mkdir -p "$OUT_DIR"
+odin build source/main_release -out:$OUT_DIR/game_debug.bin -strict-style -vet -debug
+cp -R assets $OUT_DIR
+echo "Debug build created in $OUT_DIR"
+
+
+================================================
+File: build_hot_reload.bat
+================================================
+@echo off
+
+set GAME_RUNNING=false
+
+:: OUT_DIR is for everything except the exe. The exe needs to stay in root
+:: folder so it sees the assets folder, without having to copy it.
+set OUT_DIR=build\hot_reload
+set GAME_PDBS_DIR=%OUT_DIR%\game_pdbs
+
+set EXE=game_hot_reload.exe
+
+:: Check if game is running
+FOR /F %%x IN ('tasklist /NH /FI "IMAGENAME eq %EXE%"') DO IF %%x == %EXE% set GAME_RUNNING=true
+
+if not exist %OUT_DIR% mkdir %OUT_DIR%
+
+:: If game isn't running then:
+:: - delete all game_XXX.dll files
+:: - delete all PDBs in pdbs subdir
+:: - optionally create the pdbs subdir
+:: - write 0 into pdbs\pdb_number so game.dll PDBs start counting from zero
+::
+:: This makes sure we start over "fresh" at PDB number 0 when starting up the
+:: game and it also makes sure we don't have so many PDBs laying around.
+if %GAME_RUNNING% == false (
+	del /q /s %OUT_DIR% >nul 2>nul
+	if not exist "%GAME_PDBS_DIR%" mkdir %GAME_PDBS_DIR%
+	echo 0 > %GAME_PDBS_DIR%\pdb_number
+)
+
+:: Load PDB number from file, increment and store back. For as long as the game
+:: is running the pdb_number file won't be reset to 0, so we'll get a PDB of a
+:: unique name on each hot reload.
+set /p PDB_NUMBER=<%GAME_PDBS_DIR%\pdb_number
+set /a PDB_NUMBER=%PDB_NUMBER%+1
+echo %PDB_NUMBER% > %GAME_PDBS_DIR%\pdb_number
+
+:: Build game dll, use pdbs\game_%PDB_NUMBER%.pdb as PDB name so each dll gets
+:: its own PDB. This PDB stuff is done in order to make debugging work.
+:: Debuggers tend to lock PDBs or just misbehave if you reuse the same PDB while
+:: the debugger is attached. So each time we compile `game.dll` we give the
+:: PDB a unique PDB.
+:: 
+:: Note that we could not just rename the PDB after creation; the DLL contains a
+:: reference to where the PDB is.
+::
+:: Also note that we always write game.dll to the same file. game_hot_reload.exe
+:: monitors this file and does the hot reload when it changes.
+echo Building game.dll
+odin build source -strict-style -vet -debug -define:RAYLIB_SHARED=true -build-mode:dll -out:%OUT_DIR%/game.dll -pdb-name:%GAME_PDBS_DIR%\game_%PDB_NUMBER%.pdb > nul
+IF %ERRORLEVEL% NEQ 0 exit /b 1
+
+:: If game.exe already running: Then only compile game.dll and exit cleanly
+if %GAME_RUNNING% == true (
+	echo Hot reloading... && exit /b 0
+)
+
+:: Build game.exe, which starts the program and loads game.dll och does the logic for hot reloading.
+echo Building %EXE%
+odin build source\main_hot_reload -strict-style -vet -debug -out:%EXE% -pdb-name:%OUT_DIR%\main_hot_reload.pdb
+IF %ERRORLEVEL% NEQ 0 exit /b 1
+
+set ODIN_PATH=
+for /f "delims=" %%i in ('odin root') do set "ODIN_PATH=%%i"
+
+if not exist "raylib.dll" (
+	if exist "%ODIN_PATH%\vendor\raylib\windows\raylib.dll" (
+		echo raylib.dll not found in current directory. Copying from %ODIN_PATH%\vendor\raylib\windows\raylib.dll
+		copy "%ODIN_PATH%\vendor\raylib\windows\raylib.dll" .
+		IF %ERRORLEVEL% NEQ 0 exit /b 1
+	) else (
+		echo "Please copy raylib.dll from <your_odin_compiler>/vendor/raylib/windows/raylib.dll to the same directory as game.exe"
+		exit /b 1
+	)
+)
+
+if "%~1"=="run" (
+	echo Running %EXE%...
+	start %EXE%
+)
+
+
+
+
+================================================
+File: build_hot_reload.sh
+================================================
+#!/usr/bin/env bash
+set -eu
+
+# OUT_DIR is for everything except the exe. The exe needs to stay in root
+# folder so it sees the assets folder, without having to copy it.
+OUT_DIR=build/hot_reload
+EXE=game_hot_reload.bin
+
+mkdir -p $OUT_DIR
+
+# root is a special command of the odin compiler that tells you where the Odin
+# compiler is located.
+ROOT=$(odin root)
+
+# Figure out which DLL extension to use based on platform. Also copy the Linux
+# so libs.
+case $(uname) in
+"Darwin")
+    DLL_EXT=".dylib"
+    EXTRA_LINKER_FLAGS="-Wl,-rpath $ROOT/vendor/raylib/macos"
+    ;;
+*)
+    DLL_EXT=".so"
+    EXTRA_LINKER_FLAGS="'-Wl,-rpath=\$ORIGIN/linux'"
+
+    # Copy the linux libraries into the project automatically.
+    if [ ! -d "$OUT_DIR/linux" ]; then
+        mkdir -p $OUT_DIR/linux
+        cp -r $ROOT/vendor/raylib/linux/libraylib*.so* $OUT_DIR/linux
+    fi
+    ;;
+esac
+
+# Build the game. Note that the game goes into $OUT_DIR while the exe stays in
+# the root folder.
+echo "Building game$DLL_EXT"
+odin build source -extra-linker-flags:"$EXTRA_LINKER_FLAGS" -define:RAYLIB_SHARED=true -build-mode:dll -out:$OUT_DIR/game_tmp$DLL_EXT -strict-style -vet -debug
+
+# Need to use a temp file on Linux because it first writes an empty `game.so`,
+# which the game will load before it is actually fully written.
+mv $OUT_DIR/game_tmp$DLL_EXT $OUT_DIR/game$DLL_EXT
+
+# If the executable is already running, then don't try to build and start it.
+# -f is there to make sure we match against full name, including .bin
+if pgrep -f $EXE > /dev/null; then
+    echo "Hot reloading..."
+    exit 0
+fi
+
+echo "Building $EXE"
+odin build source/main_hot_reload -out:$EXE -strict-style -vet -debug
+
+if [ $# -ge 1 ] && [ $1 == "run" ]; then
+    echo "Running $EXE"
+    ./$EXE &
+fi
+
+
+
+================================================
+File: build_release.bat
+================================================
+:: This script creates an optimized release build.
+
+@echo off
+
+set OUT_DIR=build\release
+
+if not exist %OUT_DIR% mkdir %OUT_DIR%
+
+odin build source\main_release -out:%OUT_DIR%\game_release.exe -strict-style -vet -no-bounds-check -o:speed -subsystem:windows
+IF %ERRORLEVEL% NEQ 0 exit /b 1
+
+xcopy /y /e /i assets %OUT_DIR%\assets > nul
+IF %ERRORLEVEL% NEQ 0 exit /b 1
+
+echo Release build created in %OUT_DIR%
+
+
+================================================
+File: build_release.sh
+================================================
+#!/usr/bin/env bash
+set -eu
+
+# This script creates an optimized release build.
+
+OUT_DIR="build/release"
+mkdir -p "$OUT_DIR"
+odin build source/main_release -out:$OUT_DIR/game_release.bin -strict-style -vet -no-bounds-check -o:speed
+cp -R assets $OUT_DIR
+echo "Release build created in $OUT_DIR"
+
+
+================================================
+File: build_web.bat
+================================================
+@echo off
+
+:: Point this to where you installed emscripten.
+set EMSCRIPTEN_SDK_DIR=c:\SDK\emsdk
+set OUT_DIR=build\web
+
+if not exist %OUT_DIR% mkdir %OUT_DIR%
+
+set EMSDK_QUIET=1
+call %EMSCRIPTEN_SDK_DIR%\emsdk_env.bat
+
+:: Note RAYLIB_WASM_LIB=env.o -- env.o is an internal WASM object file. You can
+:: see how RAYLIB_WASM_LIB is used inside <odin>/vendor/raylib/raylib.odin.
+::
+:: The emcc call will be fed the actual raylib library file. That stuff will end
+:: up in env.o
+::
+:: Note that there is a rayGUI equivalent: -define:RAYGUI_WASM_LIB=env.o
+odin build source\main_web -target:js_wasm32 -build-mode:obj -define:RAYLIB_WASM_LIB=env.o -define:RAYGUI_WASM_LIB=env.o -vet -strict-style -out:%OUT_DIR%\game.wasm.o
+IF %ERRORLEVEL% NEQ 0 exit /b 1
+
+for /f "delims=" %%i in ('odin root') do set "ODIN_PATH=%%i"
+
+copy "%ODIN_PATH%\core\sys\wasm\js\odin.js" %OUT_DIR%
+
+set files=%OUT_DIR%\game.wasm.o "%ODIN_PATH%\vendor\raylib\wasm\libraylib.a" "%ODIN_PATH%\vendor\raylib\wasm\libraygui.a"
+
+:: index_template.html contains the javascript code that calls the procedures in
+:: source/main_web/main_web.odin
+set flags=-sUSE_GLFW=3 -sWASM_BIGINT -sWARN_ON_UNDEFINED_SYMBOLS=0 -sASSERTIONS --shell-file source\main_web\index_template.html --preload-file assets
+
+:: For debugging: Add `-g` to `emcc` (gives better error callstack in chrome)
+::
+:: This uses `cmd /c` to avoid emcc stealing the whole command prompt. Otherwise
+:: it does not run the lines that follow it.
+cmd /c emcc -o %OUT_DIR%\index.html %files% %flags%
+
+del %OUT_DIR%\game.wasm.o 
+
+echo Web build created in %OUT_DIR%
+
+
+================================================
+File: build_web.sh
+================================================
+#!/usr/bin/env bash
+set -eu
+
+# Point this to where you installed emscripten. Optional on systems that already
+# have `emcc` in the path.
+EMSCRIPTEN_SDK_DIR="$HOME/repos/emsdk"
+OUT_DIR="build/web"
+
+mkdir -p $OUT_DIR
+
+export EMSDK_QUIET=1
+[[ -f "$EMSCRIPTEN_SDK_DIR/emsdk_env.sh" ]] && . "$EMSCRIPTEN_SDK_DIR/emsdk_env.sh"
+
+# Note RAYLIB_WASM_LIB=env.o -- env.o is an internal WASM object file. You can
+# see how RAYLIB_WASM_LIB is used inside <odin>/vendor/raylib/raylib.odin.
+#
+# The emcc call will be fed the actual raylib library file. That stuff will end
+# up in env.o
+#
+# Note that there is a rayGUI equivalent: -define:RAYGUI_WASM_LIB=env.o
+odin build source/main_web -target:js_wasm32 -build-mode:obj -define:RAYLIB_WASM_LIB=env.o -define:RAYGUI_WASM_LIB=env.o -vet -strict-style -out:$OUT_DIR/game.wasm.o
+
+ODIN_PATH=$(odin root)
+
+cp $ODIN_PATH/core/sys/wasm/js/odin.js $OUT_DIR
+
+files="$OUT_DIR/game.wasm.o ${ODIN_PATH}/vendor/raylib/wasm/libraylib.a ${ODIN_PATH}/vendor/raylib/wasm/libraygui.a"
+
+# index_template.html contains the javascript code that calls the procedures in
+# source/main_web/main_web.odin
+flags="-sUSE_GLFW=3 -sWASM_BIGINT -sWARN_ON_UNDEFINED_SYMBOLS=0 -sASSERTIONS --shell-file source/main_web/index_template.html --preload-file assets"
+
+# For debugging: Add `-g` to `emcc` (gives better error callstack in chrome)
+emcc -o $OUT_DIR/index.html $files $flags
+
+rm $OUT_DIR/game.wasm.o
+
+echo "Web build created in ${OUT_DIR}"
+
+
+
+================================================
+File: source/game.odin
+================================================
+/*
+This file is the starting point of your game.
+
+Some important procedures are:
+- game_init_window: Opens the window
+- game_init: Sets up the game state
+- game_update: Run once per frame
+- game_should_close: For stopping your game when close button is pressed
+- game_shutdown: Shuts down game and frees memory
+- game_shutdown_window: Closes window
+
+The procs above are used regardless if you compile using the `build_release`
+script or the `build_hot_reload` script. However, in the hot reload case, the
+contents of this file is compiled as part of `build/hot_reload/game.dll` (or
+.dylib/.so on mac/linux). In the hot reload cases some other procedures are
+also used in order to facilitate the hot reload functionality:
+
+- game_memory: Run just before a hot reload. That way game_hot_reload.exe has a
+	pointer to the game's memory that it can hand to the new game DLL.
+- game_hot_reloaded: Run after a hot reload so that the `g` global
+	variable can be set to whatever pointer it was in the old DLL.
+
+NOTE: When compiled as part of `build_release`, `build_debug` or `build_web`
+then this whole package is just treated as a normal Odin package. No DLL is
+created.
+*/
+
+package game
+
+import "core:fmt"
+import "core:math/linalg"
+import rl "vendor:raylib"
+
+PIXEL_WINDOW_HEIGHT :: 180
+
+Game_Memory :: struct {
+	player_pos: rl.Vector2,
+	player_texture: rl.Texture,
+	some_number: int,
+	run: bool,
+}
+
+g: ^Game_Memory
+
+game_camera :: proc() -> rl.Camera2D {
+	w := f32(rl.GetScreenWidth())
+	h := f32(rl.GetScreenHeight())
+
+	return {
+		zoom = h/PIXEL_WINDOW_HEIGHT,
+		target = g.player_pos,
+		offset = { w/2, h/2 },
+	}
+}
+
+ui_camera :: proc() -> rl.Camera2D {
+	return {
+		zoom = f32(rl.GetScreenHeight())/PIXEL_WINDOW_HEIGHT,
+	}
+}
+
+update :: proc() {
+	input: rl.Vector2
+
+	if rl.IsKeyDown(.UP) || rl.IsKeyDown(.W) {
+		input.y -= 1
+	}
+	if rl.IsKeyDown(.DOWN) || rl.IsKeyDown(.S) {
+		input.y += 1
+	}
+	if rl.IsKeyDown(.LEFT) || rl.IsKeyDown(.A) {
+		input.x -= 1
+	}
+	if rl.IsKeyDown(.RIGHT) || rl.IsKeyDown(.D) {
+		input.x += 1
+	}
+
+	input = linalg.normalize0(input)
+	g.player_pos += input * rl.GetFrameTime() * 100
+	g.some_number += 1
+
+	if rl.IsKeyPressed(.ESCAPE) {
+		g.run = false
+	}
+}
+
+draw :: proc() {
+	rl.BeginDrawing()
+	rl.ClearBackground(rl.BLACK)
+
+	rl.BeginMode2D(game_camera())
+	rl.DrawTextureEx(g.player_texture, g.player_pos, 0, 1, rl.WHITE)
+	rl.DrawRectangleV({20, 20}, {10, 10}, rl.RED)
+	rl.DrawRectangleV({-30, -20}, {10, 10}, rl.GREEN)
+	rl.EndMode2D()
+
+	rl.BeginMode2D(ui_camera())
+
+	// NOTE: `fmt.ctprintf` uses the temp allocator. The temp allocator is
+	// cleared at the end of the frame by the main application, meaning inside
+	// `main_hot_reload.odin`, `main_release.odin` or `main_web_entry.odin`.
+	rl.DrawText(fmt.ctprintf("some_number: %v\nplayer_pos: %v", g.some_number, g.player_pos), 5, 5, 8, rl.WHITE)
+
+	rl.EndMode2D()
+
+	rl.EndDrawing()
+}
+
+@(export)
+game_update :: proc() {
+	update()
+	draw()
+
+	// Everything on tracking allocator is valid until end-of-frame.
+	free_all(context.temp_allocator)
+}
+
+@(export)
+game_init_window :: proc() {
+	rl.SetConfigFlags({.WINDOW_RESIZABLE, .VSYNC_HINT})
+	rl.InitWindow(1280, 720, "Odin + Raylib + Hot Reload template!")
+	rl.SetWindowPosition(200, 200)
+	rl.SetTargetFPS(500)
+	rl.SetExitKey(nil)
+}
+
+@(export)
+game_init :: proc() {
+	g = new(Game_Memory)
+
+	g^ = Game_Memory {
+		run = true,
+		some_number = 100,
+
+		// You can put textures, sounds and music in the `assets` folder. Those
+		// files will be part any release or web build.
+		player_texture = rl.LoadTexture("assets/round_cat.png"),
+	}
+
+	game_hot_reloaded(g)
+}
+
+@(export)
+game_should_run :: proc() -> bool {
+	when ODIN_OS != .JS {
+		// Never run this proc in browser. It contains a 16 ms sleep on web!
+		if rl.WindowShouldClose() {
+			return false
+		}
+	}
+
+	return g.run
+}
+
+@(export)
+game_shutdown :: proc() {
+	free(g)
+}
+
+@(export)
+game_shutdown_window :: proc() {
+	rl.CloseWindow()
+}
+
+@(export)
+game_memory :: proc() -> rawptr {
+	return g
+}
+
+@(export)
+game_memory_size :: proc() -> int {
+	return size_of(Game_Memory)
+}
+
+@(export)
+game_hot_reloaded :: proc(mem: rawptr) {
+	g = (^Game_Memory)(mem)
+
+	// Here you can also set your own global variables. A good idea is to make
+	// your global variables into pointers that point to something inside `g`.
+}
+
+@(export)
+game_force_reload :: proc() -> bool {
+	return rl.IsKeyPressed(.F5)
+}
+
+@(export)
+game_force_restart :: proc() -> bool {
+	return rl.IsKeyPressed(.F6)
+}
+
+// In a web build, this is called when browser changes size. Remove the
+// `rl.SetWindowSize` call if you don't want a resizable game.
+game_parent_window_size_changed :: proc(w, h: int) {
+	rl.SetWindowSize(i32(w), i32(h))
+}
+
+
+
+================================================
+File: source/utils.odin
+================================================
+// Wraps os.read_entire_file and os.write_entire_file, but they also work with emscripten.
+
+package game
+
+@(require_results)
+read_entire_file :: proc(name: string, allocator := context.allocator, loc := #caller_location) -> (data: []byte, success: bool) {
+	return _read_entire_file(name, allocator, loc)
+}
+
+write_entire_file :: proc(name: string, data: []byte, truncate := true) -> (success: bool) {
+	return _write_entire_file(name, data, truncate)
+}
+
+
+================================================
+File: source/utils_default.odin
+================================================
+#+build !wasm32
+#+build !wasm64p32
+
+package game
+
+import "core:os"
+
+_read_entire_file :: proc(name: string, allocator := context.allocator, loc := #caller_location) -> (data: []byte, success: bool) {
+	err: os.Error
+	data, err = os.read_entire_file(name, allocator, loc)
+	return data, err == nil
+}
+
+_write_entire_file :: proc(name: string, data: []byte, truncate := true) -> (err: bool) {
+	return os.write_entire_file(name, data, truncate = truncate) == nil
+}
+
+
+================================================
+File: source/utils_web.odin
+================================================
+// Implementations of `read_entire_file` and `write_entire_file` using the libc
+// stuff emscripten exposes. You can read the files that get bundled by
+// `--preload-file assets` in `build_web` script.
+
+#+build wasm32, wasm64p32
+
+package game
+
+import "base:runtime"
+import "core:log"
+import "core:c"
+import "core:strings"
+
+// These will be linked in by emscripten.
+@(default_calling_convention = "c")
+foreign {
+	fopen  :: proc(filename, mode: cstring) -> ^FILE ---
+	fseek  :: proc(stream: ^FILE, offset: c.long, whence: Whence) -> c.int ---
+	ftell  :: proc(stream: ^FILE) -> c.long ---
+	fclose :: proc(stream: ^FILE) -> c.int ---
+	fread  :: proc(ptr: rawptr, size: c.size_t, nmemb: c.size_t, stream: ^FILE) -> c.size_t ---
+	fwrite :: proc(ptr: rawptr, size: c.size_t, nmemb: c.size_t, stream: ^FILE) -> c.size_t ---
+}
+
+@(private="file")
+FILE :: struct {}
+
+Whence :: enum c.int {
+	SET,
+	CUR,
+	END,
+}
+
+// Similar to raylib's LoadFileData
+_read_entire_file :: proc(name: string, allocator := context.allocator, loc := #caller_location) -> (data: []byte, success: bool) {
+	if name == "" {
+		log.error("No file name provided")
+		return
+	}
+
+	file := fopen(strings.clone_to_cstring(name, context.temp_allocator), "rb")
+
+	if file == nil {
+		log.errorf("Failed to open file %v", name)
+		return
+	}
+
+	defer fclose(file)
+
+	fseek(file, 0, .END)
+	size := ftell(file)
+	fseek(file, 0, .SET)
+
+	if size <= 0 {
+		log.errorf("Failed to read file %v", name)
+		return
+	}
+
+	data_err: runtime.Allocator_Error
+	data, data_err = make([]byte, size, allocator, loc)
+
+	if data_err != nil {
+		log.errorf("Error allocating memory: %v", data_err)
+		return
+	}
+
+	read_size := fread(raw_data(data), 1, c.size_t(size), file)
+
+	if read_size != c.size_t(size) {
+		log.warnf("File %v partially loaded (%i bytes out of %i)", name, read_size, size)
+	}
+
+	log.debugf("Successfully loaded %v", name)
+	return data, true
+}
+
+// Similar to raylib's SaveFileData.
+//
+// Note: This can save during the current session, but I don't think you can
+// save any data between sessions. So when you close the tab your saved files
+// are gone. Perhaps you could communicate back to emscripten and save a cookie.
+// Or communicate with a server and tell it to save data.
+_write_entire_file :: proc(name: string, data: []byte, truncate := true) -> (success: bool) {
+	if name == "" {
+		log.error("No file name provided")
+		return
+	}
+
+	file := fopen(strings.clone_to_cstring(name, context.temp_allocator), truncate ? "wb" : "ab")
+	defer fclose(file)
+
+	if file == nil {
+		log.errorf("Failed to open '%v' for writing", name)
+		return
+	}
+
+	bytes_written := fwrite(raw_data(data), 1, len(data), file)
+
+	if bytes_written == 0 {
+		log.errorf("Failed to write file %v", name)
+		return
+	} else if bytes_written != len(data) {
+		log.errorf("File partially written, wrote %v out of %v bytes", bytes_written, len(data))
+		return
+	}
+	
+	log.debugf("File written successfully: %v", name)
+	return true
+}
+
+
+================================================
+File: source/main_hot_reload/main_hot_reload.odin
+================================================
+/*
+Development game exe. Loads build/hot_reload/game.dll and reloads it whenever it
+changes.
+*/
+
+package main
+
+import "core:dynlib"
+import "core:fmt"
+import "core:c/libc"
+import "core:os"
+import "core:log"
+import "core:mem"
+import "core:path/filepath"
+import "core:time"
+
+when ODIN_OS == .Windows {
+	DLL_EXT :: ".dll"
+} else when ODIN_OS == .Darwin {
+	DLL_EXT :: ".dylib"
+} else {
+	DLL_EXT :: ".so"
+}
+
+GAME_DLL_DIR :: "build/hot_reload/"
+GAME_DLL_PATH :: GAME_DLL_DIR + "game" + DLL_EXT
+
+// We copy the DLL because using it directly would lock it, which would prevent
+// the compiler from writing to it.
+copy_dll :: proc(to: string) -> bool {
+	copy_err := os.copy_file(to, GAME_DLL_PATH)
+
+	if copy_err != nil {
+		fmt.printfln("Failed to copy " + GAME_DLL_PATH + " to {0}: %v", to, copy_err)
+		return false
+	}
+
+	return true
+}
+
+Game_API :: struct {
+	lib: dynlib.Library,
+	init_window: proc(),
+	init: proc(),
+	update: proc(),
+	should_run: proc() -> bool,
+	shutdown: proc(),
+	shutdown_window: proc(),
+	memory: proc() -> rawptr,
+	memory_size: proc() -> int,
+	hot_reloaded: proc(mem: rawptr),
+	force_reload: proc() -> bool,
+	force_restart: proc() -> bool,
+	modification_time: time.Time,
+	api_version: int,
+}
+
+load_game_api :: proc(api_version: int) -> (api: Game_API, ok: bool) {
+	mod_time, mod_time_error := os.last_write_time_by_name(GAME_DLL_PATH)
+	if mod_time_error != os.ERROR_NONE {
+		fmt.printfln(
+			"Failed getting last write time of " + GAME_DLL_PATH + ", error code: {1}",
+			mod_time_error,
+		)
+		return
+	}
+
+	game_dll_name := fmt.tprintf(GAME_DLL_DIR + "game_{0}" + DLL_EXT, api_version)
+	copy_dll(game_dll_name) or_return
+
+	// This proc matches the names of the fields in Game_API to symbols in the
+	// game DLL. It actually looks for symbols starting with `game_`, which is
+	// why the argument `"game_"` is there.
+	_, ok = dynlib.initialize_symbols(&api, game_dll_name, "game_", "lib")
+	if !ok {
+		fmt.printfln("Failed initializing symbols: {0}", dynlib.last_error())
+	}
+
+	api.api_version = api_version
+	api.modification_time = mod_time
+	ok = true
+
+	return
+}
+
+unload_game_api :: proc(api: ^Game_API) {
+	if api.lib != nil {
+		if !dynlib.unload_library(api.lib) {
+			fmt.printfln("Failed unloading lib: {0}", dynlib.last_error())
+		}
+	}
+
+	if os.remove(fmt.tprintf(GAME_DLL_DIR + "game_{0}" + DLL_EXT, api.api_version)) != nil {
+		fmt.printfln("Failed to remove {0}game_{1}" + DLL_EXT + " copy", GAME_DLL_DIR, api.api_version)
+	}
+}
+
+main :: proc() {
+	// Set working dir to dir of executable.
+	exe_path := os.args[0]
+	exe_dir := filepath.dir(string(exe_path), context.temp_allocator)
+	os.set_working_directory(exe_dir)
+
+	context.logger = log.create_console_logger()
+
+	default_allocator := context.allocator
+	tracking_allocator: mem.Tracking_Allocator
+	mem.tracking_allocator_init(&tracking_allocator, default_allocator)
+	context.allocator = mem.tracking_allocator(&tracking_allocator)
+
+	reset_tracking_allocator :: proc(a: ^mem.Tracking_Allocator) -> bool {
+		err := false
+
+		for _, value in a.allocation_map {
+			log.errorf("%v: Leaked %v bytes\n", value.location, value.size)
+			err = true
+		}
+
+		mem.tracking_allocator_clear(a)
+		return err
+	}
+
+	game_api_version := 0
+	game_api, game_api_ok := load_game_api(game_api_version)
+
+	if !game_api_ok {
+		fmt.println("Failed to load Game API")
+		return
+	}
+
+	game_api_version += 1
+	game_api.init_window()
+	game_api.init()
+
+	old_game_apis := make([dynamic]Game_API, default_allocator)
+
+	for game_api.should_run() {
+		game_api.update()
+		force_reload := game_api.force_reload()
+		force_restart := game_api.force_restart()
+		reload := force_reload || force_restart
+		game_dll_mod, game_dll_mod_err := os.last_write_time_by_name(GAME_DLL_PATH)
+
+		if game_dll_mod_err == os.ERROR_NONE && game_api.modification_time != game_dll_mod {
+			reload = true
+		}
+
+		if reload {
+			new_game_api, new_game_api_ok := load_game_api(game_api_version)
+
+			if new_game_api_ok {
+				force_restart = force_restart || game_api.memory_size() != new_game_api.memory_size()
+
+				if !force_restart {
+					// This does the normal hot reload
+
+					// Note that we don't unload the old game APIs because that
+					// would unload the DLL. The DLL can contain stored info
+					// such as string literals. The old DLLs are only unloaded
+					// on a full reset or on shutdown.
+					append(&old_game_apis, game_api)
+					game_memory := game_api.memory()
+					game_api = new_game_api
+					game_api.hot_reloaded(game_memory)
+				} else {
+					// This does a full reset. That's basically like opening and
+					// closing the game, without having to restart the executable.
+					//
+					// You end up in here if the game requests a full reset OR
+					// if the size of the game memory has changed. That would
+					// probably lead to a crash anyways.
+
+					game_api.shutdown()
+					reset_tracking_allocator(&tracking_allocator)
+
+					for &g in old_game_apis {
+						unload_game_api(&g)
+					}
+
+					clear(&old_game_apis)
+					unload_game_api(&game_api)
+					game_api = new_game_api
+					game_api.init()
+				}
+
+				game_api_version += 1
+			}
+		}
+
+		if len(tracking_allocator.bad_free_array) > 0 {
+			for b in tracking_allocator.bad_free_array {
+				log.errorf("Bad free at: %v", b.location)
+			}
+
+			// This prevents the game from closing without you seeing the bad
+			// frees. This is mostly needed because I use Sublime Text and my game's
+			// console isn't hooked up into Sublime's console properly.
+			libc.getchar()
+			panic("Bad free detected")
+		}
+	}
+
+	free_all(context.temp_allocator)
+	game_api.shutdown()
+	if reset_tracking_allocator(&tracking_allocator) {
+		// This prevents the game from closing without you seeing the memory
+		// leaks. This is mostly needed because I use Sublime Text and my game's
+		// console isn't hooked up into Sublime's console properly.
+		libc.getchar()
+	}
+
+	for &g in old_game_apis {
+		unload_game_api(&g)
+	}
+
+	delete(old_game_apis)
+
+	game_api.shutdown_window()
+	unload_game_api(&game_api)
+	mem.tracking_allocator_destroy(&tracking_allocator)
+}
+
+// Make game use good GPU on laptops.
+
+@(export)
+NvOptimusEnablement: u32 = 1
+
+@(export)
+AmdPowerXpressRequestHighPerformance: i32 = 1
+
+
+
+================================================
+File: source/main_release/main_release.odin
+================================================
+/*
+For making a release exe that does not use hot reload.
+*/
+
+package main_release
+
+import "core:log"
+import "core:os"
+import "core:path/filepath"
+import "core:mem"
+import game ".."
+
+_ :: mem
+
+USE_TRACKING_ALLOCATOR :: #config(USE_TRACKING_ALLOCATOR, false)
+
+main :: proc() {
+	// Set working dir to dir of executable.
+	exe_path := os.args[0]
+	exe_dir := filepath.dir(string(exe_path), context.temp_allocator)
+	os.set_working_directory(exe_dir)
+	
+	mode := os.Permissions { .Read_User, .Write_User, .Read_Group, .Read_Other }
+	logh, logh_err := os.open("log.txt", {.Create, .Trunc, .Read, .Write}, mode)
+
+	if logh_err == os.ERROR_NONE {
+		os.stdout = logh
+		os.stderr = logh
+	}
+
+	logger_alloc := context.allocator
+	logger := logh_err == os.ERROR_NONE ? log.create_file_logger(logh, allocator = logger_alloc) : log.create_console_logger(allocator = logger_alloc)
+	context.logger = logger
+
+	when USE_TRACKING_ALLOCATOR {
+		default_allocator := context.allocator
+		tracking_allocator: mem.Tracking_Allocator
+		mem.tracking_allocator_init(&tracking_allocator, default_allocator)
+		context.allocator = mem.tracking_allocator(&tracking_allocator)
+	}
+
+	game.game_init_window()
+	game.game_init()
+
+	for game.game_should_run() {
+		game.game_update()
+	}
+
+	free_all(context.temp_allocator)
+	game.game_shutdown()
+	game.game_shutdown_window()
+
+	when USE_TRACKING_ALLOCATOR {
+		for _, value in tracking_allocator.allocation_map {
+			log.errorf("%v: Leaked %v bytes\n", value.location, value.size)
+		}
+
+		mem.tracking_allocator_destroy(&tracking_allocator)
+	}
+
+	if logh_err == os.ERROR_NONE {
+		log.destroy_file_logger(logger, logger_alloc)
+	}
+}
+
+// make game use good GPU on laptops etc
+
+@(export)
+NvOptimusEnablement: u32 = 1
+
+@(export)
+AmdPowerXpressRequestHighPerformance: i32 = 1
+
+
+================================================
+File: source/main_web/emscripten_allocator.odin
+================================================
+/*
+This allocator uses the malloc, calloc, free and realloc procs that emscripten
+exposes in order to allocate memory. Just like Odin's default heap allocator
+this uses proper alignment, so that maps and simd works.
+*/
+
+package main_web
+
+import "core:mem"
+import "core:c"
+import "base:intrinsics"
+
+// This will create bindings to emscripten's implementation of libc
+// memory allocation features.
+@(default_calling_convention = "c")
+foreign {
+	calloc  :: proc(num, size: c.size_t) -> rawptr ---
+	free    :: proc(ptr: rawptr) ---
+	malloc  :: proc(size: c.size_t) -> rawptr ---
+	realloc :: proc(ptr: rawptr, size: c.size_t) -> rawptr ---
+}
+
+emscripten_allocator :: proc "contextless" () -> mem.Allocator {
+	return mem.Allocator{emscripten_allocator_proc, nil}
+}
+
+emscripten_allocator_proc :: proc(
+	allocator_data: rawptr,
+	mode: mem.Allocator_Mode,
+	size, alignment: int,
+	old_memory: rawptr,
+	old_size: int,
+	location := #caller_location
+) -> (data: []byte, err: mem.Allocator_Error)  {
+	// These aligned alloc procs are almost indentical those in
+	// `_heap_allocator_proc` in `core:os`. Without the proper alignment you
+	// cannot use maps and simd features.
+
+	aligned_alloc :: proc(size, alignment: int, zero_memory: bool, old_ptr: rawptr = nil) -> ([]byte, mem.Allocator_Error) {
+		a := max(alignment, align_of(rawptr))
+		space := size + a - 1
+
+		allocated_mem: rawptr
+		if old_ptr != nil {
+			original_old_ptr := mem.ptr_offset((^rawptr)(old_ptr), -1)^
+			allocated_mem = realloc(original_old_ptr, c.size_t(space+size_of(rawptr)))
+		} else if zero_memory {
+			// calloc automatically zeros memory, but it takes a number + size
+			// instead of just size.
+			allocated_mem = calloc(c.size_t(space+size_of(rawptr)), 1)
+		} else {
+			allocated_mem = malloc(c.size_t(space+size_of(rawptr)))
+		}
+		aligned_mem := rawptr(mem.ptr_offset((^u8)(allocated_mem), size_of(rawptr)))
+
+		ptr := uintptr(aligned_mem)
+		aligned_ptr := (ptr - 1 + uintptr(a)) & -uintptr(a)
+		diff := int(aligned_ptr - ptr)
+		if (size + diff) > space || allocated_mem == nil {
+			return nil, .Out_Of_Memory
+		}
+
+		aligned_mem = rawptr(aligned_ptr)
+		mem.ptr_offset((^rawptr)(aligned_mem), -1)^ = allocated_mem
+
+		return mem.byte_slice(aligned_mem, size), nil
+	}
+
+	aligned_free :: proc(p: rawptr) {
+		if p != nil {
+			free(mem.ptr_offset((^rawptr)(p), -1)^)
+		}
+	}
+
+	aligned_resize :: proc(p: rawptr, old_size: int, new_size: int, new_alignment: int) -> ([]byte, mem.Allocator_Error) {
+		if p == nil {
+			return nil, nil
+		}
+		return aligned_alloc(new_size, new_alignment, true, p)
+	}
+
+	switch mode {
+	case .Alloc:
+		return aligned_alloc(size, alignment, true)
+
+	case .Alloc_Non_Zeroed:
+		return aligned_alloc(size, alignment, false)
+
+	case .Free:
+		aligned_free(old_memory)
+		return nil, nil
+
+	case .Resize:
+		if old_memory == nil {
+			return aligned_alloc(size, alignment, true)
+		}
+
+		bytes := aligned_resize(old_memory, old_size, size, alignment) or_return
+
+		// realloc doesn't zero the new bytes, so we do it manually.
+		if size > old_size {
+			new_region := raw_data(bytes[old_size:])
+			intrinsics.mem_zero(new_region, size - old_size)
+		}
+
+		return bytes, nil
+
+	case .Resize_Non_Zeroed:
+		if old_memory == nil {
+			return aligned_alloc(size, alignment, false)
+		}
+
+		return aligned_resize(old_memory, old_size, size, alignment)
+
+	case .Query_Features:
+		set := (^mem.Allocator_Mode_Set)(old_memory)
+		if set != nil {
+			set^ = {.Alloc, .Free, .Resize, .Query_Features}
+		}
+		return nil, nil
+
+	case .Free_All, .Query_Info:
+		return nil, .Mode_Not_Implemented
+	}
+	return nil, .Mode_Not_Implemented
+}
+
+
+
+================================================
+File: source/main_web/emscripten_logger.odin
+================================================
+/*
+This logger is largely a copy of the console logger in `core:log`, but it uses
+emscripten's `puts` proc to write into he console of the web browser.
+
+This is more or less identical to the logger in Aronicu's repository:
+https://github.com/Aronicu/Raylib-WASM/tree/main
+*/
+
+package main_web
+
+import "core:c"
+import "core:fmt"
+import "core:log"
+import "core:strings"
+
+Emscripten_Logger_Opts :: log.Options{.Level, .Short_File_Path, .Line}
+
+create_emscripten_logger :: proc (lowest := log.Level.Debug, opt := Emscripten_Logger_Opts) -> log.Logger {
+	return log.Logger{data = nil, procedure = logger_proc, lowest_level = lowest, options = opt}
+}
+
+// This create's a binding to `puts` which will be linked in as part of the
+// emscripten runtime.
+@(default_calling_convention = "c")
+foreign {
+	puts :: proc(buffer: cstring) -> c.int ---
+}
+
+@(private="file")
+logger_proc :: proc(
+	logger_data: rawptr,
+	level: log.Level,
+	text: string,
+	options: log.Options,
+	location := #caller_location
+) {
+	b := strings.builder_make(context.temp_allocator)
+	strings.write_string(&b, Level_Headers[level])
+	do_location_header(options, &b, location)
+	fmt.sbprint(&b, text)
+
+	if bc, bc_err := strings.to_cstring(&b); bc_err == nil {
+		puts(bc)
+	}
+}
+
+@(private="file")
+Level_Headers := [?]string {
+	0 ..< 10 = "[DEBUG] --- ",
+	10 ..< 20 = "[INFO ] --- ",
+	20 ..< 30 = "[WARN ] --- ",
+	30 ..< 40 = "[ERROR] --- ",
+	40 ..< 50 = "[FATAL] --- ",
+}
+
+@(private="file")
+do_location_header :: proc(opts: log.Options, buf: ^strings.Builder, location := #caller_location) {
+	if log.Location_Header_Opts & opts == nil {
+		return
+	}
+	fmt.sbprint(buf, "[")
+	file := location.file_path
+	if .Short_File_Path in opts {
+		last := 0
+		for r, i in location.file_path {
+			if r == '/' {
+				last = i + 1
+			}
+		}
+		file = location.file_path[last:]
+	}
+
+	if log.Location_File_Opts & opts != nil {
+		fmt.sbprint(buf, file)
+	}
+	if .Line in opts {
+		if log.Location_File_Opts & opts != nil {
+			fmt.sbprint(buf, ":")
+		}
+		fmt.sbprint(buf, location.line)
+	}
+
+	if .Procedure in opts {
+		if (log.Location_File_Opts | {.Line}) & opts != nil {
+			fmt.sbprint(buf, ":")
+		}
+		fmt.sbprintf(buf, "%s()", location.procedure)
+	}
+
+	fmt.sbprint(buf, "] ")
+}
+
+
+
+================================================
+File: source/main_web/index_template.html
+================================================
+<!doctype html>
+<html lang="en-us">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+	<title>Odin + Raylib on the web</title>
+	<meta name="title" content="Odin + Raylib on the web">
+	<meta name="description" content="Make games using Odin + Raylib that work in the browser">
+	<meta name="viewport" content="width=device-width">
+
+	<style>
+		body { 
+			margin: 0px; 
+			overflow: hidden; 
+			background-color: black;
+		}
+		canvas.game_canvas { 
+			border: 0px none; 
+			background-color: black;
+			padding-left: 0;
+			padding-right: 0;
+			margin-left: auto;
+			margin-right: auto;
+			display: block;
+		}
+	</style>
+</head>
+<body>
+	<canvas class="game_canvas" id="canvas" oncontextmenu="event.preventDefault()" tabindex="-1" onmousedown="event.target.focus()" onkeydown="event.preventDefault()"></canvas>
+	<script type="text/javascript" src="odin.js"></script>
+	<script>
+		var odinMemoryInterface = new odin.WasmMemoryInterface();
+		odinMemoryInterface.setIntSize(4);
+		var odinImports = odin.setupDefaultImports(odinMemoryInterface);
+
+		// The Module is used as configuration for emscripten.
+		var Module = {
+			// This is called by emscripten when it starts up.
+			instantiateWasm: (imports, successCallback) => {
+				const newImports = {
+					...odinImports,
+					...imports
+				}
+
+				return WebAssembly.instantiateStreaming(fetch("index.wasm"), newImports).then(function(output) {
+					var e = output.instance.exports;
+					odinMemoryInterface.setExports(e);
+					odinMemoryInterface.setMemory(e.memory);
+					return successCallback(output.instance);
+				});
+			},
+			// This happens a bit after `instantiateWasm`, when everything is
+			// done setting up. At that point we can run code.
+			onRuntimeInitialized: () => {
+				var e = wasmExports;
+
+				// Calls any procedure marked with @init
+				e._start();
+
+				// See source/main_web/main_web.odin for main_start,
+				// main_update and main_end.
+				e.main_start();
+
+				function send_resize() {
+					var canvas = document.getElementById('canvas');
+					e.web_window_size_changed(canvas.width, canvas.height);
+				}
+
+				window.addEventListener('resize', function(event) {
+					send_resize();
+				}, true);
+
+				// This can probably be done better: Ideally we'd feed the
+				// initial size to `main_start`. But there seems to be a
+				// race condition. `canvas` doesn't have it's correct size yet.
+				send_resize();
+
+				// Runs the "main loop".
+				function do_main_update() {
+					if (!e.main_update()) {
+						e.main_end();
+
+						// Calls procedures marked with @fini
+						e._end();
+						return;
+					}
+					window.requestAnimationFrame(do_main_update);
+				}
+
+				window.requestAnimationFrame(do_main_update);
+			},
+			print: (function() {
+				var element = document.getElementById("output");
+				if (element) element.value = ''; // clear browser cache
+				return function(text) {
+					if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
+					console.log(text);
+					if (element) {
+					  element.value += text + "\n";
+					  element.scrollTop = element.scrollHeight; // focus on bottom
+					}
+				};
+			})(),
+			canvas: (function() {
+				return document.getElementById("canvas");
+			})()
+		};
+	</script>
+
+	<!-- Emscripten injects its javascript here -->
+	{{{ SCRIPT }}}
+</body>
+</html>
+
+
+
+================================================
+File: source/main_web/main_web.odin
+================================================
+/*
+These procs are the ones that will be called from `main_wasm.c`.
+*/
+
+package main_web
+
+import "base:runtime"
+import "core:c"
+import "core:mem"
+import game ".."
+
+@(private="file")
+web_context: runtime.Context
+
+@export
+main_start :: proc "c" () {
+	context = runtime.default_context()
+
+	// The WASM allocator doesn't seem to work properly in combination with
+	// emscripten. There is some kind of conflict with how the manage memory.
+	// So this sets up an allocator that uses emscripten's malloc.
+	context.allocator = emscripten_allocator()
+	runtime.init_global_temporary_allocator(1*mem.Megabyte)
+
+	// Since we now use js_wasm32 we should be able to remove this and use
+	// context.logger = log.create_console_logger(). However, that one produces
+	// extra newlines on web. So it's a bug in that core lib.
+	context.logger = create_emscripten_logger()
+
+	web_context = context
+
+	game.game_init_window()
+	game.game_init()
+}
+
+@export
+main_update :: proc "c" () -> bool {
+	context = web_context
+	game.game_update()
+	return game.game_should_run()
+}
+
+@export
+main_end :: proc "c" () {
+	context = web_context
+	game.game_shutdown()
+	game.game_shutdown_window()
+}
+
+@export
+web_window_size_changed :: proc "c" (w: c.int, h: c.int) {
+	context = web_context
+	game.game_parent_window_size_changed(int(w), int(h))
+}
+
+
+================================================
+File: .github/workflows/build.yml
+================================================
+name: Build
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: 0 20 * * *
+
+
+jobs:
+  build_linux:
+    name: Linux
+    runs-on: ubuntu-latest
+    steps:
+      - uses: laytan/setup-odin@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          release: false
+      
+      - uses: mymindstorm/setup-emsdk@v14
+      
+      - uses: actions/checkout@v4
+      
+      - name: Build hot reload
+        run: ./build_hot_reload.sh
+
+      - name: Build release
+        run: ./build_release.sh
+
+      - name: Build debug
+        run: ./build_debug.sh
+
+      - name: Build web
+        run: ./build_web.sh
+
+  build_macos:
+    name: MacOS
+    strategy:
+      matrix:
+        os: [macos-15-intel, macos-15]
+    runs-on: ${{matrix.os}}
+    steps:
+      - uses: laytan/setup-odin@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          release: false
+      
+      - uses: mymindstorm/setup-emsdk@v14
+
+      - uses: actions/checkout@v4
+
+      - name: Build hot reload
+        run: ./build_hot_reload.sh
+
+      - name: Build release
+        run: ./build_release.sh
+
+      - name: Build debug
+        run: ./build_debug.sh
+
+      - name: Build web
+        run: ./build_web.sh
+
+  build_windows:
+    name: Windows
+    runs-on: windows-latest
+    steps:
+      - uses: laytan/setup-odin@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          release: false
+
+      - uses: mymindstorm/setup-emsdk@v14
+
+      - uses: actions/checkout@v4
+      - uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Build hot reload
+        run: .\build_hot_reload.bat
+
+      - name: Build release
+        run: .\build_release.bat
+
+      - name: Build debug
+        run: .\build_debug.bat
+
+      - name: Build web
+        run: .\build_web.bat
+
+

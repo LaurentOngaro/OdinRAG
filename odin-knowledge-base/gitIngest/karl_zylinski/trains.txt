@@ -1,0 +1,1692 @@
+Directory structure:
+└── trains/
+    ├── LICENSE
+    ├── build_dev.bat
+    ├── build_dev_main.bat
+    ├── build_game.bat
+    ├── colors.odin
+    ├── direction.odin
+    ├── drawable.odin
+    ├── game.odin
+    ├── handle_array.odin
+    ├── helpers.odin
+    ├── math.odin
+    ├── raylib_helpers.odin
+    ├── rect.odin
+    ├── tile_grid.odin
+    ├── track.odin
+    ├── train.odin
+    ├── concepts/
+    │   └── concept_0.ase
+    ├── main_hot_reload/
+    │   ├── main_hot_reload.odin
+    │   └── tracking_allocator.odin
+    └── textures/
+        └── palette.aseprite
+
+================================================
+File: LICENSE
+================================================
+Copyright (c) 2023-2024 Karl Zylinski. All rights reserved.
+
+The files in this directory and its sub-directories are provided for educational purposes. You may not redistribute or sell them without the explicit permission from Karl Zylinski.
+
+
+================================================
+File: build_dev.bat
+================================================
+@echo off
+
+rem odin\odin.exe build assets_builder
+rem IF %ERRORLEVEL% NEQ 0 pause && exit
+
+rem assets_builder.exe
+
+QPROCESS "trains.exe">NUL
+IF %ERRORLEVEL% EQU 0 build_game && exit
+
+build_game && build_dev_main
+
+
+
+================================================
+File: build_dev_main.bat
+================================================
+@echo off
+odin build main_hot_reload -use-separate-modules -define:RAYLIB_SHARED=true -out:trains.exe -strict-style -debug
+copy c:\programs\odin\vendor\raylib\windows\raylib.dll .
+
+
+================================================
+File: build_game.bat
+================================================
+@echo off
+
+odin build . -show-timings -use-separate-modules -define:RAYLIB_SHARED=true -build-mode:dll -out:game.dll -strict-style -vet-unused -vet-using-stmt -vet-using-param -vet-style -vet-semicolon -debug
+
+
+================================================
+File: colors.odin
+================================================
+package game
+
+import rl "vendor:raylib"
+
+Color :: rl.Color
+
+ColorGround	:: Color { 59, 228, 128, 255 }
+ColorTrack :: Color { 32, 32, 32, 255 }
+ColorStation :: Color { 47, 20, 47, 255 }
+ColorTrain :: Color { 244, 50, 50, 255 }
+
+
+
+================================================
+File: direction.odin
+================================================
+package game
+
+Direction :: enum {
+	North,
+	East,
+	South,
+	West,
+}
+
+reverse_direction :: proc(dir: Direction) -> Direction {
+	switch dir {
+		case .North: return .South
+		case .East: return .West
+		case .South: return .North
+		case .West: return .East
+	}
+
+	return dir
+}
+
+vec2i_from_direction :: proc(dir: Direction) -> Vec2i {
+	switch dir {
+		case .North:
+			return {0, -1}
+		case .East:
+			return {1, 0}
+		case .South:
+			return {0, 1}
+		case .West:
+			return {-1, 0}
+	}
+
+	return {0, 0}
+}
+
+
+
+================================================
+File: drawable.odin
+================================================
+package game
+
+import "core:log"
+
+DrawableRect :: struct {
+	rect: Rect,
+	color: Color,
+}
+
+DrawableRectLines :: distinct DrawableRect
+
+DrawableTexture :: struct {
+	texture: Texture,
+	pos: Vec2i,
+	flip: bool,
+}
+
+Drawable :: union #no_nil {
+	DrawableRect,
+	DrawableRectLines,
+	DrawableTexture,
+}
+
+DrawablesArray :: [4096]Drawable
+
+@(private="file")
+drawables: ^DrawablesArray
+@(private="file")
+num_drawables: int
+
+drawables_clear :: proc() {
+	num_drawables = 0
+}
+
+drawables_init :: proc(d: ^DrawablesArray) {
+	drawables = d
+}
+
+drawables_slice :: proc() -> []Drawable {
+	return drawables[:num_drawables]
+}
+
+add_drawable :: proc(d: Drawable) {
+	if num_drawables == len(drawables) {
+		log.error("Out of drawables!")
+		return
+	}
+
+	drawables[num_drawables] = d
+	num_drawables += 1
+}
+
+draw_rect :: proc(r: Rect, c: Color) {
+	add_drawable(DrawableRect {
+		rect = r,
+		color = c,
+	})
+}
+
+draw_rect_lines :: proc(r: Rect, c: Color) {
+	add_drawable(DrawableRectLines {
+		rect = r,
+		color = c,
+	})
+}
+
+draw_texture :: proc(t: Texture, pos: Vec2i, flip: bool = false) {
+	add_drawable(DrawableTexture {
+		texture = t,
+		pos = pos,
+		flip = flip,
+	})
+}
+
+
+================================================
+File: game.odin
+================================================
+package game
+
+import "core:fmt"
+import "core:strings"
+import "core:math"
+import rl "vendor:raylib"
+
+Texture :: rl.Texture
+PixelWindowHeight :: 180
+GridSize :: 12
+
+Orientation :: enum {
+	Horizontal,
+	Vertical,
+}
+
+PlacementModeTrackStart :: struct {
+	from_dir: Direction,
+}
+
+PlacementModeTrackChosingDestDirection :: struct {
+	tile: int,
+	from_dir: Direction,
+	to_dir: Direction,
+}
+
+PlacementModeStation :: struct {
+	
+}
+
+PlacementModeTrain :: struct {
+	
+}
+
+PlacementMode :: union #no_nil {
+	PlacementModeTrackStart,
+	PlacementModeTrackChosingDestDirection,
+	PlacementModeStation,
+	PlacementModeTrain,
+}
+
+GameMemory :: struct {
+	track_straight: rl.Texture,
+	track_straight_hor: rl.Texture,
+	track_turn: rl.Texture,
+	track_turn_v_flip: rl.Texture,
+	station_tex: rl.Texture,
+	placement_mode: PlacementMode,
+	trains: HandleArray(Train, 128),
+	grid: Grid,
+	drawables: DrawablesArray,
+}
+
+g_mem: ^GameMemory
+
+@(export)
+game_init_window :: proc() {
+	rl.SetConfigFlags({.WINDOW_RESIZABLE})
+	rl.InitWindow(1920, 1080, "Trains!")
+	rl.SetWindowPosition(200, 200)
+	rl.SetTargetFPS(500)
+}
+
+@(export)
+game_init :: proc() {
+	g_mem = new(GameMemory)
+
+	g_mem^ = GameMemory {
+		track_straight = rl.LoadTexture("textures/track_straight.png"),
+		track_straight_hor = rl.LoadTexture("textures/track_straight_hor.png"),
+		track_turn = rl.LoadTexture("textures/track_turn.png"),
+		track_turn_v_flip = rl.LoadTexture("textures/track_turn_2.png"),
+		station_tex = rl.LoadTexture("textures/station.png"),
+		grid = make_grid(40, 22),
+	}
+
+	game_hot_reloaded(g_mem)
+}
+
+@(export)
+game_shutdown :: proc() { 
+	rl.UnloadTexture(g_mem.track_straight)
+	rl.UnloadTexture(g_mem.track_straight_hor)
+	rl.UnloadTexture(g_mem.track_turn)
+	rl.UnloadTexture(g_mem.track_turn_v_flip)
+	rl.UnloadTexture(g_mem.station_tex)
+	delete_grid(g_mem.grid)
+	free(g_mem)
+}
+
+@(export)
+game_shutdown_window :: proc() {
+	rl.CloseWindow()
+}
+
+game_camera :: proc() -> rl.Camera2D {
+	return {
+		zoom = f32(rl.GetScreenHeight())/PixelWindowHeight,
+	}
+}
+
+ui_camera :: proc() -> rl.Camera2D {
+	return {
+		zoom = f32(rl.GetScreenHeight())/PixelWindowHeight,
+	}
+}
+
+update :: proc() {
+	if rl.IsKeyPressed(.ONE) {
+		g_mem.placement_mode = PlacementModeTrackStart{}
+	} else if rl.IsKeyPressed(.TWO) {
+		g_mem.placement_mode = PlacementModeStation{}
+	} else if rl.IsKeyPressed(.THREE) {
+		g_mem.placement_mode = PlacementModeTrain{}
+	}
+
+	drawables_clear()
+
+	cam := game_camera()
+
+	mp := rl.GetScreenToWorld2D(rl.GetMousePosition(), cam)
+	hover_coord := Vec2i {
+		int(mp.x/GridSize),
+		int(mp.y/GridSize),
+	}
+
+	hover_coord_world := vec2_from_vec2i(hover_coord*GridSize)
+	hover_idx := tile_index_from_coord(g_mem.grid, hover_coord)
+
+	switch &p in g_mem.placement_mode {
+		case PlacementModeTrackStart:
+			hover_world_rect := Rect {
+				hover_coord_world.x, hover_coord_world.y,
+				GridSize, GridSize,
+			}
+
+			r_north, _ := split_rect_top(hover_world_rect, hover_world_rect.height / 3, 0)
+			_, r_south := split_rect_bottom(hover_world_rect, hover_world_rect.height / 3, 0)
+			r_west, _ := split_rect_left(hover_world_rect, hover_world_rect.width / 3, 0)
+			_, r_east := split_rect_right(hover_world_rect, hover_world_rect.width / 3, 0)
+
+			in_north := mouse_in_world_rect(r_north, cam)
+			in_east := mouse_in_world_rect(r_east, cam)
+			in_south := mouse_in_world_rect(r_south, cam)
+			in_west := mouse_in_world_rect(r_west, cam)
+
+			outside_rect := (p.from_dir == .North && !in_north) ||
+							(p.from_dir == .East && !in_east) ||
+							(p.from_dir == .South && !in_south) ||
+							(p.from_dir == .West && !in_west)
+
+			if outside_rect {
+				if in_north {
+					p.from_dir = .North
+				}
+
+				if in_east {
+					p.from_dir = .East
+				}
+
+				if in_south {
+					p.from_dir = .South
+				}
+
+				if in_west {
+					p.from_dir = .West
+				}
+			}
+
+			switch p.from_dir {
+				case .North: draw_rect(r_north, ColorTrain)
+				case .East: draw_rect(r_east, ColorTrain)
+				case .South: draw_rect(r_south, ColorTrain)
+				case .West: draw_rect(r_west, ColorTrain)
+			}
+
+			draw_rect_lines(hover_world_rect, ColorTrain)
+
+			if rl.IsMouseButtonPressed(.LEFT) {
+				g_mem.placement_mode = PlacementModeTrackChosingDestDirection {
+					from_dir = p.from_dir,
+					tile = hover_idx,
+				}
+			}
+
+		case PlacementModeTrackChosingDestDirection:
+			tile_coord := tile_coord_from_index(g_mem.grid, p.tile)
+			tile_world_coord := vec2_from_vec2i(tile_coord*GridSize)
+
+			tile_rect := Rect {
+				tile_world_coord.x, tile_world_coord.y,
+				GridSize, GridSize,
+			}
+
+			draw_rect_lines(tile_rect, ColorTrain)
+
+			r_north, _ := split_rect_top(tile_rect, tile_rect.height / 3, 0)
+			_, r_south := split_rect_bottom(tile_rect, tile_rect.height / 3, 0)
+			r_west, _ := split_rect_left(tile_rect, tile_rect.width / 3, 0)
+			_, r_east := split_rect_right(tile_rect, tile_rect.width / 3, 0)
+
+			in_north := mouse_in_world_rect(r_north, cam)
+			in_east := mouse_in_world_rect(r_east, cam)
+			in_south := mouse_in_world_rect(r_south, cam)
+			in_west := mouse_in_world_rect(r_west, cam)
+
+			outside_rect := (p.to_dir == .North && !in_north) ||
+							(p.to_dir == .East && !in_east) ||
+							(p.to_dir == .South && !in_south) ||
+							(p.to_dir == .West && !in_west)
+
+			if outside_rect {
+				if in_north && p.from_dir != .North {
+					p.to_dir = .North
+				}
+
+				if in_east && p.from_dir != .East {
+					p.to_dir = .East
+				}
+
+				if in_south && p.from_dir != .South {
+					p.to_dir = .South
+				}
+
+				if in_west && p.from_dir != .West {
+					p.to_dir = .West
+				}
+			}
+			
+			if p.from_dir != p.to_dir {
+				draw_track_tile_directions(tile_coord, p.from_dir, p.to_dir)
+			} else {
+				switch p.from_dir {
+					case .North: draw_rect(r_north, ColorTrain)
+					case .East: draw_rect(r_east, ColorTrain)
+					case .South: draw_rect(r_south, ColorTrain)
+					case .West: draw_rect(r_west, ColorTrain)
+				}
+			}
+
+			if hover_idx != p.tile && p.from_dir != p.to_dir {
+				coord_diff := hover_coord - tile_coord
+
+				if coord_diff.x > 0 {
+					p.to_dir = .East
+				}
+				if coord_diff.x < 0 {
+					p.to_dir = .West
+				}
+				if coord_diff.y > 0 {
+					p.to_dir = .South
+				}
+				if coord_diff.y < 0 {
+					p.to_dir = .North
+				}
+
+				dir := track_direction_from_directions(p.from_dir, p.to_dir)
+				rev_dir := reverse_track_direction(dir)
+
+				switch &v in g_mem.grid.tiles[p.tile] {
+					case TileTypeNone:
+						g_mem.grid.tiles[p.tile] = TileTypeTrack { directions = { dir, rev_dir}}
+
+					case TileTypeTrack:
+						v.directions += {dir, rev_dir}
+				}
+
+				g_mem.placement_mode = PlacementModeTrackChosingDestDirection {
+					tile = hover_idx,
+					from_dir = reverse_direction(p.to_dir),
+					to_dir = p.to_dir,
+				}
+
+				break
+			}
+
+			if rl.IsMouseButtonReleased(.LEFT) {
+				if hover_idx == p.tile && p.from_dir != p.to_dir {
+					dir := track_direction_from_directions(p.from_dir, p.to_dir)
+					rev_dir := reverse_track_direction(dir)
+
+					switch &v in g_mem.grid.tiles[p.tile] {
+						case TileTypeNone:
+							g_mem.grid.tiles[p.tile] = TileTypeTrack { directions = { dir, rev_dir}}
+
+						case TileTypeTrack:
+							v.directions += {dir, rev_dir}
+					}
+				}
+
+				g_mem.placement_mode = PlacementModeTrackStart {
+					from_dir = p.from_dir,
+				}
+			}
+
+		case PlacementModeStation:
+			switch &v in g_mem.grid.tiles[hover_idx] {
+				case TileTypeNone:
+
+				case TileTypeTrack:
+					if !v.station {
+						draw_track_station(hover_coord, v.directions)
+					}
+
+					if rl.IsMouseButtonPressed(.LEFT) {
+						v.station = !v.station
+					}
+		}
+
+		case PlacementModeTrain:
+			switch &v in g_mem.grid.tiles[hover_idx] {
+				case TileTypeNone:
+
+				case TileTypeTrack:
+					if rl.IsMouseButtonPressed(.LEFT) {
+						if heading := first_track_direction_in_bitset(v.directions); heading != .Invalid {
+							t := Train {
+								cur_cell = hover_idx,
+								heading = heading,
+								move_timer = TrainMoveSpeed,
+							}
+							ha_add(&g_mem.trains, t)
+						}
+					}
+
+					draw_train(hover_coord)
+			}
+	}
+
+	if rl.IsMouseButtonDown(.RIGHT) {
+		switch p in g_mem.placement_mode {
+			case PlacementModeTrain:
+				trains_iter := ha_make_iter(&g_mem.trains)
+				for t, th in ha_iter_ptr(&trains_iter) {
+					if t.cur_cell == hover_idx {
+						ha_remove(&g_mem.trains, th)
+						break
+					}
+				}
+			case PlacementModeTrackStart:
+				g_mem.grid.tiles[hover_idx] = {}
+			case PlacementModeTrackChosingDestDirection:
+			case PlacementModeStation:
+		}
+	}
+
+	trains_iter := ha_make_iter(&g_mem.trains)
+	for t in ha_iter_ptr(&trains_iter) {
+		t.move_timer -= rl.GetFrameTime()
+		next_tile, next_heading, next_tile_ok := train_get_next_tile(t^)
+
+		if t.move_timer <= 0 {
+			t.move_timer = TrainMoveSpeed + t.move_timer
+
+			if next_tile_ok {
+				t.cur_cell = next_tile
+				t.heading = next_heading
+			} else {
+				t.heading = reverse_track_direction(t.heading)
+			}
+		}
+	}
+}
+
+draw :: proc() {
+	rl.BeginDrawing()
+	rl.ClearBackground(ColorGround)
+	rl.BeginMode2D(game_camera())
+
+	for c, idx in g_mem.grid.tiles {
+		switch v in c {
+			case TileTypeNone:
+			case TileTypeTrack:
+				c := tile_coord_from_index(g_mem.grid, idx)
+				draw_track_tile(c, v.directions)
+
+				if v.station {
+					draw_track_station(c, v.directions)
+				}
+		}
+	}
+
+	trains_iter := ha_make_iter(&g_mem.trains)
+	for t in ha_iter_ptr(&trains_iter) {
+		next_tile, _, next_tile_ok := train_get_next_tile(t^)
+
+		cp := tile_coord_from_index(g_mem.grid, t.cur_cell)
+
+		// interpolation
+		if next_tile_ok {
+			np := tile_coord_from_index(g_mem.grid, next_tile)
+
+			p1 := rl.Vector2 {
+				f32(cp.x)*GridSize, f32(cp.y)*GridSize,
+			}
+
+			p2 := rl.Vector2 {
+				f32(np.x)*GridSize, f32(np.y)*GridSize,
+			}
+
+			pos_t := remap(TrainMoveSpeed - t.move_timer, 0, TrainMoveSpeed, 0, 1)
+			pos := math.lerp(p1, p2, pos_t)
+			draw_train_world_coords(pos)
+		} else {
+			draw_train(cp)
+		}
+	}
+
+	drawables := drawables_slice()
+
+	for d in drawables {
+		switch v in d {
+			case DrawableRect: rl.DrawRectangleRec(v.rect, v.color)
+			case DrawableRectLines: rl.DrawRectangleLinesEx(v.rect, 1, v.color)
+			case DrawableTexture:
+				p := vec2_from_vec2i(v.pos*GridSize)
+				dest := Rect {
+					p.x, p.y,
+					GridSize, GridSize,
+				}
+				rl.DrawTexturePro(v.texture, texture_rect(v.texture, v.flip), dest, 0, 0, rl.WHITE)
+		}
+	}
+
+	rl.EndMode2D()
+	rl.BeginMode2D(ui_camera())
+
+	#partial switch &p in g_mem.placement_mode {
+		case PlacementModeTrackStart:
+			rl.DrawTextEx(rl.GetFontDefault(), "Track", {2, 2}, 8, 1, rl.BLACK)
+			rl.DrawTextEx(rl.GetFontDefault(), fmt.ctprintf("%v", p.from_dir), {100, 2}, 8, 1, rl.BLACK)
+
+		case PlacementModeTrackChosingDestDirection:
+			rl.DrawTextEx(rl.GetFontDefault(), "Track", {2, 2}, 8, 1, rl.BLACK)
+			rl.DrawTextEx(rl.GetFontDefault(), fmt.ctprintf("%v", p.from_dir), {100, 2}, 8, 1, rl.BLACK)
+			rl.DrawTextEx(rl.GetFontDefault(), fmt.ctprintf("%v", p.to_dir), {140, 2}, 8, 1, rl.BLACK)
+
+		case:
+			placement_mode_str := strings.trim_prefix(fmt.tprint(union_type(g_mem.placement_mode)), "PlacementMode")
+			rl.DrawTextEx(rl.GetFontDefault(), temp_cstring(placement_mode_str), {2, 2}, 8, 1, rl.BLACK)
+	}
+
+	rl.EndMode2D()
+	rl.EndDrawing()
+}
+
+@(export)
+game_update :: proc() -> bool {
+	update()
+	draw()
+	return !rl.WindowShouldClose()
+}
+
+@(export)
+game_memory :: proc() -> rawptr {
+	return g_mem
+}
+
+@(export)
+game_memory_size :: proc() -> int {
+	return size_of(GameMemory)
+}
+
+@(export)
+game_hot_reloaded :: proc(mem: rawptr) {
+	g_mem = (^GameMemory)(mem)
+	drawables_init(&g_mem.drawables)
+}
+
+
+================================================
+File: handle_array.odin
+================================================
+package game
+
+Handle :: struct($T: typeid) {
+	// idx 0 means unused. Note that slot 0 is a dummy slot, it can never be used.
+	idx: u32,
+	gen: u32,
+}
+
+HandleArrayItem :: struct($T: typeid) {
+	item: T,
+	handle: Handle(T),
+}
+
+HandleArray :: struct($T: typeid, $N: int) {
+	items: #soa[N]HandleArrayItem(T),
+	num_items: u32,
+}
+
+ha_add :: proc(a: ^HandleArray($T, $N), v: T) -> (Handle(T), bool) #optional_ok {
+	for idx in 1..<a.num_items {
+		i := &a.items[idx]
+
+		if idx != 0 && i.handle.idx == 0 {
+			i.handle.idx = u32(idx)
+			i.item = v
+			return i.handle, true
+		}
+	}
+
+	// Index 0 is dummy
+	if a.num_items == 0 {
+		a.num_items += 1
+	}
+
+	if a.num_items == len(a.items) {
+		return {}, false
+	}
+
+	idx := a.num_items
+	i := &a.items[a.num_items]
+	a.num_items += 1
+	i.handle.idx = idx
+	i.handle.gen = 1
+	i.item = v
+	return i.handle, true
+}
+
+ha_get :: proc(a: HandleArray($T, $N), h: Handle(T)) -> (T, bool) {
+	if h.idx == 0 {
+		return {}, false
+	}
+
+	if int(h.idx) < len(a.items) && int(h.idx) < a.num_items && a.items[h.idx].handle == h {
+		return ha.items[h.idx], true
+	}
+
+	return {}, false
+}
+
+ha_get_ptr :: proc(a: HandleArray($T, $N), h: Handle(T)) -> ^T {
+	if h.idx == 0 {
+		return nil
+	}
+
+	if int(h.idx) < len(a.items) && int(h.idx) < a.num_items && a.items[h.idx].handle == h {
+		return &ha.items[h.idx].item
+	}
+
+	return nil
+}
+
+ha_remove :: proc(a: ^HandleArray($T, $N), h: Handle(T)) {
+	if h.idx == 0 {
+		return
+	}
+
+	if int(h.idx) < len(a.items) && h.idx < a.num_items && a.items[h.idx].handle == h {
+		a.items[h.idx].handle.idx = 0
+		a.items[h.idx].handle.gen += 1
+	}
+}
+
+ha_valid :: proc(a: HandleArray($T, $N), h: Handle(T)) -> bool {
+	if h.idx == 0 {
+		return false
+	}
+
+	return int(h.idx) < len(a.items) && int(h.idx) < a.num_items && a.items[h.idx].handle == h
+}
+
+HandleArrayIter :: struct($T: typeid, $N: int) {
+	a: ^HandleArray(T, N),
+	index: int,
+}
+
+ha_make_iter :: proc(a: ^HandleArray($T, $N)) -> HandleArrayIter(T, N) {
+	return HandleArrayIter(T, N) { a = a }
+}
+
+ha_iter :: proc(it: ^HandleArrayIter($T, $N)) -> (val: T, h: Handle(T), cond: bool) {
+	cond = it.index < it.a.num_items
+
+	for ; cond; cond = it.index < it.a.num_items {
+		if it.ha.items[it.index].handle.idx == 0 {
+			it.index += 1
+			continue
+		}
+
+		val = it.a.items[it.index].item
+		h = it.a.items[it.index].handle
+		it.index += 1
+		break
+	}
+
+	return
+}
+
+ha_iter_ptr :: proc(it: ^HandleArrayIter($T, $N)) -> (val: ^T, h: Handle(T), cond: bool) {
+	cond = it.index < int(it.a.num_items)
+
+	for ; cond; cond = it.index < int(it.a.num_items) {
+		if it.a.items[it.index].handle.idx == 0 {
+			it.index += 1
+			continue
+		}
+
+		val = &it.a.items[it.index].item
+		h = it.a.items[it.index].handle
+		it.index += 1
+		break
+	}
+
+	return
+}
+
+
+
+================================================
+File: helpers.odin
+================================================
+// generic odin helpers
+
+package game
+
+import "core:reflect"
+import "core:strings"
+import "core:intrinsics"
+
+increase_or_wrap_enum :: proc(e: $T) -> T {
+	ei := int(e) + 1
+
+	if ei >= len(T) {
+		ei = 0
+	}
+
+	return T(ei)
+}
+
+union_type :: proc(a: any) -> typeid {
+	return reflect.union_variant_typeid(a)
+}
+
+temp_cstring :: proc(s: string) -> cstring {
+	return strings.clone_to_cstring(s, context.temp_allocator)
+}
+
+remap :: proc "contextless" (old_value, old_min, old_max, new_min, new_max: $T) -> (x: T) where intrinsics.type_is_numeric(T), !intrinsics.type_is_array(T) {
+	old_range := old_max - old_min
+	new_range := new_max - new_min
+	if old_range == 0 {
+		return new_range / 2
+	}
+	return clamp(((old_value - old_min) / old_range) * new_range + new_min, new_min, new_max)
+}
+
+vec2_from_vec2i :: proc(p: Vec2i) -> Vec2 {
+	return { f32(p.x), f32(p.y) }
+}
+
+
+
+================================================
+File: math.odin
+================================================
+package game
+
+Vec2i :: [2]int
+Vec2 :: [2]f32
+
+
+================================================
+File: raylib_helpers.odin
+================================================
+package game
+
+texture_rect :: proc(tex: Texture, flip_x: bool) -> Rect {
+	return {
+		x = 0,
+		y = 0,
+		width = flip_x ? - f32(tex.width) : f32(tex.width),
+		height = f32(tex.height),
+	}
+}
+
+
+
+================================================
+File: rect.odin
+================================================
+// procs for modifying and managing rects
+
+package game
+
+import rl "vendor:raylib"
+
+Rect :: rl.Rectangle
+
+split_rect_top :: proc(r: Rect, y: f32, m: f32) -> (top, bottom: Rect) {
+	top = r
+	bottom = r
+	top.y += m
+	top.height = y
+	bottom.y += y + m
+	bottom.height -= y + m
+	return
+}
+
+split_rect_left :: proc(r: Rect, x: f32, m: f32) -> (left, right: Rect) {
+	left = r
+	right = r
+	left.width = x
+	right.x += x + m
+	right.width -= x +m
+	return
+}
+
+split_rect_bottom :: proc(r: rl.Rectangle, y: f32, m: f32) -> (top, bottom: rl.Rectangle) {
+	top = r
+	top.height -= y + m
+	bottom = r
+	bottom.y = top.y + top.height + m
+	bottom.height = y
+	return
+}
+
+split_rect_right :: proc(r: Rect, x: f32, m: f32) -> (left, right: Rect) {
+	left = r
+	right = r
+	right.width = x
+	left.width -= x + m
+	right.x = left.x + left.width
+	return
+}
+
+rect_middle :: proc(r: Rect) -> Vec2 {
+	return {
+		r.x + f32(r.width) * 0.5,
+		r.y + f32(r.height) * 0.5,
+	}
+}
+
+inset_rect :: proc(r: Rect, x: f32, y: f32) -> Rect {
+	return {
+		r.x + x,
+		r.y + y,
+		r.width - x * 2,
+		r.height - y * 2,
+	}
+}
+
+rect_add_pos :: proc(r: Rect, p: Vec2) -> Rect {
+	return {
+		r.x + p.x,
+		r.y + p.y,
+		r.width,
+		r.height,
+	}
+}
+
+mouse_in_rect :: proc(r: Rect) -> bool {
+	return rl.CheckCollisionPointRec(rl.GetMousePosition(), r)
+}
+
+mouse_in_world_rect :: proc(r: Rect, camera: rl.Camera2D) -> bool {
+	return rl.CheckCollisionPointRec(rl.GetScreenToWorld2D(rl.GetMousePosition(), camera), r)
+}
+
+
+================================================
+File: tile_grid.odin
+================================================
+package game
+
+Grid :: struct {
+	tiles: []TileType,
+	width: int,
+	height: int,
+}
+
+make_grid :: proc(w, h: int) -> Grid {
+	return {
+		tiles = make([]TileType, w*h),
+		width = w,
+		height = h,
+	}
+}
+
+delete_grid :: proc(grid: Grid) {
+	delete(grid.tiles)
+}
+
+TileTypeNone :: struct {}
+
+TileType :: union #no_nil {
+	TileTypeNone,
+	TileTypeTrack,
+}
+
+tile_index_from_coord :: proc(grid: Grid, p: Vec2i) -> int {
+	idx := p.y*grid.width + p.x
+
+	if idx < 0 {
+		idx = 0
+	}
+
+	if idx >= grid.width * grid.height {
+		idx = 0
+	}
+
+	return idx
+}
+
+tile_coord_from_index :: proc(grid: Grid, i: int) -> Vec2i {
+	return Vec2i {
+		i % grid.width,
+		i / grid.width,
+	}
+}
+
+
+================================================
+File: track.odin
+================================================
+package game
+
+import "core:log"
+
+TileTypeTrack :: struct {
+	directions: bit_set[TrackDirection],
+	station: bool,
+}
+
+TrackDirection :: enum {
+	Invalid,
+
+	n2e,
+	n2s,
+	n2w,
+
+	e2n,
+	e2s,
+	e2w,
+
+	s2n,
+	s2e,
+	s2w,
+
+	w2n,
+	w2e,
+	w2s,
+}
+
+reverse_track_direction :: proc(dir: TrackDirection) -> TrackDirection {
+	switch dir {
+		case .Invalid: return .Invalid
+
+		case .n2e: return .e2n
+		case .n2s: return .s2n
+		case .n2w: return .w2n
+
+		case .e2n: return .n2e
+		case .e2s: return .s2e
+		case .e2w: return .w2e
+
+		case .s2n: return .n2s
+		case .s2e: return .e2s
+		case .s2w: return .w2s
+
+		case .w2n: return .n2w
+		case .w2e: return .e2w
+		case .w2s: return .s2w
+	}
+
+	return .Invalid
+}
+
+track_direction_dest_direction :: proc(d: TrackDirection) -> (ret: Direction, ok: bool) {
+	ok = true
+
+	switch d {
+		case .Invalid: ok = false
+		case .n2e: ret = .East
+		case .n2s: ret = .South
+		case .n2w: ret = .West
+		case .e2n: ret = .North
+		case .e2s: ret = .South
+		case .e2w: ret = .West
+		case .s2n: ret = .North
+		case .s2e: ret = .East
+		case .s2w: ret = .West
+		case .w2n: ret = .North
+		case .w2e: ret = .East
+		case .w2s: ret = .South
+	}
+
+	return
+}
+
+track_direction_from_directions :: proc(from: Direction, to: Direction) -> TrackDirection {
+	switch from {
+		case .North:
+			switch to {
+				case .North:
+				case .East:
+					return .n2e
+				case .South:
+					return .n2s
+				case .West:
+					return .n2w
+			}
+
+		case .East:
+			switch to {
+				case .North:
+					return .e2n
+				case .East:
+				case .South:
+					return .e2s
+				case .West:
+					return .e2w
+			}
+
+		case .South:
+			switch to {
+				case .North:
+					return .s2n
+				case .East:
+					return .s2e
+				case .South:
+				case .West:
+					return .s2w
+			}
+
+		case .West:
+			switch to {
+				case .North:
+					return .w2n
+				case .East:
+					return .w2e
+				case .South:
+					return .w2s
+				case .West:
+			}
+	}
+
+	return .Invalid
+}
+
+first_track_direction_in_bitset :: proc(directions: bit_set[TrackDirection]) -> TrackDirection {
+	for d in TrackDirection {
+		if d in directions {
+			return d
+		}
+	}
+
+	return .Invalid
+}
+
+first_track_direction_from_direction :: proc(directions: bit_set[TrackDirection], from: Direction) -> TrackDirection {
+	switch from {
+		case .North:
+			if .n2e in directions {
+				return .n2e
+			}
+
+			if .n2s in directions {
+				return .n2s
+			}
+
+			if .n2w in directions {
+				return .n2w
+			}
+			
+		case .East:
+			if .e2n in directions {
+				return .e2n
+			}
+
+			if .e2s in directions {
+				return .e2s
+			}
+
+			if .e2w in directions {
+				return .e2w
+			}
+
+		case .South:
+			if .s2n in directions {
+				return .s2n
+			}
+
+			if .s2e in directions {
+				return .s2e
+			}
+
+			if .s2w in directions {
+				return .s2w
+			}
+
+		case .West:
+			if .w2n in directions {
+				return .w2n
+			}
+
+			if .w2e in directions {
+				return .w2e
+			}
+
+			if .w2s in directions {
+				return .w2s
+			}
+	}
+
+	return .Invalid
+}
+
+draw_track_tile_directions :: proc(pi: Vec2i, from: Direction, to: Direction) {
+	switch from {
+		case .North:
+			switch to {
+				case .North:
+				case .East:
+					draw_texture(g_mem.track_turn, pi)
+				case .South:
+					draw_texture(g_mem.track_straight, pi)
+				case .West:
+					draw_texture(g_mem.track_turn, pi, true)
+			}
+
+		case .East:
+			switch to {
+				case .North:
+					draw_texture(g_mem.track_turn, pi)
+				case .East:
+				case .South:
+					draw_texture(g_mem.track_turn_v_flip, pi)
+				case .West:
+					draw_texture(g_mem.track_straight_hor, pi)
+			}
+
+		case .South:
+			switch to {
+				case .North:
+					draw_texture(g_mem.track_straight, pi)
+				case .East:
+					draw_texture(g_mem.track_turn_v_flip, pi)
+				case .South:
+				case .West:
+					draw_texture(g_mem.track_turn_v_flip, pi, true)
+			}
+
+		case .West:
+			switch to {
+				case .North:
+					draw_texture(g_mem.track_turn, pi, true)
+				case .East:
+					draw_texture(g_mem.track_straight_hor, pi)
+				case .South:
+					draw_texture(g_mem.track_turn_v_flip, pi, true)
+				case .West:
+			}
+	}
+}
+
+draw_track_station :: proc(pi: Vec2i, directions: bit_set[TrackDirection]) {
+	dest_dirs: bit_set[Direction]
+
+	for d in TrackDirection {
+		if d in directions {
+			if dest_dir, ok := track_direction_dest_direction(d); ok {
+				dest_dirs += {dest_dir}
+			}
+		}
+	}
+
+	if dest_dirs != nil {
+		p := vec2_from_vec2i(pi*GridSize)
+
+		dest := Rect {
+			p.x, p.y,
+			GridSize, GridSize,
+		}
+
+		if !(.North in dest_dirs) {
+			top, _ := split_rect_top(dest, dest.height/4, 0)
+			draw_rect(top, ColorStation)
+		}
+
+		if !(.East in dest_dirs) {
+			_, right := split_rect_right(dest, dest.height/4, 0)
+			draw_rect(right, ColorStation)
+		}
+
+		if !(.South in dest_dirs) {
+			_, bottom := split_rect_bottom(dest, dest.height/4, 0)
+			draw_rect(bottom, ColorStation)
+		}
+
+		if !(.West in dest_dirs) {
+			left, _ := split_rect_left(dest, dest.height/4, 0)
+			draw_rect(left, ColorStation)
+		}
+	}
+}
+
+draw_track_tile :: proc(pi: Vec2i, directions: bit_set[TrackDirection]) {
+	dest_dirs: bit_set[Direction]
+
+	for d in TrackDirection {
+		if d in directions {
+			switch d {
+				case .Invalid: log.error("Invalid track direction")
+
+				case .n2e: draw_track_tile_directions(pi, .North, .East)
+				case .n2s: draw_track_tile_directions(pi, .North, .South)
+				case .n2w: draw_track_tile_directions(pi, .North, .West)
+				case .e2n: draw_track_tile_directions(pi, .East, .North)
+				case .e2s: draw_track_tile_directions(pi, .East, .South)
+				case .e2w: draw_track_tile_directions(pi, .East, .West)
+				case .s2n: draw_track_tile_directions(pi, .South, .North)
+				case .s2e: draw_track_tile_directions(pi, .South, .East)
+				case .s2w: draw_track_tile_directions(pi, .South, .West)
+				case .w2n: draw_track_tile_directions(pi, .West, .North)
+				case .w2e: draw_track_tile_directions(pi, .West, .East)
+				case .w2s: draw_track_tile_directions(pi, .West, .South)
+			}
+
+			if dest_dir, ok := track_direction_dest_direction(d); ok {
+				dest_dirs += {dest_dir}
+			}
+		}
+	}
+}
+
+
+================================================
+File: train.odin
+================================================
+package game
+
+Train :: struct {
+	cur_cell: int,
+	heading: TrackDirection,
+	move_timer: f32,
+}
+
+TrainMoveSpeed :: 0.5
+
+draw_train_world_coords :: proc(p: Vec2) {
+	train_rect := inset_rect(
+		Rect {p.x, p.y, GridSize, GridSize},
+		3,
+		3)
+	
+	draw_rect(train_rect, ColorTrain)
+}
+
+train_get_next_tile :: proc(t: Train) -> (next_tile: int, next_heading: TrackDirection, next_tile_ok: bool) {
+	if dir, ok := track_direction_dest_direction(t.heading); ok {
+		dv := vec2i_from_direction(dir)
+		p := tile_coord_from_index(g_mem.grid, t.cur_cell)
+		np := p + dv
+		next_tile = tile_index_from_coord(g_mem.grid, np)
+
+		switch v in g_mem.grid.tiles[next_tile] {
+			case TileTypeNone:
+
+			case TileTypeTrack:
+				if new_dir := first_track_direction_from_direction(v.directions, reverse_direction(dir)); new_dir != .Invalid {
+					next_heading = new_dir
+					next_tile_ok = true
+				}
+		}
+	}
+
+	return
+}
+
+draw_train :: proc(pi: Vec2i) {
+	draw_train_world_coords(vec2_from_vec2i(pi*GridSize))
+}
+
+
+================================================
+File: concepts/concept_0.ase
+================================================
+[Non-text file]
+
+
+================================================
+File: main_hot_reload/main_hot_reload.odin
+================================================
+package main
+
+import "core:dynlib"
+import "core:fmt"
+import "core:c/libc"
+import "core:os"
+import "core:time"
+import "core:strings"
+import "core:log"
+
+import rl "vendor:raylib"
+
+GameAPI :: struct {
+	lib: dynlib.Library,
+	init_window: proc(),
+	init: proc(),
+	update: proc() -> bool,
+	shutdown: proc(),
+	shutdown_window: proc(),
+	memory: proc() -> rawptr,
+	memory_size: proc() -> int,
+	hot_reloaded: proc(mem: rawptr),
+	modification_time: os.File_Time,
+	api_version: int,
+}
+
+load_game_api :: proc(api_version: int) -> (api: GameAPI, ok: bool) {
+	mod_time, mod_time_error := os.last_write_time_by_name("game.dll")
+
+	if mod_time_error != os.ERROR_NONE {
+		return
+	}
+
+	game_dll_name := fmt.tprintf("game_{0}.dll", api_version)
+
+	if libc.system(fmt.ctprintf("copy game.dll {0}", game_dll_name)) != 0 {
+		fmt.println("Failed to copy game.dll to {0}", game_dll_name)
+		return
+	}
+
+	_, ok = dynlib.initialize_symbols(&api, game_dll_name, "game_", "lib")
+	api.api_version = api_version
+	api.modification_time = mod_time
+	ok = true
+
+	return
+}
+
+unload_game_api :: proc(api: ^GameAPI) {
+	if api.lib != nil {
+		dynlib.unload_library(api.lib)
+	}
+
+	if libc.system(fmt.ctprintf("del game_{0}.dll", api.api_version)) != 0 {
+		fmt.println("Failed to remove game_{0}.dll copy", api.api_version)
+	}
+}
+
+main :: proc() {
+	context.logger = log.create_console_logger()
+	
+	default_allocator := context.allocator
+	tracking_allocator: Tracking_Allocator
+	tracking_allocator_init(&tracking_allocator, default_allocator)
+	context.allocator = allocator_from_tracking_allocator(&tracking_allocator)
+
+	reset_tracking_allocator :: proc(a: ^Tracking_Allocator) -> bool {
+		err := false
+
+		for key, value in a.allocation_map {
+			fmt.printf("%v: Leaked %v bytes\n", value.location, value.size)
+			err = true
+		}
+
+		tracking_allocator_clear(a)
+		return err
+	}
+
+	game_api_version := 0
+	game_api, game_api_ok := load_game_api(game_api_version)
+
+	if !game_api_ok {
+		fmt.println("Failed to load Game API")
+		return
+	}
+
+	game_api_version += 1
+
+	game_api.init_window()
+	game_api.init()
+
+	old_game_apis := make([dynamic]GameAPI, default_allocator)
+
+	ft_avg: [60]f32
+	ft_avg_i: int
+	last_spike: f32
+
+	window_open := true
+	for window_open {
+		window_open = game_api.update()
+		force_reload := rl.IsKeyPressed(.F5)
+		force_restart := rl.IsKeyPressed(.F6)
+		reload := force_reload || force_restart
+		game_dll_mod, game_dll_mod_err := os.last_write_time_by_name("game.dll")
+
+		if game_dll_mod_err == os.ERROR_NONE && game_api.modification_time != game_dll_mod {
+			reload = true
+		}
+
+		if reload {
+			new_game_api, new_game_api_ok := load_game_api(game_api_version)
+			
+			if new_game_api_ok {
+				if game_api.memory_size() != new_game_api.memory_size() || force_restart {
+					game_api.shutdown()
+					reset_tracking_allocator(&tracking_allocator)
+
+					for &g in old_game_apis {
+						unload_game_api(&g)
+					}
+
+					clear(&old_game_apis)
+					unload_game_api(&game_api)
+					game_api = new_game_api
+					game_api.init()
+				} else {
+					append(&old_game_apis, game_api)
+					game_memory := game_api.memory()
+					game_api = new_game_api
+					game_api.hot_reloaded(game_memory)
+				}
+
+				game_api_version += 1
+			}
+		}
+
+		free_all(context.temp_allocator)
+	}
+
+	free_all(context.temp_allocator)
+	game_api.shutdown()
+	
+	if reset_tracking_allocator(&tracking_allocator) {
+		for rl.IsKeyPressed(.SPACE) == false {
+		}
+	}
+
+	for &g in old_game_apis {
+		unload_game_api(&g)
+	}
+
+	delete(old_game_apis)
+
+	game_api.shutdown_window()
+	unload_game_api(&game_api)
+	tracking_allocator_destroy(&tracking_allocator)
+}
+
+@(export)
+NvOptimusEnablement: u32 = 1
+
+@(export)
+AmdPowerXpressRequestHighPerformance: i32 = 1
+
+
+
+================================================
+File: main_hot_reload/tracking_allocator.odin
+================================================
+package main
+
+import "core:runtime"
+import "core:mem"
+import "core:sync"
+import "core:fmt"
+
+Tracking_Allocator_Entry :: struct {
+	memory:    rawptr,
+	size:      int,
+	alignment: int,
+	mode:      mem.Allocator_Mode,
+	err:       mem.Allocator_Error,
+	location:  runtime.Source_Code_Location,
+}
+
+Tracking_Allocator :: struct {
+	backing:           mem.Allocator,
+	allocation_map:    map[rawptr]Tracking_Allocator_Entry,
+	mutex:             sync.Mutex,
+	clear_on_free_all: bool,
+}
+
+tracking_allocator_init :: proc(t: ^Tracking_Allocator, backing_allocator: mem.Allocator, internals_allocator := context.allocator) {
+	t.backing = backing_allocator
+	t.allocation_map.allocator = internals_allocator
+
+	if .Free_All in mem.query_features(t.backing) {
+		t.clear_on_free_all = true
+	}
+}
+
+tracking_allocator_destroy :: proc(t: ^Tracking_Allocator) {
+	delete(t.allocation_map)
+}
+
+
+tracking_allocator_clear :: proc(t: ^Tracking_Allocator) {
+	sync.mutex_lock(&t.mutex)
+	clear(&t.allocation_map)
+	sync.mutex_unlock(&t.mutex)
+}
+
+
+@(require_results)
+allocator_from_tracking_allocator :: proc(data: ^Tracking_Allocator) -> mem.Allocator {
+	return mem.Allocator{
+		data = data,
+		procedure = tracking_allocator_proc,
+	}
+}
+
+tracking_allocator_proc :: proc(allocator_data: rawptr, mode: mem.Allocator_Mode,
+                                size, alignment: int,
+                                old_memory: rawptr, old_size: int, loc := #caller_location) -> (result: []byte, err: mem.Allocator_Error) {
+	data := (^Tracking_Allocator)(allocator_data)
+
+	sync.mutex_guard(&data.mutex)
+
+	if mode == .Query_Info {
+		info := (^mem.Allocator_Query_Info)(old_memory)
+		if info != nil && info.pointer != nil {
+			if entry, ok := data.allocation_map[info.pointer]; ok {
+				info.size = entry.size
+				info.alignment = entry.alignment
+			}
+			info.pointer = nil
+		}
+
+		return
+	}
+
+	if mode == .Free && old_memory != nil && old_memory not_in data.allocation_map {
+		fmt.panicf("At %v: Bad free!", loc)
+	} else {
+		result = data.backing.procedure(data.backing.data, mode, size, alignment, old_memory, old_size, loc) or_return
+	}
+	result_ptr := raw_data(result)
+
+	if data.allocation_map.allocator.procedure == nil {
+		data.allocation_map.allocator = context.allocator
+	}
+
+	switch mode {
+	case .Alloc, .Alloc_Non_Zeroed:
+		data.allocation_map[result_ptr] = Tracking_Allocator_Entry{
+			memory = result_ptr,
+			size = size,
+			mode = mode,
+			alignment = alignment,
+			err = err,
+			location = loc,
+		}
+	case .Free:
+		delete_key(&data.allocation_map, old_memory)
+	case .Free_All:
+		if data.clear_on_free_all {
+			clear_map(&data.allocation_map)
+		}	
+	case .Resize, .Resize_Non_Zeroed:
+		if old_memory != result_ptr {
+			delete_key(&data.allocation_map, old_memory)
+		}
+		data.allocation_map[result_ptr] = Tracking_Allocator_Entry{
+			memory = result_ptr,
+			size = size,
+			mode = mode,
+			alignment = alignment,
+			err = err,
+			location = loc,
+		}
+
+	case .Query_Features:
+		set := (^mem.Allocator_Mode_Set)(old_memory)
+		if set != nil {
+			set^ = {.Alloc, .Alloc_Non_Zeroed, .Free, .Free_All, .Resize, .Query_Features, .Query_Info}
+		}
+		return nil, nil
+
+	case .Query_Info:
+		unreachable()
+	}
+
+	return
+}
+
+
+
+
+================================================
+File: textures/palette.aseprite
+================================================
+[Non-text file]
+

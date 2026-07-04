@@ -1,0 +1,5772 @@
+Directory structure:
+└── point_and_click/
+    ├── README.md
+    ├── LICENSE
+    ├── animation.odin
+    ├── atlas.odin
+    ├── build_debug.bat
+    ├── build_debug.sh
+    ├── build_hot_reload.bat
+    ├── build_hot_reload.sh
+    ├── build_release.bat
+    ├── build_release.sh
+    ├── game.odin
+    ├── helpers.odin
+    ├── math.odin
+    ├── pixel_filter.fs
+    ├── raylib_helpers.odin
+    ├── rect.odin
+    ├── serializer.odin
+    ├── atlas_builder/
+    │   ├── atlas_builder.odin
+    │   └── aseprite/
+    │       ├── README.md
+    │       ├── LICENSE
+    │       ├── ase.odin
+    │       ├── chunk_equal.odin
+    │       ├── common.odin
+    │       ├── marshal.odin
+    │       ├── read.odin
+    │       ├── types.odin
+    │       ├── unmarshal.odin
+    │       ├── util.odin
+    │       └── write.odin
+    ├── main_hot_reload/
+    │   └── main_hot_reload.odin
+    ├── main_release/
+    │   └── main_release.odin
+    └── textures/
+
+================================================
+File: README.md
+================================================
+[Made during this Stream](https://www.youtube.com/watch?v=iRvs1Xr1W6o)
+
+Based on this template: https://github.com/karl-zylinski/odin-raylib-hot-reload-game-template
+
+
+
+================================================
+File: LICENSE
+================================================
+Copyright (c) 2024 Karl Zylinski
+
+This software is provided "as-is", without any express or implied warranty. In no event will the authors be held liable for any damages arising from the use of this software.
+
+Permission is granted to anyone to use this software for any purpose, including commercial applications, and to alter it and redistribute it freely.
+
+You do not need to credit the authors and this notice may be removed from redistributed versions.
+
+
+================================================
+File: animation.odin
+================================================
+// This implements simple animations using sprite sheets. The texture in the
+// `Animation` struct is assumed to contain a horizontal strip of the frames
+// in the animation. Call `animation_update` to update and then call
+// `animation_rect` when you wish to know the source rect to use in the texture
+// With the source rect you can run rl.DrawTextureRec to draw the current frame.
+
+package game
+
+import "core:log"
+
+Animation :: struct {
+	texture: Texture,
+	num_frames: int,
+	current_frame: int,
+	frame_timer: f32,
+	frame_length: f32,
+}
+
+animation_create :: proc(tex: Texture, num_frames: int, frame_length: f32) -> Animation {
+	return Animation {
+		texture = tex,
+		num_frames = num_frames,
+		frame_length = frame_length,
+		frame_timer = frame_length,
+	}
+}
+
+animation_update :: proc(a: ^Animation, dt: f32) {
+	a.frame_timer -= dt
+
+	if a.frame_timer <= 0 {
+		a.frame_timer = a.frame_length + a.frame_timer
+		a.current_frame += 1
+
+		if a.current_frame >= a.num_frames {
+			a.current_frame = 0
+		}
+	}
+}
+
+animation_rect :: proc(a: Animation) -> Rect {
+	if a.num_frames == 0 {
+		log.error("Animation has zero frames")
+		return RECT_EMPTY
+	}
+
+	w := f32(a.texture.width) / f32(a.num_frames)
+	h := f32(a.texture.height)
+
+	return {
+		x = f32(a.current_frame) * w,
+		y = 0,
+		width = w,
+		height = h,
+	}
+}
+
+
+================================================
+File: atlas.odin
+================================================
+package game
+
+TextureName :: enum {
+	None,
+	Crowbar,
+	Inspect,
+	Pickup,
+	Player,
+	Use,
+	Well,
+	Well_Lid,
+	Well_Open,
+}
+
+AtlasTexture :: struct {
+	rect: Rect,
+	offset: Vec2i,
+	document_size: Vec2i,
+	duration: f32,
+}
+
+atlas_textures: [TextureName]AtlasTexture = {
+	.None = {},
+	.Crowbar = { rect = {152, 0, 9, 9}, offset = {0, 0}, document_size = {9, 9}, duration = 0.000},
+	.Inspect = { rect = {114, 0, 16, 16}, offset = {0, 0}, document_size = {16, 16}, duration = 0.000},
+	.Pickup = { rect = {97, 0, 16, 16}, offset = {0, 0}, document_size = {16, 16}, duration = 0.000},
+	.Player = { rect = {0, 0, 9, 27}, offset = {0, 0}, document_size = {9, 27}, duration = 0.000},
+	.Use = { rect = {131, 0, 9, 11}, offset = {0, 0}, document_size = {9, 11}, duration = 0.000},
+	.Well = { rect = {39, 0, 28, 21}, offset = {0, 0}, document_size = {28, 21}, duration = 0.000},
+	.Well_Lid = { rect = {68, 0, 28, 16}, offset = {0, 0}, document_size = {28, 16}, duration = 0.000},
+	.Well_Open = { rect = {10, 0, 28, 21}, offset = {0, 0}, document_size = {28, 21}, duration = 0.000},
+}
+
+Atlas_Glyph :: struct {
+	rect: Rect,
+	value: rune,
+	offset_x: int,
+	offset_y: int,
+	advance_x: int,
+}
+
+atlas_glyphs: []Atlas_Glyph = {
+}
+
+shapes_texture_rect := Rect {141, 0, 10, 10}
+
+Tile_Id :: enum {
+	T0Y0X0,
+	T0Y0X1,
+	T0Y0X2,
+	T0Y0X3,
+	T0Y0X4,
+	T0Y0X5,
+	T0Y0X6,
+	T0Y0X7,
+	T0Y0X8,
+	T0Y0X9,
+	T0Y1X0,
+	T0Y1X1,
+	T0Y1X2,
+	T0Y1X3,
+	T0Y1X4,
+	T0Y1X5,
+	T0Y1X6,
+	T0Y1X7,
+	T0Y1X8,
+	T0Y1X9,
+	T0Y2X0,
+	T0Y2X1,
+	T0Y2X2,
+	T0Y2X3,
+	T0Y2X4,
+	T0Y2X5,
+	T0Y2X6,
+	T0Y2X7,
+	T0Y2X8,
+	T0Y2X9,
+	T0Y3X0,
+	T0Y3X1,
+	T0Y3X2,
+	T0Y3X3,
+	T0Y3X4,
+	T0Y3X5,
+	T0Y3X6,
+	T0Y3X7,
+	T0Y3X8,
+	T0Y3X9,
+	T0Y4X0,
+	T0Y4X1,
+	T0Y4X2,
+	T0Y4X3,
+	T0Y4X4,
+	T0Y4X5,
+	T0Y4X6,
+	T0Y4X7,
+	T0Y4X8,
+	T0Y4X9,
+	T0Y5X0,
+	T0Y5X1,
+	T0Y5X2,
+	T0Y5X3,
+	T0Y5X4,
+	T0Y5X5,
+	T0Y5X6,
+	T0Y5X7,
+	T0Y5X8,
+	T0Y5X9,
+	T0Y6X0,
+	T0Y6X1,
+	T0Y6X2,
+	T0Y6X3,
+	T0Y6X4,
+	T0Y6X5,
+	T0Y6X6,
+	T0Y6X7,
+	T0Y6X8,
+	T0Y6X9,
+	T0Y7X0,
+	T0Y7X1,
+	T0Y7X2,
+	T0Y7X3,
+	T0Y7X4,
+	T0Y7X5,
+	T0Y7X6,
+	T0Y7X7,
+	T0Y7X8,
+	T0Y7X9,
+	T0Y8X0,
+	T0Y8X1,
+	T0Y8X2,
+	T0Y8X3,
+	T0Y8X4,
+	T0Y8X5,
+	T0Y8X6,
+	T0Y8X7,
+	T0Y8X8,
+	T0Y8X9,
+	T0Y9X0,
+	T0Y9X1,
+	T0Y9X2,
+	T0Y9X3,
+	T0Y9X4,
+	T0Y9X5,
+	T0Y9X6,
+	T0Y9X7,
+	T0Y9X8,
+	T0Y9X9,
+}
+
+atlas_tiles := #partial [Tile_Id]Rect {
+}
+
+Animation_Name :: enum {
+	None,
+}
+
+Atlas_Animation :: struct {
+	first_frame: TextureName,
+	last_frame: TextureName,
+}
+
+atlas_animations := [Animation_Name]Atlas_Animation {
+	.None = {},
+}
+
+TEXTURE_ATLAS_FILENAME :: "atlas.png"
+ATLAS_FONT_SIZE :: 32
+LETTERS_IN_FONT :: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890?&.,"
+
+
+
+================================================
+File: build_debug.bat
+================================================
+@echo off
+odin build main_release -define:RAYLIB_SHARED=false -out:game_debug.exe -no-bounds-check -subsystem:windows -debug
+
+
+
+================================================
+File: build_debug.sh
+================================================
+#!/usr/bin/env bash
+
+odin build main_release -out:game_debug.bin -no-bounds-check -debug
+
+
+
+================================================
+File: build_hot_reload.bat
+================================================
+@echo off
+
+rem Uncomment these lines if you want to build an atlas from the aseprte files in `textures`
+odin build atlas_builder -use-separate-modules -out:atlas_builder.exe -strict-style -vet-using-stmt -vet-using-param -vet-style -vet-semicolon -debug
+IF %ERRORLEVEL% NEQ 0 exit /b 1
+atlas_builder.exe
+IF %ERRORLEVEL% NEQ 0 exit /b 1
+
+rem Build game.dll
+odin build . -show-timings -use-separate-modules -define:RAYLIB_SHARED=true -build-mode:dll -out:game.dll -strict-style -vet-unused -vet-using-stmt -vet-using-param -vet-style -vet-semicolon -debug
+IF %ERRORLEVEL% NEQ 0 exit /b 1
+
+rem If game.exe already running: Then only compile game.dll and exit cleanly
+set EXE=game.exe
+FOR /F %%x IN ('tasklist /NH /FI "IMAGENAME eq %EXE%"') DO IF %%x == %EXE% exit /b 1
+
+rem build game.exe
+odin build main_hot_reload -use-separate-modules -out:game.exe -strict-style -vet-using-stmt -vet-using-param -vet-style -vet-semicolon -debug
+IF %ERRORLEVEL% NEQ 0 exit /b 1
+
+rem copy raylib.dll from odin folder to here
+if not exist "raylib.dll" (
+	echo "Please copy raylib.dll from <your_odin_compiler>/vendor/raylib/windows/raylib.dll to the same directory as game.exe"
+	exit /b 1
+)
+
+exit /b 0
+
+
+
+================================================
+File: build_hot_reload.sh
+================================================
+#!/usr/bin/env bash
+
+VET="-strict-style -vet-unused -vet-using-stmt -vet-using-param -vet-style -vet-semicolon"
+
+# NOTE: this is a recent addition to the Odin compiler, if you don't have this command
+# you can change this to the path to the Odin folder that contains vendor, eg: "~/Odin".
+ROOT=$(odin root)
+if [ ! $? -eq 0 ]; then
+    echo "Your Odin compiler does not have the 'odin root' command, please update or hardcode it in the script."
+    exit 1
+fi
+
+set -eu
+
+# Figure out the mess that is dynamic libraries.
+case $(uname) in
+"Darwin")
+    case $(uname -m) in
+    "arm64") LIB_PATH="macos-arm64" ;;
+    *)       LIB_PATH="macos" ;;
+    esac
+
+    DLL_EXT=".dylib"
+    EXTRA_LINKER_FLAGS="-Wl,-rpath $ROOT/vendor/raylib/$LIB_PATH"
+    ;;
+*)
+    DLL_EXT=".so"
+    EXTRA_LINKER_FLAGS="'-Wl,-rpath=\$ORIGIN/linux'"
+
+    # Copy the linux libraries into the project automatically.
+    if [ ! -d "linux" ]; then
+        mkdir linux
+        cp -r $ROOT/vendor/raylib/linux/libraylib*.so* linux
+    fi
+    ;;
+esac
+
+# Build the game.
+odin build . -use-separate-modules -extra-linker-flags:"$EXTRA_LINKER_FLAGS" -show-timings -define:RAYLIB_SHARED=true -build-mode:dll -out:game_tmp$DLL_EXT -debug $VET
+
+# Need to use a temp file on Linux because it first writes an empty `game.so`, which the game will load before it is actually fully written.
+mv game_tmp$DLL_EXT game$DLL_EXT
+
+# Do not build the game.bin if it is already running.
+if pgrep game.bin > /dev/null; then
+    exit 1
+else
+    odin build main_hot_reload -use-separate-modules -out:game.bin $VET -debug
+fi
+
+
+
+================================================
+File: build_release.bat
+================================================
+@echo off
+
+odin build main_release -define:RAYLIB_SHARED=false -out:game_release.exe -no-bounds-check -o:speed -strict-style -vet-unused -vet-using-stmt -vet-using-param -vet-style -vet-semicolon -subsystem:windows
+
+
+
+================================================
+File: build_release.sh
+================================================
+#!/usr/bin/env bash
+
+odin build main_release -out:game_release.bin -no-bounds-check -o:speed -strict-style -vet-unused -vet-using-stmt -vet-using-param -vet-style -vet-semicolon
+
+
+
+================================================
+File: game.odin
+================================================
+package game
+
+import "core:fmt"
+import "core:math/linalg"
+import rl "vendor:raylib"
+import sa "core:container/small_array"
+
+_ :: fmt
+
+PIXEL_WINDOW_HEIGHT :: 180
+
+Inventory_Item_Type :: enum {
+	Inspect,
+	Pickup,
+	Use,
+	Object,
+}
+
+Inventory_Item :: struct {
+	type: Inventory_Item_Type,
+	object: Object,
+}
+
+Object_Type :: enum {
+	Generic,
+	Crowbar,
+	Open_Well,
+}
+
+Object :: struct {
+	tex: TextureName,
+	pos: Vec2,
+	inspect_text: string,
+	use_item_handler: proc(o: ^Object, item: Object),
+	object_type: Object_Type,
+}
+
+well_item_handler :: proc(o: ^Object, item: Object) {
+	#partial switch item.object_type {
+	case .Crowbar:
+		o.tex = .Well_Open
+		o.inspect_text = "The well is open now"
+		o.object_type = .Open_Well
+		sa.append_elems(&g_mem.objects, Object {
+			tex = .Well_Lid,
+			pos = o.pos + {20, 20},
+			inspect_text = "The well lid I just took off",
+		})
+	}
+}
+
+Game_Memory :: struct {
+	player_pos: Vec2,
+	player_target_pos: Vec2,
+
+	atlas: rl.Texture2D,
+
+	objects: sa.Small_Array(128, Object),
+
+	say_text: string,
+	say_until: f64,
+
+	inventory: [dynamic]Inventory_Item,
+	cur_inventory_item: int,
+
+	in_well: bool,
+}
+
+g_mem: ^Game_Memory
+
+game_camera :: proc() -> rl.Camera2D {
+	return {
+		zoom = f32(rl.GetScreenHeight())/PIXEL_WINDOW_HEIGHT,
+	}
+}
+
+player_say :: proc(s: string) {
+	g_mem.say_text = s
+	g_mem.say_until = rl.GetTime() + 2
+}
+
+update :: proc() {
+	mouse_pos := rl.GetMousePosition()
+	cam := game_camera()
+	world_mouse_pos := rl.GetScreenToWorld2D(mouse_pos, cam)
+
+	player_to_target := g_mem.player_target_pos - g_mem.player_pos
+
+	if linalg.length(player_to_target) > 1 {
+		player_dir := linalg.normalize(player_to_target)
+		g_mem.player_pos += player_dir * rl.GetFrameTime() * 50
+	}
+
+	clicked_object: bool
+
+	for idx in 0..<sa.len(g_mem.objects) {
+		o := sa.get_ptr(&g_mem.objects, idx)
+		obj_rect := rect_from_pos_size(o.pos, size_from_rect(atlas_textures[o.tex].rect))
+
+		if rl.CheckCollisionPointRec(world_mouse_pos, obj_rect) {
+			if rl.IsMouseButtonPressed(.LEFT) {
+				inv_item := g_mem.inventory[g_mem.cur_inventory_item]
+
+				switch inv_item.type {
+				case .Inspect:
+					player_say(o.inspect_text)
+				case .Pickup:
+					if o.object_type != .Generic {
+						sa.unordered_remove(&g_mem.objects, idx)
+						append(&g_mem.inventory, Inventory_Item{
+							type = .Object,
+							object = o^,
+						})
+					}
+				case .Object:
+					if o.use_item_handler != nil {
+						o.use_item_handler(o, inv_item.object)
+					}
+				case .Use:
+					if o.object_type == .Open_Well {
+						g_mem.in_well = true
+					}
+				}
+
+				clicked_object = true
+			}
+		}
+	}
+
+	tr := toolbar_rect()
+
+	if !rl.CheckCollisionPointRec(world_mouse_pos, tr) && !clicked_object && rl.IsMouseButtonPressed(.LEFT) {
+		g_mem.player_target_pos = world_mouse_pos
+	}
+}
+
+draw_object :: proc(o: Object) {
+	rl.DrawTextureRec(g_mem.atlas, atlas_textures[o.tex].rect, o.pos, rl.WHITE)
+}
+
+toolbar_rect :: proc() -> Rect {
+	r := screen_rect()
+	cam := game_camera()
+	r.width /= cam.zoom
+	r.height /= cam.zoom
+	toolbar := cut_rect_bottom(&r, 20, 0)
+	return toolbar
+}
+
+draw :: proc() {
+	rl.ClearBackground({ 67, 170, 80, 255})
+
+	cam := game_camera()
+	rl.BeginMode2D(cam)
+
+	for idx in 0..<sa.len(g_mem.objects) {
+		draw_object(sa.get(g_mem.objects, idx))
+	}
+
+	t := atlas_textures[.Player]
+	rl.DrawTextureRec(g_mem.atlas, t.rect, g_mem.player_pos - {f32(t.rect.width)/2, f32(t.rect.height)}, rl.WHITE)
+	
+	if g_mem.say_until > rl.GetTime() {
+		rl.DrawText(temp_cstring(g_mem.say_text), i32(g_mem.player_pos.x), i32(g_mem.player_pos.y)- 40, 12, rl.WHITE)
+	}
+
+	rl.EndMode2D()
+}
+
+screen_rect :: proc() -> Rect {
+	return {
+		0, 0,
+		f32(rl.GetScreenWidth()), f32(rl.GetScreenHeight()),
+	}
+}
+
+update_ui :: proc() {
+	cam := game_camera()
+	rl.BeginMode2D(cam)
+
+	r := screen_rect()
+	r.width /= cam.zoom
+	r.height /= cam.zoom
+
+	world_mouse_pos := rl.GetScreenToWorld2D(rl.GetMousePosition(), cam)
+	toolbar := toolbar_rect()
+	rl.DrawRectangleRec(rect_add_pos(toolbar, {0, -1}), {109, 117, 141, 255})
+	rl.DrawRectangleRec(toolbar, {66, 36, 51, 255})
+
+	for i, idx in g_mem.inventory {
+		cell := cut_rect_left(&toolbar, toolbar.height-2, 2)
+		cell = inset_rect(cell, 0, 2)
+
+		tex: TextureName
+		switch i.type {
+		case .Inspect:
+			tex = .Inspect
+		case .Pickup:
+			tex = .Pickup
+		case .Object:
+			tex = i.object.tex
+		case .Use:
+			tex = .Use
+		}
+
+		t := atlas_textures[tex]
+		rl.DrawTexturePro(g_mem.atlas, t.rect, cell, {}, 0, rl.WHITE)
+
+		if idx == g_mem.cur_inventory_item {
+			rl.DrawRectangleLinesEx(cell, 1, rl.GRAY)
+		}
+
+		if rl.IsMouseButtonPressed(.LEFT) && rl.CheckCollisionPointRec(world_mouse_pos, cell) {
+			g_mem.cur_inventory_item = idx
+		}
+	}
+
+	rl.EndMode2D()
+}
+
+@(export)
+game_update :: proc() -> bool {
+	update()
+	rl.BeginDrawing()
+
+	if g_mem.in_well {
+		rl.ClearBackground(rl.BLACK)
+		rl.DrawText("It's dark in here...", 20, 20, 50, rl.WHITE)
+	} else {
+		draw()
+		update_ui()
+	}
+
+	rl.EndDrawing()
+	return !rl.WindowShouldClose()
+}
+
+@(export)
+game_init_window :: proc() {
+	rl.SetConfigFlags({.WINDOW_RESIZABLE})
+	rl.InitWindow(1920, 1080, "Point n click")
+	rl.SetWindowPosition(200, 200)
+	rl.SetTargetFPS(500)
+}
+
+@(export)
+game_init :: proc() {
+	g_mem = new(Game_Memory)
+
+	g_mem^ = Game_Memory {
+		player_pos = {50, 70},
+		atlas = rl.LoadTexture(TEXTURE_ATLAS_FILENAME),
+	}
+
+	g_mem.player_target_pos = g_mem.player_pos
+
+	sa.append_elem(&g_mem.objects, Object {
+		pos = {200, 100},
+		tex = .Well,
+		inspect_text = "Well well well, it's a well.",
+		use_item_handler = well_item_handler,
+	})
+
+	sa.append_elem(&g_mem.objects, Object {
+		pos = { 120, 80},
+		tex = .Crowbar,
+		inspect_text = "A crowbar!",
+		object_type = .Crowbar,
+	})
+
+	append(&g_mem.inventory, Inventory_Item { type = .Inspect })
+	append(&g_mem.inventory, Inventory_Item { type = .Pickup })
+	append(&g_mem.inventory, Inventory_Item { type = .Use })
+
+	game_hot_reloaded(g_mem)
+}
+
+@(export)
+game_shutdown :: proc() {
+	delete(g_mem.inventory)
+	free(g_mem)
+}
+
+@(export)
+game_shutdown_window :: proc() {
+	rl.CloseWindow()
+}
+
+@(export)
+game_memory :: proc() -> rawptr {
+	return g_mem
+}
+
+@(export)
+game_memory_size :: proc() -> int {
+	return size_of(Game_Memory)
+}
+
+@(export)
+game_hot_reloaded :: proc(mem: rawptr) {
+	g_mem = (^Game_Memory)(mem)
+}
+
+@(export)
+game_force_reload :: proc() -> bool {
+	return rl.IsKeyPressed(.F5)
+}
+
+@(export)
+game_force_restart :: proc() -> bool {
+	return rl.IsKeyPressed(.F6)
+}
+
+
+================================================
+File: helpers.odin
+================================================
+// generic odin helpers
+
+package game
+
+import "core:reflect"
+import "core:strings"
+import "base:intrinsics"
+
+increase_or_wrap_enum :: proc(e: $T) -> T {
+	ei := int(e) + 1
+
+	if ei >= len(T) {
+		ei = 0
+	}
+
+	return T(ei)
+}
+
+union_type :: proc(a: any) -> typeid {
+	return reflect.union_variant_typeid(a)
+}
+
+temp_cstring :: proc(s: string) -> cstring {
+	return strings.clone_to_cstring(s, context.temp_allocator)
+}
+
+// There is a remap in core:math but it doesn't clamp in the new range, which I
+// always want.
+remap :: proc "contextless" (old_value, old_min, old_max, new_min, new_max: $T) -> (x: T) where intrinsics.type_is_numeric(T), !intrinsics.type_is_array(T) {
+	old_range := old_max - old_min
+	new_range := new_max - new_min
+	if old_range == 0 {
+		return new_range / 2
+	}
+	return clamp(((old_value - old_min) / old_range) * new_range + new_min, new_min, new_max)
+}
+
+
+================================================
+File: math.odin
+================================================
+package game
+
+Vec2i :: [2]int
+Vec2 :: [2]f32
+
+vec2_from_vec2i :: proc(p: Vec2i) -> Vec2 {
+	return { f32(p.x), f32(p.y) }
+}
+
+
+
+================================================
+File: pixel_filter.fs
+================================================
+// This is a bilinear-based AA for pixelart that reduces pixel shimmering for scaled and translated pixelart.
+// In order to use it:
+// - Load this shader as a fragment shader: pixel_filter_shader = rl.LoadShader(nil, "pixel_filter.fs")
+// - Use rl.BeginShaderMode(pixel_filter_shader) to enable it at start of your program's drawing code. End the drawing code with gl.EndShaderMode()
+// - Set all textures to bilinear filtering (including fonts)
+// - Set rl.BeginBlendMode(.ALPHA_PREMULTIPLY) around all your drawing code
+// - Premultiply alpha in all textures. If your pixelart only uses full or zero transparency then you don't need to do this
+// - Premultiply alpha in any fonts.
+//
+// You can use the included load_premultiplied_alpha_ttf_from_memory in raylib_helpers.odin to load a font with premultiplied alpha
+// and bilinear filtering enabled. Feed it the font bytes (i.e. load the font bytes with os.read_entire_file("some_font.ttf"))
+// 
+// Read more here: https://gist.github.com/d7samurai/9f17966ba6130a75d1bfb0f1894ed377
+
+// The shader code is by Ben Golus
+
+#version 330
+
+in vec2 fragTexCoord;
+in vec4 fragColor;
+uniform sampler2D texture0;
+out vec4 finalColor;
+
+vec2 uv_aa_smoothstep(vec2 uv, vec2 res, float width) {
+    vec2 pixels = uv * res;
+    
+    vec2 pixels_floor = floor(pixels + 0.5);
+    vec2 pixels_fract = fract(pixels + 0.5);
+    vec2 pixels_aa = fwidth(pixels) * width * 0.5;
+    pixels_fract = smoothstep( vec2(0.5) - pixels_aa, vec2(0.5) + pixels_aa, pixels_fract );
+    
+    return (pixels_floor + pixels_fract - 0.5) / res;
+}
+
+void main()
+{
+    finalColor = fragColor * texture(texture0, uv_aa_smoothstep(fragTexCoord, ivec2(textureSize(texture0, 0)), 1.5));
+}
+
+
+================================================
+File: raylib_helpers.odin
+================================================
+package game
+
+import rl "vendor:raylib"
+import "core:slice"
+
+Texture :: rl.Texture
+Color :: rl.Color
+
+texture_size :: proc(tex: Texture) -> Vec2 {
+	return {
+		f32(tex.width),
+		f32(tex.height),
+	}
+}
+
+texture_rect :: proc(tex: Texture, flip_x: bool) -> Rect {
+	return {
+		x = 0,
+		y = 0,
+		width = flip_x ? - f32(tex.width) : f32(tex.width),
+		height = f32(tex.height),
+	}
+}
+
+load_premultiplied_alpha_ttf_from_memory :: proc(file_data: []byte, font_size: int) -> rl.Font {
+	font := rl.Font {
+		baseSize = i32(font_size),
+		glyphCount = 95,
+	}
+
+	font.glyphs = rl.LoadFontData(&file_data[0], i32(len(file_data)), font.baseSize, {}, font.glyphCount, .DEFAULT)
+
+	if font.glyphs != nil {
+		font.glyphPadding = 4
+
+		atlas := rl.GenImageFontAtlas(font.glyphs, &font.recs, font.glyphCount, font.baseSize, font.glyphPadding, 0)
+		atlas_u8 := slice.from_ptr((^u8)(atlas.data), int(atlas.width*atlas.height*2))
+
+		for i in 0..<atlas.width*atlas.height {
+			a := atlas_u8[i*2 + 1]
+			v := atlas_u8[i*2]
+			atlas_u8[i*2] = u8(f32(v)*(f32(a)/255))
+		}
+
+		font.texture = rl.LoadTextureFromImage(atlas)
+		rl.SetTextureFilter(font.texture, .BILINEAR)
+
+		// Update glyphs[i].image to use alpha, required to be used on ImageDrawText()
+		for i in 0..<font.glyphCount {
+			rl.UnloadImage(font.glyphs[i].image)
+			font.glyphs[i].image = rl.ImageFromImage(atlas, font.recs[i])
+		}
+		//TRACELOG(LOG_INFO, "FONT: Data loaded successfully (%i pixel size | %i glyphs)", font.baseSize, font.glyphCount);
+
+		rl.UnloadImage(atlas)
+	} else {
+		font = rl.GetFontDefault()
+	}
+
+	return font
+}
+
+
+================================================
+File: rect.odin
+================================================
+// procs for modifying and managing rects
+
+package game
+
+import rl "vendor:raylib"
+
+Rect :: rl.Rectangle
+
+RECT_EMPTY :: Rect{}
+
+split_rect_top :: proc(r: Rect, y: f32, m: f32) -> (top, bottom: Rect) {
+	top = r
+	bottom = r
+	top.y += m
+	top.height = y
+	bottom.y += y + m
+	bottom.height -= y + m
+	return
+}
+
+split_rect_left :: proc(r: Rect, x: f32, m: f32) -> (left, right: Rect) {
+	left = r
+	right = r
+	left.width = x
+	right.x += x + m
+	right.width -= x +m
+	return
+}
+
+split_rect_bottom :: proc(r: rl.Rectangle, y: f32, m: f32) -> (top, bottom: rl.Rectangle) {
+	top = r
+	top.height -= y + m
+	bottom = r
+	bottom.y = top.y + top.height + m
+	bottom.height = y
+	return
+}
+
+split_rect_right :: proc(r: Rect, x: f32, m: f32) -> (left, right: Rect) {
+	left = r
+	right = r
+	right.width = x
+	left.width -= x + m
+	right.x = left.x + left.width
+	return
+}
+
+cut_rect_top :: proc(r: ^Rect, y: f32, m: f32) -> Rect {
+	res := r^
+	res.y += m
+	res.height = y
+	r.y += y + m
+	r.height -= y + m
+	return res
+}
+
+cut_rect_bottom :: proc(r: ^Rect, h: f32, m: f32) -> Rect {
+	res := r^
+	res.height = h
+	res.y = r.y + r.height - h - m
+	r.height -= h + m
+	return res
+}
+
+cut_rect_left :: proc(r: ^Rect, x, m: f32) -> Rect {
+	res := r^
+	res.x += m
+	res.width = x
+	r.x += x + m
+	r.width -= x + m
+	return res
+}
+
+cut_rect_right :: proc(r: ^Rect, w, m: f32) -> Rect {
+	res := r^
+	res.width = w
+	res.x = r.x + r.width - w - m
+	r.width -= w + m
+	return res
+}
+
+rect_middle :: proc(r: Rect) -> Vec2 {
+	return {
+		r.x + f32(r.width) * 0.5,
+		r.y + f32(r.height) * 0.5,
+	}
+}
+
+inset_rect :: proc(r: Rect, x: f32, y: f32) -> Rect {
+	return {
+		r.x + x,
+		r.y + y,
+		r.width - x * 2,
+		r.height - y * 2,
+	}
+}
+
+rect_add_pos :: proc(r: Rect, p: Vec2) -> Rect {
+	return {
+		r.x + p.x,
+		r.y + p.y,
+		r.width,
+		r.height,
+	}
+}
+
+mouse_in_rect :: proc(r: Rect) -> bool {
+	return rl.CheckCollisionPointRec(rl.GetMousePosition(), r)
+}
+
+mouse_in_world_rect :: proc(r: Rect, camera: rl.Camera2D) -> bool {
+	return rl.CheckCollisionPointRec(rl.GetScreenToWorld2D(rl.GetMousePosition(), camera), r)
+}
+
+rect_intersect :: proc(r1, r2: Rect) -> Rect {
+	x1 := max(r1.x, r2.x)
+	y1 := max(r1.y, r2.y)
+	x2 := min(r1.x + r1.width, r2.x + r2.width)
+	y2 := min(r1.y + r1.height, r2.y + r2.height)
+	if x2 < x1 { x2 = x1 }
+	if y2 < y1 { y2 = y1 }
+	return {x1, y1, x2 - x1, y2 - y1}
+}
+
+rect_from_pos_size :: proc(p: Vec2, s: Vec2) -> Rect {
+	return {
+		p.x, p.y,
+		s.x, s.y,
+	}
+}
+
+pos_from_rect :: proc(r: rl.Rectangle) -> Vec2 {
+	return {r.x, r.y}
+}
+
+size_from_rect :: proc(r: rl.Rectangle) -> Vec2 {
+	return {abs(r.width), abs(r.height)}
+}
+
+
+================================================
+File: serializer.odin
+================================================
+/*
+Serializer that can both read and write using one proc per data type. It uses
+JSON as backing format for the data.
+
+Usage (writing):
+
+s: Serializer
+serialize_init_writer(&s)
+
+Some_Struct :: struct {
+	field: int,
+}
+
+some_struct := Some_Struct {
+	field = 7,
+}
+
+// this will fail to compile. You must add a serialize_some_struct proc and add
+// it to the serialize overload:
+serialize(&s, &some_struct)
+
+if data, err := json.marshal(&some_struct); err == nil {
+	os.write_entire_file("my_data.json", data)
+}
+
+Usage (reading):
+
+some_struct: Some_Struct
+
+if data, ok := os.read_entire_file("my_data.json"); ok {
+	if j, err := json.parse(data, parse_integers = true); err == nil {
+		s: Serializer
+		serialize_init_reader(&s, j)
+		serialize(&s, &some_struct)
+	}
+}
+
+Similar to https://github.com/jakubtomsu/odin-lbp-serialization but uses JSON
+as backing instead of a binary blob. It is therefore slower than the 
+implementation on the link, and uses more memory. But it produces human-
+readable JSON. Good for storing data saved by an editor.
+*/
+
+package game
+
+import "core:fmt"
+import "base:intrinsics"
+import "core:strings"
+import "core:encoding/json"
+
+_ :: fmt
+
+Serializer :: struct {
+	is_writing: bool,
+	cur: ^json.Value,
+	root: json.Value,
+}
+
+serialize_init_writer :: proc(s: ^Serializer) {
+	s.is_writing = true
+	s.root = json.Object {}
+	s.cur = &s.root
+}
+
+serialize_init_reader :: proc(s: ^Serializer, root: json.Value) {
+	s.is_writing = false
+	s.root = root
+	s.cur = &s.root
+}
+
+@(require_results)
+serialize_int :: proc(s: ^Serializer, val: ^$T) -> bool where intrinsics.type_is_integer(T) && size_of(T) <= size_of(i64) {
+	if s.is_writing {
+		s.cur^ = json.Integer(val^)
+	} else {
+		v := s.cur.(json.Integer) or_return
+		val^ = T(v)
+	}
+
+	return true
+}
+
+@(require_results)
+serialize_float :: proc(s: ^Serializer, val: ^$T) -> bool where intrinsics.type_is_float(T) {
+	if s.is_writing {
+		s.cur^ = json.Float(val^)
+	} else {
+		if v, ok := s.cur.(json.Float); ok {
+			val^ = T(v)    
+		} else if v, ok := s.cur.(json.Integer); ok {
+			val^ = T(v)    
+		} else {
+			return false
+		}
+	}
+
+	return true
+}
+
+@(require_results)
+serialize_bool :: proc(s: ^Serializer, val: ^$T) -> bool where intrinsics.type_is_boolean(T) {
+	if s.is_writing {
+		s.cur^ = json.Boolean(val^)
+	} else {
+		v := s.cur.(json.Boolean) or_return
+		val^ = T(v)
+	}
+
+	return true
+}
+
+@(require_results)
+serialize_string :: proc(s: ^Serializer, val: ^string) -> bool {
+	if s.is_writing {
+		s.cur^ = json.String(strings.clone(val^))
+	} else {
+		v := s.cur.(json.String) or_return
+		val^ = strings.clone(string(v))
+	}
+
+	return true
+}
+
+
+@(require_results)
+serialize_enum :: proc(s: ^Serializer, val: ^$T) -> bool where intrinsics.type_is_enum(T) {
+	if s.is_writing {
+		s.cur^ = json.Integer(val^)
+	} else {
+		v := s.cur.(json.Integer) or_return
+		val^ = T(v)
+	}
+
+	return true
+}
+
+@(require_results)
+serialize_union_tag_field :: proc(s: ^Serializer, key: string, value: ^$T) -> bool  
+where intrinsics.type_is_union(T) {
+	tag: i64
+	if s.is_writing {
+		tag = reflect.get_union_variant_raw_tag(value^)
+	}
+	serialize_field(s, key, &tag) or_return
+	if !s.is_writing {
+		reflect.set_union_variant_raw_tag(value^, tag)
+	}
+	return true
+}
+
+@(require_results)
+serialize_slice :: proc(s: ^Serializer, data: ^$T/[]$E) -> bool {
+	if s.is_writing {
+		s.cur^ = make(json.Array, len(data))
+	} else {
+		arr, is_arr := &s.cur.(json.Array)
+		assert(is_arr, "serialize_slice: cur is not json.Array")
+		data^ = make([]E, len(arr^))
+	}
+
+	for &v, idx in data {
+		serialize_array_element(s, idx, &v) or_return
+	}
+	return true
+}
+
+@(require_results)
+serialize_fixed_array :: proc(s: ^Serializer, data: ^$T/[$N]$E) -> bool {
+	if s.is_writing {
+		s.cur^ = make(json.Array, len(data))
+	} else {
+		_, is_arr := &s.cur.(json.Array)
+		assert(is_arr, "serialize_slice: cur is not json.Array")
+		data^ = {}
+	}
+
+	when intrinsics.type_is_enumerated_array(T) {
+		for idx in 0..<len(N) {
+			serialize_array_element(s, idx, &data[N(idx)]) or_return
+		}
+	} else {
+		for idx in 0..<N {
+			serialize_array_element(s, idx, &data[idx]) or_return
+		}	
+	}
+	return true
+}
+
+@(require_results)
+serialize_dynamic_array :: proc(s: ^Serializer, data: ^$T/[dynamic]$E, loc := #caller_location) -> bool {
+	if s.is_writing {
+		s.cur^ = make(json.Array, len(data))
+	} else {
+		arr, is_arr := &s.cur.(json.Array)
+		assert(is_arr, "serialize_dynamic_array: cur is not json.Array")
+		data^ = make([dynamic]E, len(arr), loc = loc)
+	}
+
+	for &v, idx in data {
+		serialize_array_element(s, idx, &v) or_return
+	}
+	return true
+}
+
+@(require_results)
+serialize_array_element :: proc(s: ^Serializer, idx: int, v: ^$T) -> bool {
+	prev_cur := s.cur
+	arr, is_arr := &s.cur.(json.Array)
+	assert(is_arr, "serialize_array_element: cur is not json.Array")
+
+	if s.is_writing {
+		when intrinsics.type_is_struct(T) || intrinsics.type_is_union(T) {
+			arr[idx] = json.Object{}
+		} else {
+			arr[idx] = json.Value {}    
+		}
+	}
+
+	s.cur = &arr[idx]
+	
+	when intrinsics.type_is_union(T) {
+		serialize_union_tag_field(s, "__tag", v) or_return
+	}
+
+	serialize(s, v) or_return
+	s.cur = prev_cur
+	return true
+}
+
+@(require_results)
+serialize_field :: proc(s: ^Serializer, key: string, v: ^$T) -> bool {
+	if s.is_writing {
+		when intrinsics.type_is_struct(T) {
+			if v^ == {} {
+				return true
+			}
+		} else when intrinsics.type_is_numeric(T) {
+			if v^ == {} {
+				return true
+			}
+		} else when intrinsics.type_is_boolean(T) {
+			if v^ == false {
+				return true
+			}
+		}
+	}
+
+	prev_cur := s.cur
+	obj, is_obj := &s.cur.(json.Object)
+	assert(is_obj, "serialize_field: cur is not json.Object")
+
+	if s.is_writing {
+		assert(!(key in obj), "serialize_field writer: cur already has key")
+
+		when intrinsics.type_is_struct(T) || intrinsics.type_is_union(T) { 
+			obj[strings.clone(key)] = json.Object {}
+		} else {
+			obj[strings.clone(key)] = json.Value {}    
+		}
+	} else {
+		if !(key in obj) {
+			return true
+		}
+	}
+
+	s.cur = &obj[key]
+
+	when intrinsics.type_is_union(T) {
+		if !s.is_writing && reflect.union_variant_typeid(s.cur^) == json.Integer {
+			log.warnf("Enum has become Union: Assuming enum value can be to set raw tag! Value: %v", v)
+			ti := type_info_of(T)
+			no_nil := false
+			if u, ok := ti.variant.(reflect.Type_Info_Union); ok {
+				no_nil = u.no_nil
+			}
+
+			tag: i64
+
+			serialize_int(s, &tag) or_return
+
+			if !no_nil {
+				tag += 1
+			}
+
+			reflect.set_union_variant_raw_tag(v^, tag)
+		} else {
+			serialize_union_tag_field(s, "__tag", v) or_return	
+		}
+	}
+
+	serialize(s, v) or_return
+	s.cur = prev_cur
+	return true
+}
+
+serialize :: proc {
+	// basics
+	serialize_int,
+	serialize_slice,
+	serialize_dynamic_array,
+	serialize_fixed_array,
+	serialize_bool,
+	serialize_float,
+	serialize_enum,
+	serialize_string,
+	serialize_rect,
+}
+
+@(require_results)
+serialize_rect :: proc(s: ^Serializer, v: ^Rect) -> bool {
+	serialize_field(s, "x", &v.x) or_return
+	serialize_field(s, "y", &v.y) or_return
+	serialize_field(s, "width", &v.width) or_return
+	serialize_field(s, "height", &v.height) or_return
+	return true
+}
+
+@(require_results)
+serialize_union_variant_typeid :: proc(s: ^Serializer, key: string, v: ^typeid, $T: typeid) -> bool where intrinsics.type_is_union(T) {
+	ti := runtime.type_info_base(type_info_of(T))
+	uti, ok := ti.variant.(runtime.Type_Info_Union)
+
+	if !ok {
+		return false
+	}
+
+	if s.is_writing {
+		assert(!uti.no_nil || v^ != nil)
+		tag: int
+
+		if v^ != nil {
+			for var, i in uti.variants {
+				if var.id == v^ {
+					tag = i
+					if !uti.no_nil {
+						tag += 1
+					}
+
+					break
+				}
+			}
+		}
+
+		serialize_field(s, key, &tag) or_return
+	} else {
+		tag: int
+		serialize_field(s, key, &tag) or_return
+
+		if tag < len(uti.variants) {
+			if uti.no_nil {
+				v^ = uti.variants[tag].id    
+			} else {
+				if tag == 0 {
+					v^ = nil
+				} else {
+					v^ = uti.variants[tag-1].id    
+				}
+			}
+		} else {
+			log.error("tag is out of range for union")
+			return false
+		}
+	}
+
+	return true
+}
+
+
+
+================================================
+File: atlas_builder/atlas_builder.odin
+================================================
+// This atlas builder looks into a 'textures' folder for pngs, ase and aseprite files and makes an atlas
+// from those. It outputs both atlas.png and atlas.odin. The odin file you compile as part of your game
+// it contains metadata about where in the atlas the stuff is.
+//
+// The atlas builder can also split up tilesets and fonts and splat those out into the atlas. Look for
+// the code below that processes `.ttf` and images with filenames that start with `tileset`.
+
+package ase_to_atlas
+
+import "core:c"
+import "core:fmt"
+import "core:mem"
+import "core:os"
+import "core:path/slashpath"
+import "core:slice"
+import "core:strings"
+import "core:time"
+import "core:unicode/utf8"
+import "core:image/png"
+import "vendor:stb/rect_pack"
+import ase "aseprite"
+import rl "vendor:raylib"
+
+dir_path_to_file_infos :: proc(path: string) -> []os.File_Info {
+	d, derr := os.open(path, os.O_RDONLY)
+	if derr != 0 {
+		panic("open failed")
+	}
+	defer os.close(d)
+
+	{
+		file_info, ferr := os.fstat(d)
+		defer os.file_info_delete(file_info)
+
+		if ferr != 0 {
+			panic("stat failed")
+		}
+		if !file_info.is_dir {
+			panic("not a directory")
+		}
+	}
+
+	file_infos, _ := os.read_dir(d, -1)
+	return file_infos
+}
+
+Vec2i :: [2]int
+
+Atlas_Texture_Rect :: struct {
+	rect: rl.Rectangle,
+	size: Vec2i,
+	offset: Vec2i,
+	name: string,
+	duration: f32,
+}
+
+Atlas_Tile_Rect :: struct {
+	rect: rl.Rectangle,
+	coord: Vec2i,
+}
+
+Atlas_Glyph :: struct {
+	rect: rl.Rectangle,
+	glyph: rl.GlyphInfo,
+}
+
+asset_name :: proc(path: string) -> string {
+	return fmt.tprintf("%s", strings.to_ada_case(slashpath.name(slashpath.base(path)), context.temp_allocator))
+}
+
+Texture_Data :: struct {
+	source_size: Vec2i,
+	source_offset: Vec2i,
+	document_size: Vec2i,
+	offset: Vec2i,
+	name: string,
+	pixels_size: Vec2i,
+	pixels: []rl.Color,
+	duration: f32,
+	is_tile: bool,
+	tile_coord: Vec2i,
+}
+
+rect_intersect :: proc(r1, r2: rl.Rectangle) -> rl.Rectangle {
+	x1 := max(r1.x, r2.x)
+	y1 := max(r1.y, r2.y)
+	x2 := min(r1.x + r1.width, r2.x + r2.width)
+	y2 := min(r1.y + r1.height, r2.y + r2.height)
+	if x2 < x1 { x2 = x1 }
+	if y2 < y1 { y2 = y1 }
+	return {x1, y1, x2 - x1, y2 - y1}
+}
+
+TILESET_WIDTH :: 10
+TILE_SIZE :: 10
+
+Tileset :: struct {
+	pixels: []rl.Color,
+	pixels_size: Vec2i,
+	visible_pixels_size: Vec2i,
+	offset: Vec2i,
+}
+
+load_tileset :: proc(filename: string, t: ^Tileset) {
+	data, data_ok := os.read_entire_file(filename)
+
+	if !data_ok {
+		fmt.printf("Failed loading tileset %v\n", filename)
+		return
+	}
+
+	defer delete(data)
+	doc: ase.Document
+	defer ase.destroy_doc(&doc)
+
+	_, umerr := ase.unmarshal(data[:], &doc)
+	if umerr != nil {
+		fmt.println(umerr)
+		return
+	}
+
+	indexed := doc.header.color_depth == .Indexed
+
+	for f in doc.frames {
+		palette: ase.Palette_Chunk
+		collision_layer := -1
+		layers := 0
+
+		for c in f.chunks {
+			if p, ok := c.(ase.Palette_Chunk); ok {
+				palette = p
+			} else if l, ok := c.(ase.Layer_Chunk); ok {
+				if l.name == "collision" {
+					collision_layer = layers
+				}
+
+				layers += 1
+			}
+		}
+
+		if indexed && len(palette.entries) == 0 {
+			fmt.println("Document is indexed, but found no palette!")
+			continue
+		}
+
+		for c in f.chunks {
+			#partial switch cv in c {
+				case ase.Cel_Chunk:
+					if cl, ok := cv.cel.(ase.Com_Image_Cel); ok {
+						if int(cv.layer_index) == collision_layer {
+							break
+						}
+
+						if indexed {
+							t.pixels = make([]rl.Color, int(cl.width) * int(cl.height))
+							for p, idx in cl.pixel {
+								t.pixels[idx] = rl.Color(palette.entries[u32(p)].color.abgr)
+							}
+						} else {
+							t.pixels = slice.clone(transmute([]rl.Color)(cl.pixel))
+						}
+
+						t.offset = {int(cv.x), int(cv.y)}
+						t.pixels_size = {int(cl.width), int(cl.height)}
+						t.visible_pixels_size = {int(doc.header.width), int(doc.header.height)}
+					}
+			}
+		}
+	}
+}
+
+Animation :: struct {
+	name: string,
+	first_texture: string,
+	last_texture: string,
+}
+
+load_ase_texture_data :: proc(filename: string, textures: ^[dynamic]Texture_Data, animations: ^[dynamic]Animation) {
+	data, data_ok := os.read_entire_file(filename)
+
+	if !data_ok {
+		return
+	}
+
+	defer delete(data)
+
+	doc: ase.Document
+	defer ase.destroy_doc(&doc)
+
+	_, umerr := ase.unmarshal(data[:], &doc)
+	if umerr != nil {
+		fmt.println(umerr)
+		return
+	}
+
+	base_name := asset_name(filename)
+	frame_idx := 0
+	animated := len(doc.frames) > 1
+	indexed := doc.header.color_depth == .Indexed
+
+	for f in doc.frames {
+		duration: f32 = f32(f.header.duration)/1000.0
+		palette: ase.Palette_Chunk
+		collision_layer := -1
+
+		layers := 0
+
+		for c in f.chunks {
+			if p, ok := c.(ase.Palette_Chunk); ok {
+				palette = p
+			} else if l, ok := c.(ase.Layer_Chunk); ok {
+				if l.name == "collision" {
+					collision_layer = layers
+				}
+
+				layers += 1
+			}
+		}
+
+		if indexed && len(palette.entries) == 0 {
+			fmt.println("Document is indexed, but found no palette!")
+			continue
+		}
+
+		for c in f.chunks {
+			#partial switch cv in c {
+				case ase.Cel_Chunk:
+					if cl, ok := cv.cel.(ase.Com_Image_Cel); ok {
+						td := Texture_Data {
+							source_size = {int(cl.width), int(cl.height)},
+							pixels_size = {int(cl.width), int(cl.height)},
+							document_size = {int(doc.header.width), int(doc.header.height)},
+							offset = {int(cv.x), int(cv.y)},
+							duration = duration,
+							name = animated ? fmt.tprint(base_name, frame_idx, sep = "") : base_name,
+						}
+
+						if indexed {
+							td.pixels = make([]rl.Color, int(cl.width) * int(cl.height))
+							for p, idx in cl.pixel {
+								td.pixels[idx] = rl.Color(palette.entries[u32(p)].color.abgr)
+							}
+						} else {
+							td.pixels = slice.clone(transmute([]rl.Color)(cl.pixel))
+						}
+
+						cel_rect := rl.Rectangle {
+							f32(cv.x),
+							f32(cv.y),
+							f32(cl.width),
+							f32(cl.height),
+						}
+
+						document_rect := rl.Rectangle {
+							0, 0,
+							f32(doc.header.width), f32(doc.header.height),
+						}
+
+						visible_rect := rect_intersect(document_rect, cel_rect)
+
+						if visible_rect.width != cel_rect.width || visible_rect.height != cel_rect.height {
+							from := rl.Image {
+								data = raw_data(td.pixels),
+								width = i32(cl.width),
+								height = i32(cl.height),
+								mipmaps = 1,
+								format = .UNCOMPRESSED_R8G8B8A8,
+							}
+
+							visible_pixels := make([]rl.Color, int(visible_rect.width * visible_rect.height))
+
+							to := rl.Image {
+								data = raw_data(visible_pixels),
+								width = i32(visible_rect.width),
+								height = i32(visible_rect.height),
+								mipmaps = 1,
+								format = .UNCOMPRESSED_R8G8B8A8,
+							}
+
+							source := visible_rect
+							source.x -= cel_rect.x
+							source.y -= cel_rect.y 
+							dest := visible_rect
+							dest.x += min(document_rect.x - cel_rect.x, 0)
+							dest.y += min(document_rect.y - cel_rect.y, 0)
+
+							rl.ImageDraw(&to, from, source, dest, rl.WHITE)
+
+							td.pixels = visible_pixels
+							td.source_size = {int(visible_rect.width), int(visible_rect.height)}
+							td.pixels_size = td.source_size
+							td.offset = {int(visible_rect.x), int(visible_rect.y)}
+						}
+
+						append(textures, td)
+
+						frame_idx += 1
+					}
+			}
+		}
+	}
+
+	if animated && frame_idx > 1 {
+		a := Animation {
+			name = base_name,
+			first_texture = fmt.tprint(base_name, 0, sep = ""),
+			last_texture = fmt.tprint(base_name, frame_idx - 1, sep = ""),
+		}
+
+		append(animations, a)
+	}
+}
+
+load_png_texture_data :: proc(filename: string, textures: ^[dynamic]Texture_Data) {
+	data, data_ok := os.read_entire_file(filename)
+
+	if !data_ok {
+		fmt.printf("Failed loading tileset %v\n", filename)
+		return
+	}
+
+	defer delete(data)
+
+	img, err := png.load_from_bytes(data)
+
+	if err != nil {
+		fmt.println(err)
+		return
+	}
+
+	defer png.destroy(img)
+
+	if img.depth != 8 && img.channels != 4 {
+		fmt.println("Only 8 bpp, 4 channels PNG supported (this can probably be fixed by doing some work in `load_png_texture_data`")
+		return
+	}
+
+	td := Texture_Data {
+		source_size = {img.width, img.height},
+		pixels_size = {img.width, img.height},
+		document_size = {img.width, img.height},
+		duration = 0,
+		name = asset_name(filename),
+		pixels = slice.clone(transmute([]rl.Color)(img.pixels.buf[:])),
+	}
+
+	append(textures, td)
+}
+
+ATLAS_SIZE :: 512
+
+LETTERS_IN_FONT :: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890?&.,"
+
+main :: proc() {
+	textures: [dynamic]Texture_Data
+	animations: [dynamic]Animation
+
+	file_infos := dir_path_to_file_infos("textures")
+
+	slice.sort_by(file_infos, proc(i, j: os.File_Info) -> bool {
+		return time.diff(i.creation_time, j.creation_time) > 0
+	})
+
+	tileset: Tileset
+
+	for fi in file_infos {
+		is_ase := strings.has_suffix(fi.name, ".ase") || strings.has_suffix(fi.name, ".aseprite")
+		is_png := strings.has_suffix(fi.name, ".png")
+		if is_ase || is_png {
+			path := fmt.tprintf("textures/%s", fi.name)
+			if strings.has_prefix(fi.name, "tileset") {
+				load_tileset(path, &tileset)
+			} else if is_ase {
+				load_ase_texture_data(path, &textures, &animations)	
+			} else if is_png {
+				load_png_texture_data(path, &textures)
+			}
+		}
+	}
+
+	rc: rect_pack.Context
+	rc_nodes: [ATLAS_SIZE]rect_pack.Node
+	rect_pack.init_target(&rc, ATLAS_SIZE, ATLAS_SIZE, raw_data(rc_nodes[:]), ATLAS_SIZE)
+
+	letters := utf8.string_to_runes(LETTERS_IN_FONT)
+	num_letters := len(letters)
+	FONT_SIZE :: 8*4
+
+	pack_rects: [dynamic]rect_pack.Rect
+	glyphs: [^]rl.GlyphInfo
+
+	PackRectType :: enum {
+		Texture,
+		Glyph,
+		Tile,
+		ShapesTexture,
+	}
+
+	make_pack_rect_id :: proc(id: i32, type: PackRectType) -> i32 {
+		t := u32(type)
+		t <<= 29
+		t |= u32(id)
+		return i32(t)
+	}
+
+	make_tile_id :: proc(x, y: int) -> i32 {
+		id: i32 = i32(x)
+		id <<= 13
+		return id | i32(y)
+	}
+
+	idx_from_rect_id :: proc(id: i32) -> int {
+		return int((u32(id) << 3)>>3)
+	}
+
+	x_y_from_tile_id :: proc(id: i32) -> (x, y: int) {
+		id_type_stripped := idx_from_rect_id(id)
+		return int(id_type_stripped >> 13), int((u32(id_type_stripped)<<19)>>19)
+	}
+
+	rect_id_type :: proc(i: i32) -> PackRectType {
+		return PackRectType(i >> 29)
+	}
+
+	if font_data, ok := os.read_entire_file("easvhs.ttf"); ok {
+		glyphs = rl.LoadFontData(&font_data[0], i32(len(font_data)), FONT_SIZE, raw_data(letters), i32(num_letters), .BITMAP)
+
+		for i in 0..<len(letters) {
+			g := glyphs[i]
+
+			append(&pack_rects, rect_pack.Rect {
+				id = make_pack_rect_id(i32(i), .Glyph),
+				w = rect_pack.Coord(g.image.width) + 1,
+				h = rect_pack.Coord(g.image.height) + 1,
+			})
+		}
+	}
+
+	for t, idx in textures {
+		append(&pack_rects, rect_pack.Rect {
+			id = make_pack_rect_id(i32(idx), .Texture),
+			w = rect_pack.Coord(t.source_size.x) + 1,
+			h = rect_pack.Coord(t.source_size.y) + 1,
+		})
+	}
+
+	if tileset.pixels_size.x != 0 && tileset.pixels_size.y != 0 {
+		assert(tileset.pixels_size.x + tileset.offset.x >= TILESET_WIDTH * TILE_SIZE, "Tileset texture too narrow")
+		h := tileset.visible_pixels_size.y / TILE_SIZE
+		top_left: rl.Vector2 = {-f32(tileset.offset.x), -f32(tileset.offset.y)}
+
+		t_img := rl.Image {
+			data = raw_data(tileset.pixels),
+			width = i32(tileset.pixels_size.x),
+			height = i32(tileset.pixels_size.y),
+			format = .UNCOMPRESSED_R8G8B8A8,
+		}
+		
+		for x in 0 ..<TILESET_WIDTH {
+			for y in 0..<h {
+				tx := f32(TILE_SIZE * x) + top_left.x
+				ty := f32(TILE_SIZE * y) + top_left.y
+
+				all_blank := true
+				for txx in tx..<tx+TILE_SIZE {
+					for tyy in ty..<ty+TILE_SIZE {
+						if rl.GetImageColor(t_img, i32(txx), i32(tyy)) != rl.BLANK {
+							all_blank = false
+							break
+						}
+					}
+				}
+
+				if all_blank {
+					continue
+				}
+
+				append(&pack_rects, rect_pack.Rect {
+					id = make_pack_rect_id(make_tile_id(x, y), .Tile),
+					w = 19,
+					h = 19,
+				})
+			}
+		}
+	}
+
+	append(&pack_rects, rect_pack.Rect {
+		id = make_pack_rect_id(0, .ShapesTexture),
+		w = 11,
+		h = 11,
+	})
+
+	rect_pack_res := rect_pack.pack_rects(&rc, raw_data(pack_rects), i32(len(pack_rects)))
+
+	if rect_pack_res != 1 {
+		fmt.println("failed to pack some rects")
+	}
+
+	atlas := rl.GenImageColor(ATLAS_SIZE, ATLAS_SIZE, rl.BLANK)
+	atlas_textures: [dynamic]Atlas_Texture_Rect
+	atlas_tiles: [dynamic]Atlas_Tile_Rect
+
+	atlas_glyphs: [dynamic]Atlas_Glyph
+	shapes_texture_rect: rl.Rectangle
+
+	for rp in pack_rects {
+		type := rect_id_type(rp.id)
+
+		switch type {
+		case .ShapesTexture:
+			shapes_texture_rect = rl.Rectangle {f32(rp.x), f32(rp.y), 10, 10}
+			rl.ImageDrawRectangleRec(&atlas, shapes_texture_rect, rl.WHITE)
+		case .Texture:
+			idx := idx_from_rect_id(rp.id)
+
+			t := textures[idx]
+
+			t_img := rl.Image {
+				data = raw_data(t.pixels),
+				width = i32(t.pixels_size.x),
+				height = i32(t.pixels_size.y),
+				format = .UNCOMPRESSED_R8G8B8A8,
+			}
+
+			source := rl.Rectangle {f32(t.source_offset.x), f32(t.source_offset.y), f32(t.source_size.x), f32(t.source_size.y)}
+			dest := rl.Rectangle {f32(rp.x), f32(rp.y), source.width, source.height}
+			rl.ImageDraw(&atlas, t_img, source, dest, rl.WHITE)
+
+			ar := Atlas_Texture_Rect {
+				rect = dest,
+				size = t.document_size,
+				offset = t.offset,
+				name = t.name,
+				duration = t.duration,
+			}
+
+			append(&atlas_textures, ar)	
+		case .Glyph:
+			idx := idx_from_rect_id(rp.id)
+			g := glyphs[idx]
+			img_grayscale := g.image
+
+			grayscale := transmute([^]u8)(img_grayscale.data)
+			img_pixels := make([]rl.Color, img_grayscale.width*img_grayscale.height)
+
+			for i in 0..<img_grayscale.width*img_grayscale.height {
+				a := grayscale[i]
+				img_pixels[i].r = 255
+				img_pixels[i].g = 255
+				img_pixels[i].b = 255
+				img_pixels[i].a = a
+			}
+
+			img := img_grayscale
+
+			img.data = raw_data(img_pixels)
+			img.format = .UNCOMPRESSED_R8G8B8A8
+
+			source := rl.Rectangle {0, 0, f32(img.width), f32(img.height)}
+			dest := rl.Rectangle {f32(rp.x), f32(rp.y), source.width, source.height}
+
+			rl.ImageDraw(&atlas, img, source, dest, rl.WHITE)
+
+			ag := Atlas_Glyph {
+				rect = dest,
+				glyph = g,
+			}
+
+			append(&atlas_glyphs, ag)
+		case .Tile:
+			ix, iy := x_y_from_tile_id(rp.id)
+
+			x := f32(TILE_SIZE * ix)
+			y := f32(TILE_SIZE * iy)
+
+			top_left: rl.Vector2 = {-f32(tileset.offset.x), -f32(tileset.offset.y)}
+
+			t_img := rl.Image {
+				data = raw_data(tileset.pixels),
+				width = i32(tileset.pixels_size.x),
+				height = i32(tileset.pixels_size.y),
+				format = .UNCOMPRESSED_R8G8B8A8,
+			}
+			
+			source := rl.Rectangle {x + top_left.x, y + top_left.y, TILE_SIZE, TILE_SIZE}
+			dest := rl.Rectangle {f32(rp.x) + 1, f32(rp.y) + 1, source.width, source.height}
+			rl.ImageDraw(&atlas, t_img, source, dest, rl.WHITE)
+
+			// Add padding lines
+
+			ts :: TILE_SIZE
+			// Top
+			{
+				psource := rl.Rectangle {
+					source.x,
+					source.y,
+					ts,
+					1,
+				}
+
+				pdest := rl.Rectangle {
+					dest.x,
+					dest.y - 1,
+					ts,
+					1,
+				}
+
+				rl.ImageDraw(&atlas, t_img, psource, pdest, rl.WHITE)
+			}
+
+			// Bottom
+			{
+				psource := rl.Rectangle {
+					source.x,
+					source.y + ts -1,
+					ts,
+					1,
+				}
+
+				pdest := rl.Rectangle {
+					dest.x,
+					dest.y + ts,
+					ts,
+					1,
+				}
+
+				rl.ImageDraw(&atlas, t_img, psource, pdest, rl.WHITE)
+			}
+
+			// Left
+			{
+				psource := rl.Rectangle {
+					source.x,
+					source.y,
+					1,
+					ts,
+				}
+				
+				pdest := rl.Rectangle {
+					dest.x - 1,
+					dest.y,
+					1,
+					ts,
+				}
+
+				rl.ImageDraw(&atlas, t_img, psource, pdest, rl.WHITE)
+			}
+
+			// Right
+			{
+				psource := rl.Rectangle {
+					source.x + ts - 1,
+					source.y,
+					1,
+					ts,
+				}
+				
+				pdest := rl.Rectangle {
+					dest.x + ts,
+					dest.y,
+					1,
+					ts,
+				}
+
+				rl.ImageDraw(&atlas, t_img, psource, pdest, rl.WHITE)
+			}
+
+			at := Atlas_Tile_Rect {
+				rect = dest,
+				coord = {ix, iy},
+			}
+
+			append(&atlas_tiles, at)
+		}
+	}
+
+	rl.ExportImage(atlas, "atlas.png")
+
+	f, _ := os.open("atlas.odin", os.O_WRONLY | os.O_CREATE | os.O_TRUNC)
+	defer os.close(f)
+
+	fmt.fprintln(f, "package game")
+	fmt.fprintln(f, "")
+
+	fmt.fprintln(f, "TextureName :: enum {")
+	fmt.fprint(f, "\tNone,\n")
+	for r in atlas_textures {
+		fmt.fprintf(f, "\t%s,\n", r.name)
+	}
+	fmt.fprintln(f, "}")
+	fmt.fprintln(f, "")
+
+	fmt.fprintln(f, "AtlasTexture :: struct {")
+	fmt.fprintln(f, "\trect: Rect,")
+	fmt.fprintln(f, "\toffset: Vec2i,")
+	fmt.fprintln(f, "\tdocument_size: Vec2i,")
+	fmt.fprintln(f, "\tduration: f32,")
+	fmt.fprintln(f, "}")
+	fmt.fprintln(f, "")
+
+	fmt.fprintln(f, "atlas_textures: [TextureName]AtlasTexture = {")
+	fmt.fprintln(f, "\t.None = {},")
+
+	for r in atlas_textures {
+		fmt.fprintf(f, "\t.%s = {{ rect = {{%v, %v, %v, %v}}, offset = {{%v, %v}}, document_size = {{%v, %v}}, duration = %f}},\n", r.name, r.rect.x, r.rect.y, r.rect.width, r.rect.height, r.offset.x, r.offset.y, r.size.x, r.size.y, r.duration)
+	}
+
+	fmt.fprintln(f, "}\n")
+
+	fmt.fprintln(f, "Atlas_Glyph :: struct {")
+	fmt.fprintln(f, "\trect: Rect,")
+	fmt.fprintln(f, "\tvalue: rune,")
+	fmt.fprintln(f, "\toffset_x: int,")
+	fmt.fprintln(f, "\toffset_y: int,")
+	fmt.fprintln(f, "\tadvance_x: int,")
+	fmt.fprintln(f, "}")
+	fmt.fprintln(f, "")
+
+	fmt.fprintln(f, "atlas_glyphs: []Atlas_Glyph = {")
+
+	for ag in atlas_glyphs {
+		fmt.fprintf(f, "\t{{ rect = {{%v, %v, %v, %v}}, value = %q, offset_x = %v, offset_y = %v, advance_x = %v}},\n",
+			ag.rect.x, ag.rect.y, ag.rect.width, ag.rect.height, ag.glyph.value, ag.glyph.offsetX, ag.glyph.offsetY, ag.glyph.advanceX)
+	}
+
+	fmt.fprintln(f, "}\n")
+
+	fmt.fprintf(f, "shapes_texture_rect := Rect {{%v, %v, %v, %v}}\n\n", shapes_texture_rect.x, shapes_texture_rect.y, shapes_texture_rect.width, shapes_texture_rect.height)
+
+	fmt.fprintln(f, "Tile_Id :: enum {")
+	for y in 0..<10 {
+		for x in 0..<10 {
+			fmt.fprintf(f, "\tT0Y%vX%v,\n", y, x)
+		}
+	}
+	fmt.fprintln(f, "}")
+	fmt.fprintln(f, "")
+
+	fmt.fprintln(f, "atlas_tiles := #partial [Tile_Id]Rect {")
+
+	for at in atlas_tiles {
+		fmt.fprintf(f, "\t.T0Y%vX%v = {{%v, %v, %v, %v}},\n",
+			 at.coord.y, at.coord.x, at.rect.x, at.rect.y, at.rect.width, at.rect.height)
+	}
+
+	fmt.fprintln(f, "}\n")
+
+	fmt.fprintln(f, "Animation_Name :: enum {")
+	fmt.fprint(f, "\tNone,\n")
+	for r in animations {
+		fmt.fprintf(f, "\t%s,\n", r.name)
+	}
+	fmt.fprintln(f, "}")
+	fmt.fprintln(f, "")
+
+	fmt.fprintln(f, "Atlas_Animation :: struct {")
+	fmt.fprintln(f, "\tfirst_frame: TextureName,")
+	fmt.fprintln(f, "\tlast_frame: TextureName,")
+	fmt.fprintln(f, "}")
+	fmt.fprintln(f, "")
+
+	fmt.fprintln(f, "atlas_animations := [Animation_Name]Atlas_Animation {")
+	fmt.fprint(f, "\t.None = {},\n")
+
+	for a in animations {
+		fmt.fprintf(f, "\t.%v = {{ first_frame = .%v, last_frame = .%v }},\n",
+			a.name, a.first_texture, a.last_texture)
+	}
+
+	fmt.fprintln(f, "}\n")
+
+	fmt.fprintln(f, "TEXTURE_ATLAS_FILENAME :: \"atlas.png\"")
+	fmt.fprintf(f, "ATLAS_FONT_SIZE :: %v\n", FONT_SIZE)
+	fmt.fprintf(f, "LETTERS_IN_FONT :: \"%s\"\n", LETTERS_IN_FONT)
+}
+
+
+
+================================================
+File: atlas_builder/aseprite/README.md
+================================================
+# Odin Aseprite
+Handler for Aseprite's `.ase`/`.aseprite`, `.aseprite-extension` &amp; extended `.gpl` files writen in Odin.   
+
+* `.\`: Main un/marshaler for `.ase`
+* `.\raw`: un/marshals `.ase` exactly as given by the spec
+* `.\gpl`: extended & normal .gpl   
+* `.\extensions`: .aseprite-extension. WIP   
+* `.\tests`: test files
+
+## Examples
+### aseprite
+```odin
+package main
+
+import "core:fmt"
+import ase "odin-aseprite"
+
+main :: proc() {
+    data := #load("geralt.aseprite")
+
+    doc: ase.Document
+    defer ase.destroy_doc(&doc)
+
+    _, umerr := ase.unmarshal(data[:], &doc)
+    if umerr != nil {
+        fmt.println(umerr)
+        return
+    }
+
+    buf: [dynamic]byte
+    defer delete(buf)
+
+    _, merr := ase.marshal(&buf, &doc)
+    if merr != nil {
+        fmt.println(merr)
+        return
+    }
+}
+```
+
+### gpl
+```odin
+package main
+
+import "core:fmt"
+import "odin-aseprite/gpl"
+
+main :: proc() {
+    data := #load("geralt.gpl")
+
+    palette, err := gpl.parse(data[:])
+    if err != nil {
+        fmt.println(err)
+        return
+    }
+    defer destroy_gpl(&palette)
+
+    buf, err2 := gpl.to_bytes(palette)
+    if err2 != nil {
+        fmt.println(err2)
+        return
+    } 
+    defer delete(buf)
+}
+```
+
+
+## Warnings
+User Data that is contained within maps can only be read not written rn.   
+ICC Colour Profiles aren't & will never be supported. The raw data will be saved to doc.   
+
+## Errors
+Any errors please make an issue or DM them to me, `blob1807`, on the [Odin Discord](https://discord.com/invite/sVBPHEv).  
+If you DM me please include the offending file/s.   
+   
+If you want to test your own files for errors. Add them to a new folder in `./tests` and run `odin test .` in the `./tests` directory.
+
+
+
+================================================
+File: atlas_builder/aseprite/LICENSE
+================================================
+BSD 3-Clause License
+
+Copyright (c) 2024, blob1807
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this
+   list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+3. Neither the name of the copyright holder nor the names of its
+   contributors may be used to endorse or promote products derived from
+   this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+
+================================================
+File: atlas_builder/aseprite/ase.odin
+================================================
+package aseprite_file_handler
+
+import "base:runtime"
+import "base:intrinsics"
+import "core:fmt"
+import "core:io"
+import "core:os"
+import "core:strings"
+import "core:slice"
+import "core:unicode/utf8"
+import "core:encoding/endian"
+
+// https://github.com/aseprite/aseprite/blob/main/docs/ase-file-specs.md
+// https://github.com/alpine-alpaca/asefile
+// https://github.com/AristurtleDev/AsepriteDotNet/blob/main/source/AsepriteDotNet/Document/UserData.cs
+
+
+
+================================================
+File: atlas_builder/aseprite/chunk_equal.odin
+================================================
+//+private
+package aseprite_file_handler
+
+import "core:fmt"
+import "core:log"
+import "core:slice"
+import "core:reflect"
+
+_old_palette_256_equal :: proc(x, y: Old_Palette_256_Chunk) -> (a: any, b: any, c: typeid, eq: bool) {
+    if len(x) != len(y) {
+        return len(x), len(y), typeid_of(Old_Palette_256_Chunk), false
+    }
+    for i in 0..<len(x) {
+        xp, yp := x[i], y[i]
+
+        if xp.num_colors != yp.num_colors {
+            return xp.num_colors, yp.num_colors, typeid_of(Old_Palette_Packet), false
+        }
+        if xp.entries_to_skip != yp.entries_to_skip{
+            return xp.entries_to_skip, yp.entries_to_skip, typeid_of(Old_Palette_Packet), false
+        }
+        if len(xp.colors) != len(yp.colors){
+            return len(xp.colors), len(yp.colors), typeid_of(Old_Palette_Packet), false
+        }
+
+        for c in 0..<len(xp.colors) {
+            xc, yc := xp.colors[c], yp.colors[c]
+            if xc != yc {
+                return xc, yc, typeid_of(Old_Palette_Packet), false
+            }
+        }
+    }
+    eq = true
+    return
+}
+
+_old_plette_64_equal :: proc(x, y: Old_Palette_64_Chunk) -> (a: any, b: any, c: typeid, eq: bool) {
+    if len(x) != len(y) {
+        return len(x), len(y), typeid_of(Old_Palette_256_Chunk), false
+    }
+    for i in 0..<len(x) {
+        xp, yp := x[i], y[i]
+
+        if xp.num_colors != yp.num_colors {
+            return xp.num_colors, yp.num_colors, typeid_of(Old_Palette_Packet), false
+        }
+        if xp.entries_to_skip != yp.entries_to_skip{
+            return xp.entries_to_skip, yp.entries_to_skip, typeid_of(Old_Palette_Packet), false
+        }
+        if len(xp.colors) != len(yp.colors){
+            return len(xp.colors), len(yp.colors), typeid_of(Old_Palette_Packet), false
+        }
+
+        for c in 0..<len(xp.colors) {
+            xc, yc := xp.colors[c], yp.colors[c]
+            if xc != yc {
+                return xc, yc, typeid_of(Old_Palette_Packet), false
+            }
+        }
+    }
+    eq = true
+    return
+}
+
+_layer_equal :: proc(x, y: Layer_Chunk) -> (a: any, b: any, c: typeid, eq: bool) {
+    if x.type != y.type {
+        return x.type, y.type, typeid_of(Layer_Chunk), false
+    }
+    if x.flags != y.flags {
+        return x.flags, y.flags, typeid_of(Layer_Chunk), false
+    } 
+    if x.opacity != y.opacity {
+        return x.opacity, y.opacity, typeid_of(Layer_Chunk), false
+    } 
+    if x.blend_mode != y.blend_mode {
+        return x.blend_mode, y.blend_mode, typeid_of(Layer_Chunk), false
+    }
+    if x.child_level != y.child_level {
+        return x.child_level, y.child_level, typeid_of(Layer_Chunk), false
+    }
+    if x.default_width != y.default_width {
+        return x.default_width, y.default_width, typeid_of(Layer_Chunk), false
+    }
+    if x.tileset_index != y.tileset_index {
+        return x.tileset_index, y.tileset_index, typeid_of(Layer_Chunk), false
+    }
+    if x.default_height != y.default_height {
+        return x.default_height, y.default_height, typeid_of(Layer_Chunk), false
+    }
+    if x.name != y.name {
+        return x.name, y.name, typeid_of(Layer_Chunk), false
+    }
+
+    eq = true
+    return 
+}
+
+_cel_equal :: proc(x, y: Cel_Chunk) -> (a: any, b: any, c: typeid, eq: bool) {
+    if x.x != y.x {
+        return y.x, y.x, typeid_of(Cel_Chunk), false
+    } 
+    if y.y != x.y {
+        return x.y, y.y, typeid_of(Cel_Chunk), false
+    } 
+    if x.type != y.type {
+        return x.type, y.type , typeid_of(Cel_Chunk), false
+    }
+    if x.z_index != y.z_index {
+        return x.z_index, y.z_index, typeid_of(Cel_Chunk), false
+    }
+    if x.layer_index != y.layer_index {
+        return x.layer_index, y.layer_index, typeid_of(Cel_Chunk), false
+    }
+    if x.opacity_level != y.opacity_level {
+        return x.opacity_level, y.opacity_level, typeid_of(Cel_Chunk), false
+    }
+
+    switch xv in x.cel {
+    case Raw_Cel:
+        yv, ok := y.cel.(Raw_Cel)
+        if !ok {
+            return typeid_of(type_of(xv)), reflect.union_variant_typeid(y), typeid_of(Cel_Type), false
+        }
+        if xv.width != yv.width {
+            return xv.width, yv.width, typeid_of(Raw_Cel), false
+        }
+        if xv.height != yv.height {
+            return xv.height, yv.height, typeid_of(Raw_Cel), false
+        }
+        if !slice.equal(xv.pixel[:], yv.pixel[:]) {
+            return xv.pixel[:], yv.pixel[:], typeid_of(Raw_Cel), false
+        }
+
+    case Linked_Cel:
+        yv, ok := y.cel.(Linked_Cel)
+        if !ok {
+            return typeid_of(type_of(xv)), reflect.union_variant_typeid(y), typeid_of(Cel_Type), false
+        }
+        if xv != yv {
+            return xv, yv, typeid_of(Linked_Cel), false
+        }
+
+    case Com_Image_Cel:
+        yv, ok := y.cel.(Com_Image_Cel)
+        if !ok {
+            return typeid_of(type_of(xv)), reflect.union_variant_typeid(y), typeid_of(Cel_Type), false
+        }
+        if xv.width != yv.width {
+            return xv.width, yv.width, typeid_of(Com_Image_Cel), false
+        }
+        if xv.height != yv.height {
+            return xv.height, yv.height, typeid_of(Com_Image_Cel), false
+        }
+        if !slice.equal(xv.pixel[:], yv.pixel[:]) {
+            return xv.pixel[:], yv.pixel[:], typeid_of(Com_Image_Cel), false
+        }
+
+    case Com_Tilemap_Cel:
+        yv, ok := y.cel.(Com_Tilemap_Cel)
+        if !ok {
+            return typeid_of(type_of(xv)), reflect.union_variant_typeid(y), typeid_of(Cel_Type), false
+        }
+        if xv.width != yv.width {
+            return xv.width, yv.width, typeid_of(Com_Tilemap_Cel), false
+        }
+        if xv.height != yv.height {
+            return xv.height, yv.height, typeid_of(Com_Tilemap_Cel), false
+        }
+        if xv.bitmask_x != yv.bitmask_x {
+            return xv.bitmask_x, yv.bitmask_x, typeid_of(Com_Tilemap_Cel), false
+        }
+        if xv.bitmask_y != yv.bitmask_y {
+            return xv.bitmask_y, yv.bitmask_y, typeid_of(Com_Tilemap_Cel), false
+        }
+        if xv.bitmask_id != yv.bitmask_id {
+            return xv.bitmask_id, yv.bitmask_id, typeid_of(Com_Tilemap_Cel), false
+        }
+        if xv.bits_per_tile != yv.bits_per_tile {
+            return xv.bits_per_tile, yv.bits_per_tile, typeid_of(Com_Tilemap_Cel), false
+        }
+        if xv.bitmask_diagonal != yv.bitmask_diagonal {
+            return xv.bitmask_diagonal, yv.bitmask_diagonal, typeid_of(Com_Tilemap_Cel), false
+        }
+        // TODO: Might not compare right.
+        if !slice.equal(xv.tiles[:], yv.tiles[:]) {
+            return xv.tiles[:], yv.tiles[:], typeid_of(Com_Tilemap_Cel), false
+        }
+
+    case nil:
+        if y.cel != nil {
+            return x.cel, y.cel, typeid_of(Cel_Type), false
+        }
+
+    case:
+        return x.cel, y.cel, typeid_of(Cel_Type), false
+    }
+    eq = true
+    return
+}
+
+_cel_extra_equal :: proc(x, y: Cel_Extra_Chunk) -> (a: any, b: any, c: typeid, eq: bool) {
+    if x != y { 
+        return x, y, typeid_of(Cel_Extra_Chunk), false 
+    }
+    eq = true
+    return 
+}
+
+_color_profile_equal :: proc(x, y: Color_Profile_Chunk) -> (a: any, b: any, c: typeid, eq: bool) {
+    if x.type != y.type {
+        return x.type, y.type, typeid_of(Color_Profile_Chunk), false
+    }
+    if x.flags != y.flags {
+        return x.flags, y.flags, typeid_of(Color_Profile_Chunk), false
+    }
+    if x.fixed_gamma != y.fixed_gamma {
+        return x.fixed_gamma, y.fixed_gamma, typeid_of(Color_Profile_Chunk), false
+    }
+
+    switch xv in x.icc {
+    case ICC_Profile:
+        yv, ok := y.icc.(ICC_Profile)
+        if !ok {
+            return typeid_of(type_of(xv)), reflect.union_variant_typeid(y), typeid_of(Color_Profile_Chunk), false
+        }
+        if !slice.equal(xv[:], yv[:]) {
+            return xv[:], yv[:], typeid_of(ICC_Profile), false
+        }
+    case nil:
+        if y.icc != nil {
+            return xv, reflect.union_variant_typeid(y), typeid_of(Color_Profile_Chunk), false
+        }
+    case:
+        return x.icc, y.icc, typeid_of(Color_Profile_Chunk), false
+    }
+
+    eq = true
+    return 
+}
+
+_external_files_equal :: proc(x, y: External_Files_Chunk) -> (a: any, b: any, c: typeid, eq: bool) {
+    if len(x) != len(y) {
+        return len(x), len(y), typeid_of(External_Files_Chunk), false
+    }
+
+    for i in 0..<len(x) {
+        xe, ye: External_Files_Entry = x[i], y[i]
+        if xe.id != ye.id {
+            return xe.id, ye.id, typeid_of(External_Files_Entry), false
+        }
+        if xe.type != ye.type {
+            return xe.type,ye.type, typeid_of(External_Files_Entry), false
+        }
+        if xe.file_name_or_id != ye.file_name_or_id {
+            return xe.file_name_or_id, ye.file_name_or_id, typeid_of(External_Files_Entry), false
+        } 
+    }
+    eq = true
+    return
+}
+
+_mask_equal :: proc(x, y: Mask_Chunk) -> (a: any, b: any, c: typeid, eq: bool) {
+    if x.x != y.x {
+        return x.x, y.x, typeid_of(Mask_Chunk), false
+    } 
+    if x.y != y.y {
+        return x.y, y.y, typeid_of(Mask_Chunk), false
+    }
+    if x.width != y.width {
+        return x.width, y.width, typeid_of(Mask_Chunk), false
+    }
+    if x.height != y.height {
+        return x.height, y.height, typeid_of(Mask_Chunk), false
+    }
+    if x.name != y.name {
+        return x.name, y.name, typeid_of(Mask_Chunk), false
+    }
+    if !slice.equal(x.bit_map_data[:], y.bit_map_data[:]) {
+        return x.bit_map_data[:], y.bit_map_data[:], typeid_of(Mask_Chunk), false
+    }
+    eq = true
+    return
+}
+
+_path_equal :: proc(x, y: Path_Chunk) -> (a: any, b: any, c: typeid, eq: bool) {
+    if x != y { 
+        return x, y, typeid_of(Path_Chunk), false 
+    }
+    eq = true
+    return 
+}
+
+_tags_equal :: proc(x, y: Tags_Chunk) -> (a: any, b: any, c: typeid, eq: bool) {
+    if len(x) != len(y) {
+        return len(x), len(y), typeid_of(Tags_Chunk), false
+    }
+
+    for i in 0..<len(x) {
+        xt, yt: Tag = x[i], y[i]
+        if xt.repeat != yt.repeat {
+            return xt.repeat, yt.repeat, typeid_of(Tag), false
+        } 
+        if xt.to_frame != yt.to_frame {
+            return xt.to_frame, yt.to_frame, typeid_of(Tag), false
+        } 
+        if xt.tag_color != yt.tag_color {
+            return xt.tag_color, yt.tag_color, typeid_of(Tag), false
+        }
+        if xt.from_frame != yt.from_frame {
+            return xt.from_frame, yt.from_frame, typeid_of(Tag), false
+        }
+        if xt.loop_direction != yt.loop_direction {
+            return xt.loop_direction, yt.loop_direction, typeid_of(Tag), false
+        }
+        if xt.name != xt.name {
+            return xt.name, xt.name, typeid_of(Tag), false
+        }
+        
+    }
+    eq = true
+    return
+}
+
+_palette_equal :: proc(x, y: Palette_Chunk) -> (a: any, b: any, c: typeid, eq: bool) {
+    if x.size != y.size {
+        return x.size, y.size, typeid_of(Palette_Chunk), false
+    } 
+    if x.last_index != y.last_index {
+        return x.last_index, y.last_index, typeid_of(Palette_Chunk), false
+    }
+    if x.first_index != y.first_index {
+        return x.first_index, y.first_index, typeid_of(Palette_Chunk), false
+    }
+    if len(x.entries) != len(y.entries) {
+        return len(x.entries), len(y.entries), typeid_of(Palette_Chunk), false
+    }
+
+    for i in 0..<len(x.entries) {
+        xp, yp: Palette_Entry = x.entries[i], y.entries[i]
+        if xp.color != yp.color {
+            return xp.color, yp.color, typeid_of(Palette_Entry), false
+        }
+        if xp.name != xp.name {
+            return xp.name, xp.name, typeid_of(Palette_Entry), false
+        }
+    }
+    eq = true
+    return
+}
+
+_ud_prop_val_eq :: proc(x,y: Property_Value) -> (a: any, b: any, c: typeid, eq: bool) {
+    switch xv in x {
+    case bool:
+        yv, ok := y.(bool)
+        if !ok {
+            return typeid_of(type_of(xv)), reflect.union_variant_typeid(y), typeid_of(Property_Value), false
+        }
+        if xv != yv {
+            return xv, yv, typeid_of(bool), false
+        } 
+    case i8:
+        yv, ok := y.(i8)
+        if !ok {
+            return typeid_of(type_of(xv)), reflect.union_variant_typeid(y), typeid_of(Property_Value), false
+        }
+        if xv != yv {
+            return xv, yv, typeid_of(i8), false
+        }
+    case BYTE:
+        yv, ok := y.(BYTE)
+        if !ok {
+            return typeid_of(type_of(xv)), reflect.union_variant_typeid(y), typeid_of(Property_Value), false
+        }
+        if xv != yv {
+            return xv, yv, typeid_of(BYTE), false
+        }
+
+    case SHORT:
+        yv, ok := y.(SHORT)
+        if !ok {
+            return typeid_of(type_of(xv)), reflect.union_variant_typeid(y), typeid_of(Property_Value), false
+        }
+        if xv != yv {
+            return xv, yv, typeid_of(SHORT), false
+        }
+
+    case WORD:
+        yv, ok := y.(WORD)
+        if !ok {
+            return typeid_of(type_of(xv)), reflect.union_variant_typeid(y), typeid_of(Property_Value), false
+        }
+        if xv != yv {
+            return xv, yv, typeid_of(WORD), false
+        }
+
+    case LONG:
+        yv, ok := y.(LONG)
+        if !ok {
+            return typeid_of(type_of(xv)), reflect.union_variant_typeid(y), typeid_of(Property_Value), false
+        }
+        if xv != yv {
+            return xv, yv, typeid_of(LONG), false
+        }
+
+    case DWORD:
+        yv, ok := y.(DWORD)
+        if !ok {
+            return typeid_of(type_of(xv)), reflect.union_variant_typeid(y), typeid_of(Property_Value), false
+        }
+        if xv != yv {
+            return xv, yv, typeid_of(DWORD), false
+        }
+
+    case LONG64:
+        yv, ok := y.(LONG64)
+        if !ok {
+            return typeid_of(type_of(xv)), reflect.union_variant_typeid(y), typeid_of(Property_Value), false
+        }
+        if xv != yv {
+            return xv, yv, typeid_of(LONG64), false
+        }
+
+    case QWORD:
+        yv, ok := y.(QWORD)
+        if !ok {
+            return typeid_of(type_of(xv)), reflect.union_variant_typeid(y), typeid_of(Property_Value), false
+        }
+        if xv != yv {
+            return xv, yv, typeid_of(QWORD), false
+        }
+
+    case FIXED:
+        yv, ok := y.(FIXED)
+        if !ok {
+            return typeid_of(type_of(xv)), reflect.union_variant_typeid(y), typeid_of(Property_Value), false
+        }
+        if xv != yv {
+            return xv, yv, typeid_of(FIXED), false
+        }
+
+    case FLOAT:
+        yv, ok := y.(FLOAT)
+        if !ok {
+            return typeid_of(type_of(xv)), reflect.union_variant_typeid(y), typeid_of(Property_Value), false
+        }
+        if xv != yv {
+            return xv, yv, typeid_of(FLOAT), false
+        }
+
+    case DOUBLE:
+        yv, ok := y.(DOUBLE)
+        if !ok {
+            return typeid_of(type_of(xv)), reflect.union_variant_typeid(y), typeid_of(Property_Value), false
+        }
+        if xv != yv {
+            return xv, yv, typeid_of(DOUBLE), false
+        }
+
+    case STRING:
+        yv, ok := y.(STRING)
+        if !ok {
+            return typeid_of(type_of(xv)), reflect.union_variant_typeid(y), typeid_of(Property_Value), false
+        }
+        if xv == yv {
+            return xv, yv, typeid_of(STRING), false
+        }
+        if xv != yv {
+            return xv, yv, typeid_of(STRING), false
+        } 
+
+    case SIZE:
+        yv, ok := y.(SIZE)
+        if !ok {
+            return typeid_of(type_of(xv)), reflect.union_variant_typeid(y), typeid_of(Property_Value), false
+        }
+        if xv != yv {
+            return xv, yv, typeid_of(SIZE), false
+        }
+
+    case POINT:
+        yv, ok := y.(POINT)
+        if !ok {
+            return typeid_of(type_of(xv)), reflect.union_variant_typeid(y), typeid_of(Property_Value), false
+        }
+        if xv != yv {
+            return xv, yv, typeid_of(POINT), false
+        }
+
+    case RECT:
+        yv, ok := y.(RECT)
+        if !ok {
+            return typeid_of(type_of(xv)), reflect.union_variant_typeid(y), typeid_of(Property_Value), false
+        }
+        if xv != yv {
+            return xv, yv, typeid_of(RECT), false
+        }
+
+    case UUID:
+        yv, ok := y.(UUID)
+        if !ok {
+            return typeid_of(type_of(xv)), reflect.union_variant_typeid(y), typeid_of(Property_Value), false
+        }
+        if !slice.equal(xv[:], yv[:]) {
+            return xv, yv, typeid_of(UUID), false
+        }
+
+    case Properties:
+        yv, ok := y.(Properties)
+        if !ok {
+            return typeid_of(type_of(xv)), reflect.union_variant_typeid(y), typeid_of(Property_Value), false
+        }
+        return _ud_props_eq(xv, yv)
+
+    case UD_Vec:
+        yv, ok := y.(UD_Vec)
+        if !ok {
+            return typeid_of(type_of(xv)), reflect.union_variant_typeid(y), typeid_of(Property_Value), false
+        }
+        if len(xv) != len(yv) {
+            return len(xv), len(yv), typeid_of(UD_Vec), false 
+        }
+
+        for p in 0..<len(xv) {
+            a, b, c, eq = _ud_prop_val_eq(xv[p], yv[p])
+            if !eq { return }
+        }
+        
+    case nil:
+        if y != nil {
+            return x, y, typeid_of(Property_Value), false
+        }
+    case:
+        return x, y, typeid_of(Property_Value), false
+    }
+    eq = true
+    return
+}
+
+_ud_props_eq :: proc(x, y: Properties) -> (a: any, b: any, c: typeid, eq: bool) {
+    if len(x) != len(y) {
+        return len(x), len(y), typeid_of(Properties), false
+    }
+
+    if x == nil {
+        return "Properties X", nil, typeid_of(User_Data_Chunk), false
+    } else if y == nil {
+        return nil, "Properties y", typeid_of(User_Data_Chunk), false
+    }
+    
+    for key_x, val_x in x {
+        val_y, ok := y[key_x]
+        if !ok {
+            fmt.println(key_x)
+            return key_x, nil, typeid_of(Properties_Map), false
+        }
+        a, b, c, eq = _ud_prop_val_eq(val_x, val_y)
+        if !eq { return }
+    }
+    eq = true
+    return
+}
+
+_user_data_equal :: proc(x, y: User_Data_Chunk) -> (a: any, b: any, c: typeid, eq: bool) {
+    if x.text != y.text {
+        return x.text, y.text, typeid_of(User_Data_Chunk), false
+    }
+    if x.color != y.color {
+        return x.color, y.color, typeid_of(User_Data_Chunk), false
+    }
+    //log.info("Properties Map check's been temporarily removed.")
+    if x.maps == nil && y.maps == nil {
+        eq = true
+        return
+    } else if x.maps != nil && y.maps == nil {
+        return "Properties Map X", nil, typeid_of(User_Data_Chunk), false
+    } else if y.maps != nil && x.maps == nil {
+        return nil, "Properties Map y", typeid_of(User_Data_Chunk), false
+    }
+
+    xm := x.maps.(Properties_Map)
+    ym := y.maps.(Properties_Map)
+
+    if len(xm) != len(ym) {
+        return len(xm), len(ym), typeid_of(Properties), false
+    }
+    
+    for key_x, val_x in xm {
+        val_y, ok := ym[key_x]
+        if !ok {
+            fmt.println(key_x)
+            return key_x, nil, typeid_of(Properties_Map), false
+        }
+        a, b, c, eq = _ud_prop_val_eq(val_x, val_y)
+        if !eq { return }
+    }
+    eq = true
+    return
+}
+
+_slice_equal :: proc(x, y: Slice_Chunk) -> (a: any, b: any, c: typeid, eq: bool) {
+    if x.flags != y.flags {
+        return x.flags, y.flags, typeid_of(Slice_Chunk), false
+    }
+    if x.name != x.name {
+        return x.name, x.name, typeid_of(Slice_Chunk), false
+    }
+    if len(x.keys) != len(y.keys) {
+        return len(x.keys), len(y.keys), typeid_of(Slice_Chunk), false
+    }
+
+    for i in 0..<len(x.keys) {
+        xk, yk: Slice_Key = x.keys[i], y.keys[i]
+        if xk != yk {
+            return xk, yk, typeid_of(Slice_Key), false
+        }
+    }
+    eq = true
+    return
+}
+
+_tileset_equal :: proc(x, y: Tileset_Chunk) -> (a: any, b: any, c: typeid, eq: bool) {
+    if x.id != y.id {
+        return x.id, y.id, typeid_of(Tileset_Chunk), false
+    }
+    if x.flags != y.flags {
+        return x.flags, y.flags, typeid_of(Tileset_Chunk), false
+    }
+    if x.num_of_tiles != y.num_of_tiles {
+        return x.num_of_tiles, y.num_of_tiles, typeid_of(Tileset_Chunk), false
+    }
+    if x.width != y.width {
+        return x.width, y.width, typeid_of(Tileset_Chunk), false
+    }
+    if x.height != y.height {
+        return x.height, y.height, typeid_of(Tileset_Chunk), false
+    }
+    if x.base_index != y.base_index {
+        return x.base_index, y.base_index, typeid_of(Tileset_Chunk), false
+    }
+    if x.name != x.name {
+        return x.name, x.name, typeid_of(Tileset_Chunk), false
+    }
+    if x.external != y.external {
+        return x.external, y.external, typeid_of(Tileset_External), false
+    }
+    if x.compressed == nil && y.compressed == nil {
+        eq = true
+        return
+    } else if x.compressed != nil && y.compressed == nil {
+        return "Tilemap Compressed X", nil, typeid_of(Tileset_Chunk), false
+    } else if y.compressed != nil && x.compressed == nil {
+        return nil, "Tilemap Compressed X", typeid_of(Tileset_Chunk), false
+    }
+    
+    xc := x.compressed.(Tileset_Compressed)
+    yc := y.compressed.(Tileset_Compressed)
+
+    if !slice.equal(xc[:], yc[:]) {
+        return xc, yc, typeid_of(Tileset_Compressed), false
+    }
+
+    eq = true
+    return
+}
+
+_chunk_equal :: proc{
+    _old_palette_256_equal, _old_plette_64_equal, _layer_equal, _cel_equal,
+    _cel_extra_equal, _color_profile_equal, _external_files_equal, _mask_equal,
+    _path_equal, _tags_equal, _palette_equal, _user_data_equal, _slice_equal,
+    _tileset_equal,
+}
+
+
+
+================================================
+File: atlas_builder/aseprite/common.odin
+================================================
+package aseprite_file_handler
+
+import "core:fmt"
+
+destroy_doc :: proc(doc: ^Document) {
+    destroy_value :: proc(p: ^Property_Value) {
+        #partial switch &val in p {
+        case STRING:
+            delete(val)
+        case UD_Vec:
+            for &v in val {
+                destroy_value(&v)
+            }
+            delete(val)
+
+        case Properties:
+            for k, &v in val {
+                destroy_value(&v)
+            }
+            delete(val)
+        }
+    }
+
+    for &frame in doc.frames {
+        for &chunk in frame.chunks {
+            #partial switch &v in chunk {
+            case Old_Palette_256_Chunk:
+                for pack in v {
+                    delete(pack.colors)
+                }
+                delete(v)
+
+            case Old_Palette_64_Chunk:
+                for pack in v {
+                    delete(pack.colors)
+                }
+                delete(v)
+            case Layer_Chunk:
+                delete(v.name)
+
+            case Cel_Chunk:
+                switch &cel in v.cel {
+                case Linked_Cel:
+                case Raw_Cel:
+                    delete(cel.pixel)
+                case Com_Image_Cel:
+                    delete(cel.pixel)
+                case Com_Tilemap_Cel:
+                    // FIXME: Fails to free.
+                    delete(cel.tiles)
+                }
+
+            case Color_Profile_Chunk:
+                switch icc in v.icc {
+                case ICC_Profile:
+                    delete(icc)
+                }
+
+            case External_Files_Chunk:
+                for &e in v {
+                    delete(e.file_name_or_id)
+                }
+                delete(v)
+                
+            case Mask_Chunk:
+                delete(v.name)
+                delete(v.bit_map_data)
+
+            case Tags_Chunk:
+                for &t in v {
+                    delete(t.name)
+                }
+                delete(v)
+
+            case Palette_Chunk:
+                for &e in v.entries {
+                    switch &s in e.name {
+                    case string:
+                        delete(s)
+                    }
+                }
+                delete(v.entries)
+
+            case User_Data_Chunk:
+                switch &s in v.text {
+                case string:
+                    delete(s)
+                }
+
+                if m, ok := v.maps.?; ok {
+                    for k, &val in m {
+                        destroy_value(&val)
+                    }
+                    delete_map(m)
+                }
+                /*// FIXME: Fails to free.
+                switch &m in v.maps {
+                case Properties_Map:
+                    for k, &val in m {
+                        destroy_value(&val)
+                    }
+                    delete_map(m)
+                }*/
+
+            case Slice_Chunk:
+                delete(v.name)
+                delete(v.keys)
+
+            case Tileset_Chunk:
+                delete(v.name)
+                // FIXME: Fails to free.
+                switch &c in v.compressed {
+                case Tileset_Compressed:
+                    delete(c)
+                }
+            }
+        }
+        delete(frame.chunks)
+    }
+    delete(doc.frames)
+}
+
+
+================================================
+File: atlas_builder/aseprite/marshal.odin
+================================================
+package aseprite_file_handler
+
+import "base:runtime"
+import "core:io"
+import "core:os"
+import "core:fmt"
+import "core:log"
+import "core:bytes"
+import "core:slice"
+import "core:bufio"
+import "core:strings"
+import "core:encoding/endian"
+import "vendor:zlib"
+
+
+marshal_to_bytes_buff :: proc(b: ^bytes.Buffer, doc: ^Document, allocator := context.allocator)-> (file_size: int, err: Marshal_Error) {
+    w, ok := io.to_writer(bytes.buffer_to_stream(b))
+    if !ok {
+        return file_size, .Unable_Make_Writer
+    }
+    return marshal(w, doc, allocator)
+}
+
+marshal_to_handle :: proc(h: os.Handle, doc: ^Document, allocator := context.allocator)-> (file_size: int, err: Marshal_Error) {
+    w, ok := io.to_writer(os.stream_from_handle(h))
+    if !ok {
+        return file_size, .Unable_Make_Writer
+    }
+    return marshal(w, doc, allocator)
+}
+
+marshal_to_slice :: proc(b: []byte, doc: ^Document, allocator := context.allocator)-> (file_size: int, err: Marshal_Error) {
+    buf: bytes.Buffer
+    defer bytes.buffer_destroy(&buf)
+    file_size, err = marshal(&buf, doc, allocator)
+    if err != nil {
+        return
+    }
+    if len(b) < len(buf.buf[buf.off:]) {
+        return file_size, Marshal_Errors.Buffer_Not_Big_Enough
+    }
+    copy_slice(b[:], buf.buf[buf.off:])
+    return
+}
+
+marshal_to_dynamic :: proc(b: ^[dynamic]byte, doc: ^Document, allocator := context.allocator)-> (file_size: int, err: Marshal_Error) {
+    buf: bytes.Buffer
+    defer bytes.buffer_destroy(&buf)
+    marshal(&buf, doc, allocator) or_return
+    append(b, ..buf.buf[:])
+    return
+}
+
+marshal_to_bufio :: proc(w: ^bufio.Writer, doc: ^Document, allocator := context.allocator) -> (file_size: int, err: Marshal_Error) {
+    ww, ok := io.to_writer(bufio.writer_to_stream(w))
+    if !ok {
+        return file_size, .Unable_Make_Writer
+    }
+    return marshal(ww, doc, allocator)
+}
+
+marshal :: proc{
+    marshal_to_bytes_buff, marshal_to_slice, marshal_to_handle, 
+    marshal_to_dynamic, marshal_to_bufio, marshal_to_writer,
+}
+
+marshal_to_writer :: proc(ww: io.Writer, doc: ^Document, allocator := context.allocator) -> (file_size: int, err: Marshal_Error) {
+    ud_map_warn: bool
+    s := &file_size
+    b: bytes.Buffer
+    defer bytes.buffer_destroy(&b)
+
+    w, ok := io.to_writer(bytes.buffer_to_stream(&b))
+    if !ok {
+        return file_size, .Unable_Make_Writer
+    }
+
+    write(w, FILE_MAGIC_NUM, s) or_return
+    write(w, WORD(len(doc.frames)), s) or_return
+    write(w, doc.header.width, s) or_return
+    write(w, doc.header.height, s) or_return
+    write(w, WORD(doc.header.color_depth), s) or_return
+    write(w, transmute(DWORD)doc.header.flags, s) or_return
+    write(w, doc.header.speed, s) or_return
+    write_skip(w, 8, s) or_return
+    write(w, doc.header.transparent_index, s) or_return
+    write_skip(w, 3, s) or_return
+    write(w, doc.header.num_of_colors, s) or_return
+    write(w, doc.header.ratio_width, s) or_return
+    write(w, doc.header.ratio_height, s) or_return
+    write(w, doc.header.x, s) or_return
+    write(w, doc.header.y, s) or_return
+    write(w, doc.header.grid_width, s) or_return
+    write(w, doc.header.grid_height, s) or_return
+    write_skip(w, 84, s) or_return
+
+    for frame in doc.frames {
+        fb: bytes.Buffer
+        defer bytes.buffer_destroy(&fb)
+        fw, ok2 := io.to_writer(bytes.buffer_to_stream(&fb))
+        if !ok2 {
+            return file_size, .Unable_Make_Writer
+        }
+        frame_size: int
+        fs := &frame_size
+        
+        write(fw, FRAME_MAGIC_NUM, fs) or_return
+        write(fw, frame.header.old_num_of_chunks, fs) or_return
+        write(fw, frame.header.duration, fs) or_return
+        write_skip(fw, 2, fs) or_return
+        write(fw, frame.header.num_of_chunks, fs) or_return
+
+        for chunk in frame.chunks {
+            cb: bytes.Buffer
+            defer bytes.buffer_destroy(&cb)
+            cw, ok3 := io.to_writer(bytes.buffer_to_stream(&cb))
+            if !ok3 {
+                return file_size, .Unable_Make_Writer
+            }
+            chunk_size: int
+            cs := &chunk_size
+
+            chunk_type := get_chunk_type(chunk) or_return
+            write(cw, chunk_type, cs) or_return
+
+            switch val in chunk {
+            case Old_Palette_256_Chunk:
+                write(cw, WORD(len(val)), cs) or_return
+                for p in val {
+                    write(cw, p.entries_to_skip, cs) or_return
+                    if len(p.colors) > 256 {
+                        return file_size, .Invalid_Old_Palette
+                    } else if len(p.colors) == 256 {
+                        write_byte(cw, 0, cs) or_return
+                    } else {
+                        write(cw, p.num_colors, cs) or_return
+                    }
+                    for c in p.colors {
+                        write(cw, c[2], cs) or_return
+                        write(cw, c[1], cs) or_return
+                        write(cw, c[0], cs) or_return
+                    }
+                }
+
+            case Old_Palette_64_Chunk:
+                write(cw, WORD(len(val)), cs) or_return
+                for p in val {
+                    write(cw, p.entries_to_skip, cs) or_return
+                    if len(p.colors) > 256 {
+                        return file_size, .Invalid_Old_Palette
+                    } else if len(p.colors) == 256 {
+                        write_byte(cw, 0, cs) or_return
+                    } else {
+                        write(cw, p.num_colors, cs) or_return
+                    }
+                    for c in p.colors {
+                        write(cw, c[2], cs) or_return
+                        write(cw, c[1], cs) or_return
+                        write(cw, c[0], cs) or_return
+                    }
+                }
+            case Layer_Chunk:
+                write(cw, transmute(WORD)val.flags, cs) or_return
+                write(cw, WORD(val.type), cs) or_return
+                write(cw, val.child_level, cs) or_return
+                write(cw, val.default_width, cs) or_return
+                write(cw, val.default_height, cs) or_return
+                write(cw, WORD(val.blend_mode), cs) or_return
+                write(cw, val.opacity, cs) or_return
+                write_skip(cw, 3, cs) or_return
+                write(cw, val.name, cs) or_return
+                if val.type == .Tilemap {
+                    write(cw, val.tileset_index, cs) or_return
+                }
+
+            case Cel_Chunk:
+                write(cw, val.layer_index, cs) or_return
+                write(cw, val.x, cs) or_return
+                write(cw, val.y, cs) or_return
+                write(cw, val.opacity_level, cs) or_return
+                cel_type := get_cel_type(val.cel) or_return
+                write(cw, cel_type, cs) or_return
+                write(cw, val.z_index, cs) or_return
+                write_skip(cw, 5, cs) or_return
+
+                switch cel in val.cel {
+                case Raw_Cel:
+                    write(cw, cel.width, cs) or_return
+                    write(cw, cel.height, cs) or_return
+                    write(cw, cel.pixel[:], cs) or_return
+
+                case Linked_Cel:
+                    write(cw, WORD(cel), cs) or_return
+
+                case Com_Image_Cel:
+                    write(cw, cel.width, cs) or_return
+                    write(cw, cel.height, cs) or_return
+
+                    com_buf := make([]byte, len(cel.pixel)+64, allocator) or_return
+                    defer delete(com_buf)
+                    data_rd: [^]u8 = raw_data(cel.pixel[:])
+                    com_buf_rd: [^]u8 = raw_data(com_buf[:])
+
+                    config := zlib.z_stream {
+                        avail_in=zlib.uInt(len(cel.pixel)), 
+                        next_in=&data_rd[0],
+                        avail_out=zlib.uInt(len(com_buf)),
+                        next_out=&com_buf_rd[0],
+                    }
+                    
+                    en := zlib.deflateInit(&config, zlib.DEFAULT_COMPRESSION)
+                    if en < zlib.OK {
+                        return file_size, ZLIB_Errors(en)
+                    }
+                    en = zlib.deflate(&config, zlib.FINISH)
+                    if en < zlib.OK {
+                        return file_size, ZLIB_Errors(en)
+                    }
+                    en = zlib.deflateEnd(&config)
+                    if en < zlib.OK {
+                        return file_size, ZLIB_Errors(en)
+                    }
+                    
+                    write(cw, com_buf[:int(config.total_out)], cs) or_return
+
+                case Com_Tilemap_Cel:
+                    write(cw, cel.width, cs) or_return
+                    write(cw, cel.height, cs) or_return
+                    write(cw, cel.bits_per_tile, cs) or_return
+                    write(cw, DWORD(cel.bitmask_id), cs) or_return
+                    write(cw, cel.bitmask_x, cs) or_return
+                    write(cw, cel.bitmask_y, cs) or_return
+                    write(cw, cel.bitmask_diagonal, cs) or_return
+                    write_skip(cw, 10, cs) or_return
+
+
+                    buf := make([]u8, len(cel.tiles)*4, allocator) or_return
+                    defer delete(buf)
+                    n := tiles_to_u8(cel.tiles[:], buf[:]) or_return
+
+                    com_buf := make([]byte, n+64, allocator) or_return
+                    defer delete(com_buf)
+                    data_rd: [^]u8 = raw_data(buf[:n])
+                    com_buf_rd: [^]u8 = raw_data(com_buf[:])
+
+                    config := zlib.z_stream {
+                        avail_in=zlib.uInt(n), 
+                        next_in=&data_rd[0],
+                        avail_out=zlib.uInt(len(com_buf)),
+                        next_out=&com_buf_rd[0],
+                    }
+                    
+                    en := zlib.deflateInit(&config, zlib.DEFAULT_COMPRESSION)
+                    if en < zlib.OK {
+                        return file_size, ZLIB_Errors(en)
+                    }
+                    en = zlib.deflate(&config, zlib.FINISH)
+                    if en < zlib.OK {
+                        return file_size, ZLIB_Errors(en)
+                    }
+                    en = zlib.deflateEnd(&config)
+                    if en < zlib.OK {
+                        return file_size, ZLIB_Errors(en)
+                    }
+
+                    write(cw, com_buf[:int(config.total_out)], cs) or_return
+
+                case:
+                    return file_size, .Invalid_Cel_Type
+                }
+
+            case Cel_Extra_Chunk:
+                write(cw, transmute(WORD)val.flags, cs) or_return
+                write(cw, val.x, cs) or_return
+                write(cw, val.y, cs) or_return
+                write(cw, val.width, cs) or_return
+                write(cw, val.width, cs) or_return
+                write_skip(cw, 16, cs) or_return
+
+            case Color_Profile_Chunk:
+                if val.icc != nil {
+                    write(cw, WORD(Color_Profile_Type.ICC), cs) or_return
+                } else {
+                    write(cw, WORD(val.type), cs) or_return
+                }
+                write(cw, transmute(WORD)val.flags, cs) or_return
+                write(cw, val.fixed_gamma, cs) or_return
+                write_skip(cw, 8, cs) or_return
+
+                #partial switch v in val.icc {
+                case ICC_Profile:
+                    write(cw, DWORD(len(v)), cs) or_return
+                    write(cw, cast([]u8)v[:], cs) or_return
+                }
+
+            case External_Files_Chunk:
+                write(cw, DWORD(len(val)), cs) or_return
+                write_skip(cw, 8, cs) or_return
+
+                for file in val {
+                    write(cw, file.id, cs) or_return
+                    write(cw, BYTE(file.type), cs) or_return
+                    write_skip(cw, 7, cs) or_return
+                    write(cw, file.file_name_or_id, cs) or_return
+                }
+
+            case Mask_Chunk:
+                write(cw, val.x, cs) or_return
+                write(cw, val.y, cs) or_return
+                write(cw, val.width, cs) or_return
+                write(cw, val.height, cs) or_return
+                write_skip(cw, 8, cs) or_return
+                write(cw, val.name, cs) or_return 
+                write(cw, val.bit_map_data[:], cs) or_return
+
+            case Path_Chunk:
+
+            case Tags_Chunk:
+                write(cw, WORD(len(val)), cs) or_return
+                write_skip(cw, 8, cs) or_return
+
+                for tag in val {
+                    write(cw, tag.from_frame, cs) or_return
+                    write(cw, tag.to_frame, cs) or_return
+                    write(cw, BYTE(tag.loop_direction), cs) or_return
+                    write(cw, tag.repeat, cs) or_return
+                    write_skip(cw, 6, cs) or_return
+                    write(cw, tag.tag_color[2], cs) or_return
+                    write(cw, tag.tag_color[1], cs) or_return
+                    write(cw, tag.tag_color[0], cs) or_return
+                    write(cw, BYTE(0), cs) or_return
+                    write(cw, tag.name, cs) or_return
+                }
+
+            case Palette_Chunk:
+                write(cw, DWORD(len(val.entries)), cs) or_return
+                write(cw, val.first_index, cs) or_return
+                write(cw, val.last_index, cs) or_return
+                write_skip(cw, 8, cs) or_return
+
+                for entry in val.entries {
+                    if entry.name != nil {
+                        write(cw, WORD(1), cs) or_return
+                    } else {
+                        write(cw, WORD(0), cs) or_return
+                    }
+
+                    write(cw, entry.color[3], cs) or_return
+                    write(cw, entry.color[2], cs) or_return
+                    write(cw, entry.color[1], cs) or_return
+                    write(cw, entry.color[0], cs) or_return
+
+                    #partial switch v in entry.name {
+                    case string:
+                        write(cw, v, cs) or_return
+                    }
+                }
+
+            case User_Data_Chunk:
+                flags: UD_Flags
+                if val.text != nil {
+                    flags += {.Text}
+                }if val.color != nil {
+                    flags += {.Color}
+                }if val.maps != nil {
+                    flags += {.Properties}                    
+                }
+
+                write(cw, transmute(DWORD)flags, cs) or_return
+
+                #partial switch v in val.text {
+                case string:
+                    write(cw, v, cs) or_return
+                }
+
+                #partial switch v in val.color {
+                case Color_RGBA:
+                    write(cw, v[3], cs) or_return
+                    write(cw, v[2], cs) or_return
+                    write(cw, v[1], cs) or_return
+                    write(cw, v[0], cs) or_return
+                }
+
+                #partial switch m in val.maps {
+                case Properties_Map:
+                    if !ud_map_warn {
+                        log.warn("Writing User Data Maps isn't supported rn.")
+                        ud_map_warn = true
+                    }
+                    write(cw, DWORD(8), cs) or_return
+                    write(cw, DWORD(0), cs) or_return 
+
+                    /*mb: bytes.Buffer
+                    defer bytes.buffer_destroy(&mb)
+                    mw, ok4 := io.to_writer(bytes.buffer_to_stream(&mb))
+                    if !ok4 {
+                        return file_size, .Unable_Make_Writer
+                    }
+                    map_size: int
+                    ms := &map_size
+
+                    write(mw, DWORD(len(m)), ms) or_return
+
+                    for key, val in m {
+                        write(mw, key, ms) or_return
+                        val := val.(Properties)
+                        //write(mw, val, ms) or_return
+                        for name, type in val {
+                            write(mw, name, ms) or_return
+                            write(mw, type, ms) or_return
+                        }
+                    }
+
+                    map_size += 4
+                    write(cw, DWORD(map_size), cs) or_return
+                    write(cw, mb.buf[:map_size-4], cs) or_return*/
+                }
+
+            case Slice_Chunk:
+                write(cw, DWORD(len(val.keys)), cs) or_return
+                write(cw, transmute(DWORD)val.flags, cs) or_return
+                write(cw, DWORD(0), cs) or_return
+                write(cw, val.name, cs) or_return
+
+                for key in val.keys {
+                    write(cw, key.frame_num, cs) or_return
+                    write(cw, key.x, cs) or_return
+                    write(cw, key.y, cs) or_return
+                    write(cw, key.width, cs) or_return
+                    write(cw, key.height, cs) or_return
+
+                    #partial switch v in key.center {
+                    case Slice_Center:
+                        write(cw, v.x, cs) or_return
+                        write(cw, v.y, cs) or_return
+                        write(cw, v.width, cs) or_return
+                        write(cw, v.height, cs) or_return
+                    }
+
+                    #partial switch v in key.pivot {
+                    case Slice_Pivot:
+                        write(cw, v.x, cs) or_return
+                        write(cw, v.y, cs) or_return
+                    }
+                }
+
+            case Tileset_Chunk:
+                write(cw, val.id, cs) or_return
+                write(cw, transmute(DWORD)val.flags, cs) or_return
+                write(cw, val.num_of_tiles, cs) or_return
+                write(cw, val.width, cs) or_return
+                write(cw, val.height, cs) or_return
+                write(cw, val.base_index, cs) or_return
+                write_skip(cw, 14, cs) or_return
+                write(cw, val.name, cs) or_return
+
+                #partial switch v in val.external {
+                case Tileset_External:
+                    write(cw, v.file_id, cs) or_return
+                    write(cw, v.tileset_id, cs) or_return
+                }
+
+                #partial switch v in val.compressed {
+                case Tileset_Compressed:
+                    com_buf := make([]byte, len(v), allocator) or_return
+                    defer delete(com_buf)
+                    data_rd: [^]u8 = raw_data(v[:])
+                    com_buf_rd: [^]u8 = raw_data(com_buf[:])
+
+                    config := zlib.z_stream {
+                        avail_in=zlib.uInt(len(v)), 
+                        next_in=&data_rd[0],
+                        avail_out=zlib.uInt(len(v)),
+                        next_out=&com_buf_rd[0],
+                    }
+                    
+                    en := zlib.deflateInit(&config, zlib.DEFAULT_COMPRESSION)
+                    if en < zlib.OK {
+                        return file_size, ZLIB_Errors(en)
+                    }
+                    en = zlib.deflate(&config, zlib.FINISH)
+                    if en < zlib.OK {
+                        return file_size, ZLIB_Errors(en)
+                    }
+                    en = zlib.deflateEnd(&config)
+                    if en < zlib.OK {
+                        return file_size, ZLIB_Errors(en)
+                    }
+
+                    write(cw, DWORD(config.total_out), cs) or_return
+                    write(cw, com_buf[:int(config.total_out)], cs) or_return
+                }
+
+            case:
+                return file_size, .Invalid_Chunk_Type
+            }
+            write(fw, DWORD(chunk_size + 4), fs) or_return
+            write(fw, cb.buf[:chunk_size], fs) or_return
+        }
+        write(w, DWORD(frame_size + 4), s) or_return
+        write(w, fb.buf[:frame_size], s) or_return
+    }
+
+    written: int
+    file_size += 4
+    write(ww, DWORD(file_size), &written) or_return
+    write(ww, b.buf[:file_size-4], &written) or_return
+    if written != file_size {
+        return file_size, Marshal_Errors.Wrong_Write_Size
+    }
+    return
+}
+
+
+================================================
+File: atlas_builder/aseprite/read.odin
+================================================
+package aseprite_file_handler
+
+import "base:runtime"
+import "core:io"
+import "core:log"
+import "core:fmt"
+import "core:strings"
+import "core:math/fixed"
+import "core:encoding/endian"
+
+read_bool :: proc(r: io.Reader, n: ^int) -> (data: bool, err: Read_Error) {
+    return bool(read_byte(r, n) or_return), nil
+}
+
+read_i8 :: proc(r: io.Reader, n: ^int) -> (data: i8, err: Read_Error) {
+    return i8(read_byte(r, n) or_return), nil
+}
+
+read_byte :: proc(r: io.Reader, n: ^int) -> (data: BYTE, err: Read_Error) {
+    return io.read_byte(r, n)
+}
+
+read_word :: proc(r: io.Reader, n: ^int) -> (data: WORD, err: Read_Error) { 
+    buf: [2]byte
+    s := io.read(r, buf[:], n) or_return
+    if s != 2 {
+        return 0, .Wrong_Read_Size
+    }
+
+    v, ok := endian.get_u16(buf[:], .Little)
+    if !ok {
+        err = .Unable_To_Decode_Data
+    }
+    return v, err
+}
+
+read_short :: proc(r: io.Reader, n: ^int) -> (data: SHORT, err: Read_Error) { 
+    buf: [2]byte
+    s := io.read(r, buf[:], n) or_return
+    if s != 2 {
+        return 0, .Wrong_Read_Size
+    }
+
+    v, ok := endian.get_i16(buf[:], .Little)
+    if !ok {
+        err = .Unable_To_Decode_Data
+    }
+    return v, err
+}
+
+read_dword :: proc(r: io.Reader, n: ^int) -> (data: DWORD, err: Read_Error) { 
+    buf: [4]byte
+    s := io.read(r, buf[:], n) or_return
+    if s != 4 {
+        return 0, .Wrong_Read_Size
+    }
+
+    v, ok := endian.get_u32(buf[:], .Little)
+    if !ok {
+        err = .Unable_To_Decode_Data
+    }   return v, err 
+}
+
+read_long :: proc(r: io.Reader, n: ^int) -> (data: LONG, err: Read_Error) { 
+    buf: [4]byte
+    s := io.read(r, buf[:], n) or_return
+    if s != 4 {
+        return 0, .Wrong_Read_Size
+    }
+
+    v, ok := endian.get_i32(buf[:], .Little)
+    if !ok {
+        err = .Unable_To_Decode_Data
+    }
+    return v, err 
+}
+
+read_fixed :: proc(r: io.Reader, n: ^int) -> (data: FIXED, err: Read_Error) { 
+    buf: [4]byte
+    s := io.read(r, buf[:], n) or_return
+    if s != 4 {
+        return data, .Wrong_Read_Size
+    }
+
+    v, ok := endian.get_i32(buf[:], .Little)
+    if !ok {
+        err = .Unable_To_Decode_Data
+        return
+    }
+    data.i = v
+    return 
+}
+
+read_float :: proc(r: io.Reader, n: ^int) -> (data: FLOAT, err: Read_Error) {
+    buf: [4]byte 
+    s := io.read(r, buf[:], n) or_return
+    if s !=42 {
+        return 0, .Wrong_Read_Size
+    }
+    
+    v, ok := endian.get_f32(buf[:], .Little)
+    if !ok {
+        err = .Unable_To_Decode_Data
+    }
+    return v, err 
+}
+
+read_double :: proc(r: io.Reader, n: ^int) -> (data: DOUBLE, err: Read_Error) {
+    buf: [8]byte 
+    s := io.read(r, buf[:], n) or_return
+    if s != 8 {
+        return 0, .Wrong_Read_Size
+    }
+
+    v, ok := endian.get_f64(buf[:], .Little)
+    if !ok {
+        err = .Unable_To_Decode_Data
+    }
+    return v, err 
+}
+
+read_qword :: proc(r: io.Reader, n: ^int) -> (data: QWORD, err: Read_Error) { 
+    buf: [8]byte
+    s := io.read(r, buf[:], n) or_return
+    if s != 8 {
+        return 0, .Wrong_Read_Size
+    }
+
+    v, ok := endian.get_u64(buf[:], .Little)
+    if !ok {
+        err = .Unable_To_Decode_Data
+    }
+    return v, err 
+}
+
+read_long64 :: proc(r: io.Reader, n: ^int) -> (data: LONG64, err: Read_Error) {
+    buf: [8]byte
+    s := io.read(r, buf[:], n) or_return
+    if s != 8 {
+        return 0, .Wrong_Read_Size
+    }
+
+    v, ok := endian.get_i64(buf[:], .Little)
+    if !ok {
+        err = .Unable_To_Decode_Data
+    }
+    return v, err 
+}
+
+read_string :: proc(r: io.Reader, n: ^int, allocator: runtime.Allocator, loc := #caller_location) -> (data: STRING, err: Read_Error) {
+    size := int(read_word(r, n) or_return)
+
+    buf := make([]byte, size, allocator, loc) or_return
+    s := io.read(r, buf[:], n) or_return
+    if s != size {
+        err = .Wrong_Read_Size
+        return
+    }
+
+    data = string(buf[:])
+    return
+}
+
+read_point :: proc(r: io.Reader, n: ^int) -> (data: POINT, err: Read_Error) { 
+    data.x = read_long(r, n) or_return
+    data.y = read_long(r, n) or_return
+    return 
+}
+
+read_size :: proc(r: io.Reader, n: ^int) -> (data: SIZE, err: Read_Error) {
+    data.w = read_long(r, n) or_return
+    data.h = read_long(r, n) or_return 
+    return 
+}
+
+read_rect :: proc(r: io.Reader, n: ^int) -> (data: RECT, err: Read_Error) { 
+    data.origin = read_point(r, n) or_return
+    data.size = read_size(r, n) or_return
+    return 
+}
+
+read_uuid:: proc(r: io.Reader, data: UUID, n: ^int) -> (err: Read_Error) { 
+    s := io.read(r, cast([]u8)data[:], n) or_return
+    if s != 16 {
+        err = .Wrong_Read_Size
+    }
+    return 
+}
+
+read_pixel :: proc(r: io.Reader, n: ^int) -> (data: PIXEL, err: Read_Error) { 
+    return read_byte(r, n)
+}
+
+read_pixels :: proc(r: io.Reader, data: []PIXEL, n: ^int) -> (err: Read_Error) {
+    return read_bytes(r, data[:], n)
+}
+
+read_tile :: proc(r: io.Reader, type: Tile_ID, n: ^int) -> (data: TILE, err: Read_Error) { 
+    switch type {
+    case .byte:
+        data = read_byte(r, n) or_return
+    case .word:
+        data = read_word(r, n) or_return
+    case .dword:
+        data = read_dword(r, n) or_return
+    }
+    return 
+}
+
+read_tiles :: proc(r: io.Reader, data: []TILE, type: Tile_ID, n: ^int) -> (err: Read_Error) {
+    size := len(data)
+    if len(data) == 0 {
+        return
+    }
+    for i in 0..<size {
+        data[i] = read_tile(r, type, n) or_return
+    }
+    return 
+}
+
+read_bytes :: proc(r: io.Reader, data: []byte, n: ^int) -> (err: Read_Error) {
+    s := io.read(r, data[:], n) or_return
+    if s != len(data) {
+        log.error("Could read all the bytes asked.", s, len(data))
+        err = .Wrong_Read_Size
+    }
+    return 
+}
+
+read_skip :: proc(r: io.Reader, to_skip: int, n: ^int) -> (err: Read_Error) {
+    for _ in 0..<to_skip {
+        io.read_byte(r, n) or_return
+    }
+    return
+}
+
+read_ud_value :: proc(r: io.Reader, type: Property_Type, n: ^int, allocator: runtime.Allocator) -> (val: Property_Value, err: Unmarshal_Error) {
+    switch type {
+    case .Null:   return nil, nil
+    case .Bool:   return read_bool(r, n)
+    case .I8:     return read_i8(r, n)
+    case .U8:     return read_byte(r, n)
+    case .I16:    return read_short(r, n)
+    case .U16:    return read_word(r, n)
+    case .I32:    return read_long(r, n)
+    case .U32:    return read_dword(r, n)
+    case .I64:    return read_long64(r, n)
+    case .U64:    return read_qword(r, n)
+    case .Fixed:  return read_fixed(r, n)
+    case .F32:    return read_float(r, n)
+    case .F64:    return read_double(r, n)
+    case .String: return read_string(r, n, allocator)
+    case .Point:  return read_point(r, n)
+    case .Size:   return read_size(r, n)
+    case .Rect:   return read_rect(r, n)
+    case .UUID:
+        val = make(UUID, 16, allocator) or_return
+        read_uuid(r, val.(UUID)[:], n) or_return
+
+    case .Vector:
+        num := int(read_dword(r, n) or_return)
+        val = make(UD_Vec, num, allocator) or_return
+        vec_type := Property_Type(read_word(r, n) or_return)
+
+        if vec_type == .Null {
+            for i in 0..<num {
+                type := Property_Type(read_word(r, n) or_return)
+                val.(UD_Vec)[i] = read_ud_value(r, type, n, allocator) or_return
+            }
+        } else {
+            for i in 0..<num {
+                val.(UD_Vec)[i] = read_ud_value(r, vec_type, n, allocator) or_return
+            }
+        }
+
+    case .Properties:
+        size := read_dword(r, n) or_return
+        // FIXME: Is leaking. Not writing data?
+        val = make(Properties, size, allocator) or_return
+
+        #partial switch &v in val {
+        case Properties:
+            for _ in 0..<size {
+                key := read_string(r, n, allocator) or_return
+                defer delete(key)
+                type := Property_Type(read_word(r, n) or_return)
+                v[key] = read_ud_value(r, type, n, allocator) or_return
+            }
+        }
+    }
+    return
+}
+
+
+================================================
+File: atlas_builder/aseprite/types.odin
+================================================
+package aseprite_file_handler
+
+
+import "base:runtime"
+import "core:io"
+import "core:os"
+import "core:math/fixed"
+import "core:compress/zlib"
+import vzlib "vendor:zlib"
+
+//https://github.com/aseprite/aseprite/blob/main/docs/ase-file-specs.md
+
+// TODO: Whole File rework.
+// Anything set by a flag should be a Maybe(). 
+// Only Size/Lengths that can't be gotten by len() are set.
+
+Unmarshal_Errors :: enum {
+    Unable_To_Open_File,
+    Unable_Make_Reader,
+    Bad_File_Magic_Number,
+    Bad_Frame_Magic_Number,
+    Bad_User_Data_Type,
+    Data_Size_Not_Equal_To_Header,
+    Invalid_Chunk_Type,
+    Invalid_Cel_Type,
+    Invalid_Compression_Size,
+
+    User_Data_Maps_Not_Supported,
+}
+Unmarshal_Error :: union #shared_nil {
+    Unmarshal_Errors, 
+    runtime.Allocator_Error, 
+    io.Error,
+    Read_Error,
+    zlib.Error,
+    ZLIB_Errors,
+}
+
+Read_Errors :: enum {
+    Unable_To_Decode_Data,
+    Wrong_Read_Size,
+    Array_To_Small,
+    Unable_Make_Seeker,
+}
+Read_Error :: union #shared_nil {Read_Errors, io.Error, runtime.Allocator_Error}
+
+Marshal_Errors :: enum {
+    Unable_Make_Writer,
+    Buffer_Not_Big_Enough,
+    Invalid_Chunk_Type,
+    Wrong_Write_Size,
+    Invalid_Old_Palette,
+    Invalid_Cel_Type,
+    Invalid_Property_Type,
+}
+Marshal_Error :: union #shared_nil {
+    Marshal_Errors, 
+    runtime.Allocator_Error, 
+    Write_Error,
+    io.Error,
+    ZLIB_Errors,
+}
+
+Write_Errors :: enum {
+    Unable_To_Encode_Data,
+    Wrong_Write_Size,
+    Array_To_Small,
+    Unable_Make_Seeker,
+}
+Write_Error :: union #shared_nil {
+    Write_Errors, 
+    io.Error, 
+    runtime.Allocator_Error,
+}
+
+ZLIB_Errors :: enum(i32) {
+    ERRNO = vzlib.ERRNO,
+    STREAM_ERROR = vzlib.STREAM_ERROR,
+    DATA_ERROR = vzlib.DATA_ERROR,
+    MEM_ERROR = vzlib.MEM_ERROR,
+    BUF_ERROR = vzlib.BUF_ERROR,
+    VERSION_ERROR = vzlib.VERSION_ERROR,
+}
+
+// all writen in le
+BYTE   :: u8
+WORD   :: u16
+SHORT  :: i16
+DWORD  :: u32
+LONG   :: i32
+FIXED  :: fixed.Fixed16_16
+FLOAT  :: f32
+DOUBLE :: f64
+QWORD  :: u64
+LONG64 :: i64
+
+BYTE_N :: [dynamic]BYTE
+
+// https://odin-lang.org/docs/overview/#packed
+STRING :: string
+POINT :: struct {
+    x: LONG,
+    y: LONG,
+}
+SIZE :: struct {
+    w: LONG,
+    h: LONG,
+}
+RECT :: struct {
+    origin: POINT,
+    size: SIZE,
+}
+
+PIXEL_RGBA      :: [4]BYTE
+PIXEL_GRAYSCALE :: [2]BYTE
+PIXEL_INDEXED   :: BYTE
+
+// PIXEL :: union {PIXEL_RGBA, PIXEL_GRAYSCALE, PIXEL_INDEXED}
+PIXEL :: u8
+TILE  :: union {BYTE, WORD, DWORD}
+
+// of size 16
+UUID :: distinct []BYTE
+
+Color_RGB :: [3]BYTE
+Color_RGBA :: [4]BYTE
+
+Document :: struct {
+    header: File_Header,
+    frames: []Frame,
+}
+
+Frame :: struct {
+    header: Frame_Header,
+    chunks: []Chunk,
+}
+
+Chunk :: union{
+    Old_Palette_256_Chunk, Old_Palette_64_Chunk, Layer_Chunk, Cel_Chunk, 
+    Cel_Extra_Chunk, Color_Profile_Chunk, External_Files_Chunk, Mask_Chunk, 
+    Path_Chunk, Tags_Chunk, Palette_Chunk, User_Data_Chunk, Slice_Chunk, 
+    Tileset_Chunk,
+}
+
+FILE_MAGIC_NUM : WORD : 0xA5E0
+FILE_HEADER_SIZE :: 128
+
+Color_Depth :: enum(WORD){
+    Indexed=8,
+    Grayscale=16,
+    RGBA=32,
+}
+File_Flag :: enum(DWORD){
+    Layer_Opacity,
+}
+File_Flags :: bit_set[File_Flag; DWORD]
+File_Header :: struct {
+    size: DWORD,
+    width: WORD,
+    height: WORD,
+    color_depth: Color_Depth,
+    flags: File_Flags, // 1=Layer opacity has valid value
+    speed: WORD, // Not longer in use
+    transparent_index: BYTE, // for Indexed sprites only
+    num_of_colors: WORD, // 0 == 256 for old sprites
+    ratio_width: BYTE, // "pixel width/pixel height" if 0 ratio == 1:1
+    ratio_height: BYTE, // "pixel width/pixel height" if 0 ratio == 1:1
+    x: SHORT,
+    y: SHORT,
+    grid_width: WORD, // 0 if no grid
+    grid_height: WORD, // 0 if no grid
+}
+
+FRAME_HEADER_SIZE :: 16
+FRAME_MAGIC_NUM : WORD : 0xF1FA
+Frame_Header :: struct {
+    old_num_of_chunks: WORD, // if \xFFFF use new
+    duration: WORD, // in milliseconds
+    num_of_chunks: DWORD, // if 0 use old
+}
+
+Chunk_Types :: enum(WORD) {
+    none,
+    old_palette_256 = 0x0004,
+    old_palette_64 = 0x0011,
+    layer = 0x2004,
+    cel = 0x2005,
+    cel_extra = 0x2006,
+    color_profile = 0x2007,
+    external_files = 0x2008,
+    mask = 0x2016, // no longer in use
+    path = 0x2017, // not in use
+    tags = 0x2018,
+    palette = 0x2019,
+    user_data = 0x2020,
+    slice = 0x2022,
+    tileset = 0x2023,
+}
+
+Old_Palette_Packet :: struct {
+    entries_to_skip: BYTE, // start from 0
+    num_colors: BYTE, // 0 == 256
+    colors: []Color_RGB,
+}
+Old_Palette_256_Chunk :: distinct []Old_Palette_Packet
+Old_Palette_64_Chunk :: distinct []Old_Palette_Packet
+
+Layer_Chunk_Flag :: enum(WORD) {
+    Visiable,
+    Editable,
+    Lock_Movement,
+    Background,
+    Prefer_Linked_Cels,
+    Group_Collapsed,
+    Ref_Layer,
+}
+Layer_Chunk_Flags :: bit_set [Layer_Chunk_Flag; WORD]
+Layer_Types :: enum(WORD) {
+    Normal, // image
+    Group,
+    Tilemap,
+}
+Layer_Blend_Mode :: enum(WORD) {
+    Normal,
+    Multiply,
+    Screen,
+    Overlay,
+    Darken,
+    Lighten,
+    Color_Dodge,
+    Color_Burn,
+    Hard_Light,
+    Soft_Light,
+    Difference,
+    Exclusion,
+    Hue,
+    Saturation,
+    Color,
+    Luminosity,
+    Addition,
+    Subtract,
+    Divide,
+}
+Layer_Chunk :: struct {
+    flags: Layer_Chunk_Flags, // to WORD -> transmute(WORD)layer_chunk.flags
+    type: Layer_Types,
+    child_level: WORD,
+    default_width: WORD, // Ignored
+    default_height: WORD, // Ignored
+    blend_mode: Layer_Blend_Mode,
+    opacity: BYTE, // set when header flag is 1
+    name: string,
+    tileset_index: DWORD, // set if type == Tilemap
+}
+
+Raw_Cel :: struct{
+    width: WORD, 
+    height: WORD, 
+    pixel: []PIXEL,
+}
+Linked_Cel :: distinct WORD
+// raw cel ZLIB compressed
+Com_Image_Cel :: struct{
+    width: WORD, 
+    height: WORD, 
+    pixel: []PIXEL,
+}
+Tile_ID :: enum(DWORD) { byte=0xfffffff1, word=0xffff1fff, dword=0x1fffffff }
+Com_Tilemap_Cel :: struct{
+    width, height: WORD,
+    bits_per_tile: WORD, // always 32
+    bitmask_id: Tile_ID,
+    bitmask_x: DWORD,
+    bitmask_y: DWORD,
+    bitmask_diagonal: DWORD,
+    tiles: []TILE, // ZLIB compressed
+}
+Cel_Types :: enum(WORD){
+    Raw,
+    Linked_Cel,
+    Compressed_Image,
+    Compressed_Tilemap,
+}
+Cel_Type :: union{ Raw_Cel, Linked_Cel, Com_Image_Cel, Com_Tilemap_Cel}
+Cel_Chunk :: struct {
+    layer_index: WORD,
+    x,y: SHORT,
+    opacity_level: BYTE,
+    type: Cel_Types,
+    z_index: SHORT, //0=default, pos=show n layers later, neg=back
+    cel: Cel_Type,
+}
+
+Cel_Extra_Flag :: enum(WORD){Precise}
+Cel_Extra_Flags :: bit_set[Cel_Extra_Flag; WORD]
+Cel_Extra_Chunk :: struct {
+    flags: Cel_Extra_Flags,
+    x: FIXED,
+    y: FIXED,
+    width: FIXED, 
+    height: FIXED,
+}
+
+ICC_Profile :: distinct []byte
+Color_Profile_Flag :: enum(WORD){Special_Fixed_Gamma}
+Color_Profile_Flags :: bit_set[Color_Profile_Flag; WORD]
+Color_Profile_Type :: enum(WORD) {
+    None,
+    sRGB,
+    ICC,
+}
+Color_Profile_Chunk :: struct {
+    type: Color_Profile_Type,
+    flags: Color_Profile_Flags,
+    fixed_gamma: FIXED,
+    // TODO: Yay more libs to make, https://www.color.org/icc1v42.pdf
+    icc: Maybe(ICC_Profile),
+}
+
+ExF_Entry_Type :: enum(BYTE){
+    Palette,
+    Tileset,
+    Properties_Name,
+    Tile_Manegment_Name,
+}
+External_Files_Entry :: struct{
+    id: DWORD,
+    type: ExF_Entry_Type,
+    file_name_or_id: STRING,
+}
+External_Files_Chunk :: []External_Files_Entry
+
+Mask_Chunk :: struct {
+    x,y: SHORT,
+    width, height: WORD,
+    name: string,
+    bit_map_data: []BYTE, //size = height*((width+7)/8)
+}
+
+Path_Chunk :: struct{} // never used
+
+Tag_Loop_Dir :: enum(BYTE){
+    Forward,
+    Reverse,
+    Ping_Pong,
+    Ping_Pong_Reverse,
+}
+Tag :: struct{
+    from_frame: WORD,
+    to_frame: WORD,
+    loop_direction: Tag_Loop_Dir,
+    repeat: WORD,
+    tag_color: Color_RGB,
+    name: string,
+}
+Tags_Chunk :: []Tag
+
+Pal_Flag :: enum(WORD){Has_Name}
+Pal_Flags :: bit_set[Pal_Flag; WORD]
+Palette_Entry :: struct {
+    color: Color_RGBA,
+    name: Maybe(string),
+}
+Palette_Chunk :: struct {
+    size: DWORD,
+    first_index: DWORD,
+    last_index: DWORD,
+    entries: []Palette_Entry,
+}
+
+// Vec_Diff :: struct{type: WORD, data: UD_Property_Value}
+// UD_Vec :: union {[]UD_Property_Value, []Vec_Diff}
+UD_Vec :: []Property_Value
+Property_Type :: enum(WORD) {
+    Null, Bool, I8, U8, I16, U16, I32, U32, I64, U64,
+    Fixed, F32, F64, String, Point, Size, Rect, 
+    Vector, Properties, UUID, 
+}
+Property_Value :: union {
+    bool, i8, BYTE, SHORT, WORD, LONG, DWORD, LONG64, QWORD, FIXED, FLOAT,
+    DOUBLE, STRING, POINT, SIZE, RECT, UUID,  
+    UD_Vec, Properties, 
+}
+Properties :: map[string]Property_Value
+Properties_Map :: map[DWORD]Property_Value
+UD_Flag :: enum(DWORD) {
+    Text,
+    Color,
+    Properties,
+}
+UD_Flags :: bit_set[UD_Flag; DWORD]
+User_Data_Chunk :: struct {
+    text: Maybe(string), 
+    color: Maybe(Color_RGBA), 
+    maps: Maybe(Properties_Map),
+
+}
+
+Slice_Center :: struct{
+    x: LONG,
+    y: LONG, 
+    width: DWORD, 
+    height: DWORD,
+}
+Slice_Pivot :: distinct POINT
+Slice_Key :: struct{
+    frame_num: DWORD,
+    x: LONG,
+    y: LONG, 
+    width: DWORD, 
+    height: DWORD,
+    center: Maybe(Slice_Center),
+    pivot: Maybe(Slice_Pivot),
+}
+Slice_Flag :: enum(DWORD) {
+    Patched_slice, 
+    Pivot_Information,
+}
+Slice_Flags :: bit_set[Slice_Flag; DWORD]
+// TODO: Remove need for flags.
+Slice_Chunk :: struct {
+    flags: Slice_Flags,
+    name: string,
+    keys: []Slice_Key,
+}
+
+Tileset_Flag :: enum(DWORD) {
+    Include_Link_To_External_File,
+    Include_Tiles_Inside_This_File,
+    Tile_ID_Is_0,
+    Auto_Mode_X_Flip_Match,
+    Auto_Mode_Y_Flip_Match,
+    Auto_Mode_Diagonal_Flip_Match,
+}
+Tileset_Flags :: bit_set[Tileset_Flag; DWORD]
+Tileset_External :: struct{
+    file_id, tileset_id: DWORD,
+}
+Tileset_Compressed :: distinct []PIXEL
+// Tileset_Compressed :: []PIXEL
+// TODO: Remove need for flags.
+Tileset_Chunk :: struct {
+    id: DWORD,
+    flags: Tileset_Flags,
+    num_of_tiles: DWORD,
+    width: WORD, 
+    height: WORD,
+    base_index: SHORT,
+    name: string,
+    external: Maybe(Tileset_External), 
+    compressed: Maybe(Tileset_Compressed),
+}
+
+
+================================================
+File: atlas_builder/aseprite/unmarshal.odin
+================================================
+package aseprite_file_handler
+
+import "base:runtime"
+import "core:io"
+import "core:os"
+import "core:fmt"
+import "core:log"
+import "core:bytes"
+import "core:bufio"
+import "core:strings"
+import "core:compress/zlib"
+import "core:encoding/endian"
+
+import vzlib "vendor:zlib"
+
+
+unmarshal_from_bytes_buff :: proc(r: ^bytes.Reader, doc: ^Document, allocator := context.allocator)-> (total_read: int, err: Unmarshal_Error) {
+    rr, ok := io.to_reader(bytes.reader_to_stream(r))
+    if !ok {
+        return total_read, .Unable_Make_Reader
+    }
+    return unmarshal(rr, doc, allocator)
+}
+
+unmarshal_from_bufio :: proc(r: ^bufio.Reader, doc: ^Document, allocator := context.allocator) -> (total_read: int, err: Unmarshal_Error) {
+    rr, ok := io.to_reader(bufio.reader_to_stream(r))
+    if !ok {
+        return total_read, .Unable_Make_Reader
+    }
+    return unmarshal(rr, doc, allocator)
+}
+
+unmarshal_from_filename :: proc(name: string, doc: ^Document, allocator := context.allocator) -> (total_read: int, err: Unmarshal_Error) {
+    fd, err_no := os.open(name, os.O_RDONLY, 0)
+    if err_no != 0 {
+        return total_read, .Unable_To_Open_File
+    }
+    defer os.close(fd)
+    return unmarshal(fd, doc, allocator)
+}
+
+unmarshal_from_handle :: proc(h: os.Handle, doc: ^Document, allocator := context.allocator) -> (total_read: int, err: Unmarshal_Error) {
+    rr, ok := io.to_reader(os.stream_from_handle(h))
+    if !ok {
+        return total_read, .Unable_Make_Reader
+    }
+    return unmarshal(rr, doc, allocator)
+}
+
+unmarshal_from_slice :: proc(b: []byte, doc: ^Document, allocator := context.allocator) -> (total_read: int, err: Unmarshal_Error) {
+    r: bytes.Reader
+    bytes.reader_init(&r, b[:])
+    return unmarshal(&r, doc, allocator)
+}
+
+unmarshal :: proc{
+    unmarshal_from_bytes_buff, unmarshal_from_slice, unmarshal_from_handle, 
+    unmarshal_from_filename, unmarshal_from_bufio, unmarshal_from_reader,
+}
+
+unmarshal_from_reader :: proc(r: io.Reader, doc: ^Document, allocator := context.allocator) -> (total_read: int, err: Unmarshal_Error) {
+    ud_map_warn, icc_profile_warn: bool
+    rt := &total_read
+    set := io.query(r)
+    h: File_Header
+    h.size = read_dword(r, rt) or_return
+
+    if io.Stream_Mode.Size in set {
+        stream_size := io.size(r) or_return
+        if stream_size != i64(h.size) {
+            return total_read, .Data_Size_Not_Equal_To_Header
+        }
+    }
+    
+    magic := read_word(r, rt) or_return
+    if magic != FILE_MAGIC_NUM {
+        return total_read, .Bad_File_Magic_Number
+    } 
+
+    frames := read_word(r, rt) or_return
+
+    h.width = read_word(r, rt) or_return
+    h.height = read_word(r, rt) or_return
+    h.color_depth = Color_Depth(read_word(r, rt) or_return)
+    h.flags = transmute(File_Flags)read_dword(r, rt) or_return
+    h.speed = read_word(r, rt) or_return
+    read_skip(r, 4+4, rt) or_return
+    h.transparent_index = read_byte(r, rt) or_return
+    read_skip(r, 3, rt) or_return
+    h.num_of_colors = read_word(r, rt) or_return
+    h.ratio_width = read_byte(r, rt) or_return
+    h.ratio_height = read_byte(r, rt) or_return
+    h.x = read_short(r, rt) or_return
+    h.y = read_short(r, rt) or_return
+    h.grid_width = read_word(r, rt) or_return
+    h.grid_height = read_word(r, rt) or_return
+    read_skip(r, 84, rt) or_return
+
+    doc.header = h
+    doc.frames = make([]Frame, int(frames), allocator) or_return
+
+    for &frame in doc.frames {
+        fh: Frame_Header
+        frame_size := read_dword(r, rt) or_return
+        frame_magic := read_word(r, rt) or_return
+        if frame_magic != FRAME_MAGIC_NUM {
+            return total_read, .Bad_Frame_Magic_Number
+        }
+        fh.old_num_of_chunks = read_word(r, rt) or_return
+        fh.duration = read_word(r, rt) or_return
+        read_skip(r, 2, rt) or_return
+        fh.num_of_chunks = read_dword(r, rt) or_return
+
+        chunks := int(fh.num_of_chunks) 
+        if chunks == 0 {
+            chunks = int(fh.old_num_of_chunks)
+        }
+
+        frame.header = fh
+        frame.chunks = make([]Chunk, chunks, allocator) or_return
+
+        for &chunk in frame.chunks {
+            c_size := int(read_dword(r, rt) or_return)
+            c_type := cast(Chunk_Types)read_word(r, rt) or_return
+
+            switch c_type {
+            case .old_palette_256:
+                op: Old_Palette_256_Chunk
+                op_size := cast(int)read_word(r, rt) or_return
+                op = make(Old_Palette_256_Chunk, op_size, allocator) or_return
+
+                for &packet in op {
+                    packet.entries_to_skip = read_byte(r, rt) or_return
+                    packet.num_colors = read_byte(r, rt) or_return
+                    count := int(packet.num_colors)
+                    if count == 0 {
+                        count = 256
+                    }
+
+                    packet.colors = make([]Color_RGB, count, allocator) or_return
+                    for &c in packet.colors {
+                        c[2] = read_byte(r, rt) or_return
+                        c[1] = read_byte(r, rt) or_return
+                        c[0] = read_byte(r, rt) or_return
+                    }
+                }
+                chunk = op
+
+            case .old_palette_64:
+                op: Old_Palette_64_Chunk
+                op_size := cast(int)read_word(r, rt) or_return
+                op = make(Old_Palette_64_Chunk, op_size, allocator) or_return
+
+                for &packet in op {
+                    packet.entries_to_skip = read_byte(r, rt) or_return
+                    packet.num_colors = read_byte(r, rt) or_return
+                    count := int(packet.num_colors)
+                    if count == 0 {
+                        count = 256
+                    }
+
+                    packet.colors = make([]Color_RGB, count, allocator) or_return
+                    for &c in packet.colors {
+                        c[2] = read_byte(r, rt) or_return
+                        c[1] = read_byte(r, rt) or_return
+                        c[0] = read_byte(r, rt) or_return
+                    }
+                }
+                chunk = op
+
+            case .layer:
+                l: Layer_Chunk
+                l.flags = transmute(Layer_Chunk_Flags)read_word(r, rt) or_return
+                l.type = Layer_Types(read_word(r, rt) or_return)
+                l.child_level = read_word(r, rt) or_return
+                l.default_width = read_word(r, rt) or_return
+                l.default_height = read_word(r, rt) or_return
+                l.blend_mode = Layer_Blend_Mode(read_word(r, rt) or_return)
+                l.opacity = read_byte(r, rt) or_return
+                read_skip(r, 3, rt) or_return
+                l.name = read_string(r, rt, allocator) or_return
+
+                if l.type == .Tilemap {
+                    l.tileset_index = read_dword(r, rt) or_return
+                }
+                chunk = l
+
+            case .cel:
+                c: Cel_Chunk
+                c.layer_index = read_word(r, rt) or_return
+                c.x = read_short(r, rt) or_return
+                c.y = read_short(r, rt) or_return
+                c.opacity_level = read_byte(r, rt) or_return
+                c.type = Cel_Types(read_word(r, rt) or_return)
+                c.z_index = read_short(r, rt) or_return
+                read_skip(r, 5, rt) or_return
+
+                switch c.type {
+                case .Raw:
+                    cel: Raw_Cel
+                    cel.width = read_word(r, rt) or_return
+                    cel.height = read_word(r, rt) or_return
+                    cel.pixel = make([]PIXEL, int(cel.width * cel.height), allocator) or_return
+                    read_bytes(r, cel.pixel[:], rt) or_return
+                    c.cel = cel
+
+                case .Linked_Cel:
+                    c.cel = Linked_Cel(read_word(r, rt) or_return)
+
+                case .Compressed_Image:
+                    cel: Com_Image_Cel
+                    cel.width = read_word(r, rt) or_return
+                    cel.height = read_word(r, rt) or_return
+
+                    com_size := c_size-26
+                    if com_size <= 0 {
+                        return total_read, .Invalid_Compression_Size
+                    }
+
+                    buf: bytes.Buffer
+                    defer bytes.buffer_destroy(&buf)
+                    data := make([]byte, com_size, allocator) or_return
+
+                    defer delete(data)
+                    read_bytes(r, data[:], rt) or_return
+
+                    exp_size := int(WORD(h.color_depth) / 8 * cel.height * cel.width)
+                    zlib.inflate(data[:], &buf, expected_output_size=exp_size) or_return
+
+                    cel.pixel = make([]byte, exp_size, allocator) or_return
+                    copy(cel.pixel[:], buf.buf[:])
+
+                    c.cel = cel
+
+                case .Compressed_Tilemap:
+                    cel: Com_Tilemap_Cel
+                    cel.width = read_word(r, rt) or_return
+                    cel.height = read_word(r, rt) or_return
+                    cel.bits_per_tile = read_word(r, rt) or_return
+                    cel.bitmask_id = Tile_ID(read_dword(r, rt) or_return)
+                    cel.bitmask_x = read_dword(r, rt) or_return
+                    cel.bitmask_y = read_dword(r, rt) or_return
+                    cel.bitmask_diagonal = read_dword(r, rt) or_return
+                    read_skip(r, 10, rt) or_return
+
+                    buf: bytes.Buffer
+                    defer bytes.buffer_destroy(&buf)
+                    // size_of(DWORD*5, WORD*6, SHORT*3, BYTE, SKIPED*15)-1
+                    com_size := c_size-54
+                    if com_size <= 0 {
+                        return total_read, .Invalid_Compression_Size
+                    }
+
+                    data := make([]byte, com_size, allocator) or_return
+                    defer delete(data)
+                    read_bytes(r, data[:], rt) or_return
+                    exp_size := int(WORD(h.color_depth) / 8 * cel.height * cel.width)
+                    zlib.inflate(data[:], &buf, expected_output_size=exp_size) or_return
+
+                    br: bytes.Reader
+                    bytes.reader_init(&br, buf.buf[:])
+                    rr, ok := io.to_reader(bytes.reader_to_stream(&br))
+                    if !ok { return total_read, .Unable_Make_Reader }
+
+                    // FIXME: Is leaking. Not writing data?
+                    cel.tiles = make([]TILE, cel.height * cel.width, allocator) or_return
+                    read_tiles(rr, cel.tiles[:], cel.bitmask_id, rt) or_return
+
+                    c.cel = cel
+
+                case:
+                    return total_read, .Invalid_Cel_Type
+                }
+                chunk = c
+
+            case .cel_extra:
+                ce: Cel_Extra_Chunk
+                ce.flags = transmute(Cel_Extra_Flags)read_word(r, rt) or_return
+                ce.x = read_fixed(r, rt) or_return
+                ce.y = read_fixed(r, rt) or_return
+                ce.width = read_fixed(r, rt) or_return
+                ce.height = read_fixed(r, rt) or_return
+                chunk = ce
+
+            case .color_profile:
+                cp: Color_Profile_Chunk
+                cp.type = Color_Profile_Type(read_word(r, rt) or_return)
+                cp.flags = transmute(Color_Profile_Flags)read_word(r, rt) or_return
+                cp.fixed_gamma = read_fixed(r, rt) or_return
+                read_skip(r, 8, rt) or_return
+
+                if cp.type == .ICC {
+                    icc_size := cast(int)read_dword(r, rt) or_return
+                    cp.icc = make(ICC_Profile, icc_size, allocator) or_return
+                    read_bytes(r, cast([]u8)cp.icc.(ICC_Profile)[:], rt) or_return
+                    if !icc_profile_warn {
+                        log.warn("Embedded ICC Color Profiles are currently not supported.")
+                        icc_profile_warn = true
+                    }
+                }
+                chunk = cp
+
+            case .external_files:
+                ef: External_Files_Chunk
+                entries := read_dword(r, rt) or_return
+                ef = make([]External_Files_Entry, entries, allocator) or_return
+                read_skip(r, 8, rt) or_return
+
+                for &entry in ef {
+                    entry.id = read_dword(r, rt) or_return
+                    entry.type = ExF_Entry_Type(read_byte(r, rt) or_return)
+                    read_skip(r, 7, rt) or_return
+                    entry.file_name_or_id = read_string(r, rt, allocator) or_return
+                }
+                chunk = ef
+
+            case .mask:
+                m: Mask_Chunk
+                m.x = read_short(r, rt) or_return
+                m.y = read_short(r, rt) or_return
+                m.width = read_word(r, rt) or_return
+                m.height = read_word(r, rt) or_return
+                read_skip(r, 8, rt) or_return
+                m.name = read_string(r, rt, allocator) or_return
+
+                size := int(m.height * ((m.width + 7) / 8))
+                m.bit_map_data = make([]BYTE, size, allocator) or_return
+                read_bytes(r, m.bit_map_data[:], rt) or_return
+
+                chunk = m
+
+            case .path:
+                chunk = Path_Chunk{}
+
+            case .tags:
+                tc: Tags_Chunk
+                size := cast(int)read_word(r, rt) or_return
+                tc = make([]Tag, size, allocator) or_return
+                read_skip(r, 8, rt) or_return
+
+                for &tag in tc {
+                    tag.from_frame = read_word(r, rt) or_return
+                    tag.to_frame = read_word(r, rt) or_return
+                    tag.loop_direction = Tag_Loop_Dir(read_byte(r, rt) or_return)
+                    tag.repeat = read_word(r, rt) or_return
+                    read_skip(r, 6, rt) or_return
+                    tag.tag_color[2] = read_byte(r, rt) or_return
+                    tag.tag_color[1] = read_byte(r, rt) or_return
+                    tag.tag_color[0] = read_byte(r, rt) or_return
+                    read_byte(r, rt) or_return
+                    tag.name = read_string(r, rt, allocator) or_return
+                }
+                chunk = tc
+
+            case .palette:
+                pal: Palette_Chunk
+                pal.size = read_dword(r, rt) or_return
+                pal.first_index = read_dword(r, rt) or_return
+                pal.last_index = read_dword(r, rt) or_return
+                size := int(pal.last_index - pal.first_index + 1)
+                pal.entries = make([]Palette_Entry, size, allocator) or_return
+                read_skip(r, 8, rt) or_return
+
+                for &entry in pal.entries {
+                    pf := transmute(Pal_Flags)read_word(r, rt) or_return
+                    entry.color[3] = read_byte(r, rt) or_return
+                    entry.color[2] = read_byte(r, rt) or_return
+                    entry.color[1] = read_byte(r, rt) or_return
+                    entry.color[0] = read_byte(r, rt) or_return
+
+                    if .Has_Name in pf {
+                        entry.name = read_string(r, rt, allocator) or_return
+                    }
+                }
+
+                chunk = pal
+
+            case .user_data:
+                // FIXME: This isn't working. Very annoying.
+                ud: User_Data_Chunk
+                flags := transmute(UD_Flags)read_dword(r, rt) or_return
+
+                if .Text in flags {
+                    ud.text = read_string(r, rt, allocator) or_return
+                }
+                if .Color in flags {
+                    colour: Color_RGBA
+                    colour[3] = read_byte(r, rt) or_return
+                    colour[2] = read_byte(r, rt) or_return
+                    colour[1] = read_byte(r, rt) or_return
+                    colour[0] = read_byte(r, rt) or_return
+                    ud.color = colour
+                }
+                if .Properties in flags {
+                    if !ud_map_warn {
+                        log.warn("Only Reading User Data Maps is supported rn.")
+                        ud_map_warn = true
+                    }
+
+                    total_size := read_dword(r, rt) or_return
+                    map_num := read_dword(r, rt) or_return
+                    // FIXME: Is leaking. Not writing data?
+                    maps := make(Properties_Map, map_num, allocator) or_return
+                    for i in 0..<int(map_num) {
+                        key := read_dword(r, rt) or_return
+                        //maps[key] = read_ud_value(r, .Properties, rt, allocator) or_return
+
+                        prop_num := int(read_dword(r, rt) or_return)
+                        val := make(Properties, prop_num, allocator) or_return
+
+                        for n in 0..<prop_num {
+                            name := read_string(r, rt, allocator) or_return
+                            defer delete(name)
+                            type := Property_Type(read_word(r, rt) or_return)
+                            val[name] = read_ud_value(r, type, rt, allocator) or_return
+                        }
+
+                        maps[key] = val
+                    }
+                    ud.maps = maps
+                }
+
+                chunk = ud
+
+            case .slice:
+                s: Slice_Chunk
+                keys := int(read_dword(r, rt) or_return)
+                s.flags = transmute(Slice_Flags)read_dword(r, rt) or_return
+                read_dword(r, rt) or_return
+                s.name = read_string(r, rt, allocator) or_return
+                s.keys = make([]Slice_Key, keys, allocator) or_return
+
+                for &key in s.keys {
+                    key.frame_num = read_dword(r, rt) or_return
+                    key.x = read_long(r, rt) or_return
+                    key.y = read_long(r, rt) or_return
+                    key.width = read_dword(r, rt) or_return
+                    key.height = read_dword(r, rt) or_return
+
+                    if .Patched_slice in s.flags {
+                        cen: Slice_Center
+                        cen.x = read_long(r, rt) or_return
+                        cen.y = read_long(r, rt) or_return
+                        cen.width = read_dword(r, rt) or_return
+                        cen.height = read_dword(r, rt) or_return
+                        key.center = cen
+                    }
+
+                    if .Pivot_Information in s.flags {
+                        p: Slice_Pivot
+                        p.x = read_long(r, rt) or_return
+                        p.y = read_long(r, rt) or_return
+                        key.pivot = p
+                    }
+                }
+
+                chunk = s
+
+            case .tileset:
+                ts: Tileset_Chunk
+                ts.id = read_dword(r, rt) or_return
+                ts.flags = transmute(Tileset_Flags)read_dword(r, rt) or_return
+                ts.num_of_tiles = read_dword(r, rt) or_return
+                ts.width = read_word(r, rt) or_return
+                ts.height = read_word(r, rt) or_return
+                ts.base_index = read_short(r, rt) or_return
+                read_skip(r, 14, rt)
+                ts.name = read_string(r, rt, allocator) or_return
+
+                if .Include_Link_To_External_File in ts.flags {
+                    ex: Tileset_External
+                    ex.file_id = read_dword(r, rt) or_return
+                    ex.tileset_id = read_dword(r, rt) or_return
+                    ts.external = ex
+                }
+                if .Include_Tiles_Inside_This_File in ts.flags {
+                    tc: Tileset_Compressed
+                    size := int(read_dword(r, rt) or_return)
+
+                    buf: bytes.Buffer
+                    defer bytes.buffer_destroy(&buf)
+
+                    data := make([]byte, size, allocator) or_return
+                    defer delete(data)
+                    read_bytes(r, data[:], rt) or_return
+
+                    exp_size := int(ts.width) * int(ts.height) * int(ts.num_of_tiles)
+                    zlib.inflate(data[:], &buf, expected_output_size=exp_size) or_return
+
+                    tc = make(Tileset_Compressed, exp_size, allocator) or_return
+                    copy(tc[:], cast(Tileset_Compressed)buf.buf[:])
+                    ts.compressed = tc
+
+                }
+                chunk = ts
+
+            case .none:
+                fallthrough
+            case:
+                log.error("Invalid Chunk Type", chunk)
+                return total_read, .Invalid_Chunk_Type
+            }
+        }
+    }
+    return
+}
+
+
+
+================================================
+File: atlas_builder/aseprite/util.odin
+================================================
+package aseprite_file_handler
+
+import "core:log"
+import "core:reflect"
+import "core:encoding/endian"
+
+get_chunk_type :: proc(c: Chunk) -> (type: WORD, err: Marshal_Error) {
+    switch _ in c {
+    case Old_Palette_256_Chunk:
+        type = WORD(Chunk_Types.old_palette_256)
+    case Old_Palette_64_Chunk:
+        type = WORD(Chunk_Types.old_palette_64)
+    case Layer_Chunk:
+        type = WORD(Chunk_Types.layer)
+    case Cel_Chunk:
+        type = WORD(Chunk_Types.cel)
+    case Cel_Extra_Chunk:
+        type = WORD(Chunk_Types.cel_extra)
+    case Color_Profile_Chunk:
+        type = WORD(Chunk_Types.color_profile)
+    case External_Files_Chunk:
+        type = WORD(Chunk_Types.external_files)
+    case Mask_Chunk:
+        type = WORD(Chunk_Types.mask)
+    case Path_Chunk:
+        type = WORD(Chunk_Types.path)
+    case Tags_Chunk:
+        type = WORD(Chunk_Types.tags)
+    case Palette_Chunk:
+        type = WORD(Chunk_Types.palette)
+    case User_Data_Chunk:
+        type = WORD(Chunk_Types.user_data)
+    case Slice_Chunk:
+        type = WORD(Chunk_Types.slice)
+    case Tileset_Chunk:
+        type = WORD(Chunk_Types.tileset)
+    case:
+        err = .Invalid_Chunk_Type
+    }
+    return
+}
+
+get_cel_type :: proc(c: Cel_Type) -> (type: WORD, err: Marshal_Error) {
+    switch _ in c {
+        case Raw_Cel:
+            type = WORD(Cel_Types.Raw)
+        case Linked_Cel:
+            type = WORD(Cel_Types.Linked_Cel)
+        case Com_Image_Cel:
+            type = WORD(Cel_Types.Compressed_Image)
+        case Com_Tilemap_Cel:
+            type = WORD(Cel_Types.Compressed_Tilemap)
+        case:
+            err = .Invalid_Cel_Type
+    }
+    return
+}
+
+get_property_type :: proc(v: Property_Value) -> (type: WORD, err: Marshal_Error) {
+    switch t in v {
+    case nil:        type = WORD(Property_Type.Null)
+    case bool:       type = WORD(Property_Type.Bool)
+    case i8:         type = WORD(Property_Type.I8)
+    case BYTE:       type = WORD(Property_Type.U8)
+    case SHORT:      type = WORD(Property_Type.I16)
+    case WORD:       type = WORD(Property_Type.U16)
+    case LONG:       type = WORD(Property_Type.I32)
+    case DWORD:      type = WORD(Property_Type.U32)
+    case LONG64:     type = WORD(Property_Type.I64)
+    case QWORD:      type = WORD(Property_Type.U64)
+    case FIXED:      type = WORD(Property_Type.Fixed)
+    case FLOAT:      type = WORD(Property_Type.F32)
+    case DOUBLE:     type = WORD(Property_Type.F64)
+    case STRING:     type = WORD(Property_Type.String)
+    case POINT:      type = WORD(Property_Type.Point)
+    case SIZE:       type = WORD(Property_Type.Size)
+    case RECT:       type = WORD(Property_Type.Rect)
+    case UUID:       type = WORD(Property_Type.UUID)
+    case UD_Vec:     type = WORD(Property_Type.Vector)
+    case Properties: type = WORD(Property_Type.Properties)
+    case:             err = Marshal_Errors.Invalid_Property_Type
+    }
+    return
+}
+
+tiles_to_u8 :: proc(tiles: []TILE, b: []u8) -> (pos: int, err: Write_Error) {
+    next: int
+    for t in tiles {
+        switch v in t {
+        case BYTE:
+            pos = next
+            next += size_of(BYTE)
+            b[pos] = v
+        case WORD:
+            pos = next
+            next += size_of(WORD)
+            if !endian.put_u16(b[pos:next], .Little, v) {
+                return 0, .Unable_To_Encode_Data
+            }
+        case DWORD:
+            pos = next
+            next += size_of(DWORD)
+            if !endian.put_u32(b[pos:next], .Little, v) {
+                return 0, .Unable_To_Encode_Data
+            }
+        }
+    }
+    pos = next
+    return
+}
+
+chunk_equal :: proc(x, y: Chunk) -> (a: any, b: any, c: typeid, eq: bool) {
+    switch xv in x {
+    case Old_Palette_256_Chunk:
+        yv, ok := y.(Old_Palette_256_Chunk)
+        if !ok {
+            return typeid_of(type_of(xv)), reflect.union_variant_typeid(y), typeid_of(Chunk), false 
+        }
+        return _chunk_equal(xv, yv)
+
+    case Old_Palette_64_Chunk:
+        yv, ok := y.(Old_Palette_64_Chunk) 
+        if !ok {
+            return typeid_of(type_of(xv)), reflect.union_variant_typeid(y), typeid_of(Chunk), false 
+        }
+        return _chunk_equal(xv, yv)
+
+    case Layer_Chunk:
+        yv, ok := y.(Layer_Chunk) 
+        if !ok {
+            return typeid_of(type_of(xv)), reflect.union_variant_typeid(y), typeid_of(Chunk), false 
+        }
+        return _chunk_equal(xv, yv)
+
+    case Cel_Chunk:
+        yv, ok := y.(Cel_Chunk) 
+        if !ok {
+            return typeid_of(type_of(xv)), reflect.union_variant_typeid(y), typeid_of(Chunk), false 
+        }
+        return _chunk_equal(xv, yv)
+
+    case Cel_Extra_Chunk:
+        yv, ok := y.(Cel_Extra_Chunk) 
+        if !ok {
+            return typeid_of(type_of(xv)), reflect.union_variant_typeid(y), typeid_of(Chunk), false 
+        }
+        return _chunk_equal(xv, yv)
+
+    case External_Files_Chunk:
+        yv, ok := y.(External_Files_Chunk) 
+        if !ok {
+            return typeid_of(type_of(xv)), reflect.union_variant_typeid(y), typeid_of(Chunk), false 
+        }
+        return _chunk_equal(xv, yv)
+
+    case Mask_Chunk:
+        yv, ok := y.(Mask_Chunk) 
+        if !ok {
+            return typeid_of(type_of(xv)), reflect.union_variant_typeid(y), typeid_of(Chunk), false 
+        }
+        return _chunk_equal(xv, yv)
+
+    case Path_Chunk:
+        yv, ok := y.(Path_Chunk) 
+        if !ok {
+            return typeid_of(type_of(xv)), reflect.union_variant_typeid(y), typeid_of(Chunk), false 
+        }
+        return _chunk_equal(xv, yv)
+
+    case Tags_Chunk:
+        yv, ok := y.(Tags_Chunk) 
+        if !ok {
+            return typeid_of(type_of(xv)), reflect.union_variant_typeid(y), typeid_of(Chunk), false 
+        }
+        return _chunk_equal(xv, yv)
+
+    case Palette_Chunk:
+        yv, ok := y.(Palette_Chunk)
+        if !ok {
+            return typeid_of(type_of(xv)), reflect.union_variant_typeid(y), typeid_of(Chunk), false 
+        }
+        return _chunk_equal(xv, yv)
+
+    case Color_Profile_Chunk:
+        yv, ok := y.(Color_Profile_Chunk) 
+        if !ok {
+            return typeid_of(type_of(xv)), reflect.union_variant_typeid(y), typeid_of(Chunk), false 
+        }
+        return _chunk_equal(xv, yv)
+
+    case User_Data_Chunk:
+        yv, ok := y.(User_Data_Chunk) 
+        if !ok {
+            return typeid_of(type_of(xv)), reflect.union_variant_typeid(y), typeid_of(Chunk), false 
+        }
+        return _chunk_equal(xv, yv)
+
+    case Slice_Chunk:
+        yv, ok := y.(Slice_Chunk) 
+        if !ok {
+            return typeid_of(type_of(xv)), reflect.union_variant_typeid(y), typeid_of(Chunk), false 
+        }
+        return _chunk_equal(xv, yv)
+
+    case Tileset_Chunk:
+        yv, ok := y.(Tileset_Chunk) 
+        if !ok {
+            return typeid_of(type_of(xv)), reflect.union_variant_typeid(y), typeid_of(Chunk), false 
+        }
+        return _chunk_equal(xv, yv)
+
+    case nil:
+        if y != nil {
+            return x, y, typeid_of(Chunk), false
+        }
+    case:
+        return
+    }
+
+    eq = true
+    return
+}
+
+frame_equal :: proc(x, y: Frame) -> (a: any, b: any, c: typeid, eq: bool) {
+    if x.header != y.header { 
+        return x.header, y.header, typeid_of(Document), false
+    }
+    if len(x.chunks) != len(y.chunks) {
+        return len(x.chunks), len(y.chunks), typeid_of(Document), false
+    }
+    for i in 0..<len(x.chunks) {
+        xc, yc := x.chunks[i], y.chunks[i]
+        a, b, c, eq = chunk_equal(xc, yc)
+        if !eq { return }
+    }
+    eq = true
+    return
+}
+
+document_equal :: proc(x, y: Document) -> (a: any, b: any, c: typeid, eq: bool) {
+    if x.header != y.header {
+        if x.header.size == y.header.size {
+            return x.header, y.header, typeid_of(Document), false
+        }
+        //log.warn("File sizes are differant:", x.header.size, y.header.size)
+    }
+    if len(x.frames) != len(y.frames) {
+        return len(x.frames), len(y.frames), typeid_of(Document), false
+    }
+    for i in 0..<len(x.frames) {
+        xf, yf := x.frames[i], y.frames[i]
+        a, b, c, eq = frame_equal(xf, yf)
+        if !eq { return }
+    }
+    eq = true
+    return
+}
+
+
+
+================================================
+File: atlas_builder/aseprite/write.odin
+================================================
+package aseprite_file_handler
+
+import "core:io"
+import "core:math/fixed"
+import "core:encoding/endian"
+import "core:fmt"
+
+write_bool :: proc(w: io.Writer, data: bool, size: ^int) -> (written: int, err: Write_Error) { 
+    return write_byte(w, u8(data), size)
+}
+
+write_i8 :: proc(w: io.Writer, data: i8, size: ^int) -> (written: int, err: Write_Error) { 
+    return write_byte(w, u8(data), size)
+}
+
+write_byte :: proc(w: io.Writer, data: BYTE, size: ^int) -> (written: int, err: Write_Error) { 
+    return 1, io.write_byte(w, data, size)
+}
+
+write_word :: proc(w: io.Writer, data: WORD, size: ^int) -> (written: int, err: Write_Error) { 
+    buf: [2]byte
+    if !endian.put_u16(buf[:], .Little, data) {
+        return 0, .Unable_To_Encode_Data
+    }
+
+    written = io.write(w, buf[:], size) or_return
+    if written != 2 {
+        err = .Wrong_Write_Size
+    }
+    return
+}
+
+write_short :: proc(w: io.Writer, data: SHORT, size: ^int) -> (written: int, err: Write_Error) {
+    buf: [2]byte
+    if !endian.put_i16(buf[:], .Little, data) {
+        return 0, .Unable_To_Encode_Data
+    }
+
+    written = io.write(w, buf[:], size) or_return
+    if written != 2 {
+        err = .Wrong_Write_Size
+    }
+    return
+}
+
+write_dword :: proc(w: io.Writer, data: DWORD, size: ^int) -> (written: int, err: Write_Error) { 
+    buf: [4]byte
+    if !endian.put_u32(buf[:], .Little, data) {
+        return 0, .Unable_To_Encode_Data
+    }
+
+    written = io.write(w, buf[:], size) or_return
+    if written != 4 {
+        err = .Wrong_Write_Size
+    }
+    return
+}
+
+write_long :: proc(w: io.Writer, data: LONG, size: ^int) -> (written: int, err: Write_Error) { 
+    buf: [4]byte
+    if !endian.put_i32(buf[:], .Little, data) {
+        return 0, .Unable_To_Encode_Data
+    }
+
+    written = io.write(w, buf[:], size) or_return
+    if written != 4 {
+        err = .Wrong_Write_Size
+    }
+    return
+}
+
+write_fixed :: proc(w: io.Writer, data: FIXED, size: ^int) -> (written: int, err: Write_Error) { 
+    return write(w, data.i, size)
+}
+
+write_float :: proc(w: io.Writer, data: FLOAT, size: ^int) -> (written: int, err: Write_Error) {
+    buf: [4]byte 
+    if !endian.put_f32(buf[:], .Little, data) {
+        return 0, .Unable_To_Encode_Data
+    }
+
+    written = io.write(w, buf[:], size) or_return
+    if written != 4 {
+        err = .Wrong_Write_Size
+    }
+    return
+}
+
+write_double :: proc(w: io.Writer, data: DOUBLE, size: ^int) -> (written: int, err: Write_Error) { 
+    buf: [8]byte
+    if !endian.put_f64(buf[:], .Little, data) {
+        return 0, .Unable_To_Encode_Data
+    }
+
+    written = io.write(w, buf[:], size) or_return
+    if written != 8 {
+        err = .Wrong_Write_Size
+    }
+    return
+}
+
+write_qword :: proc(w: io.Writer, data: QWORD, size: ^int) -> (written: int, err: Write_Error) { 
+    buf: [8]byte
+    if !endian.put_u64(buf[:], .Little, data) {
+        return 0, .Unable_To_Encode_Data
+    }
+
+    written = io.write(w, buf[:], size) or_return
+    if written != 8 {
+        err = .Wrong_Write_Size
+    }
+    return
+}
+
+write_long64 :: proc(w: io.Writer, data: LONG64, size: ^int) -> (written: int, err: Write_Error) {
+    buf: [8]byte
+    if !endian.put_i64(buf[:], .Little, data) {
+        return 0, .Unable_To_Encode_Data
+    }
+
+    written = io.write(w, buf[:], size) or_return
+    if written != 8 {
+        err = .Wrong_Write_Size
+    }
+    return
+}
+
+write_string :: proc(w: io.Writer, data: STRING, size: ^int) -> (written: int, err: Write_Error) {
+    written = write_word(w, WORD(len(data)), size) or_return
+    if written != 2 {
+        return 0, .Wrong_Write_Size
+    }
+
+    str := transmute([]u8)data
+    written += write_bytes(w, str[:], size) or_return
+    if written != 2 + len(data) {
+        err = .Wrong_Write_Size
+    }
+    return
+}
+
+write_point :: proc(w: io.Writer, data: POINT, size: ^int) -> (written: int, err: Write_Error) { 
+    written = write_long(w, data.x, size) or_return
+    if written != 4 {
+        return 0, .Wrong_Write_Size
+    }
+    written += write_long(w, data.y, size) or_return
+    if written != 8 {
+        return 0, .Wrong_Write_Size
+    }
+    return
+}
+
+write_size :: proc(w: io.Writer, data: SIZE, size: ^int) -> (written: int, err: Write_Error) { 
+    written = write_long(w, data.w, size) or_return
+    if written != 4 {
+        return 0, .Wrong_Write_Size
+    }
+    written += write_long(w, data.h, size) or_return
+    if written != 8 {
+        return 0, .Wrong_Write_Size
+    }
+    return
+}
+
+write_rect :: proc(w: io.Writer, data: RECT, size: ^int) -> (written: int, err: Write_Error) { 
+    write_point(w, data.origin, size) or_return
+    write_size(w, data.size, size) or_return
+    return
+}
+
+write_uuid:: proc(w: io.Writer, data: UUID, size: ^int) -> (written: int, err: Write_Error) { 
+    data := cast([]u8)data
+    written = io.write(w, data[:], size) or_return
+    if written != 16 {
+        err = .Wrong_Write_Size
+    }
+    return
+}
+
+write_pixel :: proc(w: io.Writer, data: PIXEL, size: ^int) -> (written: int, err: Write_Error) {
+    return write_byte(w, data, size)
+}
+
+write_pixels :: proc(w: io.Writer, data: []PIXEL, size: ^int) -> (written: int, err: Write_Error) {
+    return write_bytes(w, data[:], size)
+}
+
+write_tile :: proc(w: io.Writer, data: TILE, size: ^int) -> (written: int, err: Write_Error) { 
+    switch v in data {
+    case BYTE:
+        written = write_byte(w, v, size) or_return
+    case WORD:
+        written = write_word(w, v, size) or_return
+    case DWORD:
+        written = write_dword(w, v, size) or_return
+    }
+    return  
+}
+
+write_tiles :: proc(w: io.Writer, data: []TILE, size: ^int) -> (written: int, err: Write_Error) {
+    if len(data) == 0 {
+        return 0, .Array_To_Small
+    }
+
+    for tile in data {
+        switch v in tile {
+        case BYTE:
+            written += write_byte(w, v, size) or_return
+        case WORD:
+            written += write_word(w, v, size) or_return
+        case DWORD:
+            written += write_dword(w, v, size) or_return
+        }
+    }
+    return 
+}
+
+write_bytes :: proc(w: io.Writer, data: []u8, size: ^int) -> (written: int, err: Write_Error) {
+    written = io.write(w, data[:], size) or_return
+    if written != len(data) {
+        err = .Wrong_Write_Size
+    }
+    return 
+}
+
+/*write_skip :: proc(w: io.Writer, set: io.Stream_Mode_Set, to_skip: i64, size: ^int) -> (written: i64, err: Write_Error) {
+    if io.Stream_Mode.Seek in set {
+        seeker, ok := io.to_write_seeker(w)
+        if !ok {
+            return 0, .Unable_Make_Seeker
+        }
+        written = io.seek(seeker, to_skip, .Current) or_return
+    } else {
+        for _ in 0..<to_skip {
+            io.write_byte(w, 0x0, size) or_return
+            written += 1
+        }
+    }
+    if written != to_skip {
+        err = .Wrong_Write_Size
+    }
+    return
+}*/
+
+write_skip :: proc(w: io.Writer, to_skip: int, size: ^int) -> (written: int, err: Write_Error) {
+    for _ in 0..<to_skip {
+        io.write_byte(w, 0x0, size) or_return
+        written += 1
+    }
+    if written != to_skip {
+        err = .Wrong_Write_Size
+    }
+    return
+}
+
+write_ud_value :: proc(w: io.Writer, data: Property_Value, size: ^int) -> (err: Marshal_Error) {
+    switch v in data {
+    case nil:
+    case bool:   write(w, v, size) or_return
+    case i8:     write(w, v, size) or_return
+    case BYTE:   write(w, v, size) or_return
+    case SHORT:  write(w, v, size) or_return
+    case WORD:   write(w, v, size) or_return
+    case LONG:   write(w, v, size) or_return
+    case DWORD:  write(w, v, size) or_return
+    case LONG64: write(w, v, size) or_return
+    case QWORD:  write(w, v, size) or_return
+    case FIXED:  write(w, v, size) or_return
+    case FLOAT:  write(w, v, size) or_return
+    case DOUBLE: write(w, v, size) or_return
+    case STRING: write(w, v, size) or_return
+    case POINT:  write(w, v, size) or_return
+    case SIZE:   write(w, v, size) or_return
+    case RECT:   write(w, v, size) or_return
+    case UUID:   write(w, v, size) or_return
+    case UD_Vec:
+        write(w, DWORD(len(v)), size) or_return
+        write(w, WORD(0), size) or_return
+        for vec in v {
+            write(w, get_property_type(vec) or_return, size) or_return
+            write(w, vec, size) or_return
+        }
+    case Properties:
+        write(w, DWORD(len(v)), size) or_return
+        for key, val in v {
+            write(w, key, size) or_return
+            write(w, get_property_type(val) or_return, size) or_return
+            write(w, val, size) or_return
+        }
+    }
+    return
+}
+
+write :: proc{
+    write_bool, write_i8, write_byte, write_word, write_short, write_dword,  
+    write_long, write_fixed, write_float, write_double, write_qword,  
+    write_long64, write_string, write_point, write_size, write_rect,
+    write_uuid, write_tile, write_bytes, write_skip, write_ud_value,
+}
+
+
+
+================================================
+File: main_hot_reload/main_hot_reload.odin
+================================================
+// Development game exe. Loads game.dll and reloads it whenever it changes.
+
+package main
+
+import "core:dynlib"
+import "core:fmt"
+import "core:c/libc"
+import "core:os"
+import "core:log"
+import "core:mem"
+
+when ODIN_OS == .Windows {
+	DLL_EXT :: ".dll"
+} else when ODIN_OS == .Darwin {
+	DLL_EXT :: ".dylib"
+} else {
+	DLL_EXT :: ".so"
+}
+
+copy_dll :: proc(to: string) -> bool {
+	exit: i32
+	when ODIN_OS == .Windows {
+		exit = libc.system(fmt.ctprintf("copy game.dll {0}", to))
+	} else {
+		exit = libc.system(fmt.ctprintf("cp game" + DLL_EXT + " {0}", to))
+	}
+
+	if exit != 0 {
+		fmt.printfln("Failed to copy game" + DLL_EXT + " to {0}", to)
+		return false
+	}
+
+	return true
+}
+
+Game_API :: struct {
+	lib: dynlib.Library,
+	init_window: proc(),
+	init: proc(),
+	update: proc() -> bool,
+	shutdown: proc(),
+	shutdown_window: proc(),
+	memory: proc() -> rawptr,
+	memory_size: proc() -> int,
+	hot_reloaded: proc(mem: rawptr),
+	force_reload: proc() -> bool,
+	force_restart: proc() -> bool,
+	modification_time: os.File_Time,
+	api_version: int,
+}
+
+load_game_api :: proc(api_version: int) -> (api: Game_API, ok: bool) {
+	mod_time, mod_time_error := os.last_write_time_by_name("game" + DLL_EXT)
+	if mod_time_error != os.ERROR_NONE {
+		fmt.printfln(
+			"Failed getting last write time of game" + DLL_EXT + ", error code: {1}",
+			mod_time_error,
+		)
+		return
+	}
+
+	// NOTE: this needs to be a relative path for Linux to work.
+	game_dll_name := fmt.tprintf("{0}game_{1}" + DLL_EXT, "./" when ODIN_OS != .Windows else "", api_version)
+	copy_dll(game_dll_name) or_return
+
+	_, ok = dynlib.initialize_symbols(&api, game_dll_name, "game_", "lib")
+	if !ok {
+		fmt.printfln("Failed initializing symbols: {0}", dynlib.last_error())
+	}
+
+	api.api_version = api_version
+	api.modification_time = mod_time
+	ok = true
+
+	return
+}
+
+unload_game_api :: proc(api: ^Game_API) {
+	if api.lib != nil {
+		if !dynlib.unload_library(api.lib) {
+			fmt.printfln("Failed unloading lib: {0}", dynlib.last_error())
+		}
+	}
+
+	if os.remove(fmt.tprintf("game_{0}" + DLL_EXT, api.api_version)) != 0 {
+		fmt.printfln("Failed to remove game_{0}" + DLL_EXT + " copy", api.api_version)
+	}
+}
+
+main :: proc() {
+	context.logger = log.create_console_logger()
+
+	default_allocator := context.allocator
+	tracking_allocator: mem.Tracking_Allocator
+	mem.tracking_allocator_init(&tracking_allocator, default_allocator)
+	context.allocator = mem.tracking_allocator(&tracking_allocator)
+
+	reset_tracking_allocator :: proc(a: ^mem.Tracking_Allocator) -> bool {
+		err := false
+
+		for _, value in a.allocation_map {
+			fmt.printf("%v: Leaked %v bytes\n", value.location, value.size)
+			err = true
+		}
+
+		mem.tracking_allocator_clear(a)
+		return err
+	}
+
+	game_api_version := 0
+	game_api, game_api_ok := load_game_api(game_api_version)
+
+	if !game_api_ok {
+		fmt.println("Failed to load Game API")
+		return
+	}
+
+	game_api_version += 1
+	game_api.init_window()
+	game_api.init()
+
+	old_game_apis := make([dynamic]Game_API, default_allocator)
+
+	window_open := true
+	for window_open {
+		window_open = game_api.update()
+		force_reload := game_api.force_reload()
+		force_restart := game_api.force_restart()
+		reload := force_reload || force_restart
+		game_dll_mod, game_dll_mod_err := os.last_write_time_by_name("game" + DLL_EXT)
+
+		if game_dll_mod_err == os.ERROR_NONE && game_api.modification_time != game_dll_mod {
+			reload = true
+		}
+
+		if reload {
+			new_game_api, new_game_api_ok := load_game_api(game_api_version)
+
+			if new_game_api_ok {
+				if game_api.memory_size() != new_game_api.memory_size() || force_restart {
+					game_api.shutdown()
+					reset_tracking_allocator(&tracking_allocator)
+
+					for &g in old_game_apis {
+						unload_game_api(&g)
+					}
+
+					clear(&old_game_apis)
+					unload_game_api(&game_api)
+					game_api = new_game_api
+					game_api.init()
+				} else {
+					append(&old_game_apis, game_api)
+					game_memory := game_api.memory()
+					game_api = new_game_api
+					game_api.hot_reloaded(game_memory)
+				}
+
+				game_api_version += 1
+			}
+		}
+
+		if len(tracking_allocator.bad_free_array) > 0 {
+			for b in tracking_allocator.bad_free_array {
+				log.errorf("Bad free at: %v", b.location)
+			}
+
+			libc.getchar()
+			panic("Bad free detected")
+		}
+
+		free_all(context.temp_allocator)
+	}
+
+	free_all(context.temp_allocator)
+	game_api.shutdown()
+	if reset_tracking_allocator(&tracking_allocator) {
+		libc.getchar()
+	}
+
+	for &g in old_game_apis {
+		unload_game_api(&g)
+	}
+
+	delete(old_game_apis)
+
+	game_api.shutdown_window()
+	unload_game_api(&game_api)
+	mem.tracking_allocator_destroy(&tracking_allocator)
+}
+
+// make game use good GPU on laptops etc
+
+@(export)
+NvOptimusEnablement: u32 = 1
+
+@(export)
+AmdPowerXpressRequestHighPerformance: i32 = 1
+
+
+
+================================================
+File: main_release/main_release.odin
+================================================
+// For making a release exe that does not use hot reload.
+
+package main_release
+
+import "core:log"
+import "core:os"
+
+import game ".."
+
+USE_TRACKING_ALLOCATOR :: #config(USE_TRACKING_ALLOCATOR, false)
+
+main :: proc() {
+	when USE_TRACKING_ALLOCATOR {
+		default_allocator := context.allocator
+		tracking_allocator: Tracking_Allocator
+		tracking_allocator_init(&tracking_allocator, default_allocator)
+		context.allocator = allocator_from_tracking_allocator(&tracking_allocator)
+	}
+
+	mode: int = 0
+	when ODIN_OS == .Linux || ODIN_OS == .Darwin {
+		mode = os.S_IRUSR | os.S_IWUSR | os.S_IRGRP | os.S_IROTH
+	}
+
+	logh, logh_err := os.open("log.txt", (os.O_CREATE | os.O_TRUNC | os.O_RDWR), mode)
+
+	if logh_err == os.ERROR_NONE {
+		os.stdout = logh
+		os.stderr = logh
+	}
+
+	logger := logh_err == os.ERROR_NONE ? log.create_file_logger(logh) : log.create_console_logger()
+	context.logger = logger
+	
+	game.game_init_window()
+	game.game_init()
+
+	window_open := true
+	for window_open {
+		window_open = game.game_update()
+
+		when USE_TRACKING_ALLOCATOR {
+			for b in tracking_allocator.bad_free_array {
+				log.error("Bad free at: %v", b.location)
+			}
+
+			clear(&tracking_allocator.bad_free_array)
+		}
+
+		free_all(context.temp_allocator)
+	}
+
+	free_all(context.temp_allocator)
+	game.game_shutdown()
+	game.game_shutdown_window()
+	
+	if logh_err == os.ERROR_NONE {
+		log.destroy_file_logger(logger)
+	}
+
+	when USE_TRACKING_ALLOCATOR {
+		for key, value in tracking_allocator.allocation_map {
+			log.error("%v: Leaked %v bytes\n", value.location, value.size)
+		}
+
+		tracking_allocator_destroy(&tracking_allocator)
+	}
+}
+
+// make game use good GPU on laptops etc
+
+@(export)
+NvOptimusEnablement: u32 = 1
+
+@(export)
+AmdPowerXpressRequestHighPerformance: i32 = 1
+
+
