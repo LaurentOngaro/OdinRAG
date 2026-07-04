@@ -1,0 +1,225 @@
+{
+  // Repo map for `_Helpers/scripts/scrapers/build_gitingest.py`.
+  //
+  // Each entry:
+  //   "id":        short slug used in the output filename
+  //   "src":       absolute path to the LOCAL clone (Windows-style)
+  //   "subfolder": subfolder under `odin-knowledge-base/gitIngest/`
+  //   "skip":      if true, the entry is excluded from a default run
+  //                (kept in the file as documentation of what was tried)
+  //   "priority":  1 = highest, used by `--only <id>` and ordering
+  //   "max_size":  bytes; files larger than this are skipped by gitingest (-s)
+  //   "exclude":   list of glob patterns passed to gitingest (-e)
+  //   "notes":     free-form human note
+  //
+  // Edit this file to add/remove repos. The script picks up changes on next run.
+
+  "karl_zylinski": [
+    {
+      "id": "odin-raylib-hot-reload-game-template",
+      "src": "D:\\Sources\\Odin\\karl_zylinski\\github\\odin-raylib-hot-reload-game-template",
+      "subfolder": "karl_zylinski",
+      "priority": 1,
+      "max_size": 100000,
+      "exclude": ["build/**", "*.exe", "*.dll", "*.o", "*.obj"],
+      "notes": "Reference template for hot-reload workflow. PRIORITY 1."
+    },
+    {
+      "id": "metroidvaniaish",
+      "src": "D:\\Sources\\Odin\\karl_zylinski\\github\\metroidvaniaish",
+      "subfolder": "karl_zylinski",
+      "priority": 2,
+      "max_size": 200000,
+      "exclude": ["build/**", "*.exe", "*.dll", "*.o", "*.obj", "assets/textures/**"],
+      "notes": "Main source of gameplay patterns. PRIORITY 2."
+    },
+    {
+      "id": "learn-odin-gamedev-blog-code",
+      "src": "D:\\Sources\\Odin\\karl_zylinski\\github\\learn-odin-gamedev-blog-code",
+      "subfolder": "karl_zylinski",
+      "priority": 3,
+      "max_size": 100000,
+      "exclude": ["build/**", "*.exe", "*.dll"],
+      "notes": "Code companion to zylinski.se blog articles. PRIORITY 3."
+    },
+    {
+      "id": "cat-and-onion",
+      "src": "D:\\Sources\\Odin\\karl_zylinski\\github\\cat-and-onion",
+      "subfolder": "karl_zylinski",
+      "priority": 4,
+      "max_size": 30000,
+      "exclude": ["build/**", "builds/**", "*.exe", "*.dll", "*.mp3", "*.wav", "*.ogg", "*.png", "*.ttf", "*.exp", "*.cat_*", "*.pak", "*.zip", "game/**", "levels/**", "music/**", "object_art/**", "sounds/**", "source_data/**", "textures/**", "assets_builder/**", "texture_builder/**", "notes/**", "unused/**", "odin/**"],
+      "notes": "Platformer reference. PRIORITY 4. Trimmed: exclude vendored Odin compiler + game assets, keep code only."
+    },
+    {
+      "id": "odin-sokol-terrain-example",
+      "src": "D:\\Sources\\Odin\\karl_zylinski\\github\\odin-sokol-terrain-example",
+      "subfolder": "karl_zylinski",
+      "priority": 5,
+      "max_size": 100000,
+      "exclude": ["build/**"],
+      "notes": "Optional - Sokol reference."
+    },
+    {
+      "id": "atlas-builder",
+      "src": "D:\\Sources\\Odin\\karl_zylinski\\github\\atlas-builder",
+      "subfolder": "karl_zylinski",
+      "priority": 6,
+      "max_size": 100000,
+      "exclude": ["build/**"],
+      "notes": "Tool: sprite atlas builder."
+    },
+    {
+      "id": "odin-dod-benchmarks",
+      "src": "D:\\Sources\\Odin\\karl_zylinski\\github\\odin-dod-benchmarks",
+      "subfolder": "karl_zylinski",
+      "priority": 7,
+      "max_size": 100000,
+      "exclude": ["build/**"],
+      "notes": "Data-oriented design benchmarks."
+    },
+    {
+      "id": "odin-hot-reload",
+      "src": "D:\\Sources\\Odin\\karl_zylinski\\github\\odin-hot-reload",
+      "subfolder": "karl_zylinski",
+      "priority": 8,
+      "max_size": 100000,
+      "exclude": ["build/**"],
+      "notes": "Standalone hot-reload reference."
+    },
+    {
+      "id": "odin-c-bindgen",
+      "src": "D:\\Sources\\Odin\\karl_zylinski\\github\\odin-c-bindgen",
+      "subfolder": "karl_zylinski",
+      "priority": 9,
+      "max_size": 100000,
+      "exclude": ["build/**"],
+      "notes": "c-bindgen usage examples."
+    },
+    {
+      "id": "odinbook.com",
+      "src": "D:\\Sources\\Odin\\karl_zylinski\\github\\odinbook.com",
+      "subfolder": "karl_zylinski",
+      "priority": 10,
+      "max_size": 100000,
+      "exclude": ["build/**"],
+      "notes": "Book companion site."
+    },
+    {
+      "id": "karl2d",
+      "src": "D:\\Sources\\Odin\\karl_zylinski\\github\\karl2d",
+      "subfolder": "karl_zylinski",
+      "priority": 11,
+      "max_size": 100000,
+      "exclude": ["build/**"],
+      "notes": "Small 2D engine."
+    },
+    {
+      "id": "karl2d-hot-reload-template",
+      "src": "D:\\Sources\\Odin\\karl_zylinski\\github\\karl2d-hot-reload-template",
+      "subfolder": "karl_zylinski",
+      "priority": 12,
+      "max_size": 100000,
+      "exclude": ["build/**"],
+      "notes": "2D engine hot-reload template."
+    },
+    {
+      "id": "odin-raylib-web",
+      "src": "D:\\Sources\\Odin\\karl_zylinski\\github\\odin-raylib-web",
+      "subfolder": "karl_zylinski",
+      "skip": true,
+      "priority": 13,
+      "max_size": 100000,
+      "exclude": ["build/**"],
+      "notes": "Web export - out of main scope. SKIPPED by default."
+    },
+    {
+      "id": "snake-tutorial-code",
+      "src": "D:\\Sources\\Odin\\karl_zylinski\\github\\snake-tutorial-code",
+      "subfolder": "karl_zylinski",
+      "priority": 14,
+      "max_size": 100000,
+      "exclude": ["build/**"],
+      "notes": "Tutorial code."
+    },
+    {
+      "id": "breakout",
+      "src": "D:\\Sources\\Odin\\karl_zylinski\\github\\breakout",
+      "subfolder": "karl_zylinski",
+      "priority": 15,
+      "max_size": 100000,
+      "exclude": ["build/**"],
+      "notes": "Breakout game sample."
+    },
+    {
+      "id": "car-racer",
+      "src": "D:\\Sources\\Odin\\karl_zylinski\\github\\car-racer",
+      "subfolder": "karl_zylinski",
+      "priority": 16,
+      "max_size": 100000,
+      "exclude": ["build/**"],
+      "notes": "3D car sample."
+    },
+    {
+      "id": "point_and_click",
+      "src": "D:\\Sources\\Odin\\karl_zylinski\\github\\point_and_click",
+      "subfolder": "karl_zylinski",
+      "priority": 17,
+      "max_size": 100000,
+      "exclude": ["build/**"],
+      "notes": "Point-and-click adventure sample."
+    },
+    {
+      "id": "trains",
+      "src": "D:\\Sources\\Odin\\karl_zylinski\\github\\trains",
+      "subfolder": "karl_zylinski",
+      "priority": 18,
+      "max_size": 100000,
+      "exclude": ["build/**"],
+      "notes": "Trains sample."
+    },
+    {
+      "id": "adventure",
+      "src": "D:\\Sources\\Odin\\karl_zylinski\\github\\adventure",
+      "subfolder": "karl_zylinski",
+      "priority": 19,
+      "max_size": 100000,
+      "exclude": ["build/**"],
+      "notes": "Adventure game sample."
+    }
+  ],
+
+  "falconerd": [
+    {
+      "id": "raylib_introduction",
+      "src": "D:\\Sources\\Odin\\falconerd\\raylib_introduction",
+      "subfolder": "falconerd",
+      "priority": 1,
+      "max_size": 100000,
+      "exclude": ["build/**", "*.exe", "*.dll"],
+      "notes": "Falconerd's Raylib intro (PVG Module 1)."
+    },
+    {
+      "id": "F_metroidvania_pvg",
+      "src": "D:\\Sources\\Odin\\falconerd\\F_metroidvania_pvg",
+      "subfolder": "falconerd",
+      "priority": 2,
+      "max_size": 200000,
+      "exclude": ["build/**", "*.exe", "*.dll", "*.png", "*.wav", "*.mp3"],
+      "notes": "Falconerd's Metroidvania course companion."
+    }
+  ],
+
+  "odin-lang": [
+    {
+      "id": "Odin",
+      "src": "D:\\Sources\\Odin\\odin-lang\\F_odin",
+      "subfolder": "odin-lang",
+      "skip": true,
+      "priority": 1,
+      "max_size": 200000,
+      "exclude": ["build/**", "vendor/**", "llvm/**", "*.exe", "*.dll", "*.o", "*.obj"],
+      "notes": "Odin compiler source - large, skipped by default. Run with --only Odin to enable."
+    }
+  ]
+}

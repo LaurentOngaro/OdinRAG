@@ -10,17 +10,20 @@ All scrapers are **re-entrant**: an already exported file is skipped unless `--f
 
 ## Overview
 
-| Scraper                     | Source                             | Output                                           | Prerequisites            |
-| --------------------------- | ---------------------------------- | ------------------------------------------------ | ------------------------ |
-| `scrape_skool.py`           | Skool "programvideogames"          | `odin-knowledge-base/courses/programvideogames/` | skool-cli + Playwright   |
-| `scrape-official.py`        | odin-lang.org/docs/ + awesome-odin | `odin-knowledge-base/docs/official/`             | requests + BeautifulSoup |
-| `scrape-zylinski.py`        | zylinski.se blog                   | `odin-knowledge-base/docs/karl_zylinski/`        | requests + BeautifulSoup |
-| `scrape-gingerbill.py`      | gingerbill.org RSS                 | `odin-knowledge-base/docs/gingerbill/`           | requests + BeautifulSoup |
-| `scrape-newsletters.py`     | odin-lang.org/news/                | `odin-knowledge-base/docs/newsletters/`          | requests + BeautifulSoup |
-| `scrape-jakubtomsu.py`      | jakubtomsu.github.io RSS           | `odin-knowledge-base/docs/jakubtomsu/`           | requests + BeautifulSoup |
-| `scrape-showcase.py`        | odin-lang.org/showcase/            | `odin-knowledge-base/docs/showcase/`             | requests + BeautifulSoup |
-| `download_gists.py`         | awesome-odin gist URLs             | `code/gists/`                                    | None (stdlib urllib)     |
-| `download_odin_examples.py` | Odin repo examples/                | `code/examples/`                                 | None (stdlib urllib)     |
+| Scraper                      | Source                             | Output                                           | Prerequisites            |
+| ---------------------------- | ---------------------------------- | ------------------------------------------------ | ------------------------ |
+| `scrape_skool.py`            | Skool "programvideogames"          | `odin-knowledge-base/courses/programvideogames/` | skool-cli + Playwright   |
+| `scrape-official.py`         | odin-lang.org/docs/ + awesome-odin | `odin-knowledge-base/docs/official/`             | requests + BeautifulSoup |
+| `scrape-zylinski.py`         | zylinski.se blog                   | `odin-knowledge-base/docs/karl_zylinski/`        | requests + BeautifulSoup |
+| `scrape-gingerbill.py`       | gingerbill.org RSS                 | `odin-knowledge-base/docs/gingerbill/`           | requests + BeautifulSoup |
+| `scrape-newsletters.py`      | odin-lang.org/news/                | `odin-knowledge-base/docs/newsletters/`          | requests + BeautifulSoup |
+| `scrape-jakubtomsu.py`       | jakubtomsu.github.io RSS           | `odin-knowledge-base/docs/jakubtomsu/`           | requests + BeautifulSoup |
+| `scrape-showcase.py`         | odin-lang.org/showcase/            | `odin-knowledge-base/docs/showcase/`             | requests + BeautifulSoup |
+| `scrape_odin_changelog.py`   | github.com/odin-lang/Odin releases | `odin-knowledge-base/docs/official/changelog/`   | requests                 |
+| `scrape_raylib_changelog.py` | github.com/raysan5/raylib releases | `odin-knowledge-base/docs/raylib/changelog/`     | requests                 |
+| `build_gitingest.py`         | local clones + gitingest CLI       | `odin-knowledge-base/gitIngest/`                 | gitingest                |
+| `download_gists.py`          | awesome-odin gist URLs             | `code/gists/`                                    | None (stdlib urllib)     |
+| `download_odin_examples.py`  | Odin repo examples/                | `code/examples/`                                 | None (stdlib urllib)     |
 
 ## How
 
@@ -90,6 +93,29 @@ Exit codes:
 - File `_Private/.config/skool_credentials.txt` (gitignored)
 
 1. **Windows**: disable Defender firewall (Playwright Chromium otherwise fails with `ERR_NETWORK_ACCESS_DENIED`)
+
+### Changelog scrapers (Odin / Raylib)
+
+```bash
+python _Helpers/scripts/scrappers/scrape_odin_changelog.py            # last 20 releases
+python _Helpers/scripts/scrappers/scrape_odin_changelog.py --limit 50 # last 50
+python _Helpers/scripts/scrappers/scrape_raylib_changelog.py          # last 10 releases
+python _Helpers/scripts/scrappers/scrape_raylib_changelog.py --check  # dry-run
+```
+
+Both are idempotent (release file already present + matching `tag:` in frontmatter = skip). Optional env var `GITHUB_TOKEN` raises the GitHub rate limit from 60 to 5000 requests/hour.
+
+### gitingest snapshot generator (Perplexity Space)
+
+```bash
+python _Helpers/scripts/scrapers/build_gitingest.py            # rebuild only stale snapshots
+python _Helpers/scripts/scrapers/build_gitingest.py --force    # rewrite everything
+python _Helpers/scripts/scrapers/build_gitingest.py --check    # dry-run
+python _Helpers/scripts/scrapers/build_gitingest.py --only metroidvaniaish odin-raylib-hot-reload-game-template
+python _Helpers/scripts/scrapers/build_gitingest.py --include-skipped  # also generate the Odin compiler source snapshot
+```
+
+The script reads `_Helpers/config/gitIngest_repos.jsonc` and invokes `gitingest` for each entry. Each snapshot is paired with a `<id>.json` sidecar (provenance metadata + max mtime of the source tree) so a re-run skips anything unchanged.
 
 ### scrape-official / scrape-zylinski
 

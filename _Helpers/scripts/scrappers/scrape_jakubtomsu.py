@@ -37,7 +37,7 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from lib.http_client import discover_via_rss, slug_from_url  # noqa: E402
 from lib.html2md import scrape_to_markdown  # noqa: E402
 
