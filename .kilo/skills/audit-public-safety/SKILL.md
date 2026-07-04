@@ -42,7 +42,7 @@ Expected output: `[OK] Public safety audit (branch): clean`.
 | ---- | ------------- | --------------------------------------------------- |
 | 0    | Clean         | Safe to push                                        |
 | 1    | Leak detected | Fix the leak (see "Common leaks" below)             |
-| 2    | Tool error    | git missing, branch absent, etc. — read the message |
+| 2    | Tool error    | git missing, branch absent, etc. - read the message |
 
 ## Refresh the public branch first
 
@@ -75,7 +75,7 @@ git stash pop
 
 - **Push `main` to the `public` remote.** The hook refuses it; bypassing the hook leaks history.
 - **Push without running `audit_public_safety.py --scope branch` first.**
-- **Share a `git bundle`** of the local repo without purging — the bundle contains the full history including personal content.
+- **Share a `git bundle`** of the local repo without purging - the bundle contains the full history including personal content.
 - **Include long excerpts (> 200 words) of Skool lessons** in public posts: fair use does not cover full republication.
 - **Disable or skip the pre-push hook.** It is the last line of defense.
 
@@ -100,12 +100,12 @@ Treat the `public` remote as **compromised**:
 
 ## Reference
 
-- Full procedure (canonical): [`_Helpers/docs/005_public_release_checklist.md`](../../_Helpers/docs/005_public_release_checklist.md) — 111 lines, covers every edge case.
+- Full procedure (canonical): [`_Helpers/docs/005_public_release_checklist.md`](../../_Helpers/docs/005_public_release_checklist.md) - 111 lines, covers every edge case.
 - Workflow file (re-runs the audit in CI): `.github/workflows/public_safety.yml`.
 - Underlying two-branch rationale: [`_Helpers/docs/007_mixing_public_and_private_history.md`](../../_Helpers/docs/007_mixing_public_and_private_history.md).
 
 ## Anti-patterns
 
 - **Never** declare a push safe without running the script (exit 0 is the only valid signal).
-- **Never** edit `audit_public_safety.py` `FORBIDDEN_PATTERNS` to silence a real leak — that hides the problem, it doesn't fix it.
-- **Never** assume the working tree is clean because `git status` is empty — the audit checks `refs/heads/public`, not `main` directly.
+- **Never** edit `audit_public_safety.py` `FORBIDDEN_PATTERNS` to silence a real leak - that hides the problem, it doesn't fix it.
+- **Never** assume the working tree is clean because `git status` is empty - the audit checks `refs/heads/public`, not `main` directly.

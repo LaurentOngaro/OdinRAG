@@ -41,7 +41,7 @@ python _Helpers/scripts/diagnostic/auditReadmeCoherence.py --fail-on-error
 | ---- | ------------ | --------------------------------------------------- |
 | 0    | Clean        | All READMEs coherent with their host directory      |
 | 1    | Issues found | Read the output, fix or mark the README (see below) |
-| 2    | Tool error   | Path missing, etc. — read the message               |
+| 2    | Tool error   | Path missing, etc. - read the message               |
 
 ## Common issues and fixes
 
@@ -71,8 +71,8 @@ The marker tells the script: "missing files here are intentional, don't flag the
 ## Anti-patterns
 
 - **Never** delete a README to silence the audit. The README is the documentation contract; fix the structure instead.
-- **Never** add a "Structure cible" header to hide real drift — it's for planned content only. If the content was supposed to exist and doesn't, write it.
-- **Never** add `--fail-on-error` to a CI job that runs on every commit unless you also triage existing failures first — it will block all merges until drift is fixed.
+- **Never** add a "Structure cible" header to hide real drift - it's for planned content only. If the content was supposed to exist and doesn't, write it.
+- **Never** add `--fail-on-error` to a CI job that runs on every commit unless you also triage existing failures first - it will block all merges until drift is fixed.
 - **Never** assume a passing audit means a perfect README. The audit catches structure drift; it does not catch typos, factual errors, or style issues (those are `markdownlint-cli2` + `reflow_md.py`).
 
 ## Reference
