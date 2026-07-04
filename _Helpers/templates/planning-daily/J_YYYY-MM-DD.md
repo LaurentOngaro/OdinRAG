@@ -36,6 +36,19 @@ updatedBy: "MiniMax-M3 (Kilo Code)"
 - [ ] Second step
 - [ ] Step N
 
+## Rappels recurrents
+
+> Trimestriels: verifier et cocher ci-dessous quand applicables.
+
+- [ ] KB stale check: `python _Helpers/scripts/scrapers/build_gitingest.py --check` (sortie 0 = rien a regenerer)
+- [ ] Changelog freshness: `python _Helpers/scripts/scrappers/scrape_odin_changelog.py --check` + `scrape_raylib_changelog.py --check`
+- [ ] Audit pre-push: `python _Helpers/scripts/diagnostic/audit_public_safety.py` (avant tout commit destine a `public`)
+- [ ] Revue Space Perplexity: verifier que la liste § 9A du doc `_Private/raw/Perplexity backlog/2026-07-04_04_odin_assistant_optimisation_espace_perplexity.md` est toujours alignee avec l'etat du repo
+
+> Annuels: seulement si une revue strategique est planifiee.
+
+- [ ] Revue cartographie MCP GitHub vs Space Perplexity (cf. meme doc § 5)
+
 ## Blockers / Questions
 
 > Anything that blocks progress, or open question to discuss.

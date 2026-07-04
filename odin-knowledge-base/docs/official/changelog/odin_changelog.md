@@ -1173,7 +1173,7 @@ The old default generator is available under `core:math/rand` in `rand_pcg.odin`
 
 - Add `LPFN_GETACCEPTEXSOCKADDRS` to ws2_32.odin
 
-- Specify `%m` and `%M `as verbs for integer formatting in `core:fmt`
+- Specify `%m` and `%M` as verbs for integer formatting in `core:fmt`
 
 - Add `@(require_results)` attribute to procs returning an allocator
 

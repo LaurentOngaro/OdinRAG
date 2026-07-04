@@ -1,5 +1,5 @@
 ## General [#](#general)
- 
+
 ### What is the history of the project? [#](#what-is-the-history-of-the-project)
 
 The project started one evening in late July 2016 when Ginger Bill was annoyed with programming in C++. The language began as a Pascal clone (with `begin` and `end` and more) but changed quite quickly to become something else.
