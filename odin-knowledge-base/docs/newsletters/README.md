@@ -11,6 +11,8 @@
 
 Run `python _Helpers/scripts/scrappers/scrape_newsletters.py` to scrape all newsletters (re-entrant, `--force` to rewrite, `--check` to dry-run).
 
+Run `python _Helpers/scripts/scrappers/scrape_newsletters.py` to scrape all newsletters (re-entrant, `--force` to rewrite, `--check` to dry-run).
+
 If your scraper targets newsletters (when configured), the output stays in this folder but is **gitignored**. Only this `README.md` is published with the repo.
 
 ## See also
