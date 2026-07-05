@@ -4,9 +4,9 @@ date: "2026-07-01"
 tags: [OdinRAG, reference, structure]
 type: reference
 status: active
-version: 1.0.0
-lastUpdated: "2026-07-01"
-updatedBy: "MiniMax-M3 (Kilo Code)"
+version: 1.1.0
+lastUpdated: "2026-07-05"
+updatedBy: "Perplexity (MCP GitHub)"
 ---
 
 # 001_folder_structure
@@ -121,12 +121,17 @@ _Private/
 │   └── ...
 ├── docs/                    <- private meta docs (ABSENT from public)
 │   ├── README - docs.md
+│   ├── decisions/           <- Architecture Decision Records (ADR) - see naming convention below
+│   │   ├── README.md
+│   │   └── YYYY-MM-DD_ADR-NNN_<slug>.md
 │   └── ...
 ├── planning/                <- day-by-day planning (ABSENT from public)
 │   ├── README - planning.md
 │   ├── ...
 │   └── daily/               <- one file per working day, J_YYYY-MM-DD.md (no NNN_ prefix)
 └── raw/                     <- raw research notes, kept as-is (no NNN_ prefix, no frontmatter)
+    ├── Perplexity backlog/  <- all raw Perplexity session notes (<DATE>_<NNN>_<slug>.md)
+    └── Perplexity decisions/<- decision drafts in transit before ADR validation
 ```
 
 > `_Private/` content is **NOT gitignored** - it is tracked in the local `main` branch and pushed to the private remote `OdinRag-private`, then excluded from the public `public` branch via `refresh_public_branch.py` (two-branch strategy). Local `git status` keeps personal paths quiet via `.git/info/exclude` (LOCAL only, never version-controlled). Only `/_Private/.config/` is doubly protected (also in the tracked `.gitignore`) because credentials must never reach history.
@@ -135,6 +140,20 @@ _Private/
 > See [`_Private/archives/README - archives.md`](../../_Private/archives/README%20-%20archives.md) for the convention (when to archive, naming, frontmatter annotations).
 >
 > For PUBLIC archives (old versions of public-facing docs that should stay visible to collaborators), use a `_Helpers/archives/` folder instead - to be created on first need.
+>
+> **ADR naming convention** (`_Private/docs/decisions/`): `YYYY-MM-DD_ADR-NNN_<slug>.md`. NNN is a global sequential counter (001, 002, ...). Source drafts transit through `_Private/raw/Perplexity decisions/` before being promoted to a stable ADR.
+
+## Perplexity workflow (raw -> ADR)
+
+Sessions Perplexity produce two kinds of outputs:
+
+| Output type | Destination | Naming |
+| --- | --- | --- |
+| Session notes, Q&A, syntheses | `_Private/raw/Perplexity backlog/` | `<DATE>_<NNN>_<slug>.md` |
+| Decision drafts (pending validation) | `_Private/raw/Perplexity decisions/` | `<DATE>_<NNN>_<slug>.md` |
+| Validated ADRs | `_Private/docs/decisions/` | `<DATE>_ADR-<NNN>_<slug>.md` |
+
+Perplexity uses GitHub MCP (read + write) to push directly into `OdinRAG-private/main`. No manual upload needed for repo-bound content.
 
 ## Where this file is referenced
 

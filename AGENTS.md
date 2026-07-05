@@ -27,7 +27,7 @@ The scraped content of paywalled or copyrighted sources is **never redistributed
 
 > Note: paywalled scraped content (`odin-knowledge-base/courses/`, `odin-knowledge-base/docs/karl_zylinski/odin-book/`) is **tracked** in the local `main` branch and pushed to the private remote `OdinRag-private`.
 > It is **absent from the public `public` branch** (and therefore from `github.com/LaurentOngaro/OdinRAG`).
-> The exclusion mechanism is the **two-branch strategy** (local `main` ↔ private remote / local `public` ↔ public remote), NOT `.gitignore`.
+> The exclusion mechanism is the **two-branch strategy** (local `main` <-> private remote / local `public` <-> public remote), NOT `.gitignore`.
 > Personal paths are excluded from local `git status` via `.git/info/exclude` (LOCAL only, never version-controlled).
 > Canonical reference: [`_Helpers/docs/007_mixing_public_and_private_history.md`](_Helpers/docs/007_mixing_public_and_private_history.md).
 
@@ -74,12 +74,12 @@ Chain of resolution per value: **env var > user_config.jsonc > empty string**.
 
 - **Default** (authored docs under `_Helpers/docs/` and `_Private/planning/`): filename is `NNN_snake_case_slug.md` (3-digit prefix, lowercase + underscores + hyphens). NNN restarts at 001 in each folder. Chronological by creation date.
 - **H1 title = filename exactly** (no leading `NNN_` in the H1 if the filename has one). Examples:
-  - `003_yaml_frontmatter_conventions.md` → H1 `# 003_yaml_frontmatter_conventions`
-  - `002_how_minimax_m3_is_used_in_this_repository.md` → H1 `# 002_how_minimax_m3_is_used_in_this_repository`
+  - `003_yaml_frontmatter_conventions.md` -> H1 `# 003_yaml_frontmatter_conventions`
+  - `002_how_minimax_m3_is_used_in_this_repository.md` -> H1 `# 002_how_minimax_m3_is_used_in_this_repository`
 - **FS-unsafe characters forbidden in both filename and H1**: `<`, `>`, `:`, `"`, `/`, `\`, `|`, `?`, `*`. If the natural title would need one, rephrase.
 - **READMEs in authored folders**: filename is `README - <topic>.md` where `<topic>` is the parent directory name. H1 matches the filename (per the rule above). Examples:
-  - `_Helpers/scripts/README - scripts.md` → H1 `# README - scripts`
-  - `_Helpers/docs/README - docs.md` → H1 `# README - docs`
+  - `_Helpers/scripts/README - scripts.md` -> H1 `# README - scripts`
+  - `_Helpers/docs/README - docs.md` -> H1 `# README - docs`
 - **NNN\_ prefix is NOT applied** to files in these folder patterns (they keep their natural name):
   - `**/templates/**` (template files keep their semantic name, e.g. `J_YYYY-MM-DD.md`, `main.odin`, `odin-project.md`)
   - `**/planning/**` (planning files use semantic names: `J_YYYY-MM-DD.md`, `NNN_odin_learning_plan_*.md`, `NNN_roadmap.md` - the `NNN_` is REQUIRED here as it's the only way to order them; daily files do NOT use `NNN_`)
@@ -88,15 +88,38 @@ Chain of resolution per value: **env var > user_config.jsonc > empty string**.
   - `**/social/**` (one-off social posts, no chronological order)
   - `**/daily/**` (dailies use `J_YYYY-MM-DD.md` - the `J_` prefix is the date tag)
   - `**/raw/**` (raw notes kept as-is, no frontmatter, no NNN\_)
+  - `**/decisions/**` (ADR files use `YYYY-MM-DD_ADR-NNN_<slug>.md` - see ADR section)
   - `code/**` (no NNN\_ - code files keep their original names)
   - `odin-knowledge-base/**` (no NNN\_ - scraped files keep their original slugs)
 - **Dailies live in `_Private/planning/daily/`** (tracked in `main` only, absent from `public`): their filename is purely personal and never reaches the public repo.
 - The full authoritative tree is in [`_Helpers/docs/001_folder_structure.md`](_Helpers/docs/001_folder_structure.md).
 
+### ADR (Architecture Decision Records)
+
+ADRs live in `_Private/docs/decisions/` (private, main-only).
+
+- Naming: `YYYY-MM-DD_ADR-NNN_<slug>.md` (NNN = global sequential counter, restarts nowhere)
+- Status values: `Proposee`, `Acceptee`, `Rejetee`, `Obsolete`
+- Minimal structure: Context / Decision / Consequences / References
+- Source drafts transit through `_Private/raw/Perplexity decisions/` before promotion
+- See `_Private/docs/decisions/README.md` for the full index
+
+### Perplexity workflow
+
+Perplexity AI (Space: Odin Assistant Projet jeu) uses GitHub MCP to read and write directly into `OdinRAG-private/main`.
+
+| Output type | Destination | Naming |
+| --- | --- | --- |
+| Session notes, Q&A, syntheses | `_Private/raw/Perplexity backlog/` | `<DATE>_<NNN>_<slug>.md` |
+| Decision drafts (pending validation) | `_Private/raw/Perplexity decisions/` | `<DATE>_<NNN>_<slug>.md` |
+| Validated ADRs | `_Private/docs/decisions/` | `<DATE>_ADR-<NNN>_<slug>.md` |
+
+Do NOT upload repo-bound content to the Perplexity Space if it is already accessible via MCP (see `ADR-001`).
+
 ### Markdown (knowledge base)
 
 - **Frontmatter** - see [`_Helpers/docs/003_yaml_frontmatter_conventions.md`](_Helpers/docs/003_yaml_frontmatter_conventions.md) for the full schema (5 main fields + hierarchical Obsidian tags).
-- Scraped Skool lessons have a scraping frontmatter (`Cours`, `Module`, `ID`, `Durée`) which can be extended with `topic/*` for classification.
+- Scraped Skool lessons have a scraping frontmatter (`Cours`, `Module`, `ID`, `Duree`) which can be extended with `topic/*` for classification.
 - **2-space** indentation inside `odin ...` blocks (no tabs, no smart tabs). Configured via `odinfmt.json` at repo root. Re-format procedure + flags: load the [`odin-format`](.kilo/skills/odin-format/SKILL.md) skill after any Odin edit.
 - **LF** newlines everywhere (even on Windows).
 - Inter-file links: relative `./module/lesson.md` or absolute from repo root.
@@ -132,7 +155,7 @@ Examples of durable scripts that already live in `_Helpers/`:
 
 - `build_kb_index.py` - regenerates `odin-knowledge-base/INDEX.md`
 - `format_odin_in_files.py` - reformats `.odin` and `odin ...` blocks
-- `book_html_to_md.py` - converts Karl's HTML book → per-chapter MD
+- `book_html_to_md.py` - converts Karl's HTML book -> per-chapter MD
 - `scrape_*.py` - re-scrape the KB
 
 These scripts must:
@@ -155,15 +178,15 @@ These rules apply to every tracked `.md` file in this repo unless the file is ex
 
 - **Never use em-dash (U+2014) or en-dash (U+2013).** Use plain ASCII hyphen-minus (`-`, U+002D). Reason: these characters are almost exclusively used by AI assistants in French/English prose, not by humans in their daily writing. Their presence in a tracked file is a strong signal of AI-generated content.
 - Same rule for smart quotes / ellipsis: ASCII `'` `"` `...` instead of curly variants. Mostly enforced automatically by `MD026` in `markdownlint`.
-- **Accented letters are NOT in scope** of this rule: French typography (é, è, ê, à, â, ç, ô, ù, û, î, ï, ë, ÿ) and other European diacritics are normal human text. Keep them as-is.
-- Box-drawing characters (─, │, ╭, ╮, ...) and arrow symbols (→, ⇒, ←) are OK for diagrams and table separators.
+- **Accented letters are NOT in scope** of this rule: French typography (e, e, e, a, a, c, o, u, u, i, i, e, y) and other European diacritics are normal human text. Keep them as-is.
+- Box-drawing characters and arrow symbols (-> , =>, <-) are OK for diagrams and table separators.
 - Full rationale + edge cases: load the [`markdown-style`](.kilo/skills/markdown-style/SKILL.md) skill before any `.md` edit.
 
 ### Markdown prose
 
 - **One paragraph = one physical line.** No line break inside a sentence, no matter the line length. Tables, code blocks, and frontmatter are exempt.
 - **Before** writing or editing any `.md` file, load the [`markdown-style`](.kilo/skills/markdown-style/SKILL.md) skill (pre/post checklists in one place).
-- **After** writing or editing any `.md` file, run `python _Helpers/scripts/fixes/reflow_md.py --quiet --check --path <file>` → exit `0` = clean. `--apply` is MANUAL recovery only (explicit user GO).
+- **After** writing or editing any `.md` file, run `python _Helpers/scripts/fixes/reflow_md.py --quiet --check --path <file>` -> exit `0` = clean. `--apply` is MANUAL recovery only (explicit user GO).
 - Detailed rule + examples: [`_Helpers/docs/004_markdown_style.md`](_Helpers/docs/004_markdown_style.md) (loaded on demand, not in first-context).
 
 ### Markdown structure: READMEs must reflect their directory
@@ -215,7 +238,7 @@ See [`.kilo/agents/odin-gamedev.md`](.kilo/agents/odin-gamedev.md) for the speci
 ## Anti-patterns
 
 - **Do NOT rename** KB folders without updating the generated indexes.
-- **Do NOT manually edit** files under `odin-knowledge-base/courses/*/` - they are auto-generated by `scrape_skool.py`. Editing them → overwritten on next scrape (unless `--force`).
+- **Do NOT manually edit** files under `odin-knowledge-base/courses/*/` - they are auto-generated by `scrape_skool.py`. Editing them -> overwritten on next scrape (unless `--force`).
 - **Do NOT touch** the following auto-generated KB subtrees:
   - `odin-knowledge-base/docs/"` (scraped from odin-lang.org)
   - README additions are OK
@@ -228,11 +251,13 @@ See [`.kilo/agents/odin-gamedev.md`](.kilo/agents/odin-gamedev.md) for the speci
 - **Exception**: trivial tasks explicitly framed as "commit and push this" may proceed without a second confirmation, but the summary must be shown before the action.
 - This rule exists to keep the user in control of every public mutation. The audit trail must remain their decision.
 
+> **Note for Perplexity AI (GitHub MCP)**: the rule above applies to Kilo Code / Claude Code agents working locally. Perplexity uses GitHub MCP (remote write) and commits directly on user explicit request ("ok fait le directement", "pousse", etc.). Each MCP commit must include a clear summary of what was pushed.
+
 ## Push to the public repo - checklist
 
 Before any push to `github.com/LaurentOngaro/OdinRAG`:
 
-1. `python _Helpers/scripts/diagnostic/audit_public_safety.py` → **must** exit 0.
+1. `python _Helpers/scripts/diagnostic/audit_public_safety.py` -> **must** exit 0.
 2. Verify `.git/info/exclude` contains the local-only paywall patterns (`/odin-knowledge-base/courses/`, `/odin-knowledge-base/docs/karl_zylinski/odin-book/`, etc.) so personal content stays untracked locally. The tracked `.gitignore` itself only carries secrets + build/IDE ignores.
 3. Verify no `_Private/planning/daily/` or `_Private/raw/` files are staged.
 
@@ -240,10 +265,10 @@ The full pre-push procedure (refresh branch, audit, push, post-push verification
 
 ## Alternate indexes (Kilo + RAG)
 
-This project does not use RAGnarök yet. KB search currently goes through:
+This project does not use RAGnarok yet. KB search currently goes through:
 
 1. Kilo's global context (workspace = all tracked files of the repo).
 2. Frontmatter semantic filtering (`Cours:`, `Module:`, `ID:`).
 3. Kilo slash commands (see `kilo.json`).
 
-If the workspace exceeds ~5000 files or latency becomes a problem, switch to RAGnarök or a dedicated vector index.
+If the workspace exceeds ~5000 files or latency becomes a problem, switch to RAGnarok or a dedicated vector index.
