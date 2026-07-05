@@ -1,6 +1,6 @@
 ---
 title: "OdinKB - Semantic index"
-date: 2026-07-03
+date: 2026-07-05
 tags: [OdinRAG, kb, doc/index, reference]
 type: reference
 status: active
@@ -17,15 +17,16 @@ summary: "Compact index (~5 KB) to navigate the ~180 files of the Odin KB withou
 
 ## Overview (by source)
 
-| Source | Files | Format | Why |
-| ------ | ----- | ------ | --- |
-| `odin-knowledge-base/` | 118 | Skool 'programvideogames' lessons (Markdown with frontmatter) | Concrete implementation, complete code, game patterns |
-| `odin-knowledge-base/docs/karl_zylinski/odin-book/` | 34 | Karl's book **'Understanding the Odin Programming Language'** split into 1 file per chapter | Language reference, pure concept, minimal example |
-| `odin-knowledge-base/docs/karl_zylinski/*.md` | 20 | Karl Zylinski blog articles | Game dev patterns, opinions, hot take |
-| `odin-knowledge-base/docs/official/` | 12 | Official odin-lang.org docs + awesome-odin | Official language reference |
-| `code/examples/demo.odin` | 1 | Official language demo | Exhaustive feature reference |
+| Source                                              | Files | Format                                                                                      | Why                                                   |
+| --------------------------------------------------- | ----- | ------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| `odin-knowledge-base/`                              | 120   | Skool 'programvideogames' lessons (Markdown with frontmatter)                               | Concrete implementation, complete code, game patterns |
+| `odin-knowledge-base/docs/karl_zylinski/odin-book/` | 34    | Karl's book **'Understanding the Odin Programming Language'** split into 1 file per chapter | Language reference, pure concept, minimal example     |
+| `odin-knowledge-base/docs/karl_zylinski/*.md`       | 20    | Karl Zylinski blog articles                                                                 | Game dev patterns, opinions, hot take                 |
+| `odin-knowledge-base/docs/official/`                | 33    | Official odin-lang.org docs + awesome-odin                                                  | Official language reference                           |
+| `odin-knowledge-base/gitIngest/`                    | 21    | gitingest snapshots of local Odin repo clones (karl_zylinski, falconerd, odin-lang)         | Fallback context layer when MCP GitHub is unavailable |
+| `code/examples/demo.odin`                           | 1     | Official language demo                                                                      | Exhaustive feature reference                          |
 
-**Total**: ~185 files, ~2 MB of MD.
+**Total**: ~229 files, ~8 MB of MD.
 
 ## Skool courses (programvideogames)
 
@@ -42,44 +43,44 @@ See the detail in [`courses/programvideogames/README.md`](courses/programvideoga
 
 **Absolute** reference for the Odin language. For any fundamental question, start here.
 
-| # | Chapter | Topic |
-| - | ------- | ----- |
-| 1 | [Introduction](odin-knowledge-base/docs/karl_zylinski/odin-book/01-introduction.md) | |
-| 2 | [Hellope! A tiny program](odin-knowledge-base/docs/karl_zylinski/odin-book/02-hellope-a-tiny-program.md) | |
-| 3 | [Variables and constants](odin-knowledge-base/docs/karl_zylinski/odin-book/03-variables-and-constants.md) | |
-| 4 | [Some additional basics](odin-knowledge-base/docs/karl_zylinski/odin-book/04-some-additional-basics.md) | |
-| 5 | [Making new types](odin-knowledge-base/docs/karl_zylinski/odin-book/05-making-new-types.md) | |
-| 6 | [Pointers](odin-knowledge-base/docs/karl_zylinski/odin-book/06-pointers.md) | |
-| 7 | [Procedures and scopes](odin-knowledge-base/docs/karl_zylinski/odin-book/07-procedures-and-scopes.md) | |
-| 8 | [Fixed-memory containers](odin-knowledge-base/docs/karl_zylinski/odin-book/08-fixed-memory-containers.md) | |
-| 9 | [Introduction to manual memory management](odin-knowledge-base/docs/karl_zylinski/odin-book/09-introduction-to-manual-memory-management.md) | |
-| 10 | [More container types](odin-knowledge-base/docs/karl_zylinski/odin-book/10-more-container-types.md) | |
-| 11 | [Strings](odin-knowledge-base/docs/karl_zylinski/odin-book/11-strings.md) | |
-| 12 | [Implicit context](odin-knowledge-base/docs/karl_zylinski/odin-book/12-implicit-context.md) | |
-| 13 | [Making manual memory management easier](odin-knowledge-base/docs/karl_zylinski/odin-book/13-making-manual-memory-management-easier.md) | |
-| 14 | [Parametric polymorphism: Writing generic code](odin-knowledge-base/docs/karl_zylinski/odin-book/14-parametric-polymorphism-writing-generic-code.md) | |
-| 15 | [Bit-related types](odin-knowledge-base/docs/karl_zylinski/odin-book/15-bit-related-types.md) | |
-| 16 | [Error handling](odin-knowledge-base/docs/karl_zylinski/odin-book/16-error-handling.md) | |
-| 17 | [Package system and code organization](odin-knowledge-base/docs/karl_zylinski/odin-book/17-package-system-and-code-organization.md) | |
-| 18 | [You (probably) don't need a build system](odin-knowledge-base/docs/karl_zylinski/odin-book/18-you-probably-dont-need-a-build-system.md) | |
-| 19 | [Reflection and Run-Time Type Information (RTTI)](odin-knowledge-base/docs/karl_zylinski/odin-book/19-reflection-and-run-time-type-information-rtti.md) | |
-| 20 | [Data-oriented design](odin-knowledge-base/docs/karl_zylinski/odin-book/20-data-oriented-design.md) | |
-| 21 | [Making C library bindings (Foreign Function Interface)](odin-knowledge-base/docs/karl_zylinski/odin-book/21-making-c-library-bindings-foreign-function-interface.md) | |
-| 22 | [Debuggers](odin-knowledge-base/docs/karl_zylinski/odin-book/22-debuggers.md) | |
-| 23 | [Odin features you should avoid](odin-knowledge-base/docs/karl_zylinski/odin-book/23-odin-features-you-should-avoid.md) | |
-| 24 | [A tour of the core collection](odin-knowledge-base/docs/karl_zylinski/odin-book/24-a-tour-of-the-core-collection.md) | |
-| 25 | [Libraries for creating video games](odin-knowledge-base/docs/karl_zylinski/odin-book/25-libraries-for-creating-video-games.md) | |
-| 26 | [A few more things...](odin-knowledge-base/docs/karl_zylinski/odin-book/26-a-few-more-things.md) | |
-| 27 | [Where to find more Odin resources](odin-knowledge-base/docs/karl_zylinski/odin-book/27-where-to-find-more-odin-resources.md) | |
-| 28 | [Thanks for reading!](odin-knowledge-base/docs/karl_zylinski/odin-book/28-thanks-for-reading.md) | |
-| A-D | Appendices (4 files in `odin-book/appendices/`) | Handle-based array, fixed arrays only, dropdown, Box2D+Raylib |
+| #   | Chapter                                                                                                                                                               | Topic                                                         |
+| --- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| 1   | [Introduction](odin-knowledge-base/docs/karl_zylinski/odin-book/01-introduction.md)                                                                                   |                                                               |
+| 2   | [Hellope! A tiny program](odin-knowledge-base/docs/karl_zylinski/odin-book/02-hellope-a-tiny-program.md)                                                              |                                                               |
+| 3   | [Variables and constants](odin-knowledge-base/docs/karl_zylinski/odin-book/03-variables-and-constants.md)                                                             |                                                               |
+| 4   | [Some additional basics](odin-knowledge-base/docs/karl_zylinski/odin-book/04-some-additional-basics.md)                                                               |                                                               |
+| 5   | [Making new types](odin-knowledge-base/docs/karl_zylinski/odin-book/05-making-new-types.md)                                                                           |                                                               |
+| 6   | [Pointers](odin-knowledge-base/docs/karl_zylinski/odin-book/06-pointers.md)                                                                                           |                                                               |
+| 7   | [Procedures and scopes](odin-knowledge-base/docs/karl_zylinski/odin-book/07-procedures-and-scopes.md)                                                                 |                                                               |
+| 8   | [Fixed-memory containers](odin-knowledge-base/docs/karl_zylinski/odin-book/08-fixed-memory-containers.md)                                                             |                                                               |
+| 9   | [Introduction to manual memory management](odin-knowledge-base/docs/karl_zylinski/odin-book/09-introduction-to-manual-memory-management.md)                           |                                                               |
+| 10  | [More container types](odin-knowledge-base/docs/karl_zylinski/odin-book/10-more-container-types.md)                                                                   |                                                               |
+| 11  | [Strings](odin-knowledge-base/docs/karl_zylinski/odin-book/11-strings.md)                                                                                             |                                                               |
+| 12  | [Implicit context](odin-knowledge-base/docs/karl_zylinski/odin-book/12-implicit-context.md)                                                                           |                                                               |
+| 13  | [Making manual memory management easier](odin-knowledge-base/docs/karl_zylinski/odin-book/13-making-manual-memory-management-easier.md)                               |                                                               |
+| 14  | [Parametric polymorphism: Writing generic code](odin-knowledge-base/docs/karl_zylinski/odin-book/14-parametric-polymorphism-writing-generic-code.md)                  |                                                               |
+| 15  | [Bit-related types](odin-knowledge-base/docs/karl_zylinski/odin-book/15-bit-related-types.md)                                                                         |                                                               |
+| 16  | [Error handling](odin-knowledge-base/docs/karl_zylinski/odin-book/16-error-handling.md)                                                                               |                                                               |
+| 17  | [Package system and code organization](odin-knowledge-base/docs/karl_zylinski/odin-book/17-package-system-and-code-organization.md)                                   |                                                               |
+| 18  | [You (probably) don't need a build system](odin-knowledge-base/docs/karl_zylinski/odin-book/18-you-probably-dont-need-a-build-system.md)                              |                                                               |
+| 19  | [Reflection and Run-Time Type Information (RTTI)](odin-knowledge-base/docs/karl_zylinski/odin-book/19-reflection-and-run-time-type-information-rtti.md)               |                                                               |
+| 20  | [Data-oriented design](odin-knowledge-base/docs/karl_zylinski/odin-book/20-data-oriented-design.md)                                                                   |                                                               |
+| 21  | [Making C library bindings (Foreign Function Interface)](odin-knowledge-base/docs/karl_zylinski/odin-book/21-making-c-library-bindings-foreign-function-interface.md) |                                                               |
+| 22  | [Debuggers](odin-knowledge-base/docs/karl_zylinski/odin-book/22-debuggers.md)                                                                                         |                                                               |
+| 23  | [Odin features you should avoid](odin-knowledge-base/docs/karl_zylinski/odin-book/23-odin-features-you-should-avoid.md)                                               |                                                               |
+| 24  | [A tour of the core collection](odin-knowledge-base/docs/karl_zylinski/odin-book/24-a-tour-of-the-core-collection.md)                                                 |                                                               |
+| 25  | [Libraries for creating video games](odin-knowledge-base/docs/karl_zylinski/odin-book/25-libraries-for-creating-video-games.md)                                       |                                                               |
+| 26  | [A few more things...](odin-knowledge-base/docs/karl_zylinski/odin-book/26-a-few-more-things.md)                                                                      |                                                               |
+| 27  | [Where to find more Odin resources](odin-knowledge-base/docs/karl_zylinski/odin-book/27-where-to-find-more-odin-resources.md)                                         |                                                               |
+| 28  | [Thanks for reading!](odin-knowledge-base/docs/karl_zylinski/odin-book/28-thanks-for-reading.md)                                                                      |                                                               |
+| A-D | Appendices (4 files in `odin-book/appendices/`)                                                                                                                       | Handle-based array, fixed arrays only, dropdown, Box2D+Raylib |
 
 ## Statistics
 
-- **118** Skool lessons (Vertical Slice and Dice v1.0 + Metroidvania 1.0)
+- **120** Skool lessons (Vertical Slice and Dice v1.0 + Metroidvania 1.0)
 - **34** Karl book files (28 chapters + 4 appendices + about-author)
 - **20** Zylinski articles
-- **12** official odin-lang.org docs
+- **33** official odin-lang.org docs
 - **1** official demo (`code/examples/demo.odin`)
 
 ## Skill to navigate

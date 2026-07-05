@@ -52,6 +52,7 @@ KB_PATHS = {
     "karl":    ROOT / "odin-knowledge-base" / "docs" / "karl_zylinski",
     "zylinski":ROOT / "odin-knowledge-base" / "docs" / "karl_zylinski",
     "official":ROOT / "odin-knowledge-base" / "docs" / "official",
+    "gitIngest":ROOT / "odin-knowledge-base" / "gitIngest",
     "examples":ROOT / "code" / "examples",
 }
 INDEX_PATH = ROOT / "odin-knowledge-base" / "INDEX.md"
@@ -77,6 +78,27 @@ def count_md_files(root: Path) -> tuple[int, int]:
                 total += p.stat().st_size
             except OSError:
                 pass
+    return count, total
+
+
+def count_snapshot_files(root: Path) -> tuple[int, int]:
+    """Count .txt snapshots + .md README under `root`.
+
+    Used for `gitIngest/` which stores gitingest output as .txt files
+    (not .md). Returns (count, total size in bytes) summed across both.
+    """
+    if not root.exists():
+        return 0, 0
+    count = 0
+    total = 0
+    for ext in ("*.md", "*.txt"):
+        for p in root.rglob(ext):
+            if p.is_file():
+                count += 1
+                try:
+                    total += p.stat().st_size
+                except OSError:
+                    pass
     return count, total
 
 
@@ -141,6 +163,7 @@ def build_source_overview() -> str:
     zyl_count -= karl_count
     zyl_size   -= karl_size
     off_count, off_size     = count_md_files(KB_PATHS["official"])
+    gi_count,  gi_size      = count_snapshot_files(KB_PATHS["gitIngest"])
     ex_count,  ex_size      = count_md_files(KB_PATHS["examples"])
 
     def fmt_size(n: int) -> str:
@@ -159,9 +182,10 @@ def build_source_overview() -> str:
         f"| `odin-knowledge-base/docs/karl_zylinski/odin-book/` | {karl_count} | Karl's book **'Understanding the Odin Programming Language'** split into 1 file per chapter | Language reference, pure concept, minimal example |",
         f"| `odin-knowledge-base/docs/karl_zylinski/*.md` | {zyl_count} | Karl Zylinski blog articles | Game dev patterns, opinions, hot take |",
         f"| `odin-knowledge-base/docs/official/` | {off_count} | Official odin-lang.org docs + awesome-odin | Official language reference |",
+        f"| `odin-knowledge-base/gitIngest/` | {gi_count} | gitingest snapshots of local Odin repo clones (karl_zylinski, falconerd, odin-lang) | Fallback context layer when MCP GitHub is unavailable |",
         "| `code/examples/demo.odin` | 1 | Official language demo | Exhaustive feature reference |",
         "",
-        f"**Total**: ~{skool_count + karl_count + zyl_count + off_count + 1} files, ~{fmt_size(skool_size + karl_size + zyl_size + off_size)} of MD.",
+        f"**Total**: ~{skool_count + karl_count + zyl_count + off_count + gi_count + 1} files, ~{fmt_size(skool_size + karl_size + zyl_size + off_size + gi_size)} of MD.",
         "",
     ]
     return "\n".join(lines)
