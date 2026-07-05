@@ -49,7 +49,9 @@ python _Helpers/scripts/fixes/reflow_md.py --quiet --check --path <file>
 # exit 0 = clean, exit 1 = reflow needed (paths printed one per line)
 ```
 
-### 2. ASCII punctuation only
+### 2. No AI-typical punctuation
+
+Em-dash, en-dash, curly quotes, and ellipsis are almost exclusively used by AI assistants in prose, not by humans in their daily writing. Their presence in a tracked file is a strong signal of AI-generated content. Replace them with their ASCII equivalents:
 
 | Wrong                         | Right | Notes                    |
 | ----------------------------- | ----- | ------------------------ |
@@ -58,6 +60,9 @@ python _Helpers/scripts/fixes/reflow_md.py --quiet --check --path <file>
 | `'` `'` (curly quotes)        | `'`   | U+2019 / U+2018 → U+0027 |
 | `"` `"` (curly double quotes) | `"`   | U+201C / U+201D → U+0022 |
 | `…` (ellipsis)                | `...` | U+2026 → three dots      |
+
+**Accented letters are NOT in scope of this rule**: French typography (é, è, ê, à, â, ç, ô, ù, û, î, ï, ë, ÿ) and other European diacritics are normal human text. Keep them as-is.
+Box-drawing characters (─, │, ╭, ╮, ...) and arrow symbols (→, ⇒, ←) are OK for diagrams and table separators.
 
 ### 3. English only for PUBLIC docs (`AGENTS.md`)
 
