@@ -1,6 +1,6 @@
 ---
 name: scraper-runner
-description: "Run a scraper (_Helpers/scripts/scrappers/scrape_*.py) with the right flags. Covers scrape_skool (Skool programvideogames), scrape_official (odin-lang.org), scrape_zylinski (zylinski.se), scrape_gingerbill.py, scrape_newsletters.py, scrape_jakubtomsu.py, scrape_showcase.py, download_gists.py, download_odin_examples.py. All re-entrant."
+description: "Run a scraper (_Helpers/scripts/scrapers/scrape_*.py) with the right flags. Covers scrape_skool (Skool programvideogames), scrape_official (odin-lang.org), scrape_zylinski (zylinski.se), scrape_gingerbill.py, scrape_newsletters.py, scrape_jakubtomsu.py, scrape_showcase.py, download_gists.py, download_odin_examples.py. All re-entrant."
 ---
 
 # Run a scraper
@@ -30,9 +30,9 @@ All scrapers are **re-entrant**: an already exported file is skipped unless `--f
 ### Re-scrape a source (idempotent skip)
 
 ```bash
-python _Helpers/scripts/scrappers/scrape_official.py
-python _Helpers/scripts/scrappers/scrape_zylinski.py
-python _Helpers/scripts/scrappers/scrape_skool.py
+python _Helpers/scripts/scrapers/scrape_official.py
+python _Helpers/scripts/scrapers/scrape_zylinski.py
+python _Helpers/scripts/scrapers/scrape_skool.py
 ```
 
 -> Skip already-present files, only write new ones.
@@ -40,9 +40,9 @@ python _Helpers/scripts/scrappers/scrape_skool.py
 ### Force a full rewrite
 
 ```bash
-python _Helpers/scripts/scrappers/scrape_official.py --force
-python _Helpers/scripts/scrappers/scrape_zylinski.py --force
-python _Helpers/scripts/scrappers/scrape_skool.py --overwrite-existing-lessons
+python _Helpers/scripts/scrapers/scrape_official.py --force
+python _Helpers/scripts/scrapers/scrape_zylinski.py --force
+python _Helpers/scripts/scrapers/scrape_skool.py --overwrite-existing-lessons
 ```
 
 -> Rewrite ALL files (useful after a KB refactor or an HTML format change on the source side).
@@ -51,21 +51,21 @@ python _Helpers/scripts/scrappers/scrape_skool.py --overwrite-existing-lessons
 
 ```bash
 # A single lesson (fuzzy title filter)
-python _Helpers/scripts/scrappers/scrape_skool.py --lesson "entities state physics"
+python _Helpers/scripts/scrapers/scrape_skool.py --lesson "entities state physics"
 
 # Resume after an interruption (skip the first 50)
-python _Helpers/scripts/scrappers/scrape_skool.py --skip-until 50
+python _Helpers/scripts/scrapers/scrape_skool.py --skip-until 50
 
 # Also download YouTube videos
-python _Helpers/scripts/scrappers/scrape_skool.py --download-video
+python _Helpers/scripts/scrapers/scrape_skool.py --download-video
 
 # Also download the ZIPs attached to lessons
-python _Helpers/scripts/scrappers/scrape_skool.py --download-support-files
+python _Helpers/scripts/scrapers/scrape_skool.py --download-support-files
 
 # With explicit credentials (otherwise interactive prompt)
 export SKOOL_EMAIL="your@email.com"
 export SKOOL_PASSWORD="yourpassword"
-python _Helpers/scripts/scrappers/scrape_skool.py
+python _Helpers/scripts/scrapers/scrape_skool.py
 ```
 
 Exit codes:
@@ -97,10 +97,10 @@ Exit codes:
 ### Changelog scrapers (Odin / Raylib)
 
 ```bash
-python _Helpers/scripts/scrappers/scrape_odin_changelog.py            # last 20 releases
-python _Helpers/scripts/scrappers/scrape_odin_changelog.py --limit 50 # last 50
-python _Helpers/scripts/scrappers/scrape_raylib_changelog.py          # last 10 releases
-python _Helpers/scripts/scrappers/scrape_raylib_changelog.py --check  # dry-run
+python _Helpers/scripts/scrapers/scrape_odin_changelog.py            # last 20 releases
+python _Helpers/scripts/scrapers/scrape_odin_changelog.py --limit 50 # last 50
+python _Helpers/scripts/scrapers/scrape_raylib_changelog.py          # last 10 releases
+python _Helpers/scripts/scrapers/scrape_raylib_changelog.py --check  # dry-run
 ```
 
 Both are idempotent (release file already present + matching `tag:` in frontmatter = skip). Optional env var `GITHUB_TOKEN` raises the GitHub rate limit from 60 to 5000 requests/hour.

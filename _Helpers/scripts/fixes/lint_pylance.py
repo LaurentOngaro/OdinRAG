@@ -5,7 +5,7 @@ Wraps the `pyright` CLI (the open-source engine behind VSCode Pylance) into a du
 
 Usage:
     python _Helpers/scripts/fixes/lint_pylance.py                          # whole repo
-    python _Helpers/scripts/fixes/lint_pylance.py _Helpers/scripts/scrappers/scrape_skool.py # single file
+    python _Helpers/scripts/fixes/lint_pylance.py _Helpers/scripts/scrapers/scrape_skool.py # single file
     python _Helpers/scripts/fixes/lint_pylance.py _Helpers/                # one folder
     python _Helpers/scripts/fixes/lint_pylance.py --check                  # dry-run, exit 0
     python _Helpers/scripts/fixes/lint_pylance.py --strict                 # warnings count

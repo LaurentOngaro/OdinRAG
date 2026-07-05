@@ -12,7 +12,7 @@ Public RAG-management bucket. Two subtrees:
 
 ## Conventions
 
-- Scripts in `scripts/` are grouped by purpose (`diagnostic/`, `fixes/`, `indexing/`, `scrappers/`, `lib/`).
+- Scripts in `scripts/` are grouped by purpose (`diagnostic/`, `fixes/`, `indexing/`, `scrapers/`, `lib/`).
 - `scripts/lib/` is the shared library imported by other scripts as `_Helpers.scripts.lib.*`.
 - Documentation in `docs/` follows the `NNN_snake_case.md` filename convention.
 

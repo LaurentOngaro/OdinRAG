@@ -30,7 +30,7 @@ Sharing it here since the MiniMax-M3 showcase round 2 is live and this is 100% M
 ## How MiniMax-M3 is actually used (not just chat)
 
 1. **Subagent delegation** - M3 picks up "what pattern for arena allocators in Odin?" → routes to `odin-gamedev` subagent → returns citations like `odin-knowledge-base/docs/karl_zylinski/temporary-allocator-your-first-arena.md:42`.
-2. **Re-entrant scrapers** - I asked M3 to write `_Helpers/scripts/scrappers/scrape_skool.py` with `--check`, dry-run, idempotency, structured logging. Re-running = no-op if files exist.
+2. **Re-entrant scrapers** - I asked M3 to write `_Helpers/scripts/scrapers/scrape_skool.py` with `--check`, dry-run, idempotency, structured logging. Re-running = no-op if files exist.
 3. **Skill authoring** - M3 authored the 6 skills above (SKILL.md + workflow) following progressive disclosure.
 4. **Frontmatter discipline** - every lesson has `topic/*` tags so semantic search works in Obsidian too.
 5. **Format gate** - after each scrape, `format_odin_in_files.py` is run to keep ```odin ...``` blocks consistent (no tabs, 2 spaces, LF).

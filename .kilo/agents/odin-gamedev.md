@@ -32,12 +32,12 @@ The orchestrator (main `code` agent) delegates questions that match these criter
 | Dynamic arrays/arena | `odin-knowledge-base/docs/karl_zylinski/dynamic-arrays-and-arenas.md`                                                                                                                                                                |
 | DOD                  | `odin-knowledge-base/docs/karl_zylinski/odin-dod-benchmarks.md`; `odin-knowledge-base/docs/karl_zylinski/data-oriented-ideas-for-small-gamedev-teams.md`                                                                             |
 | c-bindgen            | `odin-knowledge-base/docs/karl_zylinski/generate-odin-bindings-for-c-libraries.md`                                                                                                                                                   |
-| Raylib               | `code/vendored templates/` (to clone), `odin-knowledge-base/.../introduction/001-introduction-to-odin-and-raylib.md` (when indexed)                                                                                                           |
+| Raylib               | `code/vendored templates/` (to clone), `odin-knowledge-base/.../introduction/001-introduction-to-odin-and-raylib.md` (when indexed)                                                                                                  |
 | WASM                 | `odin-knowledge-base/docs/karl_zylinski/odin-sokol-web.md`                                                                                                                                                                           |
 | Allocator tracking   | `odin-knowledge-base/.../rpg/088-26-tracking-allocator.md` (when indexed)                                                                                                                                                            |
 | Battle resolution    | `odin-knowledge-base/.../rpg/093-31-party-system-battle-resolution.md` (when indexed)                                                                                                                                                |
 
-> File paths marked "when indexed" only exist after you have run `_Helpers/scripts/scrappers/scrape_skool.py` with your own paid Skool membership. Until then, only `odin-knowledge-base/docs/official/` and `odin-knowledge-base/docs/karl_zylinski/` are populated.
+> File paths marked "when indexed" only exist after you have run `_Helpers/scripts/scrapers/scrape_skool.py` with your own paid Skool membership. Until then, only `odin-knowledge-base/docs/official/` and `odin-knowledge-base/docs/karl_zylinski/` are populated.
 
 ## Response workflow
 

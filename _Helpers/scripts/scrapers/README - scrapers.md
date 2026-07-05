@@ -1,4 +1,4 @@
-# README - scrappers
+# README - scrapers
 
 ## Contents
 

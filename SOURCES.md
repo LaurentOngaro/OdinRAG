@@ -13,7 +13,7 @@ To keep this repo small and the licensing clear, the **public branch** of this r
 
 The exclusion mechanism for the last category is the **two-branch strategy** (local `main` ↔ private remote / local `public` ↔ public remote), NOT `.gitignore`. See [`_Helpers/docs/007_mixing_public_and_private_history.md`](../_Helpers/docs/007_mixing_public_and_private_history.md).
 
-To populate the full corpus of any sample source, run the corresponding scraper (`python _Helpers/scripts/scrappers/scrape_<source>.py`). All scrapers are idempotent.
+To populate the full corpus of any sample source, run the corresponding scraper (`python _Helpers/scripts/scrapers/scrape_<source>.py`). All scrapers are idempotent.
 
 ## 1. Odin official documentation
 
@@ -24,7 +24,7 @@ To populate the full corpus of any sample source, run the corresponding scraper 
 
 **What ships in this repo**: every scraped official page, in `odin-knowledge-base/docs/official/`.
 
-**Scraper**: `_Helpers/scripts/scrappers/scrape_official.py` (sitemap + crawl + static fallback).
+**Scraper**: `_Helpers/scripts/scrapers/scrape_official.py` (sitemap + crawl + static fallback).
 
 ## 2. Karl Zylinski blog (`zylinski.se`)
 
@@ -32,9 +32,9 @@ To populate the full corpus of any sample source, run the corresponding scraper 
 | -------------------------------------- | -------------------------------------------------------- | ------------------------------------ |
 | Individual blog posts on `zylinski.se` | © Karl Zylinski, all rights reserved (publicly readable) | Free to read: <https://zylinski.se/> |
 
-**What ships in this repo**: 5 sample articles in `odin-knowledge-base/docs/karl_zylinski/` (representative selection covering hot-reload, allocators, gamedev, c-bindgen, DOD). Run `python _Helpers/scripts/scrappers/scrape_zylinski.py` to populate the full corpus (19 posts).
+**What ships in this repo**: 5 sample articles in `odin-knowledge-base/docs/karl_zylinski/` (representative selection covering hot-reload, allocators, gamedev, c-bindgen, DOD). Run `python _Helpers/scripts/scrapers/scrape_zylinski.py` to populate the full corpus (19 posts).
 
-**Scraper**: `_Helpers/scripts/scrappers/scrape_zylinski.py` (RSS auto-discovery + sitemap + crawl).
+**Scraper**: `_Helpers/scripts/scrapers/scrape_zylinski.py` (RSS auto-discovery + sitemap + crawl).
 
 ## 3. "Understanding the Odin Programming Language" (Karl Zylinski, ebook)
 
@@ -68,7 +68,7 @@ The exclusion is done via the two-branch strategy, not `.gitignore`. Local `git 
 
 **What ships in this repo**: 32 scraped newsletters in `odin-knowledge-base/docs/newsletters/` (all issues).
 
-**Scraper**: `_Helpers/scripts/scrappers/scrape_newsletters.py` (crawl).
+**Scraper**: `_Helpers/scripts/scrapers/scrape_newsletters.py` (crawl).
 
 ## 5. Ginger Bill's blog (gingerbill.org)
 
@@ -76,9 +76,9 @@ The exclusion is done via the two-branch strategy, not `.gitignore`. Local `git 
 | ------------------------------------- | ------------------------------------------------------ | --------------------------------------------------- |
 | Articles on `gingerbill.org/article/` | © Ginger Bill, all rights reserved (publicly readable) | Free to read: <https://www.gingerbill.org/article/> |
 
-**What ships in this repo**: 5 sample articles in `odin-knowledge-base/docs/gingerbill/` (representative selection covering C/Zig comparisons, allocators, Odin philosophy, relative-pointers). Run `python _Helpers/scripts/scrappers/scrape_gingerbill.py` to populate the full corpus (44 posts).
+**What ships in this repo**: 5 sample articles in `odin-knowledge-base/docs/gingerbill/` (representative selection covering C/Zig comparisons, allocators, Odin philosophy, relative-pointers). Run `python _Helpers/scripts/scrapers/scrape_gingerbill.py` to populate the full corpus (44 posts).
 
-**Scraper**: `_Helpers/scripts/scrappers/scrape_gingerbill.py` (RSS).
+**Scraper**: `_Helpers/scripts/scrapers/scrape_gingerbill.py` (RSS).
 
 ## 6. Jakub Tomsu's blog (jakubtomsu.github.io)
 
@@ -86,9 +86,9 @@ The exclusion is done via the two-branch strategy, not `.gitignore`. Local `git 
 | ----------------------------------------- | --------------------------------- | --------------------------------------------- |
 | Articles on `jakubtomsu.github.io/posts/` | © Jakub Tomsu (publicly readable) | Free to read: <https://jakubtomsu.github.io/> |
 
-**What ships in this repo**: 4 sample articles in `odin-knowledge-base/docs/jakubtomsu/` (representative selection covering bit-pools, game loop, renderer, validation). Run `python _Helpers/scripts/scrappers/scrape_jakubtomsu.py` to populate the full corpus (11 posts).
+**What ships in this repo**: 4 sample articles in `odin-knowledge-base/docs/jakubtomsu/` (representative selection covering bit-pools, game loop, renderer, validation). Run `python _Helpers/scripts/scrapers/scrape_jakubtomsu.py` to populate the full corpus (11 posts).
 
-**Scraper**: `_Helpers/scripts/scrappers/scrape_jakubtomsu.py` (RSS).
+**Scraper**: `_Helpers/scripts/scrapers/scrape_jakubtomsu.py` (RSS).
 
 ## 7. Odin Showcase
 
@@ -98,7 +98,7 @@ The exclusion is done via the two-branch strategy, not `.gitignore`. Local `git 
 
 **What ships in this repo**: 7 scraped showcase pages in `odin-knowledge-base/docs/showcase/` (all pages).
 
-**Scraper**: `_Helpers/scripts/scrappers/scrape_showcase.py` (crawl).
+**Scraper**: `_Helpers/scripts/scrapers/scrape_showcase.py` (crawl).
 
 ## 8. Skool "programvideogames" group (Vertical Slice and Dice + Metroidvania courses)
 
@@ -110,14 +110,14 @@ The exclusion is done via the two-branch strategy, not `.gitignore`. Local `git 
 > The repository ships **only the scraper**, not the lessons. Personal use (indexing for yourself, querying through your own LLM) is generally tolerated;
 > **do not redistribute the scraped output publicly**.
 
-**What ships in this repo**: the scraper `_Helpers/scripts/scrappers/scrape_skool.py`. Lesson metadata (slug, duration, module) is also written locally only.
+**What ships in this repo**: the scraper `_Helpers/scripts/scrapers/scrape_skool.py`. Lesson metadata (slug, duration, module) is also written locally only.
 
 **Prerequisites** (see AGENTS.md for full setup):
 
 - `npm install -g skool-cli`
 - `npx playwright install chromium`
 - Authenticate with your paid Skool account in the browser session
-- Run `python _Helpers/scripts/scrappers/scrape_skool.py`
+- Run `python _Helpers/scripts/scrapers/scrape_skool.py`
 
 ## 9. Odin & Raylib changelogs (GitHub Releases API)
 
@@ -133,8 +133,8 @@ The exclusion is done via the two-branch strategy, not `.gitignore`. Local `git 
 
 **Scrapers**:
 
-- `_Helpers/scripts/scrappers/scrape_odin_changelog.py`
-- `_Helpers/scripts/scrappers/scrape_raylib_changelog.py`
+- `_Helpers/scripts/scrapers/scrape_odin_changelog.py`
+- `_Helpers/scripts/scrapers/scrape_raylib_changelog.py`
 
 Both are idempotent (frontmatter `tag:` check), support `--check` dry-run and an optional `GITHUB_TOKEN` env var for the 5000 req/hour rate limit.
 
@@ -158,13 +158,13 @@ Both are idempotent (frontmatter `tag:` check), support `--check` dry-run and an
 
 ## 11. Code references (always-public)
 
-| Source                                          | Licence               | How to obtain                                                                                                  |
-| ----------------------------------------------- | --------------------- | -------------------------------------------------------------------------------------------------------------- |
-| Official Odin examples (10 .odin files)         | Odin core (MIT-style) | Bundled in Odin releases, also at <https://github.com/odin-lang/Odin/tree/master/examples/demo>                |
-| `code/examples/*` (ships: `demo.odin` + README) | Odin core (MIT-style) | Scraper: `_Helpers/scripts/scrappers/download_odin_examples.py` pulls them locally (tracked: `demo.odin` only) |
-| 25 public gists from awesome-odin               | Public, MIT-style     | Scraper: `_Helpers/scripts/scrappers/download_gists.py`                                                        |
-| `code/gists/*`                                  | Public, MIT-style     | See file headers for attribution                                                                               |
-| `code/vendored templates/*`                     | MIT (this repo)       | Bundled in this repo                                                                                           |
+| Source                                          | Licence               | How to obtain                                                                                                 |
+| ----------------------------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------- |
+| Official Odin examples (10 .odin files)         | Odin core (MIT-style) | Bundled in Odin releases, also at <https://github.com/odin-lang/Odin/tree/master/examples/demo>               |
+| `code/examples/*` (ships: `demo.odin` + README) | Odin core (MIT-style) | Scraper: `_Helpers/scripts/scrapers/download_odin_examples.py` pulls them locally (tracked: `demo.odin` only) |
+| 25 public gists from awesome-odin               | Public, MIT-style     | Scraper: `_Helpers/scripts/scrapers/download_gists.py`                                                        |
+| `code/gists/*`                                  | Public, MIT-style     | See file headers for attribution                                                                              |
+| `code/vendored templates/*`                     | MIT (this repo)       | Bundled in this repo                                                                                          |
 
 ## Attributions & trademarks
 

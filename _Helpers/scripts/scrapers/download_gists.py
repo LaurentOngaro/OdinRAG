@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-_Helpers/scripts/scrappers/download_gists.py - Download public GitHub gists from awesome-odin.md.
+_Helpers/scripts/scrapers/download_gists.py - Download public GitHub gists from awesome-odin.md.
 
 Parses odin-knowledge-base/docs/official/awesome-odin.md to find all gist.github.com URLs, downloads each gist via the public GitHub API, and saves the raw content to code/gists/{gist_id}.odin (or .md for markdown files).
 
@@ -8,9 +8,9 @@ Re-entrant: skips already-downloaded gists unless --force.
 --check: dry-run, lists gists that would be downloaded, exits 0.
 
 Usage:
-    python _Helpers/scripts/scrappers/download_gists.py             # download missing gists
-    python _Helpers/scripts/scrappers/download_gists.py --check     # dry-run: list what would be downloaded
-    python _Helpers/scripts/scrappers/download_gists.py --force     # re-download all gists
+    python _Helpers/scripts/scrapers/download_gists.py             # download missing gists
+    python _Helpers/scripts/scrapers/download_gists.py --check     # dry-run: list what would be downloaded
+    python _Helpers/scripts/scrapers/download_gists.py --force     # re-download all gists
 """
 
 from __future__ import annotations

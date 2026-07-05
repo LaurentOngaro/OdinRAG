@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """
-_Helpers/scripts/scrappers/download_odin_examples.py - Official Odin example files downloader
+_Helpers/scripts/scrapers/download_odin_examples.py - Official Odin example files downloader
 [Re-entrant: skip if .odin already present; --force to redownload]
 
 Downloads additional official Odin example files (.odin) from the odin-lang/Odin GitHub repository into code/examples/.
 
 Usage:
-    python _Helpers/scripts/scrappers/download_odin_examples.py             # download new files (re-entrant)
-    python _Helpers/scripts/scrappers/download_odin_examples.py --force     # force redownload all
-    python _Helpers/scripts/scrappers/download_odin_examples.py --check     # dry-run (report only, no writes)
+    python _Helpers/scripts/scrapers/download_odin_examples.py             # download new files (re-entrant)
+    python _Helpers/scripts/scrapers/download_odin_examples.py --force     # force redownload all
+    python _Helpers/scripts/scrapers/download_odin_examples.py --check     # dry-run (report only, no writes)
 
 Source: GitHub Contents API (public, no auth)
     - https://api.github.com/repos/odin-lang/Odin/contents/examples/demo
@@ -128,7 +128,7 @@ def _generate_readme(files: list[str]) -> str:
         "## Source",
         "",
         "Official example files from the [odin-lang/Odin](https://github.com/odin-lang/Odin) repository.",
-        "Downloaded via `_Helpers/scripts/scrappers/download_odin_examples.py`.",
+        "Downloaded via `_Helpers/scripts/scrapers/download_odin_examples.py`.",
         "",
         "## Files",
         "",

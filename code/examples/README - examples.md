@@ -6,7 +6,7 @@
 
 ## Sources
 
-Scraped by [`_Helpers/scripts/scrappers/download_odin_examples.py`](../../_Helpers/scripts/scrappers/download_odin_examples.py).
+Scraped by [`_Helpers/scripts/scrapers/download_odin_examples.py`](../../_Helpers/scripts/scrapers/download_odin_examples.py).
 
 ## Cross-references
 

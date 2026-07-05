@@ -88,7 +88,7 @@ _Helpers/
 │   │   └── code_auditor/    <- code_auditor.py + odin_rules.{jsonc,schema.json} + rule_loader.py + scanner.py + kb_index.py + context_builder.py + reporter.py + README - code_auditor.md (self-contained package, Phase 1+2+3)
 │   ├── fixes/               <- format_odin_in_files, fix_mojibake, reflow_md, odin_format, book_html_to_md, lint_pylance
 │   ├── indexing/            <- build_kb_index.py
-│   ├── scrappers/           <- scrape_*.py + download_*.py
+│   ├── scrapers/            <- scrape_*.py + download_*.py
 │   └── lib/                 <- text_clean, http_client, html2md, user_config (shared libs; per-package modules stay inside their own folder)
 ├── docs/                    <- meta docs about this repo (NNN_*.md)
 │   ├── README - docs.md

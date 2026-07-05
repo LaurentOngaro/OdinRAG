@@ -25,7 +25,7 @@ What's in the box:
 ```text
 How M3 actually helped:
 - Designed the frontmatter schema (Cours / Module / ID / Durée / topic/\*)
-- Wrote `_Helpers/scripts/scrappers/scrape_skool.py` with re-entrancy + `--check` dry-run
+- Wrote `_Helpers/scripts/scrapers/scrape_skool.py` with re-entrancy + `--check` dry-run
 - Authored the subagent prompt with citation discipline
 - Created 6 skills following progressive disclosure
 ```

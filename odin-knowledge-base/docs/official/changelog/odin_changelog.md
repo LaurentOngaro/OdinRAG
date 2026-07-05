@@ -14,7 +14,7 @@ tags: [OdinRAG, kb, source/official, changelog, odin]
 # Odin Changelog (consolidated, 20 releases)
 
 > Generated from the [odin-lang/Odin releases](https://github.com/odin-lang/Odin/releases) feed on 2026-07-04.
-> Re-run `python _Helpers/scripts/scrappers/scrape_odin_changelog.py` to refresh.
+> Re-run `python _Helpers/scripts/scrapers/scrape_odin_changelog.py` to refresh.
 
 ## dev-2026-06 - 2026-06-10
 

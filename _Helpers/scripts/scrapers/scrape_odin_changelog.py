@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""_Helpers/scripts/scrappers/scrape_odin_changelog.py - Odin Changelog Scraper.
+"""_Helpers/scripts/scrapers/scrape_odin_changelog.py - Odin Changelog Scraper.
 
 Fetches the N most recent Odin releases from the GitHub REST API (`https://api.github.com/repos/odin-lang/Odin/releases`) and writes them to `odin-knowledge-base/docs/official/changelog/`.
 
@@ -8,11 +8,11 @@ Two artefacts are produced:
     - one file per release under `releases/<tag>.md` (idempotent: skip if the file is already present and the underlying release tag matches)
 
 Usage:
-    python _Helpers/scripts/scrappers/scrape_odin_changelog.py            # last 20 releases, skip if present
-    python _Helpers/scripts/scrappers/scrape_odin_changelog.py --limit 50
-    python _Helpers/scripts/scrappers/scrape_odin_changelog.py --force    # rewrite everything
-    python _Helpers/scripts/scrappers/scrape_odin_changelog.py --check    # dry-run
-    python _Helpers/scripts/scrappers/scrape_odin_changelog.py --include-prereleases
+    python _Helpers/scripts/scrapers/scrape_odin_changelog.py            # last 20 releases, skip if present
+    python _Helpers/scripts/scrapers/scrape_odin_changelog.py --limit 50
+    python _Helpers/scripts/scrapers/scrape_odin_changelog.py --force    # rewrite everything
+    python _Helpers/scripts/scrapers/scrape_odin_changelog.py --check    # dry-run
+    python _Helpers/scripts/scrapers/scrape_odin_changelog.py --include-prereleases
 
 Prerequisites:
     pip install requests
@@ -145,7 +145,7 @@ def render_consolidated(releases: list[dict[str, Any]]) -> str:
         f"# Odin Changelog (consolidated, {len(releases)} releases)\n\n"
         f"> Generated from the [odin-lang/Odin releases]"
         f"(https://github.com/odin-lang/Odin/releases) feed on {today}.\n"
-        f"> Re-run `python _Helpers/scripts/scrappers/scrape_odin_changelog.py` "
+        f"> Re-run `python _Helpers/scripts/scrapers/scrape_odin_changelog.py` "
         f"to refresh.\n\n"
     )
     body_parts: list[str] = []

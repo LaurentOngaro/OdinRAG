@@ -14,7 +14,7 @@ Then edit the copy and fill in your paths / credentials.
 Scripts that depend on the user config:
 
     - _Helpers/scripts/fixes/odin_format.py       (ODINFMT_EXE)
-    - _Helpers/scripts/scrappers/scrape_skool.py      (yt-dlp path, Skool credentials)
+    - _Helpers/scripts/scrapers/scrape_skool.py      (yt-dlp path, Skool credentials)
     - _Helpers/scripts/fixes/book_html_to_md.py   (path to Karl book HTML)
 """
 

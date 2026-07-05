@@ -50,11 +50,11 @@ cd OdinRAG
 python _Helpers/scripts/diagnostic/audit_public_safety.py
 
 # Scrape the public sources (no paywall, no auth)
-python _Helpers/scripts/scrappers/scrape_official.py
-python _Helpers/scripts/scrappers/scrape_zylinski.py
+python _Helpers/scripts/scrapers/scrape_official.py
+python _Helpers/scripts/scrapers/scrape_zylinski.py
 
 # (Skool requires your own paid membership - see SOURCES.md)
-python _Helpers/scripts/scrappers/scrape_skool.py
+python _Helpers/scripts/scrapers/scrape_skool.py
 
 # Format all .odin + ```odin``` blocks in the working tree
 python _Helpers/scripts/fixes/format_odin_in_files.py --path odin-knowledge-base

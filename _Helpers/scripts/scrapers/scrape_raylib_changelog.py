@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""_Helpers/scripts/scrappers/scrape_raylib_changelog.py - Raylib Changelog Scraper.
+"""_Helpers/scripts/scrapers/scrape_raylib_changelog.py - Raylib Changelog Scraper.
 
 Fetches the N most recent releases of:
     - raysan5/raylib                      (the C library)
@@ -11,10 +11,10 @@ Two artefacts are produced:
     - one file per release under `releases/<tag>.md` (idempotent: skip if the file is already present and the underlying release tag matches)
 
 Usage:
-    python _Helpers/scripts/scrappers/scrape_raylib_changelog.py            # last 10 releases, skip if present
-    python _Helpers/scripts/scrappers/scrape_raylib_changelog.py --limit 30
-    python _Helpers/scripts/scrappers/scrape_raylib_changelog.py --force
-    python _Helpers/scripts/scrappers/scrape_raylib_changelog.py --check
+    python _Helpers/scripts/scrapers/scrape_raylib_changelog.py            # last 10 releases, skip if present
+    python _Helpers/scripts/scrapers/scrape_raylib_changelog.py --limit 30
+    python _Helpers/scripts/scrapers/scrape_raylib_changelog.py --force
+    python _Helpers/scripts/scrapers/scrape_raylib_changelog.py --check
 
 Prerequisites:
     pip install requests
@@ -140,7 +140,7 @@ def render_consolidated(releases: list[dict[str, Any]]) -> str:
         f"# Raylib Changelog (consolidated, {len(releases)} releases)\n\n"
         f"> Generated from the [raysan5/raylib releases]"
         f"(https://github.com/raysan5/raylib/releases) feed on {today}.\n"
-        f"> Re-run `python _Helpers/scripts/scrappers/scrape_raylib_changelog.py` to refresh.\n\n"
+        f"> Re-run `python _Helpers/scripts/scrapers/scrape_raylib_changelog.py` to refresh.\n\n"
     )
     body_parts: list[str] = []
     for r in releases:

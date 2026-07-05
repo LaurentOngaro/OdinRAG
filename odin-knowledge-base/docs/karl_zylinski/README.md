@@ -19,8 +19,8 @@ If you want the full articles on your machine:
 3. Run:
 
    ```bash
-   python _Helpers/scripts/scrappers/scrape_zylinski.py            # re-entrant: skip already scraped
-   python _Helpers/scripts/scrappers/scrape_zylinski.py --force    # force re-write
+   python _Helpers/scripts/scrapers/scrape_zylinski.py            # re-entrant: skip already scraped
+   python _Helpers/scripts/scrapers/scrape_zylinski.py --force    # force re-write
    ```
 
    Output (local only): 20+ files at the root of this folder, one per blog post,

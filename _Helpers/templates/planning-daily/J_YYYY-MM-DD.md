@@ -20,7 +20,6 @@ updatedBy: "MiniMax-M3 (Kilo Code)"
 > 5. At end of day, add a "Bilan" section at the bottom
 
 ```md
-
 # Daily YYYY-MM-DD - Subject of the day
 
 ## Goal of the day
@@ -41,7 +40,7 @@ updatedBy: "MiniMax-M3 (Kilo Code)"
 > Trimestriels: verifier et cocher ci-dessous quand applicables.
 
 - [ ] KB stale check: `python _Helpers/scripts/scrapers/build_gitingest.py --check` (sortie 0 = rien a regenerer)
-- [ ] Changelog freshness: `python _Helpers/scripts/scrappers/scrape_odin_changelog.py --check` + `scrape_raylib_changelog.py --check`
+- [ ] Changelog freshness: `python _Helpers/scripts/scrapers/scrape_odin_changelog.py --check` + `scrape_raylib_changelog.py --check`
 - [ ] Audit pre-push: `python _Helpers/scripts/diagnostic/audit_public_safety.py` (avant tout commit destine a `public`)
 - [ ] Revue Space Perplexity: verifier que la liste § 9A du doc `_Private/raw/Perplexity backlog/2026-07-04_04_odin_assistant_optimisation_espace_perplexity.md` est toujours alignee avec l'etat du repo
 
@@ -81,5 +80,4 @@ updatedBy: "MiniMax-M3 (Kilo Code)"
 - **Delivered**: _what is actually done_
 - **Postponed**: _what could not be done and why_
 - **Mood note**: _(optional) general state_
-
 ```

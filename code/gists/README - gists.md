@@ -8,7 +8,7 @@ Each `.odin` file has its attribution in the header.
 
 ## Sources
 
-Downloaded by [`_Helpers/scripts/scrappers/download_gists.py`](../../_Helpers/scripts/scrappers/download_gists.py).
+Downloaded by [`_Helpers/scripts/scrapers/download_gists.py`](../../_Helpers/scripts/scrapers/download_gists.py).
 
 ## Cross-references
 

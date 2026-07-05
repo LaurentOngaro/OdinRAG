@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """
-_Helpers/scripts/scrappers/scrape_showcase.py - Odin Showcase Scraper (odin-lang.org/showcase/)
+_Helpers/scripts/scrapers/scrape_showcase.py - Odin Showcase Scraper (odin-lang.org/showcase/)
 [Re-entrant: skip if <slug>.md already exists; --force to rewrite]
 
 Fetches all showcase entries from https://odin-lang.org/showcase/ and converts each individual showcase page into Markdown under odin-knowledge-base/docs/showcase/.
 
 Usage:
-    python _Helpers/scripts/scrappers/scrape_showcase.py            # skip if already exported (re-entrant)
-    python _Helpers/scripts/scrappers/scrape_showcase.py --force    # force full rewrite
-    python _Helpers/scripts/scrappers/scrape_showcase.py --check    # dry-run: list what would be scraped
+    python _Helpers/scripts/scrapers/scrape_showcase.py            # skip if already exported (re-entrant)
+    python _Helpers/scripts/scrapers/scrape_showcase.py --force    # force full rewrite
+    python _Helpers/scripts/scrapers/scrape_showcase.py --check    # dry-run: list what would be scraped
 
 Prerequisites:
     pip install requests markdownify beautifulsoup4 lxml

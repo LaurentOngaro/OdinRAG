@@ -43,8 +43,8 @@ _None for now._
 
 - **REMINDER01** (target: 2026-10-01) - Quarterly check KB + Space
   - `python _Helpers/scripts/scrapers/build_gitingest.py --check`
-  - `python _Helpers/scripts/scrappers/scrape_odin_changelog.py --check`
-  - `python _Helpers/scripts/scrappers/scrape_raylib_changelog.py --check`
+  - `python _Helpers/scripts/scrapers/scrape_odin_changelog.py --check`
+  - `python _Helpers/scripts/scrapers/scrape_raylib_changelog.py --check`
   - Audit list § 9A of the Perplexity doc (still aligned?)
 
 ## Roadmap / Ideas to Investigate (last: IDEA01)

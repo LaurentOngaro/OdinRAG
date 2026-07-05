@@ -13,9 +13,7 @@
 
 ## How this folder was populated
 
-`odin-knowledge-base/docs/official/*.md` (and `odin-knowledge-base/docs/official/awesome-odin.md`) are produced by
-`_Helpers/scripts/scrappers/scrape_official.py` (sitemap + crawl + static fallback). Re-running is
-idempotent - already-scraped files are skipped unless you pass `--force`.
+`odin-knowledge-base/docs/official/*.md` (and `odin-knowledge-base/docs/official/awesome-odin.md`) are produced by `_Helpers/scripts/scrappers/scrape_official.py` (sitemap + crawl + static fallback). Re-running is idempotent - already-scraped files are skipped unless you pass `--force`.
 
 ```bash
 python _Helpers/scripts/scrappers/scrape_official.py            # re-entrant: skip existing

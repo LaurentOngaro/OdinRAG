@@ -57,20 +57,20 @@ cp _Helpers/templates/user_config.example.jsonc _Private/.config/user_config.jso
 
 Scripts that need personal info read from this config (with env var override):
 
-| Script                                       | Field                  | Env var                                 |
-| -------------------------------------------- | ---------------------- | --------------------------------------- |
-| `_Helpers/scripts/fixes/odin_format.py`      | `paths.odinfmt_exe`    | `ODINFMT_EXE`                           |
-| `_Helpers/scripts/scrappers/scrape_skool.py` | `paths.yt_dlp_exe`     | `YT_DLP_EXE`                            |
-| `_Helpers/scripts/scrappers/scrape_skool.py` | `skool.email`          | `SKOOL_EMAIL`                           |
-| `_Helpers/scripts/scrappers/scrape_skool.py` | (password)             | `SKOOL_PASSWORD` (env ONLY, never JSON) |
-| `_Helpers/scripts/fixes/book_html_to_md.py`  | `paths.karl_book_html` | `BOOK_HTML_SRC`                         |
-| `_Helpers/scripts/fixes/book_html_to_md.py`  | `paths.karl_book_out`  | `BOOK_HTML_OUT`                         |
+| Script                                      | Field                  | Env var                                 |
+| ------------------------------------------- | ---------------------- | --------------------------------------- |
+| `_Helpers/scripts/fixes/odin_format.py`     | `paths.odinfmt_exe`    | `ODINFMT_EXE`                           |
+| `_Helpers/scripts/scrapers/scrape_skool.py` | `paths.yt_dlp_exe`     | `YT_DLP_EXE`                            |
+| `_Helpers/scripts/scrapers/scrape_skool.py` | `skool.email`          | `SKOOL_EMAIL`                           |
+| `_Helpers/scripts/scrapers/scrape_skool.py` | (password)             | `SKOOL_PASSWORD` (env ONLY, never JSON) |
+| `_Helpers/scripts/fixes/book_html_to_md.py` | `paths.karl_book_html` | `BOOK_HTML_SRC`                         |
+| `_Helpers/scripts/fixes/book_html_to_md.py` | `paths.karl_book_out`  | `BOOK_HTML_OUT`                         |
 
 Chain of resolution per value: **env var > user_config.jsonc > empty string**.
 
 ## Conventions
 
-### File naming (NNN_ prefix)
+### File naming (NNN\_ prefix)
 
 - **Default** (authored docs under `_Helpers/docs/` and `_Private/planning/`): filename is `NNN_snake_case_slug.md` (3-digit prefix, lowercase + underscores + hyphens). NNN restarts at 001 in each folder. Chronological by creation date.
 - **H1 title = filename exactly** (no leading `NNN_` in the H1 if the filename has one). Examples:
@@ -80,16 +80,16 @@ Chain of resolution per value: **env var > user_config.jsonc > empty string**.
 - **READMEs in authored folders**: filename is `README - <topic>.md` where `<topic>` is the parent directory name. H1 matches the filename (per the rule above). Examples:
   - `_Helpers/scripts/README - scripts.md` → H1 `# README - scripts`
   - `_Helpers/docs/README - docs.md` → H1 `# README - docs`
-- **NNN_ prefix is NOT applied** to files in these folder patterns (they keep their natural name):
+- **NNN\_ prefix is NOT applied** to files in these folder patterns (they keep their natural name):
   - `**/templates/**` (template files keep their semantic name, e.g. `J_YYYY-MM-DD.md`, `main.odin`, `odin-project.md`)
   - `**/planning/**` (planning files use semantic names: `J_YYYY-MM-DD.md`, `NNN_odin_learning_plan_*.md`, `NNN_roadmap.md` - the `NNN_` is REQUIRED here as it's the only way to order them; daily files do NOT use `NNN_`)
   - `**/prompts/**` (prompt files keep their descriptive name, e.g. `refresh_topic_index.md`)
-  - `**/scripts/**` (Python files; the directory itself uses NNN_ ordering via its README only)
+  - `**/scripts/**` (Python files; the directory itself uses NNN\_ ordering via its README only)
   - `**/social/**` (one-off social posts, no chronological order)
   - `**/daily/**` (dailies use `J_YYYY-MM-DD.md` - the `J_` prefix is the date tag)
-  - `**/raw/**` (raw notes kept as-is, no frontmatter, no NNN_)
-  - `code/**` (no NNN_ - code files keep their original names)
-  - `odin-knowledge-base/**` (no NNN_ - scraped files keep their original slugs)
+  - `**/raw/**` (raw notes kept as-is, no frontmatter, no NNN\_)
+  - `code/**` (no NNN\_ - code files keep their original names)
+  - `odin-knowledge-base/**` (no NNN\_ - scraped files keep their original slugs)
 - **Dailies live in `_Private/planning/daily/`** (tracked in `main` only, absent from `public`): their filename is purely personal and never reaches the public repo.
 - The full authoritative tree is in [`_Helpers/docs/001_folder_structure.md`](_Helpers/docs/001_folder_structure.md).
 
@@ -181,7 +181,7 @@ Verify with `python _Helpers/scripts/diagnostic/auditReadmeCoherence.py` (non-ze
 
 - **Exempted from this rule** (any language is fine):
   - Everything under `_Private/` (Bucket 3, gitignored) - never reaches the `public` branch.
-  - Files under any `**/raw/**` folder - raw notes are kept as-is by convention (no frontmatter, no NNN_ prefix).
+  - Files under any `**/raw/**` folder - raw notes are kept as-is by convention (no frontmatter, no NNN\_ prefix).
   - Personal logs, planning notes, daily entries - always private.
 
 - **Rare public non-English doc**: annotate in frontmatter with `exception: <reason>` so the convention violation is explicit.
@@ -198,17 +198,17 @@ See [`.kilo/agents/odin-gamedev.md`](.kilo/agents/odin-gamedev.md) for the speci
 
 ## Kilo skills
 
-| Skill                                     | Usage                                                                   |
-| ----------------------------------------- | ----------------------------------------------------------------------- |
-| `.kilo/skills/audit-public-safety/`       | Pre-push audit of the `public` branch (leak detection)                  |
-| `.kilo/skills/kb-navigator/`              | Search the KB by topic / frontmatter                                    |
-| `.kilo/skills/markdown-style/`            | Pre/post checklists for any `.md` edit                                  |
-| `.kilo/skills/odin-format/`               | Re-format a single Odin file or a `.md`                                 |
-| `.kilo/skills/odin-pattern-finder/`       | Find a precise Odin pattern (state machine, allocator, hot reload...)   |
-| `.kilo/skills/planning-helper/`           | Manage daily planning files (create, update, list)                      |
-| `.kilo/skills/pylance-check/`             | Run pyright on Python files and fix diagnostics                         |
-| `.kilo/skills/readme-coherence/`          | Audit that every `README*.md` matches its host directory                |
-| `.kilo/skills/scraper-runner/`            | Run a scraper with the right flags                                      |
+| Skill                               | Usage                                                                 |
+| ----------------------------------- | --------------------------------------------------------------------- |
+| `.kilo/skills/audit-public-safety/` | Pre-push audit of the `public` branch (leak detection)                |
+| `.kilo/skills/kb-navigator/`        | Search the KB by topic / frontmatter                                  |
+| `.kilo/skills/markdown-style/`      | Pre/post checklists for any `.md` edit                                |
+| `.kilo/skills/odin-format/`         | Re-format a single Odin file or a `.md`                               |
+| `.kilo/skills/odin-pattern-finder/` | Find a precise Odin pattern (state machine, allocator, hot reload...) |
+| `.kilo/skills/planning-helper/`     | Manage daily planning files (create, update, list)                    |
+| `.kilo/skills/pylance-check/`       | Run pyright on Python files and fix diagnostics                       |
+| `.kilo/skills/readme-coherence/`    | Audit that every `README*.md` matches its host directory              |
+| `.kilo/skills/scraper-runner/`      | Run a scraper with the right flags                                    |
 
 ## Anti-patterns
 

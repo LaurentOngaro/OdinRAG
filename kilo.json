@@ -19,8 +19,8 @@
   },
   "permission": {
     "bash": {
-      "python _Helpers/scripts/scrappers/scrape_*.py *": "allow",
-      "python _Helpers/scripts/scrappers/download_*.py *": "allow",
+      "python _Helpers/scripts/scrapers/scrape_*.py *": "allow",
+      "python _Helpers/scripts/scrapers/download_*.py *": "allow",
       "python _Helpers/scripts/fixes/book_html_to_md.py *": "allow",
       "python _Helpers/scripts/fixes/format_odin_in_files.py *": "allow",
       "python _Helpers/scripts/fixes/fix_mojibake.py *": "allow",
