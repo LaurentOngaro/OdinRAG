@@ -36,6 +36,17 @@ _None for now._
 
 _None for now._
 
+## Recurring tasks (last: RAPPEL01)
+
+> Meet quarterly (see `_Helpers/templates/planning-daily/J_YYYY-MM-DD.md` section “Recurring reminders”).
+> KB Space Perplexity strategy documented in `_Private/raw/Perplexity backlog/2026-07-04_04_odin_assistant_optimization_espace_perplexity.md`.
+
+- **REMINDER01** (target: 2026-10-01) - Quarterly check KB + Space
+  - `python _Helpers/scripts/scrapers/build_gitingest.py --check`
+  - `python _Helpers/scripts/scrappers/scrape_odin_changelog.py --check`
+  - `python _Helpers/scripts/scrappers/scrape_raylib_changelog.py --check`
+  - Audit list § 9A of the Perplexity doc (still aligned?)
+
 ## Roadmap / Ideas to Investigate (last: IDEA01)
 
 Next up:

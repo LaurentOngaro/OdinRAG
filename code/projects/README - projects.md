@@ -2,7 +2,9 @@
 
 ## Contents
 
-Personal Odin projects. Each subfolder is gitignored per `.gitignore`.
+Personal Odin projects. Each subfolder is **tracked in the local `main` branch** and pushed to the private remote `OdinRag-private`.
+**Absent from the public `public` branch** (two-branch strategy).
+They are NOT gitignored — see [`_Helpers/docs/007_mixing_public_and_private_history.md`](../../_Helpers/docs/007_mixing_public_and_private_history.md).
 
 - `PVG03_RPG/` - the author's remake of the ProgramVideoGame RPG module (see [`PVG03_RPG/AGENTS.md`](PVG03_RPG/AGENTS.md))
 

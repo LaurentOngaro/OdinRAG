@@ -20,7 +20,7 @@ Pre-push audit for the `public` branch of OdinRAG. The repo uses a **single-repo
 ## The 3 MUST-PASS conditions
 
 1. `python _Helpers/scripts/diagnostic/audit_public_safety.py` → **must exit 0**.
-2. `.gitignore` `COPYRIGHTED SCRAPED CONTENT` section is intact.
+2. `.git/info/exclude` contains the local-only paywall patterns (`/odin-knowledge-base/courses/`, `/odin-knowledge-base/docs/karl_zylinski/odin-book/`, `/code/projects/PVG03_RPG/`, etc.) so personal content stays untracked locally. The tracked `.gitignore` itself only carries secrets + build/IDE ignores.
 3. No `_Private/planning/daily/`, `_Private/raw/`, or `_Private/docs/` files are staged.
 
 ## Quick audit
@@ -63,13 +63,13 @@ git stash pop
 
 ## Common leaks and fixes
 
-| Leak                                                | Cause                                | Fix                                                                |
-| --------------------------------------------------- | ------------------------------------ | ------------------------------------------------------------------ |
-| `_Private/planning/daily/J_2026-XX-XX.md`           | Not in `.git/info/exclude`           | Add to `.git/info/exclude` + re-run `refresh_public_branch.py`     |
-| `odin-knowledge-base/courses/programvideogames/...` | Paywalled content                    | Already gitignored by design, but `audit` re-checks                |
-| `_Private/.config/skool_credentials.txt`            | Credentials file accidentally staged | `git rm --cached` + verify `/_Private/.config/` is in `.gitignore` |
-| `code/projects/PVG03_RPG/`                          | Personal project folder              | Add to `.git/info/exclude` + update `STRIP_RULES`                  |
-| `odin-knowledge-base/docs/karl_zylinski/odin-book/` | Paywalled book chapters              | Already gitignored; verify with `--verbose`                        |
+| Leak                                                | Cause                                | Fix                                                                                                       |
+| --------------------------------------------------- | ------------------------------------ | --------------------------------------------------------------------------------------------------------- |
+| `_Private/planning/daily/J_2026-XX-XX.md`           | Not in `.git/info/exclude`           | Add to `.git/info/exclude` + re-run `refresh_public_branch.py`                                            |
+| `odin-knowledge-base/courses/programvideogames/...` | Paywalled content                    | Tracked in `main` only, stripped from `public` branch — verify with `--verbose`                           |
+| `_Private/.config/skool_credentials.txt`            | Credentials file accidentally staged | `git rm --cached` + verify `/_Private/.config/` is in `.gitignore` (doubly protected)                     |
+| `code/projects/PVG03_RPG/`                          | Personal project folder              | Tracked in `main` only, stripped from `public` branch — add to `.git/info/exclude` + update `STRIP_RULES` |
+| `odin-knowledge-base/docs/karl_zylinski/odin-book/` | Paywalled book chapters              | Tracked in `main` only, stripped from `public` branch — verify with `--verbose`                           |
 
 ## NEVER
 

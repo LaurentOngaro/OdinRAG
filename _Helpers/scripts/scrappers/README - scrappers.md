@@ -8,7 +8,7 @@
 ## Conventions
 
 - Every scraper is re-entrant: by default it skips already scraped files. Use `--force` to rewrite.
-- Scraped output goes under `odin-knowledge-base/docs/<source>/` (gitignored where the source is paid).
+- Scraped output goes under `odin-knowledge-base/docs/<source>/` for public sources. Paid sources (Skool PVG courses, Karl Zylinski ebook) are written under `odin-knowledge-base/courses/` and `odin-knowledge-base/docs/karl_zylinski/odin-book/` respectively, **tracked in local `main`** and pushed to the private remote `OdinRag-private`, **absent from the public `public` branch** (two-branch strategy, not `.gitignore`).
 
 ## Cross-references
 

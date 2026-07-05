@@ -37,7 +37,7 @@ Sharing it here since the MiniMax-M3 showcase round 2 is live and this is 100% M
 
 ## What I deliberately did NOT do
 
-- No scraped course content or blog posts are published in this public repo (see `.gitignore`). The scrapers and the curated indexing workflow are open-source; the indexed content stays on my disk under my own paywall subscription.
+- No scraped course content or blog posts are published in this public repo (two-branch strategy: local `main` → private remote, local `public` → public remote). The scrapers and the curated indexing workflow are open-source; the indexed content stays on my disk under my own paywall subscription.
 - No vector DB / no RAGnarök yet - KB is small enough (~150 docs) that M3's context + frontmatter filtering is enough. Indexing trigger at ~5000 files.
 
 ## Try it / fork it

@@ -8,7 +8,7 @@ The OdinRAG repo ships the **scaffold** for a project: [`_Helpers/templates/odin
 
 **Actual project code is personal and never pushed.** Two options:
 
-1. **Inside the repo (recommended for Kilo context)** - copy the scaffold from `_Helpers/templates/odin-project/` to `code/projects/<your-project>/`. Add an entry for your project in `.gitignore` (see `PVG03_RPG/` for the pattern). Kilo sees your code, you get AI assistance, nothing leaks to git.
+1. **Inside the repo (recommended for Kilo context)** - copy the scaffold from `_Helpers/templates/odin-project/` to `code/projects/<your-project>/`. The project folder is **tracked in the local `main` branch** and pushed to the private remote `OdinRag-private`, but **absent from the public `public` branch** via the two-branch strategy (see [`_Helpers/docs/007_mixing_public_and_private_history.md`](../_Helpers/docs/007_mixing_public_and_private_history.md)). Add the path to `.git/info/exclude` so `git status` stays quiet locally. Kilo sees your code, you get AI assistance, nothing reaches the public remote.
 2. **Outside the repo (strict IP isolation)** - copy the scaffold somewhere like `D:\OdinProjects\<your-project>\`. The repo stays 100% clean.
 
 Both work. Option 1 is more convenient; option 2 is more IP-secure. The repo's public state is identical in both cases.
@@ -20,7 +20,7 @@ When you code in `code/projects/<your-project>/src/`, Kilo sees **the whole work
 > **The full tree is documented in [`_Helpers/docs/001_folder_structure.md`](../_Helpers/docs/001_folder_structure.md).**
 > Key parts relevant to coding sessions:
 >
-> - `code/projects/<your-project>/` - your code, devlogs, project AGENTS.md (gitignored)
+> - `code/projects/<your-project>/` - your code, devlogs, project AGENTS.md (tracked in `main` only, absent from `public`)
 > - `odin-knowledge-base/` - Skool KB, Karl's book, official docs
 > - `code/vendored templates/` - upstream hot-reload templates (to clone OUTSIDE this repo for a real project)
 > - `_Helpers/scripts/` - scrapers + utilities
@@ -81,8 +81,8 @@ Steps to add a new project:
 2. Fill out `code/projects/<your-project>/AGENTS.md` with: goal, stack, file structure, modules, allocator policy, patterns implemented, pitfalls, architectural decisions, KB sources.
 3. Fill out `code/projects/<your-project>/.kilo/agents/odin-project.md` with the project-specific sources-of-truth table (replace `<PROJECT_NAME>`).
 4. Add both files to `kilo.json` `instructions` (above the global `.kilo/agents/odin-gamedev.md` line so it loads first).
-5. Add `code/projects/<your-project>/` to `.gitignore` (see the existing `PVG03_RPG/` entry for the pattern).
-6. Verify with `_Helpers/scripts/diagnostic/audit_public_safety.py` - the new files must be gitignored.
+5. Add `code/projects/<your-project>/` to `.git/info/exclude` so `git status` stays quiet locally (the folder itself stays tracked in `main` and pushed to the private remote — that's the two-branch strategy). The tracked `.gitignore` does **not** need an entry for this.
+6. Verify with `_Helpers/scripts/diagnostic/audit_public_safety.py` - the new files must be absent from the `public` branch.
 
 The orchestrator (`code` agent) auto-loads the project's `AGENTS.md` first because it appears earlier in the `instructions` array. The project's `odin-project.md` subagent is then auto-invoked when the question matches the project's topic.
 

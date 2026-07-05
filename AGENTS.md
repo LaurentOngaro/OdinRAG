@@ -20,12 +20,16 @@ The scraped content of paywalled or copyrighted sources is **never redistributed
 > **The full tree lives in [`_Helpers/docs/001_folder_structure.md`](_Helpers/docs/001_folder_structure.md).**
 > This section gives a one-line summary of each bucket; refer to the structure doc for the complete tree.
 
-- `odin-knowledge-base/` - **Bucket 1** (public, partly gitignored) - scraped KB + Skool courses
+- `odin-knowledge-base/` - **Bucket 1** (public sanitized on `public` branch, full content tracked locally on `main` branch) - scraped KB + Skool courses
 - `code/` - public code references (examples, gists, vendored templates, personal projects)
 - `_Helpers/` - **Bucket 2** (public) - scripts, meta docs, internal templates, prompts, logs
 - `_Private/` - **Bucket 3** (gitignored, never pushed) - config, planning, raw notes
 
-> Note: `odin-knowledge-base/courses/` and `odin-knowledge-base/docs/karl_zylinski/odin-book/*.md` are gitignored by design (paywalled sources). They live only on the local machine that produced them.
+> Note: paywalled scraped content (`odin-knowledge-base/courses/`, `odin-knowledge-base/docs/karl_zylinski/odin-book/`) is **tracked** in the local `main` branch and pushed to the private remote `OdinRag-private`.
+> It is **absent from the public `public` branch** (and therefore from `github.com/LaurentOngaro/OdinRAG`).
+> The exclusion mechanism is the **two-branch strategy** (local `main` ↔ private remote / local `public` ↔ public remote), NOT `.gitignore`.
+> Personal paths are excluded from local `git status` via `.git/info/exclude` (LOCAL only, never version-controlled).
+> Canonical reference: [`_Helpers/docs/007_mixing_public_and_private_history.md`](_Helpers/docs/007_mixing_public_and_private_history.md).
 
 ## Dependencies
 
@@ -86,7 +90,7 @@ Chain of resolution per value: **env var > user_config.jsonc > empty string**.
   - `**/raw/**` (raw notes kept as-is, no frontmatter, no NNN_)
   - `code/**` (no NNN_ - code files keep their original names)
   - `odin-knowledge-base/**` (no NNN_ - scraped files keep their original slugs)
-- **Dailies are gitignored**: they never reach the public repo, so their filename is purely personal.
+- **Dailies live in `_Private/planning/daily/`** (tracked in `main` only, absent from `public`): their filename is purely personal and never reaches the public repo.
 - The full authoritative tree is in [`_Helpers/docs/001_folder_structure.md`](_Helpers/docs/001_folder_structure.md).
 
 ### Markdown (knowledge base)
@@ -100,7 +104,7 @@ Chain of resolution per value: **env var > user_config.jsonc > empty string**.
 
 ### Planning (day-by-day)
 
-- **Dailies** live in `_Private/planning/daily/J_YYYY-MM-DD.md` (gitignored). Created from the template in `_Helpers/templates/planning-daily/` (duplicate, never edit the template).
+- **Dailies** live in `_Private/planning/daily/J_YYYY-MM-DD.md` (tracked in `main` only, absent from `public` branch). Created from the template in `_Helpers/templates/planning-daily/` (duplicate, never edit the template).
 - **Roadmap** in `_Private/planning/002_roadmap.md` covers phases P0-P4. `TODO.md` is legacy - migrate progressively to the daily system.
 - **No retroactive dating** - only create dailies for days actually worked.
 - **End-of-day `bilan` section is mandatory** in each daily (never folded into "in progress"). It is a retrospective, not a logbook.
@@ -226,7 +230,7 @@ See [`.kilo/agents/odin-gamedev.md`](.kilo/agents/odin-gamedev.md) for the speci
 Before any push to `github.com/LaurentOngaro/OdinRAG`:
 
 1. `python _Helpers/scripts/diagnostic/audit_public_safety.py` → **must** exit 0.
-2. Verify `.gitignore` `COPYRIGHTED SCRAPED CONTENT` section is intact.
+2. Verify `.git/info/exclude` contains the local-only paywall patterns (`/odin-knowledge-base/courses/`, `/odin-knowledge-base/docs/karl_zylinski/odin-book/`, etc.) so personal content stays untracked locally. The tracked `.gitignore` itself only carries secrets + build/IDE ignores.
 3. Verify no `_Private/planning/daily/` or `_Private/raw/` files are staged.
 
 The full pre-push procedure (refresh branch, audit, push, post-push verification, CI rollback): load the [`audit-public-safety`](.kilo/skills/audit-public-safety/SKILL.md) skill. Canonical reference: [`_Helpers/docs/005_public_release_checklist.md`](_Helpers/docs/005_public_release_checklist.md).

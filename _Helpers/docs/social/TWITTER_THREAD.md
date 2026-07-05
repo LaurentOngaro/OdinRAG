@@ -34,7 +34,7 @@ How M3 actually helped:
 
 ```text
 Deliberate non-decisions:
-- No scraped content pushed to public repo (see `.gitignore`)
+- No scraped content pushed to public repo (two-branch strategy: local `main` → private remote, local `public` → public remote)
 - No vector DB at < 5000 files - context + frontmatter filtering is enough
 - No manual edits to scraped files (they're auto-generated)
 ```

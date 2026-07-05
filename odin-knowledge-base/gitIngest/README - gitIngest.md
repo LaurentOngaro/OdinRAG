@@ -110,7 +110,7 @@ Useful gitingest flags:
 ## Conventions
 
 - One `*.txt` per repo, named after the repo folder.
-- Files are **gitignored** if they contain non-redistributable content. The whole `gitIngest/` folder is currently _not_ gitignored (these are just local snapshots of public repos), but a per-folder `.gitignore` can be added if any private fork is ever included.
+- Files are added to `.gitignore` if they contain non-redistributable content. The whole `gitIngest/` folder is currently **not** gitignored (these are just local snapshots of public repos), but a per-folder `.gitignore` can be added if any private fork is ever included.
 - Each snapshot is regenerated **on demand** - no scheduled job. The script logs generation date into a sidecar `*.json` (`source`, `generated_at`, `size_bytes`, `gitingest_version`).
 - Snapshots larger than ~5 MB are still kept (gitingest handles them), but you may want to use `-s` to trim.
 

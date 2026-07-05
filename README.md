@@ -18,19 +18,27 @@ OdinRAG aggregates, formats, and indexes learning material about Odin game dev s
 - a human (via Obsidian, Grep, or `INDEX.md` files)
 - an AI agent (via the [`.kilo/skills/`](.kilo/skills) `kb-navigator` skill and the [`.kilo/agents/odin-gamedev.md`](.kilo/agents/odin-gamedev.md) subagent)
 
-The repo ships **only** the curation workflow (scrapers, agents, skills, indexes, doc metadata). The copyrighted content the scrapers target - Skool courses, blog posts, the Karl Zylinski book - is **deliberately not redistributed** in this repo and stays in the user's local working directory. See [SOURCES.md](SOURCES.md) for how to obtain each source legally on your own.
+The repo ships **only** the curation workflow (scrapers, agents, skills, indexes, doc metadata) on the **public `public` branch** (pushed to `github.com/LaurentOngaro/OdinRAG`).
+The paywalled scraped content (Skool courses, full Karl Zylinski book, full blog corpora) is **tracked** in the local `main` branch and pushed to the separate **private remote** `OdinRag-private`.
+It is excluded from the public `public` branch by the two-branch strategy, not by `.gitignore`.
+See [`_Helpers/docs/007_mixing_public_and_private_history.md`](_Helpers/docs/007_mixing_public_and_private_history.md) for the workflow.
+See [SOURCES.md](SOURCES.md) for how to obtain each source legally on your own.
 
 ## Structure
 
 > **The full tree lives in [`_Helpers/docs/001_folder_structure.md`](_Helpers/docs/001_folder_structure.md).**
 > This section gives a one-line summary of each bucket; refer to the structure doc for the complete tree.
 
-- `odin-knowledge-base/` - **Bucket 1** (public, partly gitignored) - scraped KB + Skool courses
+- `odin-knowledge-base/` - **Bucket 1** (public sanitized on `public` branch, full content tracked locally on `main` branch) - scraped KB + Skool courses
 - `code/` - public code references (examples, gists, vendored templates, personal projects)
 - `_Helpers/` - **Bucket 2** (public) - scripts, meta docs, internal templates, prompts, logs
 - `_Private/` - **Bucket 3** (gitignored, never pushed) - config, planning, raw notes
 
-> `odin-knowledge-base/courses/` and `odin-knowledge-base/docs/karl_zylinski/odin-book/*.md` are **gitignored** by design - they contain copyrighted content under your own subscription. The repo ships sample articles in `odin-knowledge-base/docs/{karl_zylinski,gingerbill,jakubtomsu}/`; run the corresponding scrapers to populate the full corpus on your own machine.
+> Paywalled scraped content (`odin-knowledge-base/courses/`, `odin-knowledge-base/docs/karl_zylinski/odin-book/`) is **absent from the public `public` branch** by the two-branch strategy.
+> That strategy is: local `main` ↔ private remote / local `public` ↔ public remote.
+> The exclusion mechanism is **not** `.gitignore`.
+> The repo ships sample articles in `odin-knowledge-base/docs/{karl_zylinski,gingerbill,jakubtomsu}/` on the `public` branch.
+> Run the corresponding scrapers (or sync from the private remote if you have access) to populate the full corpus on your own machine.
 
 ## Quick start
 

@@ -10,7 +10,7 @@ How M3 was used (not just chat):
 • Designed the `odin-gamedev` subagent with `file:line` citation discipline
 • Wrote the idempotent scrapers (`scrape_skool.py`, `scrape-official.py`, `scrape-zylinski.py`) with `--check` dry-run + structured logging
 • Designed the frontmatter schema (Cours / Module / ID / Durée / topic/*)
-• Curated `.gitignore` to keep scraped content local (copyright-respecting)
+• Two-branch strategy (local `main` ↔ private remote / local `public` ↔ public remote) to keep scraped content local (copyright-respecting)
 
 Stack: Python stdlib · Kilo Code · MiniMax-M3 · odinfmt · Skool CLI · BeautifulSoup/markdownify
 

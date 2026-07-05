@@ -30,11 +30,16 @@ OdinRAG/
 ├── .editorconfig
 ├── .gitignore
 │
-├── odin-knowledge-base/     <- Bucket 1 - Odin KB (public, partly gitignored)
-├── code/                    <- Bucket 1b - Public code references
+├── odin-knowledge-base/     <- Bucket 1 - Odin KB (sanitized in public branch, full in local main)
+├── code/                    <- Bucket 1b - Public code references + personal projects (sanitized in public)
 ├── _Helpers/                <- Bucket 2 - Public RAG management
-└── _Private/                <- Bucket 3 - Private (gitignored, never pushed)
+└── _Private/                <- Bucket 3 - Private (tracked in local main, absent from public branch)
 ```
+
+> **Important - what "private" means in this repo**: paywalled and personal content is **NOT gitignored**.
+> It is **tracked in the local `main` branch** and pushed to the **private remote `OdinRag-private`**.
+> It is excluded from the public `public` branch via the **two-branch strategy** (canonical reference: [`007_mixing_public_and_private_history.md`](007_mixing_public_and_private_history.md)).
+> The actual tracked `.gitignore` only contains secrets + build/IDE ignores; local-only excludes live in `.git/info/exclude` (never version-controlled).
 
 ## Bucket 1 - `odin-knowledge-base/`
 
@@ -43,13 +48,15 @@ odin-knowledge-base/
 ├── README - odin knowledge base.md
 ├── INDEX.md                 <- central index (auto + manual zones)
 ├── docs/                    <- scraped Markdown sources
-│   ├── official/            <- odin-lang.org/docs/ + awesome-odin (MIT-style)
-│   ├── karl_zylinski/       <- zylinski.se + book README (full book gitignored)
-│   ├── newsletters/         <- odin-lang.org/news/ (Odin team)
-│   ├── gingerbill/          <- gingerbill.org (5 sample articles)
-│   ├── jakubtomsu/          <- jakubtomsu.github.io (4 sample articles)
-│   └── showcase/            <- odin-lang.org/showcase/ (Odin team)
-└── courses/                 <- Skool programvideogames content (gitignored, paid)
+│   ├── official/            <- odin-lang.org/docs/ + awesome-odin (MIT-style, public branch)
+│   ├── karl_zylinski/       <- zylinski.se sample + book README index (public branch)
+│   │   └── odin-book/       <- 33 MD chapters of Karl's paid ebook (ABSENT from public)
+│   ├── newsletters/         <- odin-lang.org/news/ (Odin team, public branch)
+│   ├── gingerbill/          <- gingerbill.org (5 sample articles in public, full corpus in main)
+│   ├── jakubtomsu/          <- jakubtomsu.github.io (sample in public, full corpus in main)
+│   └── showcase/            <- odin-lang.org/showcase/ (Odin team, public branch)
+├── gitIngest/               <- gitingest snapshots of local Odin repo clones (public branch, regenerable)
+└── courses/                 <- Skool programvideogames content (ABSENT from public)
 ```
 
 ## Bucket 1b - `code/`
@@ -60,12 +67,12 @@ code/
 ├── INTEGRATION.md           <- convention for personal Odin projects under projects/
 ├── examples/                <- public Odin examples (demo.odin)
 ├── gists/                   <- 25 public Odin gists from awesome-odin
-├── vendored templates/      <- third-party project templates (each its own git repo, gitignored)
+├── vendored templates/      <- third-party project templates (each its own git repo, content .gitignored, only README tracked)
 │   ├── odin-raylib-hot-reload/
 │   ├── odin-raylib-web/
 │   ├── odin-sokol-hot-reload/
 │   └── odin-sokol-web/
-└── projects/                <- personal Odin projects (each gitignored)
+└── projects/                <- personal Odin projects (ABSENT from public)
     ├── README - projects.md
     └── PVG03_RPG/           <- the author's RPG remake
 ```
@@ -108,21 +115,23 @@ _Helpers/
 ```text
 _Private/
 ├── README - private.md
-├── .config/                 <- user_config.jsonc, cookies.txt, skool_credentials.txt (gitignored)
-├── archives/                <- archived/superseded docs (gitignored, see README - archives.md)
+├── .config/                 <- user_config.jsonc, cookies.txt, skool_credentials.txt (DOUBLY: .gitignore + main-only)
+├── archives/                <- archived/superseded docs (ABSENT from public)
 │   ├── README - archives.md
 │   └── ...
-├── docs/                    <- private meta docs (gitignored)
+├── docs/                    <- private meta docs (ABSENT from public)
 │   ├── README - docs.md
 │   └── ...
-├── planning/                <- day-by-day planning (gitignored)
+├── planning/                <- day-by-day planning (ABSENT from public)
 │   ├── README - planning.md
 │   ├── ...
 │   └── daily/               <- one file per working day, J_YYYY-MM-DD.md (no NNN_ prefix)
 └── raw/                     <- raw research notes, kept as-is (no NNN_ prefix, no frontmatter)
 ```
 
-> The `archives/` subfolder is gitignored like the rest of `_Private/`. It exists to keep evolution of decisions traceable when a doc is rewritten or translated.
+> `_Private/` content is **NOT gitignored** — it is tracked in the local `main` branch and pushed to the private remote `OdinRag-private`, then excluded from the public `public` branch via `refresh_public_branch.py` (two-branch strategy). Local `git status` keeps personal paths quiet via `.git/info/exclude` (LOCAL only, never version-controlled). Only `/_Private/.config/` is doubly protected (also in the tracked `.gitignore`) because credentials must never reach history.
+>
+> The `archives/` subfolder keeps the evolution of decisions traceable when a doc is rewritten or translated.
 > See [`_Private/archives/README - archives.md`](../../_Private/archives/README%20-%20archives.md) for the convention (when to archive, naming, frontmatter annotations).
 >
 > For PUBLIC archives (old versions of public-facing docs that should stay visible to collaborators), use a `_Helpers/archives/` folder instead - to be created on first need.

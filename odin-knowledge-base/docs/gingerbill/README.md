@@ -6,8 +6,9 @@
 
 ## What's here
 
-Only `README.md` (this file). The actual blog articles (`*.md` per post) are excluded
-from the public repo by design (see the `COPYRIGHTED SCRAPED CONTENT` section of the root `.gitignore`).
+Only `README.md` (this file) is present in the **public branch** of this repo.
+The actual blog articles (`*.md` per post) are **tracked in the local `main` branch** and pushed to the private remote `OdinRag-private`.
+They are excluded from the public `public` branch via the **two-branch strategy**, NOT via `.gitignore`. Canonical reference: [`../../../_Helpers/docs/007_mixing_public_and_private_history.md`](../../../_Helpers/docs/007_mixing_public_and_private_history.md).
 
 ## How to populate this locally
 
