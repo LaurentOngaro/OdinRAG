@@ -176,6 +176,21 @@
       "problemMatcher": [],
       "detail": "Same as [PUBLISH] full but skip the private push (use when you already pushed main to private manually).",
       "group": "build"
+    },
+    {
+      "label": "[SCRAPE] Run all scrapers (interactive)",
+      "type": "shell",
+      "command": "python _Helpers/scripts/scrapers/run_all_scrapers.py",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "new",
+        "focus": true
+      },
+      "problemMatcher": [],
+      "detail": "Launch every scraper in _Helpers/scripts/scrapers/ interactively. Lists each with its description and prompts [O/n/q] before launch. Supports --check (dry-run inventory), --yes (non-interactive), --only <substr>, --skip <substr> (both repeatable)."
     }
   ]
 }
