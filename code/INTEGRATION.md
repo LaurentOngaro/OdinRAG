@@ -81,7 +81,7 @@ Steps to add a new project:
 2. Fill out `code/projects/<your-project>/AGENTS.md` with: goal, stack, file structure, modules, allocator policy, patterns implemented, pitfalls, architectural decisions, KB sources.
 3. Fill out `code/projects/<your-project>/.kilo/agents/odin-project.md` with the project-specific sources-of-truth table (replace `<PROJECT_NAME>`).
 4. Add both files to `kilo.json` `instructions` (above the global `.kilo/agents/odin-gamedev.md` line so it loads first).
-5. Add `code/projects/<your-project>/` to `.git/info/exclude` so `git status` stays quiet locally (the folder itself stays tracked in `main` and pushed to the private remote — that's the two-branch strategy). The tracked `.gitignore` does **not** need an entry for this.
+5. Add `code/projects/<your-project>/` to `.git/info/exclude` so `git status` stays quiet locally (the folder itself stays tracked in `main` and pushed to the private remote - that's the two-branch strategy). The tracked `.gitignore` does **not** need an entry for this.
 6. Verify with `_Helpers/scripts/diagnostic/audit_public_safety.py` - the new files must be absent from the `public` branch.
 
 The orchestrator (`code` agent) auto-loads the project's `AGENTS.md` first because it appears earlier in the `instructions` array. The project's `odin-project.md` subagent is then auto-invoked when the question matches the project's topic.

@@ -129,7 +129,7 @@ _Private/
 └── raw/                     <- raw research notes, kept as-is (no NNN_ prefix, no frontmatter)
 ```
 
-> `_Private/` content is **NOT gitignored** — it is tracked in the local `main` branch and pushed to the private remote `OdinRag-private`, then excluded from the public `public` branch via `refresh_public_branch.py` (two-branch strategy). Local `git status` keeps personal paths quiet via `.git/info/exclude` (LOCAL only, never version-controlled). Only `/_Private/.config/` is doubly protected (also in the tracked `.gitignore`) because credentials must never reach history.
+> `_Private/` content is **NOT gitignored** - it is tracked in the local `main` branch and pushed to the private remote `OdinRag-private`, then excluded from the public `public` branch via `refresh_public_branch.py` (two-branch strategy). Local `git status` keeps personal paths quiet via `.git/info/exclude` (LOCAL only, never version-controlled). Only `/_Private/.config/` is doubly protected (also in the tracked `.gitignore`) because credentials must never reach history.
 >
 > The `archives/` subfolder keeps the evolution of decisions traceable when a doc is rewritten or translated.
 > See [`_Private/archives/README - archives.md`](../../_Private/archives/README%20-%20archives.md) for the convention (when to archive, naming, frontmatter annotations).

@@ -100,7 +100,7 @@ Chain of resolution per value: **env var > user_config.jsonc > empty string**.
 - **2-space** indentation inside `odin ...` blocks (no tabs, no smart tabs). Configured via `odinfmt.json` at repo root. Re-format procedure + flags: load the [`odin-format`](.kilo/skills/odin-format/SKILL.md) skill after any Odin edit.
 - **LF** newlines everywhere (even on Windows).
 - Inter-file links: relative `./module/lesson.md` or absolute from repo root.
-- Unicode characters in content: OK (accented letters, box-drawing). Smart punctuation (em-dash, smart quotes, ellipsis) NOT OK — see Punctuation rule below.
+- Unicode characters in content: OK (accented letters, box-drawing). Smart punctuation (em-dash, smart quotes, ellipsis) NOT OK - see Punctuation rule below.
 
 ### Planning (day-by-day)
 

@@ -66,10 +66,10 @@ git stash pop
 | Leak                                                | Cause                                | Fix                                                                                                       |
 | --------------------------------------------------- | ------------------------------------ | --------------------------------------------------------------------------------------------------------- |
 | `_Private/planning/daily/J_2026-XX-XX.md`           | Not in `.git/info/exclude`           | Add to `.git/info/exclude` + re-run `refresh_public_branch.py`                                            |
-| `odin-knowledge-base/courses/programvideogames/...` | Paywalled content                    | Tracked in `main` only, stripped from `public` branch — verify with `--verbose`                           |
+| `odin-knowledge-base/courses/programvideogames/...` | Paywalled content                    | Tracked in `main` only, stripped from `public` branch - verify with `--verbose`                           |
 | `_Private/.config/skool_credentials.txt`            | Credentials file accidentally staged | `git rm --cached` + verify `/_Private/.config/` is in `.gitignore` (doubly protected)                     |
-| `code/projects/PVG03_RPG/`                          | Personal project folder              | Tracked in `main` only, stripped from `public` branch — add to `.git/info/exclude` + update `STRIP_RULES` |
-| `odin-knowledge-base/docs/karl_zylinski/odin-book/` | Paywalled book chapters              | Tracked in `main` only, stripped from `public` branch — verify with `--verbose`                           |
+| `code/projects/PVG03_RPG/`                          | Personal project folder              | Tracked in `main` only, stripped from `public` branch - add to `.git/info/exclude` + update `STRIP_RULES` |
+| `odin-knowledge-base/docs/karl_zylinski/odin-book/` | Paywalled book chapters              | Tracked in `main` only, stripped from `public` branch - verify with `--verbose`                           |
 
 ## NEVER
 

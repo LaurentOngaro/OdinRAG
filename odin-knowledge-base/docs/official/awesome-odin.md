@@ -1,15 +1,11 @@
-<p align="center">
-    <img src="assets/logo_small.png" alt="Logo" width="200">
-</p>
-
-A curated list of awesome Odin libraries, software and resources.
+# A curated list of awesome Odin libraries, software and resources
 
 [Odin](https://odin-lang.org/) is a general-purpose programming language built for high-performance, modern systems and data-oriented programming.
 
 > [!NOTE]
 > Many commonly used bindings are already included in the [Vendor Collection](https://pkg.odin-lang.org/vendor/) which comes with the compiler
 
-# Contents
+## Contents
 
 - **[Getting Started](#getting-started)**
 - [Libraries](#libraries)
@@ -18,53 +14,53 @@ A curated list of awesome Odin libraries, software and resources.
 - [Resources](#resources)
 - [Built with Odin](#built-with-odin)
 
-## Other Lists
+### Other Lists
 
 - [Odin Wiki Libs](https://github.com/odin-lang/Odin/wiki/Odin-Libs)
 - [Core Library Collection](https://pkg.odin-lang.org/core/)
 - [Vendor Library Collection](https://pkg.odin-lang.org/vendor/)
 
-# Getting Started
+## Getting Started
 
 - [Installing Odin](https://odin-lang.org/docs/install/) to set up an Odin development environment. Alternatively Karl Zylinski made a video about [setting up the Odin compiler from source on Windows](https://youtu.be/yq5VabsGz_4?si=VAA-eyg3KmjjZh3H)
 - [Overview](https://odin-lang.org/docs/overview/) is the official documentation for the language
 - [demo.odin](https://github.com/odin-lang/Odin/blob/master/examples/demo/demo.odin) is an example of odin's features in practice
 - [Understanding the Odin Programming Language](https://odinbook.com/) is the first book on Odin. An easy-to-read book that bridges the gap between the online docs and years of experience. Loosely based on this article: [Introduction to Odin](https://zylinski.se/posts/introduction-to-odin/)
 
-# Packages
+## Packages
 
-## Libraries
+### Libraries
 
-### Gamedev
+#### Gamedev
 
-| Name                                                                                                         | Description                                                                                                                                                                    | License                                                                                           | Tags                                      |
-| ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------- | ----------------------------------------- |
-| [Ravn Engine](https://github.com/jakubtomsu/ravn)                                                            | Simple and efficient framework for 2D and 3D game development.                                                                                                                 | [MIT](https://github.com/jakubtomsu/ravn/blob/main/LICENSE.txt)                                   | Gamedev                                   |
-| [Karl 2D](https://github.com/karl-zylinski/karl2d)                                                           | Odin 2D game library. Beginner friendly and easy to modify                                                                                                                     | [Zlib](https://github.com/karl-zylinski/karl2d/blob/master/LICENSE)                               | Framework                                 |
-| [Jamgine](https://github.com/asbott/jamgine/tree/audio)                                                      | Self-contained realtime graphical application engine with a simplistic design philosophy                                                                                       | [MIT](https://github.com/asbott/jamgine/blob/main/LICENSE)                                        | Gamedev, Engine, Graphics, Vulkan         |
-| [LBP Serialization](https://github.com/jakubtomsu/odin-lbp-serialization)                                    | Easy-to-use LBP binary serialization utility                                                                                                                                   | [MIT](https://github.com/jakubtomsu/odin-lbp-serialization/blob/main/LICENSE)                     | Gamedev, Serialization, Assets            |
-| [jobs](https://github.com/jakubtomsu/jobs)                                                                   | Job system                                                                                                                                                                     | [MIT](https://github.com/jakubtomsu/jobs/blob/main/LICENSE)                                       | Gamedev                                   |
-| [Godot Toolkit](https://github.com/dresswithpockets/odin-godot)                                              | Toolkit for Godot 4.4 to work with GDExtension and generating boilerplate                                                                                                      | [Apache 2.0](https://github.com/dresswithpockets/odin-godot/blob/main/LICENSE)                    | Gamedev, Engine, Utility                  |
-| [glTF2](https://github.com/Pawel82S/glTF2)                                                                   | Native Odin implementation of glTF2 loading file format                                                                                                                        | [MIT](https://github.com/Pawel82S/glTF2/blob/master/LICENSE)                                      | Gamedev, Format, 3D                       |
-| [Aseprite loader](https://github.com/blob1807/odin-aseprite)                                                 | Handler for Aseprite's .ase/.aseprite, .aseprite-extension & extended .gpl files writen in Odin                                                                                | [BSD 3-Clause](https://github.com/blob1807/odin-aseprite/blob/main/LICENSE)                       | Gamedev, 2D, Format                       |
-| [Odin + Raylib Hotreloading Template](https://github.com/karl-zylinski/odin-raylib-hot-reload-game-template) | An Odin + Raylib game template with Hot Reloading pre-setup. My game projects tend to have some things in common, so I made this template so I can get up and running quicker  | [Custom](https://github.com/karl-zylinski/odin-raylib-hot-reload-game-template/blob/main/LICENSE) | Gamedev, Template, Raylib                 |
-| [Odin + Sokol Template](https://github.com/karl-zylinski/odin-sokol-web)                                     | An Odin + Sokol template with WASM support.                                                                                                                                    | [MIT](https://github.com/karl-zylinski/odin-sokol-web/blob/main/LICENSE)                          | Gamedev, Template, Sokol                  |
-| [Anima](https://github.com/atomicptr/anima)                                                                  | A 2D animation library for Odin. Inspired by the LÖVE library [anim8](https://github.com/kikito/anim8)                                                                         | [MIT](https://github.com/atomicptr/anima/blob/master/LICENSE)                                     | Gamedev, 2D, Utility, Raylib              |
-| [ZTME](https://github.com/Z7-Z7L/ZTME)                                                                       | Simple Tile Editor Made For Raylib In Odin                                                                                                                                     | [MIT](https://github.com/Z7-Z7L/ZTME?tab=MIT-1-ov-file#readme)                                    | Gamedev, 2D, Utility, Editor, Raylib      |
-| [pathgrid](https://github.com/scoobery/odin_pathgrid)                                                        | A simple 2D grid-based pathfinding library for Odin                                                                                                                            | [BSD 3-Clause "New" or "Revised"](https://github.com/scoobery/odin_pathgrid/blob/master/LICENSE)  |                                           |
-| [VEFontCache](https://github.com/Ed94/VEFontCache-Odin)                                                      | A port of Vertex Engine GPU Font Cache ([VEFontCache](https://github.com/hypernewbie/VEFontCache)) for the Odin programming language                                           | [Custom](https://github.com/Ed94/VEFontCache-Odin/blob/main/LICENSE.md)                           |                                           |
-| [Dusk](https://github.com/JerMakesStuff/Dusk)                                                                | A small game framework / project template                                                                                                                                      | [MIT](https://github.com/JerMakesStuff/Dusk/blob/main/LICENSE)                                    | Gamedev, Template, Framework, Engine, ECS |
-| [mikktspace](https://github.com/wrapperup/odin-mikktspace)                                                   | A port of Morten S. Mikkelsen's tangent space algorithm for Odin                                                                                                               | [zlib](https://github.com/wrapperup/odin-mikktspace/blob/main/LICENSE)                            | Gamedev, Graphics, 3D                     |
-| [Valhalla](https://github.com/xandaron/valhalla)                                                             | A graphics engine designed for rendering 3D scenes with a focus on non-photorealistic rendering techniques                                                                     | [MIT](https://github.com/xandaron/Valhalla/blob/Odin_3D_Engine/LICENSE)                           | Gamedev, Vulkan, Graphics                 |
-| [Anvil](https://github.com/ariaghora/anvil)                                                                  | Neural network inference in pure Odin                                                                                                                                          | [MIT](https://github.com/ariaghora/anvil/blob/main/LICENSE)                                       | ML, ONNX                                  |
-| [libretro](https://codeberg.org/virtualxt/libretro)                                                          | Simple API that allows for the creation of games and emulators                                                                                                                 | [MIT](https://codeberg.org/virtualxt/libretro/src/branch/main/LICENSE)                            | Gamedev, Emulation                        |
-| [muninn](https://github.com/GuilHartt/muninn)                                                                | A lightweight, high-performance, archetype-based Entity Component System (ECS)                                                                                                 | [zlib](https://github.com/GuilHartt/muninn/blob/main/LICENSE)                                     | Gamedev, ECS, Performance                 |
-| [odecs](https://github.com/NateTheGreatt/odecs)                                                              | A simple, modern ECS built in Odin.                                                                                                                                            | [MIT](https://github.com/NateTheGreatt/odecs/blob/main/license)                                   | Gamedev, ECS                              |
-| [moecs](https://github.com/helioscout/moecs)                                                                 | Easy to use **mo**tivated **e**ntity **c**omponent **s**ystem.                                                                                                                 | [MIT](https://github.com/helioscout/moecs/blob/master/LICENSE.md)                                 | Gamedev, ECS                              |
-| [Odin Unity Interop](https://github.com/herohiralal/com.herohiralal.odininterop)                             | Odin interoperability for Unity. Works with Windows, Mac, Linux, iOS, Android. Super-easy to generate C# bindings, and the package already ships with a lot of necessary ones. | [Apache 2.0](https://github.com/herohiralal/com.herohiralal.odininterop/blob/main/LICENSE)        | GameDev, Unity, Engine, Utility           |
-| [Marshmallow engine](https://github.com/DragosPopse/marshmallow)                                             | WIP Game Engine written in pure Odin                                                                                                                                           | None                                                                                              | Gamedev, Engine                           |
+| Name                                                                                                         | Description                                                                                                                                                                     | License                                                                                           | Tags                                      |
+| ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- | ----------------------------------------- |
+| [Ravn Engine](https://github.com/jakubtomsu/ravn)                                                            | Simple and efficient framework for 2D and 3D game development.                                                                                                                  | [MIT](https://github.com/jakubtomsu/ravn/blob/main/LICENSE.txt)                                   | Gamedev                                   |
+| [Karl 2D](https://github.com/karl-zylinski/karl2d)                                                           | Odin 2D game library. Beginner friendly and easy to modify                                                                                                                      | [Zlib](https://github.com/karl-zylinski/karl2d/blob/master/LICENSE)                               | Framework                                 |
+| [Jamgine](https://github.com/asbott/jamgine/tree/audio)                                                      | Self-contained realtime graphical application engine with a simplistic design philosophy                                                                                        | [MIT](https://github.com/asbott/jamgine/blob/main/LICENSE)                                        | Gamedev, Engine, Graphics, Vulkan         |
+| [LBP Serialization](https://github.com/jakubtomsu/odin-lbp-serialization)                                    | Easy-to-use LBP binary serialization utility                                                                                                                                    | [MIT](https://github.com/jakubtomsu/odin-lbp-serialization/blob/main/LICENSE)                     | Gamedev, Serialization, Assets            |
+| [jobs](https://github.com/jakubtomsu/jobs)                                                                   | Job system                                                                                                                                                                      | [MIT](https://github.com/jakubtomsu/jobs/blob/main/LICENSE)                                       | Gamedev                                   |
+| [Godot Toolkit](https://github.com/dresswithpockets/odin-godot)                                              | Toolkit for Godot 4.4 to work with GDExtension and generating boilerplate                                                                                                       | [Apache 2.0](https://github.com/dresswithpockets/odin-godot/blob/main/LICENSE)                    | Gamedev, Engine, Utility                  |
+| [glTF2](https://github.com/Pawel82S/glTF2)                                                                   | Native Odin implementation of glTF2 loading file format                                                                                                                         | [MIT](https://github.com/Pawel82S/glTF2/blob/master/LICENSE)                                      | Gamedev, Format, 3D                       |
+| [Aseprite loader](https://github.com/blob1807/odin-aseprite)                                                 | Handler for Aseprite's .ase/.aseprite, .aseprite-extension & extended .gpl files writen in Odin                                                                                 | [BSD 3-Clause](https://github.com/blob1807/odin-aseprite/blob/main/LICENSE)                       | Gamedev, 2D, Format                       |
+| [Odin + Raylib Hotreloading Template](https://github.com/karl-zylinski/odin-raylib-hot-reload-game-template) | An Odin + Raylib game template with Hot Reloading pre-setup. My game projects tend to have some things in common, so I made this template so I can get up and running quicker   | [Custom](https://github.com/karl-zylinski/odin-raylib-hot-reload-game-template/blob/main/LICENSE) | Gamedev, Template, Raylib                 |
+| [Odin + Sokol Template](https://github.com/karl-zylinski/odin-sokol-web)                                     | An Odin + Sokol template with WASM support.                                                                                                                                     | [MIT](https://github.com/karl-zylinski/odin-sokol-web/blob/main/LICENSE)                          | Gamedev, Template, Sokol                  |
+| [Anima](https://github.com/atomicptr/anima)                                                                  | A 2D animation library for Odin. Inspired by the LÖVE library [anim8](https://github.com/kikito/anim8)                                                                          | [MIT](https://github.com/atomicptr/anima/blob/master/LICENSE)                                     | Gamedev, 2D, Utility, Raylib              |
+| [ZTME](https://github.com/Z7-Z7L/ZTME)                                                                       | Simple Tile Editor Made For Raylib In Odin                                                                                                                                      | [MIT](https://github.com/Z7-Z7L/ZTME?tab=MIT-1-ov-file#readme)                                    | Gamedev, 2D, Utility, Editor, Raylib      |
+| [pathgrid](https://github.com/scoobery/odin_pathgrid)                                                        | A simple 2D grid-based pathfinding library for Odin                                                                                                                             | [BSD 3-Clause "New" or "Revised"](https://github.com/scoobery/odin_pathgrid/blob/master/LICENSE)  |                                           |
+| [VEFontCache](https://github.com/Ed94/VEFontCache-Odin)                                                      | A port of Vertex Engine GPU Font Cache ([VEFontCache](https://github.com/hypernewbie/VEFontCache)) for the Odin programming language                                            | [Custom](https://github.com/Ed94/VEFontCache-Odin/blob/main/LICENSE.md)                           |                                           |
+| [Dusk](https://github.com/JerMakesStuff/Dusk)                                                                | A small game framework / project template                                                                                                                                       | [MIT](https://github.com/JerMakesStuff/Dusk/blob/main/LICENSE)                                    | Gamedev, Template, Framework, Engine, ECS |
+| [mikktspace](https://github.com/wrapperup/odin-mikktspace)                                                   | A port of Morten S. Mikkelsen's tangent space algorithm for Odin                                                                                                                | [zlib](https://github.com/wrapperup/odin-mikktspace/blob/main/LICENSE)                            | Gamedev, Graphics, 3D                     |
+| [Valhalla](https://github.com/xandaron/valhalla)                                                             | A graphics engine designed for rendering 3D scenes with a focus on non-photorealistic rendering techniques                                                                      | [MIT](https://github.com/xandaron/Valhalla/blob/Odin_3D_Engine/LICENSE)                           | Gamedev, Vulkan, Graphics                 |
+| [Anvil](https://github.com/ariaghora/anvil)                                                                  | Neural network inference in pure Odin                                                                                                                                           | [MIT](https://github.com/ariaghora/anvil/blob/main/LICENSE)                                       | ML, ONNX                                  |
+| [libretro](https://codeberg.org/virtualxt/libretro)                                                          | Simple API that allows for the creation of games and emulators                                                                                                                  | [MIT](https://codeberg.org/virtualxt/libretro/src/branch/main/LICENSE)                            | Gamedev, Emulation                        |
+| [muninn](https://github.com/GuilHartt/muninn)                                                                | A lightweight, high-performance, archetype-based Entity Component System (ECS)                                                                                                  | [zlib](https://github.com/GuilHartt/muninn/blob/main/LICENSE)                                     | Gamedev, ECS, Performance                 |
+| [odecs](https://github.com/NateTheGreatt/odecs)                                                              | A simple, modern ECS built in Odin.                                                                                                                                             | [MIT](https://github.com/NateTheGreatt/odecs/blob/main/license)                                   | Gamedev, ECS                              |
+| [moecs](https://github.com/helioscout/moecs)                                                                 | Easy to use **mo**tivated **e**ntity **c**omponent **s**ystem.                                                                                                                  | [MIT](https://github.com/helioscout/moecs/blob/master/LICENSE.md)                                 | Gamedev, ECS                              |
+| [Odin Unity Interop](https://github.com/herohiralal/com.herohiralal.odininterop)                             | Odin interoperability for Unity. Works with Windows, Mac, Linux, iOS, Android. Super-easy to generate C## bindings, and the package already ships with a lot of necessary ones. | [Apache 2.0](https://github.com/herohiralal/com.herohiralal.odininterop/blob/main/LICENSE)        | GameDev, Unity, Engine, Utility           |
+| [Marshmallow engine](https://github.com/DragosPopse/marshmallow)                                             | WIP Game Engine written in pure Odin                                                                                                                                            | None                                                                                              | Gamedev, Engine                           |
 
-### Formats
+#### Formats
 
 | Name                                                                      | Description                                                                                  | License                                                                       | Tags                   |
 | ------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ---------------------- |
@@ -79,13 +75,13 @@ A curated list of awesome Odin libraries, software and resources.
 | [TOML Parser](https://github.com/Up05/toml_parser)                        | A simple TOML parser                                                                         | [MIT](https://github.com/Up05/toml_parser/blob/main/LICENSE)                  |                        |
 | [BML Parser](https://github.com/mabeh19/bml/)                             | Structured binary parser based on XML schemes                                                | None                                                                          |                        |
 
-### Networking
+#### Networking
 
 | Name                                             | Description                                                                                 | License                                                      | Tags                       |
 | ------------------------------------------------ | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------ | -------------------------- |
 | [Odin HTTP](https://github.com/laytan/odin-http) | A HTTP/1.1 server & client implementation for Odin purely written in Odin (besides OpenSSL) | [MIT](https://github.com/laytan/odin-http/blob/main/LICENSE) | Webdev, Server, Networking |
 
-### Webdev
+#### Webdev
 
 | Name                                                                   | Description                                                                 | License                                                                              | Tags             |
 | ---------------------------------------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ | ---------------- |
@@ -93,7 +89,7 @@ A curated list of awesome Odin libraries, software and resources.
 | [Open-OstrichDB](https://github.com/Archetype-Dynamics/Open-OstrichDB) | The open source backend that powers [OstrichDB.com](https://ostrichdb.com/) | [Apache 2.0](https://github.com/Archetype-Dynamics/Open-OstrichDB/blob/main/LICENSE) | Webdev, Database |
 | [OstrichDB-CLI](https://github.com/Archetype-Dynamics/OstrichDB-CLI)   | A NoSQL/NoJSON document based DBMS directly in your terminal!               | [Apache 2.0](https://github.com/Archetype-Dynamics/OstrichDB-CLI/blob/main/LICENCE)  | Database         |
 
-### Templating
+#### Templating
 
 | Name                                                        | Description                                                                   | License                                                                             | Tags             |
 | ----------------------------------------------------------- | ----------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- | ---------------- |
@@ -101,7 +97,7 @@ A curated list of awesome Odin libraries, software and resources.
 | [Temple](https://github.com/laytan/temple)                  | Templating engine that compiles to Odin io calls                              | [MIT](https://github.com/laytan/temple/blob/main/LICENSE)                           | Template, Webdev |
 | [Templateless](https://github.com/nviam/odin-templateless)  | A lightweight, logicless templating library for the Odin programming language | [1-Clause BSD NON-AI](https://github.com/nviam/odin-templateless/blob/main/LICENSE) | Template, Webdev |
 
-### Data structures
+#### Data structures
 
 | Name                                                      | Description                                                                                        | License                                                       | Tags                          |
 | --------------------------------------------------------- | -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- | ----------------------------- |
@@ -109,7 +105,7 @@ A curated list of awesome Odin libraries, software and resources.
 | [Piece Table](https://github.com/xDahl/Piece-Table)       | Piece-Table implementation written in Odin, and comes with unlimited linear undo & redo capability | [MIT](https://github.com/xDahl/Piece-Table/blob/main/LICENSE) | Datastructure                 |
 | [Shared Memory Queue](https://github.com/0xULT/shm_queue) | Thread safe lock free ring buffers that seek to minimize false sharing, MPMC and SPMC              | None                                                          | Datastructure, Multithreading |
 
-### Other
+#### Other
 
 | Name                                                              | Description                                                                                                                              | License                                                                      | Tags                       |
 | ----------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | -------------------------- |
@@ -127,7 +123,7 @@ A curated list of awesome Odin libraries, software and resources.
 | [locale](https://codeberg.org/mgavioli/locale)                    | An experimental Odin libray to manage locale informations. Inspired by [findlocale](https://icculus.org/~aspirin/findlocale/) C library  | [FreeBSD](https://codeberg.org/mgavioli/locale/src/branch/master/LICENSE.md) |                            |
 | [podin](https://codeberg.org/mgavioli/podin)                      | `.pot` generation utility from Odin sources to collect translatable messages to be managed with tools like [PoEdit](https://poedit.net/) | [FreeBSD](https://codeberg.org/mgavioli/podin/src/branch/main/LICENSE.md)    |                            |
 
-### Language Tooling
+#### Language Tooling
 
 Compilers, transpilers, binding generators, and other language-related tools.
 
@@ -137,11 +133,11 @@ Compilers, transpilers, binding generators, and other language-related tools.
 | [VecC](https://github.com/jakubtomsu/vecc)     | Experimental vector-oriented programming language with C codegen                                                  | [MIT](https://github.com/jakubtomsu/vecc/blob/main/LICENSE)                 | C codegen, SIMD |
 | [Runic](https://github.com/Samudevv/runic)     | Bindings Generator and Intermediate Format for programming languages using the C-ABI, with support for C and Odin | [GNU v2.0](https://github.com/Samudevv/runic/blob/master/LICENSE)           |                 |
 
-## Built-in
+### Built-in
 
 This is a list of notable libraries which are distributed along with the Odin compiler. For a full list head over to [Official Package Documentation](https://pkg.odin-lang.org/).
 
-### Base
+#### Base
 
 Base packages are required by the compiler
 
@@ -151,7 +147,7 @@ Base packages are required by the compiler
 | [intrinsics](https://pkg.odin-lang.org/base/intrinsics/) | Contains Odin's compiler-level intrinsics, including many low-level procs like atomics, SIMD, X86 or WASM intrinsics and compile-time type reflection                                             |
 | [runtime](https://pkg.odin-lang.org/base/runtime/)       | This is the runtime code required by the compiler. Contains definitions of context, allocator, logger, map, dynamic array, type_info etc. and implements things like appending to a dynamic array |
 
-### Core
+#### Core
 
 The core packages implement most of the common features you need while working with Odin
 
@@ -171,7 +167,7 @@ The core packages implement most of the common features you need while working w
 | [reflect](https://pkg.odin-lang.org/core/reflect/)             | Runtime type reflection                                                                       |
 | [path/filepath](https://pkg.odin-lang.org/core/path/filepath/) | File path string operations                                                                   |
 
-### Vendor
+#### Vendor
 
 Vendor packages are commonly-used third-party libraries distributed along with the compiler
 
@@ -189,7 +185,7 @@ Vendor packages are commonly-used third-party libraries distributed along with t
 | [stb](https://pkg.odin-lang.org/vendor/stb/)                                                   | Bindings for libs from [STB](https://github.com/nothings/stb)                                                                    | Format, Gamedev, Assets, Utility     |
 | [sdl2](https://pkg.odin-lang.org/vendor/sdl2/), [sdl3](https://pkg.odin-lang.org/vendor/sdl3/) | Bindings for [SDL](https://www.libsdl.org), a cross-platform development library                                                 | Gamedev, Graphics, Audio, Networking |
 
-## Bindings
+### Bindings
 
 List of Odin bindings to C/C++ libraries.
 
@@ -250,7 +246,7 @@ If you can't find the bindings you need, then you can try using this generator: 
 | [wsServer](https://github.com/saenai255/odin-wsserver)                 | [wsServer](https://github.com/Theldus/wsServer) C WebSocket library                                                                                                                                                                                              | [MIT](https://github.com/saenai255/odin-wsserver/blob/main/LICENSE)                         | WebSockets, Networking                         |
 | [Odin-Slang](https://github.com/DragosPopse/odin-slang)                | Bings for [Shader-Slang](https://github.com/shader-slang/slang)                                                                                                                                                                                                  | [Apache-2.0](https://github.com/shader-slang/slang/blob/master/LICENSE)                     | ML, GPU, Gamedev, Graphics                     |
 
-# Gists
+## Gists
 
 Useful Github Gists in Odin.
 
@@ -280,7 +276,7 @@ Useful Github Gists in Odin.
 | [sokol_gfx + D3D11 setup without sokol_app](https://gist.github.com/jakubtomsu/470e33d477936ba9c772e2395f661b5f) | Minimal example of sokol_gfx on native D3D11                                                   | Graphics, Gamedev                                   |
 | [Cubic curves](https://gist.github.com/jakubtomsu/577f2375aad587e09c2d75e085fef87f)                              | Sample of various cubic curves (bezier, hermite, catmull-rom, b-spline) based on Freya's video | Math, Graphics, Gamedev                             |
 
-# Resources
+## Resources
 
 List of Odin tutorials, articles, videos and other resources.
 
@@ -311,13 +307,13 @@ List of Odin tutorials, articles, videos and other resources.
 | [Simple Undo/Redo](https://jakubtomsu.github.io/posts/simple_undo_redo_in_odin/)                                                                                 | An article about a grug brained approach to level editor history                                       | Article, Gamedev               |
 | [Odin SDL3 GPU Tutorial](https://www.youtube.com/playlist?list=PLI3kBEQ3yd-CbQfRchF70BPLF9G1HEzhy)                                                               | A video tutorial series on how to get started with the SDL3 GPU API                                    | Youtube, Tutorial, Playlist    |
 
-## Interviews
+### Interviews
 
 - [ThePrimeagen - Odin Creator Ginger Bill Talks Odin](https://youtu.be/nVa9mgRcVPs?si=Thf2agqoYtYYsXIR)
 - [Developer Voices - Is Odin "Programming done right"? (with Bill Hall)](https://youtu.be/aKYdj0f1iQI?si=oBESSHmgSZGYEPmw)
 - [Mike Shah & Ginger Bill - Programming Proverbs and the Odin programming language](https://youtu.be/IXUfD5c5wp4?si=fga31CkhzYBLeZ0W)
 
-# Tooling
+## Tooling
 
 A linter is built into the compiler, see `odin help check`, specifically the `-vet-*` and `-strict-style` flags.
 
@@ -327,9 +323,9 @@ A linter is built into the compiler, see `odin help check`, specifically the `-v
 - [[laytan/setup-odin](https://github.com/laytan/setup-odin)]: GitHub action for setting up the compiler ![GitHub last commit](https://img.shields.io/github/last-commit/laytan/setup-odin)
 - [[Data-Oriented-House/PortableBuildTools](https://github.com/Data-Oriented-House/PortableBuildTools)]: Portable, simple and fast installer for Visual Studio Build Tools ![GitHub last commit](https://img.shields.io/github/last-commit/Data-Oriented-House/PortableBuildTools)
 
-# Built with Odin
+## Built with Odin
 
-## Open-source Projects
+### Open-source Projects
 
 Open-source software implemented in Odin.
 
@@ -355,7 +351,7 @@ Open-source software implemented in Odin.
 | [Bragi](https://github.com/xandaron/Bragi)                                      | An image processing pipeline in Vulkan for testing post processing effects                                                                    | [MIT](https://github.com/xandaron/Bragi/blob/main/LICENSE)                               | Vulkan, Shader                   |
 | [mouniverse](https://github.com/helioscout/mouniverse)                          | Space game crafted with Odin, karl2d, box2d, moecs.                                                                                           | [GPL-3.0](https://github.com/helioscout/mouniverse/blob/master/LICENSE.md)               | Gamedev, ECS                     |
 
-## Closed-Source Projects
+### Closed-Source Projects
 
 A list of interesting software built in Odin. It's not open-source, but it can still be useful or inspiring.
 
@@ -367,7 +363,7 @@ A list of interesting software built in Odin. It's not open-source, but it can s
 | [CAT & ONION](https://odin-lang.org/showcase/cat_and_onion/) | A whimsical adventure game about a cat (NOTE: the source code is available if you buy the game on [itch.io](https://zylinski.itch.io/cat-and-onion))       | Gamedev, 2D                     |
 | [entry00](https://smilex.itch.io/odin-entry00)               | A simple 2d game made in 8 hours                                                                                                                           | Gamedev, 2D                     |
 
-# Editor Support
+## Editor Support
 
 | Name                                                        | Description                                                    | License                                                                   |
 | ----------------------------------------------------------- | -------------------------------------------------------------- | ------------------------------------------------------------------------- |
@@ -380,7 +376,7 @@ A list of interesting software built in Odin. It's not open-source, but it can s
 | [Tree Sitter](https://github.com/amaanq/tree-sitter-odin)   | Odin Tree-sitter grammar                                       | [MIT](https://github.com/ap29600/tree-sitter-odin/blob/main/LICENSE)      |
 | [Zed](https://github.com/clseibold/zed-odin)                | Zed Editor plugin integrating OLS and Tree-sitter              | [MIT](https://github.com/clseibold/zed-odin/blob/main/LICENSE)            |
 
-# Deprecated
+## Deprecated
 
 A list of outdated/deprecated/archived libraries, included for the sake of completeness and in case someone wants to update it.
 
@@ -400,12 +396,12 @@ A list of outdated/deprecated/archived libraries, included for the sake of compl
 | https://github.com/mp768/odin-lua-bindings       | check out `vendor:lua`         |
 | https://github.com/laytan/odin-pattern           | check out `core:text/match`    |
 
-# Links
+## Links
 
 - [Reddit](https://www.reddit.com/r/odinlang/)
 - [Twitter](https://twitter.com/odinlang)
 - [Github](https://github.com/odin-lang/Odin)
 
-# Contributions
+## Contributions
 
 Please submit a PR to add any interesting/useful Odin projects! Make sure to properly link license and add useful tags for easier searching.
