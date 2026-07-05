@@ -33,15 +33,14 @@ import re
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from bs4 import BeautifulSoup, Tag
 from bs4.element import NavigableString
 
 from markdownify import markdownify as md
 
-from _Helpers.scripts.lib.user_config import env_or_config
+from lib.user_config import env_or_config
 
 _DESCRIPTION = (
     "Convert Karl's HTML book into one MD file per chapter + a book index README."

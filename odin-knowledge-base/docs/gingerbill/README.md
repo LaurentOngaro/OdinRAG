@@ -2,19 +2,18 @@
 
 > This folder is the **public landing** for the Ginger Bill (`gingerbill.org`) content.
 > The scraped articles themselves are **not** redistributed in this repo - see
-> [`../../../SOURCES.md`](../../../SOURCES.md) for licensing and how to obtain them legally on your own.
+> [`../../SOURCES.md`](../../SOURCES.md) for licensing and how to obtain them legally on your own.
 
 ## What's here
 
-Only `README.md` (this file) is present in the **public branch** of this repo.
-The actual blog articles (`*.md` per post) are **tracked in the local `main` branch** and pushed to the private remote `OdinRag-private`.
-They are excluded from the public `public` branch via the **two-branch strategy**, NOT via `.gitignore`. Canonical reference: [`../../../_Helpers/docs/007_mixing_public_and_private_history.md`](../../../_Helpers/docs/007_mixing_public_and_private_history.md).
+Only `README.md` (this file). The actual blog articles (`*.md` per post) are excluded
+from the public repo by design (see the `COPYRIGHTED SCRAPED CONTENT` section of the root `.gitignore`).
 
 ## How to populate this locally
 
 If you want the full articles on your machine:
 
-1. Read [`../../../SOURCES.md`](../../../SOURCES.md) for licensing.
+1. Read [`../../SOURCES.md`](../../SOURCES.md) for licensing.
 2. Authenticate nothing - `gingerbill.org` is public.
 3. Run:
 
@@ -80,4 +79,5 @@ Articles that the scraper can pull (specific count depends on your local run):
 - [`../official/`](../official/) - Odin official docs (public, included)
 - [`../karl_zylinski/`](../karl_zylinski/) - Karl Zylinski blog index
 - [`../newsletters/`](../newsletters/) - Odin newsletters index
-- [`../../../SOURCES.md`](../../../SOURCES.md) - source procurement guide
+- [`../../SOURCES.md`](../../SOURCES.md) - source procurement guide
+- [`../../_Helpers/docs/002_how_minimax_m3_is_used_in_this_repository.md`](../../_Helpers/docs/002_how_minimax_m3_is_used_in_this_repository.md) - how MiniMax-M3 powers this repo

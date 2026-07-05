@@ -88,18 +88,12 @@ def scrape_to_markdown(
     output_path.write_text(f"{markdown}\n\n>Source: {source_url}\n", encoding="utf-8")
 
     if format_odin and output_path.suffix.lower() == ".md":
-        # Add _Helpers/scripts/fixes/ + repo root to sys.path so that odin_format can import _Helpers.scripts.lib.user_config.
-        _scripts_fixes_dir = Path(__file__).resolve().parents[3] / "_Helpers" / "scripts" / "fixes"
-        _repo_root = Path(__file__).resolve().parents[3]
-        sys.path.insert(0, str(_scripts_fixes_dir))
-        sys.path.insert(0, str(_repo_root))
-
-        from _Helpers.scripts.fixes.odin_format import (  # noqa: E402
-            ODINFMT_EXE,
-            ODINFMT_CONFIG,
-            MAX_FILE_BYTES,
-            format_path_if_odin,
-        )
+        # Add _Helpers/scripts/ to sys.path so `from fixes.odin_format import …` works
+        # (mirrors the convention used by every scraper in _Helpers/scripts/scrapers/).
+        _scripts_dir = Path(__file__).resolve().parent.parent
+        if str(_scripts_dir) not in sys.path:
+            sys.path.insert(0, str(_scripts_dir))
+        from fixes.odin_format import format_path_if_odin  # noqa: E402
 
         format_path_if_odin(output_path, silent=True)
 

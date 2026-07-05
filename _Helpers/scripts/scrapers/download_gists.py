@@ -33,6 +33,9 @@ AWESOME_MD = REPO_ROOT / "odin-knowledge-base" / "docs" / "official" / "awesome-
 GISTS_DIR = REPO_ROOT / "code" / "gists"
 GISTS_README = GISTS_DIR / "README.md"
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from fixes.odin_format import format_path_if_odin  # noqa: E402
+
 GIST_URL_RE = re.compile(r"https://gist\.github\.com/([^/]+)/([0-9a-fA-F]+)")
 
 API_URL = "https://api.github.com/gists/{}"
@@ -155,6 +158,7 @@ def download_one(full_url: str, _owner: str, gist_id: str, existing: dict[str, P
             out_content = source_line + content
 
         out_path.write_text(out_content, encoding="utf-8")
+        format_path_if_odin(out_path, silent=True)
         print(f"    [OK] {out_path.name}")
         break
 

@@ -39,14 +39,14 @@ from pathlib import Path
 
 # Allow importing the `_Helpers/lib` package from the archive.
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from lib.http_client import (  # noqa: E402
+from lib.http_client import (
     crawl_links,
     discover_via_rss,
     discover_via_sitemap,
     normalize_url,
     slug_from_url,
 )
-from lib.html2md import scrape_to_markdown  # noqa: E402
+from lib.html2md import scrape_to_markdown 
 
 _DESCRIPTION = "Karl Zylinski blog scraper (zylinski.se) - re-entrant via RSS, --force to rewrite."
 

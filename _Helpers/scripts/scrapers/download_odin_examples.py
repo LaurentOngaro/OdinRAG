@@ -35,6 +35,9 @@ from pathlib import Path
 from urllib.error import URLError
 from urllib.request import Request, urlopen
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from fixes.odin_format import format_path_if_odin  # noqa: E402
+
 _API_BASE = "https://api.github.com/repos/odin-lang/Odin/contents"
 _API_PATHS: list[str] = [
     "examples/demo",
@@ -204,6 +207,7 @@ def main(argv: list[str] | None = None) -> int:
             continue
 
         dest.write_text(content, encoding="utf-8")
+        format_path_if_odin(dest, silent=True)
         print(f"    [OK] {fname} ({len(content)} bytes)")
         downloaded += 1
         time.sleep(REQUEST_DELAY)

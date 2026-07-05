@@ -65,10 +65,9 @@ from urllib.request import Request, urlopen
 from urllib.error import URLError, HTTPError
 
 # Helpers réutilisables (lib/ + fixes/)
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "fixes"))
-from lib.text_clean import repair_mojibake  # noqa: E402
-from _Helpers.scripts.fixes.odin_format import format_path_if_odin  # noqa: E402
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from lib.text_clean import repair_mojibake
+from fixes.odin_format import format_path_if_odin
 
 
 # get root directory
@@ -96,7 +95,7 @@ OUTPUT_DIR     = ROOT_DIR / "odin-knowledge-base" / "courses" / "programvideogam
 DELAY_BETWEEN  = 1.0   # secondes entre chaque appel Skool (politesse)
 
 # yt-dlp: read in this order - env var YT_DLP_EXE > user_config.jsonc paths.yt_dlp_exe > empty string
-from _Helpers.scripts.lib.user_config import env_or_config
+from lib.user_config import env_or_config
 YT_DLP_EXE     = env_or_config("paths.yt_dlp_exe", "YT_DLP_EXE")
 
 # Video download
@@ -259,7 +258,7 @@ def setup_credentials() -> None:
     credentials["SKOOL_PASSWORD"] = os.environ.get("SKOOL_PASSWORD", credentials.get("SKOOL_PASSWORD", ""))
     # Priority 2: _Private/.config/user_config.jsonc (skool.email only - password stays env/file/prompt)
     try:
-        from _Helpers.scripts.lib.user_config import SKOOL as _SKOOL
+        from lib.user_config import SKOOL as _SKOOL
         if not credentials["SKOOL_EMAIL"]:
             credentials["SKOOL_EMAIL"] = _SKOOL.get("email", "")
     except (ImportError, OSError):

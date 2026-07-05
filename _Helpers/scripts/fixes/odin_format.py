@@ -37,7 +37,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from _Helpers.scripts.lib.user_config import env_or_config
+from lib.user_config import env_or_config
 
 # ─── CONFIG ───────────────────────────────────────────────────────────────────
 ODINFMT_EXE   = Path(env_or_config("paths.odinfmt_exe", "ODINFMT_EXE"))

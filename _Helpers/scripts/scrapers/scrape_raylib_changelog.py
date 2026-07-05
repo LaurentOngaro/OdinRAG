@@ -49,6 +49,7 @@ sys.stdout.reconfigure(encoding="utf-8")  # type: ignore[attr-defined]
 # Allow importing the `_Helpers/lib` package.
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from lib.http_client import DEFAULT_HEADERS, DEFAULT_TIMEOUT, fetch  # noqa: E402
+from fixes.odin_format import format_path_if_odin  # noqa: E402
 
 _DESCRIPTION = "Raylib GitHub releases scraper (raysan5/raylib)."
 
@@ -208,6 +209,7 @@ def main(argv: list[str] | None = None) -> int:
         try:
             content = render_release_md(r)
             out_path.write_text(content, encoding="utf-8")
+            format_path_if_odin(out_path, silent=True)
             size = out_path.stat().st_size
             print(f"  [{i:>3}/{len(releases)}] {tag}  [OK] {size:,} bytes")
             scraped += 1
@@ -218,6 +220,7 @@ def main(argv: list[str] | None = None) -> int:
     consolidated_path = OUT_ROOT / "raylib_changelog.md"
     try:
         consolidated_path.write_text(render_consolidated(releases), encoding="utf-8")
+        format_path_if_odin(consolidated_path, silent=True)
         print(f"  [+] consolidated -> {consolidated_path.name} "
                 f"({consolidated_path.stat().st_size:,} bytes)")
     except OSError as exc:
