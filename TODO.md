@@ -36,16 +36,16 @@ _None for now._
 
 _None for now._
 
-## Recurring tasks (last: RAPPEL01)
+## Recurring tasks (last: REC01)
 
-> Meet quarterly (see `_Helpers/templates/planning-daily/J_YYYY-MM-DD.md` section “Recurring reminders”).
-> KB Space Perplexity strategy documented in `_Private/raw/Perplexity backlog/2026-07-04_04_odin_assistant_optimization_espace_perplexity.md`.
+- [ ] REC01: **Quarterly check KB + Space** - run the following scripts to ensure the knowledge base and Space are up-to-date and consistent.
 
-- **REMINDER01** (target: 2026-10-01) - Quarterly check KB + Space
-  - `python _Helpers/scripts/scrapers/build_gitingest.py --check`
-  - `python _Helpers/scripts/scrapers/scrape_odin_changelog.py --check`
-  - `python _Helpers/scripts/scrapers/scrape_raylib_changelog.py --check`
-  - Audit list § 9A of the Perplexity doc (still aligned?)
+  ```bash
+  python _Helpers/scripts/scrapers/build_gitingest.py --check
+  python _Helpers/scripts/scrappers/scrape_odin_changelog.py --check
+  python _Helpers/scripts/scrappers/scrape_raylib_changelog.py --check
+  python _Helpers/scripts/diagnostic/audit_public_safety.py
+  ```
 
 ## Roadmap / Ideas to Investigate (last: IDEA01)
 
@@ -55,7 +55,9 @@ _None for now._
 
 Backlog (value to confirm):
 
-_None for now._
+- [ ] **`scrape_odin_discussions.py`** - postponed .
+- [ ] **`scrape_raylib_odin_bindings.py`** - unplanned.
+- [ ] **(Optional)** Upload the TerraBloom synthesis if pair-coding TerraBloom-like.
 
 ## Completed
 
