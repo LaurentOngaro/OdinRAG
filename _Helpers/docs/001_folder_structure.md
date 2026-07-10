@@ -57,6 +57,7 @@ odin-knowledge-base/
 │   ├── jakubtomsu/          <- jakubtomsu.github.io (sample in public, full corpus in main)
 │   └── showcase/            <- odin-lang.org/showcase/ (Odin team, public branch)
 ├── gitIngest/               <- gitingest snapshots of local Odin repo clones (public branch, regenerable)
+├── references/             <- curated cross-language style/design references (public branch, hand-maintained)
 └── courses/                 <- Skool programvideogames content (ABSENT from public)
 ```
 

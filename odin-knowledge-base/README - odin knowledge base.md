@@ -5,6 +5,7 @@
 - `docs/` - scraped Markdown sources (official, karl_zylinski, newsletters, gingerbill, jakubtomsu, showcase)
 - `INDEX.md` - central index by topic (auto + manual zones)
 - `gitIngest/` - gitingest snapshots of local Odin repo clones (regenerable)
+- `references/` - curated cross-language style/design references (TigerStyle, design philosophy); hand-maintained in both branches, see its README
 - `courses/` - Skool programvideogames content (TRACKED in local main, ABSENT from public branch via two-branch strategy)
 
 ## Conventions
