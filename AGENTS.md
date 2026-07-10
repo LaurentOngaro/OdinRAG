@@ -70,7 +70,7 @@ Chain of resolution per value: **env var > user_config.jsonc > empty string**.
 
 ## Conventions
 
-### File naming (NNN\_ prefix)
+### File naming (`NNN_` prefix)
 
 - **Default** (authored docs under `_Helpers/docs/` and `_Private/planning/`): filename is `NNN_snake_case_slug.md` (3-digit prefix, lowercase + underscores + hyphens). NNN restarts at 001 in each folder. Chronological by creation date.
 - **H1 title = filename exactly** (no leading `NNN_` in the H1 if the filename has one). Examples:
@@ -80,17 +80,17 @@ Chain of resolution per value: **env var > user_config.jsonc > empty string**.
 - **READMEs in authored folders**: filename is `README - <topic>.md` where `<topic>` is the parent directory name. H1 matches the filename (per the rule above). Examples:
   - `_Helpers/scripts/README - scripts.md` -> H1 `# README - scripts`
   - `_Helpers/docs/README - docs.md` -> H1 `# README - docs`
-- **NNN\_ prefix is NOT applied** to files in these folder patterns (they keep their natural name):
+- **`NNN_` prefix is NOT applied** to files in these folder patterns (they keep their natural name):
   - `**/templates/**` (template files keep their semantic name, e.g. `J_YYYY-MM-DD.md`, `main.odin`, `odin-project.md`)
   - `**/planning/**` (planning files use semantic names: `J_YYYY-MM-DD.md`, `NNN_odin_learning_plan_*.md`, `NNN_roadmap.md` - the `NNN_` is REQUIRED here as it's the only way to order them; daily files do NOT use `NNN_`)
   - `**/prompts/**` (prompt files keep their descriptive name, e.g. `refresh_topic_index.md`)
-  - `**/scripts/**` (Python files; the directory itself uses NNN\_ ordering via its README only)
+  - `**/scripts/**` (Python files; the directory itself uses `NNN_` ordering via its README only)
   - `**/social/**` (one-off social posts, no chronological order)
   - `**/daily/**` (dailies use `J_YYYY-MM-DD.md` - the `J_` prefix is the date tag)
-  - `**/raw/**` (raw notes kept as-is, no frontmatter, no NNN\_)
+  - `**/raw/**` (raw notes kept as-is, no frontmatter, no `NNN_`)
   - `**/decisions/**` (ADR files use `YYYY-MM-DD_ADR-NNN_<slug>.md` - see ADR section)
-  - `code/**` (no NNN\_ - code files keep their original names)
-  - `odin-knowledge-base/**` (no NNN\_ - scraped files keep their original slugs)
+  - `code/**` (no `NNN_` - code files keep their original names)
+  - `odin-knowledge-base/**` (no `NNN_` - scraped files keep their original slugs)
 - **Dailies live in `_Private/planning/daily/`** (tracked in `main` only, absent from `public`): their filename is purely personal and never reaches the public repo.
 - The full authoritative tree is in [`_Helpers/docs/001_folder_structure.md`](_Helpers/docs/001_folder_structure.md).
 
@@ -108,11 +108,11 @@ ADRs live in `_Private/docs/decisions/` (private, main-only).
 
 Perplexity AI (Space: Odin Assistant Projet jeu) uses GitHub MCP to read and write directly into `OdinRAG-private/main`.
 
-| Output type | Destination | Naming |
-| --- | --- | --- |
-| Session notes, Q&A, syntheses | `_Private/raw/Perplexity backlog/` | `<DATE>_<NNN>_<slug>.md` |
-| Decision drafts (pending validation) | `_Private/raw/Perplexity decisions/` | `<DATE>_<NNN>_<slug>.md` |
-| Validated ADRs | `_Private/docs/decisions/` | `<DATE>_ADR-<NNN>_<slug>.md` |
+| Output type                          | Destination                          | Naming                       |
+| ------------------------------------ | ------------------------------------ | ---------------------------- |
+| Session notes, Q&A, syntheses        | `_Private/raw/Perplexity backlog/`   | `<DATE>_<NNN>_<slug>.md`     |
+| Decision drafts (pending validation) | `_Private/raw/Perplexity decisions/` | `<DATE>_<NNN>_<slug>.md`     |
+| Validated ADRs                       | `_Private/docs/decisions/`           | `<DATE>_ADR-<NNN>_<slug>.md` |
 
 Do NOT upload repo-bound content to the Perplexity Space if it is already accessible via MCP (see `ADR-001`).
 
@@ -206,7 +206,7 @@ Verify with `python _Helpers/scripts/diagnostic/auditReadmeCoherence.py` (non-ze
 
 - **Exempted from this rule** (any language is fine):
   - Everything under `_Private/` (Bucket 3, gitignored) - never reaches the `public` branch.
-  - Files under any `**/raw/**` folder - raw notes are kept as-is by convention (no frontmatter, no NNN\_ prefix).
+  - Files under any `**/raw/**` folder - raw notes are kept as-is by convention (no frontmatter, no `NNN_` prefix).
   - Personal logs, planning notes, daily entries - always private.
 
 - **Rare public non-English doc**: annotate in frontmatter with `exception: <reason>` so the convention violation is explicit.
