@@ -29,6 +29,7 @@ OdinRAG/
 ├── .markdownlintignore
 ├── .editorconfig
 ├── .gitignore
+├── .zed/                    <- Project-level Zed config (settings.json, keymap.json, tasks.json)
 │
 ├── odin-knowledge-base/     <- Bucket 1 - Odin KB (sanitized in public branch, full in local main)
 ├── code/                    <- Bucket 1b - Public code references + personal projects (sanitized in public)

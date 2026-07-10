@@ -40,7 +40,7 @@
   "MD012": {
     "maximum": 1
   },
-  "MD013": false, // line length is intentionally NOT enforced - do not auto-wrap prose, tables, or URLs at any character limit
+  "MD013": false,
   "MD014": true,
   "MD018": true,
   "MD019": true,

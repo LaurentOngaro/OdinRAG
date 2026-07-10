@@ -9,6 +9,7 @@ Meta documentation about this repository:
 - `004_markdown_style.md` - Markdown style rules
 - `005_public_release_checklist.md` - pre-push checklist
 - `007_mixing_public_and_private_history.md` - workflow for splitting public/private content
+- `008_zed_setup.md` - project-level Zed configuration (mirrors VSCode setup)
 - `001_folder_structure.md` - **single source of truth for the folder tree**
 - `social/` - social posts (Reddit, Twitter, Discord)
 

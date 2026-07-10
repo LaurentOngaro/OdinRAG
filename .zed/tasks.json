@@ -1,0 +1,116 @@
+// Zed tasks for OdinRAG.
+//
+// Scope: project-level tasks mirroring the critical subset of `.vscode/tasks.json`.
+// Zed evaluates `tasks.json` from the worktree root (same as `.vscode/tasks.json`).
+//
+// Variables (Zed):
+//   $ZED_WORKTREE_ROOT  - absolute path of the workspace root
+//   $ZED_FILE           - absolute path of the active file
+//
+// Convention (from _Private/raw/2026-07-09_migration_vscode_vers_zed_odin.md):
+//   - Keep the PowerShell wrapper `_Helpers/scripts/dev/odin_task.ps1` as-is.
+//   - Recreate only the tasks tied to the Odin daily flow.
+//   - Diagnostics ([DIAG] * tasks) stay in the terminal for now - they are
+//     one-shot CLI calls with no muscle-memory shortcut.
+//   - Format on save is wired through `languages.Odin.format_on_save: "on"`
+//     (see .zed/settings.json), so no explicit "format" task is needed.
+[
+  {
+    "label": "Odin: Build Debug",
+    "command": "powershell",
+    "args": [
+      "-NoProfile",
+      "-ExecutionPolicy", "Bypass",
+      "-File", "$ZED_WORKTREE_ROOT/_Helpers/scripts/dev/odin_task.ps1",
+      "-WorkspaceFolder", "$ZED_WORKTREE_ROOT",
+      "-ActiveFile", "$ZED_FILE",
+      "-Mode", "build-debug"
+    ],
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "reveal": "always",
+    "hide": "never",
+    "show_summary": true,
+    "use_new_terminal": false
+  },
+  {
+    "label": "Odin: Build Release",
+    "command": "powershell",
+    "args": [
+      "-NoProfile",
+      "-ExecutionPolicy", "Bypass",
+      "-File", "$ZED_WORKTREE_ROOT/_Helpers/scripts/dev/odin_task.ps1",
+      "-WorkspaceFolder", "$ZED_WORKTREE_ROOT",
+      "-ActiveFile", "$ZED_FILE",
+      "-Mode", "build-release"
+    ],
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "reveal": "always",
+    "hide": "never",
+    "show_summary": true,
+    "use_new_terminal": false
+  },
+  {
+    "label": "Odin: Hot Reload - Build DLL",
+    "command": "powershell",
+    "args": [
+      "-NoProfile",
+      "-ExecutionPolicy", "Bypass",
+      "-File", "$ZED_WORKTREE_ROOT/_Helpers/scripts/dev/odin_task.ps1",
+      "-WorkspaceFolder", "$ZED_WORKTREE_ROOT",
+      "-ActiveFile", "$ZED_FILE",
+      "-Mode", "build-dll"
+    ],
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "reveal": "always",
+    "hide": "never",
+    "show_summary": true,
+    "use_new_terminal": false
+  },
+  {
+    "label": "Odin: Run Debug",
+    "command": "powershell",
+    "args": [
+      "-NoProfile",
+      "-ExecutionPolicy", "Bypass",
+      "-File", "$ZED_WORKTREE_ROOT/_Helpers/scripts/dev/odin_task.ps1",
+      "-WorkspaceFolder", "$ZED_WORKTREE_ROOT",
+      "-ActiveFile", "$ZED_FILE",
+      "-Mode", "run-debug"
+    ],
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "reveal": "always",
+    "hide": "never",
+    "show_summary": true,
+    "use_new_terminal": false
+  },
+  {
+    "label": "Odin: Check (vet only)",
+    "command": "powershell",
+    "args": [
+      "-NoProfile",
+      "-ExecutionPolicy", "Bypass",
+      "-File", "$ZED_WORKTREE_ROOT/_Helpers/scripts/dev/odin_task.ps1",
+      "-WorkspaceFolder", "$ZED_WORKTREE_ROOT",
+      "-ActiveFile", "$ZED_FILE",
+      "-Mode", "check"
+    ],
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "reveal": "always",
+    "hide": "never",
+    "show_summary": true,
+    "use_new_terminal": false
+  },
+  {
+    "label": "Odin: Format Odin blocks (manual)",
+    "command": "python",
+    "args": [
+      "$ZED_WORKTREE_ROOT/_Helpers/scripts/fixes/format_odin_in_files.py",
+      "--file", "$ZED_FILE"
+    ],
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "reveal": "always",
+    "hide": "never",
+    "show_summary": true,
+    "use_new_terminal": false
+  }
+]

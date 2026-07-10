@@ -1,0 +1,62 @@
+// Zed project-level settings for OdinRAG.
+//
+// Scope: project-level overrides applied ON TOP OF the user-level settings.json
+// (`~/AppData/Roaming/Zed/settings.json`). Only fields that diverge from, or
+// extend, the user-level config live here.
+//
+// Convention: keep this file lean. Cosmetic / personal preferences (font, theme,
+// terminal font, keymap base) stay at user level so they survive project switches.
+// Project-level settings are reserved for things that ARE truly project-specific.
+//
+// Rationale + decision history: see _Helpers/docs/008_zed_setup.md.
+{
+  // Odin / OLS language server.
+  // - OLS is wired through the bundled `odin` extension (tree-sitter + LSP).
+  // - The binary is expected on PATH, or via `lsp.ols.binary.path` below.
+  // - odinfmt (formatting on save) uses the local `odinfmt.json` at the repo root,
+  //   which encodes the repo convention (2-space indent).
+  //   See _Helpers/docs/001_folder_structure.md and .kilo/skills/odin-format.
+  "languages": {
+    "Odin": {
+      "format_on_save": "on",
+      "tab_size": 2,
+      "use_on_type_format": true,
+      "formatter": "language_server",
+      "language_servers": ["ols", "..."]
+    }
+  },
+  "lsp": {
+    "ols": {
+      "binary": {
+        "path": "ols",
+        "arguments": []
+      }
+    }
+  },
+
+  // Search exclusions - mirror .vscode/settings.json (search.exclude).
+  // Excludes build outputs, vendor content and node_modules from project
+  // search, file finder and project panel indexing.
+  "file_scan_exclusions": [
+    "**/build/**",
+    "**/node_modules/**",
+    "**/vendor/**",
+    "**/.git/**",
+    "**/_Private/raw/**",
+    "**/_Private/planning/daily/**",
+    "**/code/vendored templates/*/**",
+    "**/_Private/.config/**"
+  ],
+
+  // File-type associations specific to OdinRAG.
+  // - The user-level settings.json already covers .ahk/.ahk2, .wsb (XML), .gd (GDScript),
+  //   and .template (as C++). Nothing to add for now.
+  // Add entries here only if a new extension type is introduced in the repo.
+  "file_types": {},
+
+  // LSP inlay hints - off by default to keep the editor quiet on Odin (OLS does
+  // not yet produce inlay hints reliably; revisit when upstream stabilises).
+  "inlay_hints": {
+    "enabled": false
+  }
+}

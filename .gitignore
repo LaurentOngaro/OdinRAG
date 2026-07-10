@@ -53,6 +53,18 @@ Thumbs.db
 # but user tasks.json is tracked for the benefit of collaborators, so we don't ignore it:
 !.vscode/tasks.json
 
+# === Zed project config ===
+# Mirror of the .vscode/* pattern above: the .zed/ folder is versioned so that
+# every collaborator gets the same Odin-aware keymap + tasks + LSP wiring.
+# Personal / cosmetic preferences (font, theme, MCP tokens, agent LLM)
+# remain at user level in ~/AppData/Roaming/Zed/settings.json - they are
+# NEVER versioned.
+.zed/*
+!.zed/settings.json
+!.zed/keymap.json
+!.zed/tasks.json
+!.zed/README - zed.md
+
 # === Kilo runtime state ===
 .kilo/worktrees/
 .kilo/agent-manager.json
