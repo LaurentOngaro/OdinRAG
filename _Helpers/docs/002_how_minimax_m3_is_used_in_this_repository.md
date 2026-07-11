@@ -17,7 +17,7 @@ This document is a quick technical reference for anyone reading the code and won
 
 Every file in this repo - scrapers, skills, subagent prompts, frontmatter schemas, lint configs, planning templates - was designed, drafted, or rewritten through [Kilo Code](https://kilo.ai) powered by **[MiniMax-M3](https://minimax.io)**, the MiniMax MiniMax-M3 foundation model family.
 
-The agent setup is described by [`../kilo.json`](../kilo.json) and the operational guardrails live in [`../../AGENTS.md`](../../AGENTS.md).
+The agent setup is described by [`/kilo.json`](/kilo.json) and the operational guardrails live in [`/AGENTS.md`](/AGENTS.md).
 
 ## Concrete invocations
 

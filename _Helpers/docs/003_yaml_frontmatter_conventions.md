@@ -34,17 +34,17 @@ updatedBy: "MiniMax-M3 (Kilo Code)"
 
 List reduced to the essentials for this project:
 
-| Value       | Usage                                                             |
-| ----------- | ----------------------------------------------------------------- |
-| `note`      | Free note, brainstorm, thought                                    |
-| `daily`     | Daily note (`J_YYYY-MM-DD`)                                       |
-| `weekly`    | Weekly review (`W_YYYY-WW`)                                       |
-| `monthly`   | Monthly review (`M_YYYY-MM`)                                      |
-| `roadmap`   | Action plan, milestones (e.g. `_Private/planning/002_roadmap.md`) |
-| `reference` | Cheatsheet, stable doc (conventions, index)                       |
-| `dev_log`   | Per-project devlog (`code/projects/<p>/devlog/`)                  |
-| `archive`   | Saved for history, no longer edited                               |
-| `template`  | Document template (used as a base to create)                      |
+| Value       | Usage                                                                                           |
+| ----------- | ----------------------------------------------------------------------------------------------- |
+| `note`      | Free note, brainstorm, thought                                                                  |
+| `daily`     | Daily note (`J_YYYY-MM-DD`)                                                                     |
+| `weekly`    | Weekly review (`W_YYYY-WW`)                                                                     |
+| `monthly`   | Monthly review (`M_YYYY-MM`)                                                                    |
+| `roadmap`   | Action plan, milestones (e.g. `_Private/planning/002_roadmap.md`)                               |
+| `reference` | Cheatsheet, stable doc (conventions, index)                                                     |
+| `dev_log`   | Per-project devlog. See `_Private/docs/003_devlog_location.md` for the two supported locations. |
+| `archive`   | Saved for history, no longer edited                                                             |
+| `template`  | Document template (used as a base to create)                                                    |
 
 ## Statuses (`status`)
 

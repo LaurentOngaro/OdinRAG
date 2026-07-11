@@ -14,5 +14,5 @@ Meta documentation about this repository:
 ## Conventions
 
 - All files follow `NNN_snake_case.md` filename pattern.
-- H1 = filename exactly (see [AGENTS.md § Naming convention](../../AGENTS.md)).
+- H1 = filename exactly (see [AGENTS.md § Naming convention](AGENTS.md.md)).
 - This README is part of the repo-wide folder tree. See [001_folder_structure.md](001_folder_structure.md) for the full tree and update procedure.

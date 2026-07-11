@@ -1,4 +1,6 @@
-# AGENTS.md - Context for AI coding agents (Kilo Code, Claude Code, etc.)
+# AGENTS
+
+**Context for AI coding agents (Kilo Code, Claude Code, etc.)**
 
 > This file is read first by AI coding agents to understand the structure, conventions, and tools of the OdinRAG repository.
 > **Keep it up to date** when the structure evolves.
@@ -203,14 +205,11 @@ Verify with `python _Helpers/scripts/diagnostic/auditReadmeCoherence.py` (non-ze
 
 - **Rule**: all **PUBLIC** tracked `.md` files must be in English. This includes top-level files (README.md, AGENTS.md, SOURCES.md, etc.), anything under `_Helpers/`, `odin-knowledge-base/`, `code/`, and any other path that ends up in the `public` branch. The same applies to frontmatter (`title`, `summary`) of public docs.
 - **Why**: the `public` branch is what gets pushed to github.com. That repo is public and international. The rule exists for search consistency, AI tooling (the subagent prompt expects English keywords), and international contributors.
-
 - **Exempted from this rule** (any language is fine):
   - Everything under `_Private/` (Bucket 3, gitignored) - never reaches the `public` branch.
   - Files under any `**/raw/**` folder - raw notes are kept as-is by convention (no frontmatter, no `NNN_` prefix).
   - Personal logs, planning notes, daily entries - always private.
-
 - **Rare public non-English doc**: annotate in frontmatter with `exception: <reason>` so the convention violation is explicit.
-
 - **Verification**: no automated language check today (convention-based). If a non-English public doc sneaks in, only a human review would catch it.
 
 ### Frontmatter / file conventions (unchanged)

@@ -54,7 +54,7 @@ The orchestrator (main `code` agent) delegates questions that match these criter
 If the question concerns code in `code/projects/<project>/src/`, add to context:
 
 - Read `code/projects/<project>/AGENTS.md` (patterns already implemented, pitfalls identified)
-- Read 1-2 recent devlogs from `code/projects/<project>/devlog/`
+- Read 1-2 recent devlogs. Default location is `_Private/devlogs/<project>/J_YYYY-MM-DD_*.md`; the legacy `code/projects/<project>/devlog/` path may also exist. If neither exists yet, note it and proceed without historical context.
 - Adapt KB patterns to the project's specific context
 
 > **See also**: `code/INTEGRATION.md` for the full convention.

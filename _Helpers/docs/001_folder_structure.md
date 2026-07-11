@@ -122,10 +122,11 @@ _Private/
 │   └── ...
 ├── docs/                    <- private meta docs (ABSENT from public)
 │   ├── README - docs.md
-│   └── social/              <- social posts
 │   ├── decisions/           <- Architecture Decision Records (ADR) - see naming convention below
 │   │   ├── README.md
 │   │   └── YYYY-MM-DD_ADR-NNN_<slug>.md
+│   ├── devlogs/             <- per-project devlogs (J_YYYY-MM-DD_<topic>.md). Private by location, not by inheritance.
+│   │   └── <project>/
 │   └── ...
 ├── planning/                <- day-by-day planning (ABSENT from public)
 │   ├── README - planning.md
@@ -149,18 +150,18 @@ _Private/
 
 Sessions Perplexity produce two kinds of outputs:
 
-| Output type | Destination | Naming |
-| --- | --- | --- |
-| Session notes, Q&A, syntheses | `_Private/raw/Perplexity backlog/` | `<DATE>_<NNN>_<slug>.md` |
-| Decision drafts (pending validation) | `_Private/raw/Perplexity decisions/` | `<DATE>_<NNN>_<slug>.md` |
-| Validated ADRs | `_Private/docs/decisions/` | `<DATE>_ADR-<NNN>_<slug>.md` |
+| Output type                          | Destination                          | Naming                       |
+| ------------------------------------ | ------------------------------------ | ---------------------------- |
+| Session notes, Q&A, syntheses        | `_Private/raw/Perplexity backlog/`   | `<DATE>_<NNN>_<slug>.md`     |
+| Decision drafts (pending validation) | `_Private/raw/Perplexity decisions/` | `<DATE>_<NNN>_<slug>.md`     |
+| Validated ADRs                       | `_Private/docs/decisions/`           | `<DATE>_ADR-<NNN>_<slug>.md` |
 
 Perplexity uses GitHub MCP (read + write) to push directly into `OdinRAG-private/main`. No manual upload needed for repo-bound content.
 
 ## Where this file is referenced
 
-- [`AGENTS.md`](../../AGENTS.md) - global agent context (top-level reference)
-- [`README.md`](../../README.md) - top-level repo intro (top-level reference)
+- [`AGENTS.md`](AGENTS.md) - global agent context (top-level reference)
+- [`README.md`](README.md) - top-level repo intro (top-level reference)
 - All `README - <topic>.md` files in authored folders (one per folder)
 - This is the only place where the full tree lives; everything else links here.
 

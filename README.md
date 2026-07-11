@@ -1,4 +1,4 @@
-# OdinRAG - Curated knowledge base for Odin game development
+# README
 
 > A personal RAG knowledge base for the [Odin programming language](https://odin-lang.org/) applied to game development (Raylib, Sokol, hot-reload, allocators).
 > Built and curated end-to-end with **MiniMax-M3** as the structural engineering agent.

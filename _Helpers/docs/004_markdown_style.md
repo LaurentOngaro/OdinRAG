@@ -11,7 +11,7 @@ updatedBy: "MiniMax-M3 (Kilo Code)"
 
 # 004_markdown_style
 
-> Detailed convention. The 2-line pointer in [`../../AGENTS.md`](../../AGENTS.md) is the only first-load context. Read this file when in doubt.
+> Detailed convention. The 2-line pointer in [`/AGENTS.md`](AGENTS.md.md) is the only first-load context. Read this file when in doubt.
 
 ## The rule
 

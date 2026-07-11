@@ -16,7 +16,7 @@ supersedes: "v1.0.0 (2026-07-01) and v2.0.0 (2026-07-02, pointer stub). v2.0.0 w
 
 You maintain a repo whose public remote must stay clean of personal content (e.g. an open-source knowledge base or a curated RAG scaffold), yet you also want full local git history for:
 
-- per-project code and devlogs in `code/projects/<your-project>/`
+- per-project code in `code/projects/<your-project>/`, devlogs in `_Private/devlogs/<your-project>/` (preferred) or `code/projects/<your-project>/devlog/` (legacy)
 - personal daily notes, planning, raw research in a private folder
 - scraped content under fair-use restrictions in `odin-knowledge-base/courses/` and `odin-knowledge-base/docs/karl_zylinski/odin-book/`
 

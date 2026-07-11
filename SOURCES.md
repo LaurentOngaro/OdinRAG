@@ -1,4 +1,6 @@
-# SOURCES - How to obtain the content referenced by this KB
+# SOURCES
+
+**How to obtain the content referenced by this KB**
 
 > The scrapers in `_Helpers/` target external sources that are **not redistributed** in this repository.
 > This page lists every source, the licence / paywall status, and how to obtain it on your own so the scrapers work for you.

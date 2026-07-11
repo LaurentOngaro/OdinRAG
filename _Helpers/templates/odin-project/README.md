@@ -41,6 +41,18 @@ When cloned into `code/projects/<project>/`, the target structure becomes:
 └── .kilo/agents/          <- optional subagent for this project
 ```
 
+### Where to put the devlog
+
+Two options, pick one and stay consistent for the project's lifetime:
+
+| Location                                                                                                                                                                              | Privacy model                                                    | Pros                                                                                             | Cons                                                                            |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------- |
+| `code/projects/<project>/devlog/`                                                                                                                                                     | Private **by inheritance** (parent folder is private)            | Same folder as the code, natural locality.                                                       | Privacy is implicit; if the project ever goes public, the devlog leaks with it. |
+| `_Private/devlogs/<project>/`                                                                                                                                                         | Private **explicit at the path** (`_Private/` is always private) | Survives any future decision to publish the project code; aligned with dailies, raw notes, ADRs. | Two hops to navigate between code and devlog; lose `Ctrl+P` locality.           |
+| Recommended default for new projects: **`_Private/devlogs/<project>/`** (privacy by location, not by association). See `_Private/docs/003_devlog_location.md` for the full rationale. |
+
+If you keep the devlog in `code/projects/<project>/devlog/`, no change is required - it still works because the parent `code/projects/` is already absent from the public branch. The migration to `_Private/` is optional and reversible.
+
 ## How to run
 
 ```bash
@@ -48,7 +60,12 @@ When cloned into `code/projects/<project>/`, the target structure becomes:
 cd code/projects/<project>
 ls src/                         # see the sources
 cat AGENTS.md                   # context for the AI
+
+# Devlog (legacy location, in the project):
 cat devlog/J_*.md | head -50    # history
+
+# Devlog (preferred location, in _Private/):
+cat /_Private/devlogs/<project>/J_*.md | head -50    # history
 ```
 
 > **Note**:

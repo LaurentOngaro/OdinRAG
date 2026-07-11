@@ -2,14 +2,19 @@
 
 > How to use this file:
 >
-> 1. Copy this file into `code/projects/<your-project>/devlog/J_YYYY-MM-DD_<topic>.md`
+> 1. Copy this file into one of the two supported locations:
+>    - `code/projects/<your-project>/devlog/J_YYYY-MM-DD_<topic>.md` (legacy, alongside the code)
+>    - `_Private/devlogs/<your-project>/J_YYYY-MM-DD_<topic>.md` (preferred, privacy by location)
 > 2. Fill in the date in the H1 heading
 > 3. Check off tasks as you go
 > 4. Fill in the bilan at end of day
 >
-> Note: this devlog folder is **per-project**. It is gitignored via `/code/projects/*/` in `.gitignore`,
-> so your notes stay local. For KB-maintenance notes (about the OdinRAG repo itself), use the
-> per-project devlog too - just adjust the path accordingly.
+> See `_Private/docs/003_devlog_location.md` for the rationale behind the two locations. The
+> short version: `_Private/` is preferred because privacy is explicit at the path, not
+> inherited from a parent folder that might one day become public.
+>
+> Note: the devlog folder is **per-project**. For KB-maintenance notes (about the OdinRAG
+> repo itself), use the same per-project devlog - just adjust the path accordingly.
 
 ```markdown
 # J_YYYY-MM-DD - Session topic
