@@ -1,47 +1,18 @@
-// Zed project-level keymap for OdinRAG.
+// Zed project-level keymap
 //
-// Scope: layered on top of the VSCode base keymap (set at user level via
-// `base_keymap: "VSCode"` in ~/AppData/Roaming/Zed/settings.json).
-// Only project-critical overrides and additions are listed here.
-//
-// Rule (from _Private/raw/2026-07-09_migration_vscode_vers_zed_odin.md):
-//   1. Keep the VSCode base keymap (already active at user level).
-//   2. Re-bind only the shortcuts ACTUALLY used in the OdinRAG daily flow.
-//   3. Add task spawns for the critical Odin tasks (build / run / check).
-//
-// Adding more bindings is a Phase 3 exercise: only do it after 2-3 real
-// sessions, when muscle-memory gaps are visible.
 [
   {
-    // Editor context - navigation + refactor muscle-memory from VSCode.
+    // Editor context
     "context": "Editor",
     "bindings": {
-      "ctrl-shift-p": "command_palette::Toggle",
-      "ctrl-p": "workspace::OpenPath",
-      "f12": "editor::GoToDefinition",
-      "shift-f12": "editor::FindAllReferences",
-      "ctrl-shift-f": "search::Deploy",
-      "alt-shift-f": "editor::Format",
-      "f2": "editor::Rename",
-      "ctrl-.": "editor::CodeActions"
-    }
+    },
   },
   {
-    // Workspace context - spawn the critical Odin tasks on Ctrl+Shift+B / F5.
-    // Mirrors VSCode's `workbench.action.tasks.build` and `workbench.action.debug.run`
-    // defaults for muscle-memory parity.
+    // Workspace context
     "context": "Workspace",
     "bindings": {
       "ctrl-shift-b": ["task::Spawn", "Odin: Build Debug"],
-      "f5": ["task::Spawn", "Odin: Run Debug"]
-    }
+      "f5": ["task::Spawn", "Odin: Run Debug"],
+    },
   },
-  {
-    // Terminal context - explicit toggle matches VSCode muscle memory.
-    // (Zed default already is `ctrl-`` on most layouts; this is a safety net.)
-    "context": "Workspace",
-    "bindings": {
-      "ctrl-`": "terminal::Toggle"
-    }
-  }
 ]
