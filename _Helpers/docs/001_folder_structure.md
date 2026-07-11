@@ -99,8 +99,7 @@ _Helpers/
 │   ├── 003_yaml_frontmatter_conventions.md
 │   ├── 004_markdown_style.md
 │   ├── 005_public_release_checklist.md
-│   ├── 007_mixing_public_and_private_history.md
-│   └── social/              <- social posts (REDDIT_POST.md, TWITTER_THREAD.md, DISCORD_NOTE.md)
+│   ├── ...
 ├── templates/               <- INTERNAL OdinRAG templates (clone these, never edit in place)
 │   ├── README - templates.md
 │   ├── odin-project/        <- project scaffold (AGENTS, README, src/main.odin, devlog, subagent)
@@ -123,6 +122,7 @@ _Private/
 │   └── ...
 ├── docs/                    <- private meta docs (ABSENT from public)
 │   ├── README - docs.md
+│   └── social/              <- social posts
 │   ├── decisions/           <- Architecture Decision Records (ADR) - see naming convention below
 │   │   ├── README.md
 │   │   └── YYYY-MM-DD_ADR-NNN_<slug>.md

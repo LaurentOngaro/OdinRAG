@@ -262,9 +262,7 @@ def _is_all_uppercase_stem(name: str) -> bool:
     apply). Digits, underscores, hyphens and the dot are allowed but ignored.
 
     Examples that return True:
-        AGENTS.md, README.md, CHANGELOG.md, LICENSE.md, INDEX.md,
-        J_TEMPLATE.md, SKILL.md, REDDIT_POST.md, TWITTER_THREAD.md,
-        DISCORD_NOTE.md
+        AGENTS.md, README.md, CHANGELOG.md, LICENSE.md, INDEX.md, J_TEMPLATE.md, SKILL.md
     Examples that return False:
         007_yaml_frontmatter_conventions.md (lowercase letters present) main.odin (lowercase) auditReadmeCoherence.py (lowercase) 123.md (no letters)
     """

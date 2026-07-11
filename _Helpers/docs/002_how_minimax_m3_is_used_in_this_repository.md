@@ -53,14 +53,6 @@ Each of the four durable scrapers follows a contract M3 proposed:
 
 M3 wrote the public-safety auditor used to gate pushes to this very repo. It mirrors the rules in `.gitignore` and exits non-zero if any copyrighted path is staged for push. See [`PUBLIC_RELEASE_CHECKLIST.md`](PUBLIC_RELEASE_CHECKLIST.md) § 2.
 
-### 5. Social assets - `_Helpers/docs/social/`
-
-Post drafts prepared (with M3) for the MiniMax-M3 Showcase Round 2 (June 29 - July 5, 2026):
-
-- [`social/REDDIT_POST.md`](social/REDDIT_POST.md) - draft for `r/odinlang`
-- [`social/TWITTER_THREAD.md`](social/TWITTER_THREAD.md) - thread for X
-- [`social/DISCORD_NOTE.md`](social/DISCORD_NOTE.md) - note for `show-your-case`
-
 ## What M3 is _not_ used for
 
 - Generating the scraped content itself - M3 drives the scrapers, but the scraped output is whatever the source pages contain.
