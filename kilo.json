@@ -44,8 +44,6 @@
       "odin-knowledge-base/courses/**/!README.md": "deny",
       "odin-knowledge-base/docs/**/!README.md": "deny",
       "_Helpers/logs/**": "deny",
-      "code/projects/PVG03_RPG/**": "deny",
-      "**/.private/**": "deny",
       "**/__pycache__/**": "deny"
     }
   },

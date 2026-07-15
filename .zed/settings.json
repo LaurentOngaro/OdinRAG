@@ -58,5 +58,17 @@
   // not yet produce inlay hints reliably; revisit when upstream stabilises).
   "inlay_hints": {
     "enabled": false
+  },
+
+  // Inline diagnostics (a.k.a. error lens) - shows LSP diagnostics as a
+  // vertical list to the right of the code. Equivalent to VSCode's "Problems"
+  // panel rendered inline, but without the aggregated project-wide list.
+  // Use F8 / Shift+F8 to navigate (see .zed/keymap.json for explicit bindings).
+  // max_severity = null means show all severities (error, warning, info, hint).
+  "diagnostics": {
+    "inline": {
+      "enabled": true,
+      "max_severity": null
+    }
   }
 }
