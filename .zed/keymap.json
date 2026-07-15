@@ -1,18 +1,22 @@
-// Zed project-level keymap
-//
 [
   {
-    // Editor context
     "context": "Editor",
     "bindings": {
-    },
+      "f8": "editor::GoToDiagnostic",
+      "shift-f8": "editor::GoToPreviousDiagnostic"
+    }
   },
   {
-    // Workspace context
     "context": "Workspace",
     "bindings": {
-      "ctrl-shift-b": ["task::Spawn", "Odin: Build Debug"],
-      "f5": ["task::Spawn", "Odin: Run Debug"],
-    },
-  },
+      "ctrl-shift-b": [
+        "task::Spawn",
+        "Odin: Build Debug"
+      ],
+      "f5": [
+        "task::Spawn",
+        "Odin: Run Debug"
+      ]
+    }
+  }
 ]

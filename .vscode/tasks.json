@@ -138,8 +138,10 @@
         "/c",
         "${workspaceFolder}\\_tools\\build_and_run_OdinRAG.bat",
         "build",
-        "--src", "${workspaceFolder}\\code\\projects\\PVG03_RPG\\source",
-        "--out", "${workspaceFolder}\\code\\projects\\PVG03_RPG\\build\\PVG03_RPG_debug.exe",
+        "--src",
+        "${workspaceFolder}\\code\\projects\\PVG03_RPG\\source",
+        "--out",
+        "${workspaceFolder}\\code\\projects\\PVG03_RPG\\build\\PVG03_RPG_debug.exe",
         "--debug",
         "--raddebugger",
         "--verbose"
