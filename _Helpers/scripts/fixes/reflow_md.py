@@ -49,17 +49,8 @@ TEXT_EXTENSIONS: tuple[str, ...] = (".md", ".markdown")
 
 # Directories to skip entirely. These either contain third-party content (node_modules) or transient / cache material that should not be touched.
 SKIP_DIRS: tuple[str, ...] = (
-    "node_modules",
-    ".git",
-    ".kilo/cache",
-    ".kilo/sessions",
-    ".kilo/worktrees",
-    "build",
-    "logs",
-    "raw",
-    "archives",
-    "refs",
-    "tools",
+    "node_modules", ".git", ".kilo/cache", ".kilo/sessions", ".kilo/worktrees", "build", "logs", "raw", "archives", "refs", "tools",
+    "odin-knowledge-base", "code", ".obsidian"
 )
 # Pre-computed for case-insensitive matching. Necessary on Windows / macOS where
 # the filesystem preserves case but compares insensitively (and git's
@@ -125,13 +116,13 @@ def _is_block_start(line: str) -> bool:
     s = line.lstrip()
     if not s:
         return False
-    if s.startswith("#"):                          # ATX heading
+    if s.startswith("#"):  # ATX heading
         return True
-    if s.startswith(">"):                          # blockquote
+    if s.startswith(">"):  # blockquote
         return True
-    if s.startswith("|"):                          # table
+    if s.startswith("|"):  # table
         return True
-    if s.startswith(("-", "*", "+")):              # list item or thematic break
+    if s.startswith(("-", "*", "+")):  # list item or thematic break
         return True
     # Ordered list: "1." "2)" etc.
     i = 0
@@ -218,13 +209,7 @@ def _reflow(text: str) -> str:
         # of the previous one. Without this guard, a sequence of list items at
         # the same indent under a parent would be incorrectly merged into one
         # line by --apply.
-        if (
-            _is_continuation(line)
-            and out
-            and out[-1].strip()
-            and not _is_block_start(out[-1])
-            and not _is_block_start(line.lstrip())
-        ):
+        if (_is_continuation(line) and out and out[-1].strip() and not _is_block_start(out[-1]) and not _is_block_start(line.lstrip())):
             out[-1] = out[-1].rstrip() + " " + line.strip()
             i += 1
             continue
@@ -325,11 +310,21 @@ def scan_and_reflow(root: Path, apply: bool, quiet: bool = False) -> tuple[int, 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=_DESCRIPTION)
-    parser.add_argument( "--path", type=Path, default=DEFAULT_ROOT, help=f"Root to scan (default: repo root = {DEFAULT_ROOT.relative_to(ROOT_DIR)}). Accepts a single file or a directory.", )
-    parser.add_argument( "--apply", action="store_true", help="Apply the reflow (without this flag: dry-run)", )
-    parser.add_argument( "--check", action="store_true", help="Exit non-zero if any file would change (for CI / pre-commit). Combine with --quiet for signal-only output.", )
     parser.add_argument(
-        "--quiet", "-q",
+        "--path",
+        type=Path,
+        default=DEFAULT_ROOT,
+        help=f"Root to scan (default: repo root = {DEFAULT_ROOT.relative_to(ROOT_DIR)}). Accepts a single file or a directory.",
+    )
+    parser.add_argument("--apply", action="store_true", help="Apply the reflow (without this flag: dry-run)", )
+    parser.add_argument(
+        "--check",
+        action="store_true",
+        help="Exit non-zero if any file would change (for CI / pre-commit). Combine with --quiet for signal-only output.",
+    )
+    parser.add_argument(
+        "--quiet",
+        "-q",
         action="store_true",
         help=(
             "Suppress banners, summaries, and per-file detail. With --check (or a plain "
