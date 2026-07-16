@@ -8,7 +8,7 @@
       // does (its child task is `type: "process", command: "odin"`).
       // Hardcoded to PVG03_RPG for now. To add another project, duplicate this entry
       // with a different `label` + path, and reference it from launch.json.
-      "label": "[BUILD-LAUNCH] Odin: PVG03_RPG - Build Debug (process)",
+      "label": "[BUILD_PVG03] Build with Odin (Debug)",
       "type": "process",
       "command": "odin",
       "args": [
@@ -46,7 +46,7 @@
     },
     {
       // Direct Odin invocation for release builds launched from F5.
-      "label": "[BUILD-LAUNCH] Odin: PVG03_RPG - Build Release (process)",
+      "label": "[BUILD_PVG03] Build with Odin (Release)",
       "type": "process",
       "command": "odin",
       "args": [
@@ -83,7 +83,7 @@
     },
     {
       // Direct Odin invocation for vet-only checks launched from F5.
-      "label": "[BUILD-LAUNCH] Odin: PVG03_RPG - Check vet only (process)",
+      "label": "[BUILD_PVG03] Check with Odin (vet)",
       "type": "process",
       "command": "odin",
       "args": [
@@ -131,7 +131,7 @@
       //      "Waiting for preLaunchTask ..." status.
       // Resolves raddbg.exe from %FLD_APPS%\Raddebugger\ first, then falls back
       // to PATH.
-      "label": "[BUILD-LAUNCH] Odin: PVG03_RPG - Launch Raddebugger (process)",
+      "label": "[BUILD_PVG03] build_and_run (Raddebugger)",
       "type": "process",
       "command": "cmd",
       "args": [
@@ -159,7 +159,7 @@
       "detail": "Builds PVG03_RPG (debug) via OdinRAG's _tools/build_and_run_OdinRAG.bat, then opens RAD Debugger (EpicGames/raddebugger) detached. Mirrors the project-local _tools/build_and_run.bat pipeline."
     },
     {
-      "label": "[BUILD] Odin: Build Debug",
+      "label": "[BUILD] Build with odin_task (Debug)",
       "type": "shell",
       "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"${workspaceFolder}/_Helpers/scripts/dev/odin_task.ps1\" -WorkspaceFolder \"${workspaceFolder}\" -ActiveFile \"${file}\" -Mode build-debug",
       "options": {
@@ -178,7 +178,7 @@
       "detail": "Build (debug) the project containing the active file. Project is detected from ${file} (must live under code/projects/<project>/)."
     },
     {
-      "label": "[BUILD] Odin: Build Release",
+      "label": "[BUILD] Build with odin_task (Release)",
       "type": "shell",
       "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"${workspaceFolder}/_Helpers/scripts/dev/odin_task.ps1\" -WorkspaceFolder \"${workspaceFolder}\" -ActiveFile \"${file}\" -Mode build-release",
       "options": {
@@ -189,7 +189,7 @@
       "detail": "Build (release, -o:speed) the project containing the active file."
     },
     {
-      "label": "[BUILD] Odin: Hot Reload - Build DLL",
+      "label": "[BUILD] Hot Reload with odin_task (Build DLL)",
       "type": "shell",
       "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"${workspaceFolder}/_Helpers/scripts/dev/odin_task.ps1\" -WorkspaceFolder \"${workspaceFolder}\" -ActiveFile \"${file}\" -Mode build-dll",
       "options": {
@@ -200,7 +200,7 @@
       "detail": "Build the hot-reload DLL for the project containing the active file."
     },
     {
-      "label": "[BUILD] Odin: Build Debug + Raddebugger",
+      "label": "[BUILD] Build with odin_task (Debug + Raddebugger)",
       "type": "shell",
       "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"${workspaceFolder}/_Helpers/scripts/dev/odin_task.ps1\" -WorkspaceFolder \"${workspaceFolder}\" -ActiveFile \"${file}\" -Mode build-raddebug",
       "options": {
@@ -216,7 +216,7 @@
       "detail": "Build the debug binary then launch RAD Debugger (raddbg.exe from EpicGames/raddebugger) on it. If raddbg.exe is not in PATH, the build still succeeds and the binary path is printed."
     },
     {
-      "label": "[BUILD] Odin: Run Debug",
+      "label": "[RUN] Run with odin_task (Debug)",
       "type": "shell",
       "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"${workspaceFolder}/_Helpers/scripts/dev/odin_task.ps1\" -WorkspaceFolder \"${workspaceFolder}\" -ActiveFile \"${file}\" -Mode run-debug",
       "options": {
@@ -235,7 +235,7 @@
       "detail": "Build then run the debug binary for the project containing the active file."
     },
     {
-      "label": "[DEV] Odin: Check (vet only)",
+      "label": "[DEV] Check Source folder with odin_task",
       "type": "shell",
       "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"${workspaceFolder}/_Helpers/scripts/dev/odin_task.ps1\" -WorkspaceFolder \"${workspaceFolder}\" -ActiveFile \"${file}\" -Mode check",
       "options": {
@@ -246,7 +246,7 @@
       "detail": "Run odin check (vet + strict-style) on the project containing the active file."
     },
     {
-      "label": "[DIAG] Audit Cohérence READMEs",
+      "label": "[DIAG] Audit Consistency READMEs",
       "type": "shell",
       "command": "python _Helpers/scripts/diagnostic/auditReadmeCoherence.py",
       "options": {
@@ -288,7 +288,7 @@
       "detail": "Validate every .md file's YAML frontmatter against the 8-field OdinRAG schema. Exits 2 on any error. Runs an auto-fix for long dashes (en-dash/em-dash/horizontal bar -> ASCII '-')."
     },
     {
-      "label": "[DIAG] Odin Code Audit (PVG03_RPG)",
+      "label": "[DIAG PVG03] Code Audit with code_auditor",
       "type": "shell",
       "command": "python _Helpers/scripts/diagnostic/code_auditor/code_auditor.py --path code/projects/PVG03_RPG/source --report _Helpers/scripts/diagnostic/code_auditor/latest_audit.md",
       "options": {
@@ -302,7 +302,7 @@
       "detail": "Run the headless Odin code auditor against PVG03_RPG/source. Writes the Markdown report to _Helpers/scripts/diagnostic/code_auditor/latest_audit.md. Exit code is non-zero on error (2) or warning+--strict (1)."
     },
     {
-      "label": "[DIAG] Odin Code Audit (single file prompt)",
+      "label": "[DIAG] Code Audit with code_auditor (single file prompt)",
       "type": "shell",
       "command": "python _Helpers/scripts/diagnostic/code_auditor/code_auditor.py",
       "options": {
@@ -316,7 +316,7 @@
       "detail": "Prompts for a file or path then runs code_auditor.py against it (use Run -> Input variant). Default: prints to stdout."
     },
     {
-      "label": "[PUBLISH] --check (dry-run)",
+      "label": "[PUBLISH] publish_public --check (dry-run)",
       "type": "shell",
       "command": "python _Helpers/scripts/diagnostic/publish_public.py --check",
       "options": {
@@ -331,7 +331,7 @@
       "group": "test"
     },
     {
-      "label": "[PUBLISH] full (private + regen + public)",
+      "label": "[PUBLISH] publish_public --full (private + regen + public)",
       "type": "shell",
       "command": "python _Helpers/scripts/diagnostic/publish_public.py",
       "options": {
@@ -346,7 +346,7 @@
       "group": "build"
     },
     {
-      "label": "[PUBLISH] --skip-private",
+      "label": "[PUBLISH] publish_public --skip-private",
       "type": "shell",
       "command": "python _Helpers/scripts/diagnostic/publish_public.py --skip-private",
       "options": {
@@ -357,7 +357,7 @@
         "panel": "new"
       },
       "problemMatcher": [],
-      "detail": "Same as [PUBLISH] full but skip the private push (use when you already pushed main to private manually).",
+      "detail": "Same as [PUBLISH] publish_public --full but skip the private push (use when you already pushed main to private manually).",
       "group": "build"
     },
     {
