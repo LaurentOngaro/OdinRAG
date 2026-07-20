@@ -29,13 +29,11 @@
       "request": "launch",
       "preLaunchTask": "[BUILD] odin_task (debug)",
       "program": "cmd.exe",
-      "args": [
-        "/c",
-        "exit 0"
-      ],
+      "args": ["/c", "exit 0"],
       "stopAtEntry": false,
       "environment": [],
-      "console": "integratedTerminal"
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}"
     },
     {
       "name": "[BUILD] odin_task (release)",
@@ -43,13 +41,11 @@
       "request": "launch",
       "preLaunchTask": "[BUILD] odin_task (release)",
       "program": "cmd.exe",
-      "args": [
-        "/c",
-        "exit 0"
-      ],
+      "args": ["/c", "exit 0"],
       "stopAtEntry": false,
       "environment": [],
-      "console": "integratedTerminal"
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}"
     },
     {
       // Raddebugger-only: no cppvsdbg attach. The preLaunchTask already opens RAD
@@ -62,25 +58,73 @@
       "request": "launch",
       "preLaunchTask": "[BUILD] odin_task (Debug + Raddebugger)",
       "program": "cmd.exe",
-      "args": [
-        "/c",
-        "exit 0"
-      ],
+      "args": ["/c", "exit 0"],
       "stopAtEntry": false,
       "environment": [],
       "console": "integratedTerminal",
-      "internalConsoleOptions": "neverOpen"
+      "internalConsoleOptions": "neverOpen",
+      "cwd": "${workspaceFolder}"
     },
     {
       "name": "[DIAG] Odin: Check (vet only) - then attach",
       "type": "cppvsdbg",
       "request": "launch",
-      "preLaunchTask": "[BUILD_PVG03] Check with Odin (vet)",
-      "program": "${workspaceFolder}/code/projects/PVG03_RPG/build/debug/PVG03_RPG.exe",
-      "args": [],
+      "preLaunchTask": "[DEV] odin_task Check Source folder",
+      "program": "cmd.exe",
+      "args": ["/c", "exit 0"],
       "stopAtEntry": false,
       "environment": [],
-      "console": "integratedTerminal"
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}"
+    },
+    // =====================================================================
+    // Project-specific configs (one entry per project x mode).
+    //
+    // These differ from the generic [BUILD] odin_task (*) configs above by:
+    //   - `cwd` is HARDCODED to the sub-project's folder. This makes the build work even if the active editor tab is not under that project (the generic configs require ${file} to be inside).
+    //   - Because `cwd` lands inside code/projects/<project>, the odin_task.ps1 wrapper detects the sub-project's _tools/build_and_run.bat and delegates to it (preserving the pipeline used by the standalone workspace).
+    //
+    // To add a new project:
+    // - duplicate the 3 entries below and replace PVG03_RPG with your project name
+    // - update the `cwd` and the `program` paths.
+    //
+    // The .vscode/tasks.json is NOT touched.
+    // =====================================================================
+    {
+      "name": "[PVG03] build (debug)",
+      "type": "cppvsdbg",
+      "request": "launch",
+      "preLaunchTask": "[BUILD] odin_task (debug)",
+      "program": "cmd.exe",
+      "args": ["/c", "exit 0"],
+      "stopAtEntry": false,
+      "environment": [],
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}/code/projects/PVG03_RPG"
+    },
+    {
+      "name": "[PVG03] build (release)",
+      "type": "cppvsdbg",
+      "request": "launch",
+      "preLaunchTask": "[BUILD] odin_task (release)",
+      "program": "cmd.exe",
+      "args": ["/c", "exit 0"],
+      "stopAtEntry": false,
+      "environment": [],
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}/code/projects/PVG03_RPG"
+    },
+    {
+      "name": "[PVG03] build (check)",
+      "type": "cppvsdbg",
+      "request": "launch",
+      "preLaunchTask": "[DEV] odin_task Check Source folder",
+      "program": "cmd.exe",
+      "args": ["/c", "exit 0"],
+      "stopAtEntry": false,
+      "environment": [],
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}/code/projects/PVG03_RPG"
     }
   ]
 }

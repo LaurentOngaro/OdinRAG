@@ -1,9 +1,38 @@
 {
   "version": "2.0.0",
+  // `pvProjectDir` is the project root passed to odin_task.ps1 via `-Cwd`.
+  // It is ONLY consumed by Family B launch configs (which hardcode the path).
+  // For Family A, the input is never resolved (the task is invoked from the
+  // menu picker, not from a launch), so odin_task.ps1 falls back to
+  // (Get-Location) for project detection.
+  //
+  // Why `pickString` and not `command`:
+  //   * `command` input would let us auto-detect projects from
+  //     `code/projects/*`, but on this machine VS Code refuses to spawn
+  //     any executable from a `command` input (PATH not inherited,
+  //     ${workspaceFolder} not resolved in the `command` field).
+  //   * `pickString` is native, supports a `default` value, and the user
+  //     just presses Enter to validate. No hang risk.
+  //   * The list is HARDCODED. To add a new sub-project, append a new
+  //     entry in `options` below (and mirror it in `default` if you want
+  //     it pre-selected). No script needed for the common case.
+  "inputs": [
+    {
+      "id": "pvProjectDir",
+      "type": "pickString",
+      "description": "Select the project to build (Hard Coded list)",
+      "options": [
+        "${workspaceFolder}/code/projects/PVG03_RPG",
+        "${workspaceFolder}/code/projects/PVG02_Metroidvania",
+        "${workspaceFolder}/code/projects/Odin_Skeleton"
+      ],
+      "default": "${workspaceFolder}/code/projects/PVG03_RPG"
+    }
+  ],
   "tasks": [
     {
       "label": "[BUILD] odin_task (debug)",
-      "detail": "Build (debug) the project containing the active file. Project is detected from ${file} (must live under code/projects/<project>/).",
+      "detail": "Build (debug) the project containing the active file. Project is detected from ${file} (must live under code/projects/<project>/). Pass -Exec if the launch config needs the binary to be launched (the corresponding [PVG03] build configs do).",
       "type": "process",
       "command": "powershell",
       "args": [
@@ -17,7 +46,10 @@
         "-ActiveFile",
         "${file}",
         "-Mode",
-        "build-debug"
+        "build-debug",
+        "-Exec",
+        "-Cwd",
+        "${input:pvProjectDir}"
       ],
       "options": {
         "cwd": "${workspaceFolder}"
@@ -35,7 +67,7 @@
     },
     {
       "label": "[BUILD] odin_task (release)",
-      "detail": "Build (release, -o:speed) the project containing the active file.",
+      "detail": "Build (release, -o:speed) the project containing the active file. Pass -Exec if the launch config needs the binary to be launched.",
       "type": "process",
       "command": "powershell",
       "args": [
@@ -49,7 +81,10 @@
         "-ActiveFile",
         "${file}",
         "-Mode",
-        "build-release"
+        "build-release",
+        "-Exec",
+        "-Cwd",
+        "${input:pvProjectDir}"
       ],
       "options": {
         "cwd": "${workspaceFolder}"
@@ -73,7 +108,9 @@
         "-ActiveFile",
         "${file}",
         "-Mode",
-        "build-dll"
+        "build-dll",
+        "-Cwd",
+        "${input:pvProjectDir}"
       ],
       "options": {
         "cwd": "${workspaceFolder}"
@@ -97,7 +134,9 @@
         "-ActiveFile",
         "${file}",
         "-Mode",
-        "build-raddebug"
+        "build-raddebug",
+        "-Cwd",
+        "${input:pvProjectDir}"
       ],
       "options": {
         "cwd": "${workspaceFolder}"
@@ -126,7 +165,9 @@
         "-ActiveFile",
         "${file}",
         "-Mode",
-        "run-debug"
+        "run-debug",
+        "-Cwd",
+        "${input:pvProjectDir}"
       ],
       "options": {
         "cwd": "${workspaceFolder}"
@@ -158,7 +199,9 @@
         "-ActiveFile",
         "${file}",
         "-Mode",
-        "run-release"
+        "run-release",
+        "-Cwd",
+        "${input:pvProjectDir}"
       ],
       "options": {
         "cwd": "${workspaceFolder}"
@@ -189,7 +232,9 @@
         "-ActiveFile",
         "${file}",
         "-Mode",
-        "check"
+        "check",
+        "-Cwd",
+        "${input:pvProjectDir}"
       ],
       "options": {
         "cwd": "${workspaceFolder}"
