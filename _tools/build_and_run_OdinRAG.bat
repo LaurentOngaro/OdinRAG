@@ -14,9 +14,9 @@ setlocal enableextensions enabledelayedexpansion
 ::   build | run | clean | test
 ::   --src <folder>
 ::   --out <file>
-::   --debug (default)
+::   --debug (default) | --release
 ::   --exec (for run action)
-::   --raddebugger
+::   --raddebugger (implies --debug; auto-disabled with --release)
 ::   --wipe
 ::   --verbose
 ::
@@ -38,13 +38,16 @@ set execfile=0
 set wipe=0
 set raddebugger=0
 set verbose=0
+set releaseMode=0
 
 :: Default project when opened from the OdinRAG root workspace.
 :: Override with --src / --out if you add a second project.
+:: Convention: binaries live under build\<mode>\<Project>.exe (no _debug / _release
+:: suffix on the file name - the sub-folder disambiguates).
 set defaultProject=PVG03_RPG
 set defaultProjectDir=%cwd%..\code\projects\%defaultProject%
 set defaultSrc=%defaultProjectDir%\source
-set defaultOut=%defaultProjectDir%\build\%defaultProject%_debug.exe
+set defaultOut=%defaultProjectDir%\build\debug\%defaultProject%.exe
 set childToolsDir=%defaultProjectDir%\_tools
 
 :LOOP
@@ -53,6 +56,8 @@ set childToolsDir=%defaultProjectDir%\_tools
   if "%~1"=="--verbose" set verbose=1
   if "%~1"=="-d" set debug=1
   if "%~1"=="--debug" set debug=1
+  if "%~1"=="-r" set releaseMode=1
+  if "%~1"=="--release" set releaseMode=1
   if "%~1"=="-e" set execfile=1
   if "%~1"=="--exec" set execfile=1
   if "%~1"=="-w" set wipe=1
@@ -100,7 +105,15 @@ set childToolsDir=%defaultProjectDir%\_tools
   )
   if not exist "%outputFolder%" mkdir "%outputFolder%"
 
-  if %debug%==1 (set debugMode=-debug -o:none) else (set debugMode=-o:speed& set raddebugger=0)
+  :: Mode resolution: --release wins over --debug. raddebugger is incompatible
+  :: with release (no debug info to attach to), so it is auto-disabled in that case.
+  if %releaseMode%==1 (
+    set debugMode=-o:speed
+    set debug=0
+    set raddebugger=0
+  ) else (
+    if %debug%==1 (set debugMode=-debug -o:none) else (set debugMode=-o:speed& set raddebugger=0)
+  )
 
   set odin_build_cmd=%buildCommand% %action% "%src%" %debugMode% %fileMode% %buildOptions% -out:%outputFile%
   echo.

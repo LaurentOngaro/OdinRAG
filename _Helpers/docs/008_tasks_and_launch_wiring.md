@@ -1,12 +1,12 @@
 ---
 title: "Tasks and launch wiring (root workspace)"
-date: "2026-07-16"
+date: "2026-07-20"
 tags: [OdinRAG, reference, vscode, zed, tasks, launch, odin, raddebugger]
 type: reference
 status: active
-version: 2.1.0
-lastUpdated: "2026-07-16"
-updatedBy: "Kilo Code (rewritten to match the actual .vscode/tasks.json, .vscode/launch.json and .zed/tasks.json; added child-project naming section after PVG03_RPG launch.json patch)"
+version: 2.2.0
+lastUpdated: "2026-07-20"
+updatedBy: "Kilo Code (migrated to build/debug/ and build/release/ sub-folders, removed _debug / _release suffixes from binaries; aligned labels to current .vscode/tasks.json; patched .bat for --release support)"
 ---
 
 # 008_tasks_and_launch_wiring
@@ -15,20 +15,20 @@ updatedBy: "Kilo Code (rewritten to match the actual .vscode/tasks.json, .vscode
 
 ## TL;DR
 
-- F5 from the OdinRAG root workspace builds and runs `code/projects/PVG03_RPG` via **6 launch configurations**.
-- The launches reference **4 `[BUILD_PVG03]` `type: "process"` tasks** that invoke `odin` directly (no PowerShell wrapper) to avoid pipe-tracking hangs.
+- F5 from the OdinRAG root workspace builds and runs `code/projects/PVG03_RPG` via **4 launch configurations**.
+- The launches all use the **PowerShell wrapper** `[BUILD] / [DEV] odin_task *` tasks (`type: "process"` + `command: "powershell"`). They were also `type: "shell"` historically but are now `type: "process"` with the shell kept as the process - this still lets us detect the project from `${file}` while avoiding the "Waiting for preLaunchTask..." pipe-tracking hang that motivated the original split.
 - The Raddebugger flow goes through `_tools/build_and_run_OdinRAG.bat` (mirror of the child project's `_tools/build_and_run.bat`).
-- **PowerShell-wrapper tasks** still exist with `[BUILD] / [RUN] / [DEV]` prefixes (`type: "shell"` calling `_Helpers/scripts/dev/odin_task.ps1`). They detect the project from `${file}` and are useful for `Ctrl+Shift+P > Run Task` workflows and for the `run-debug` mode (which builds then runs the binary in one go).
+- **Binary convention**: outputs go to `build/<mode>/<Project>.exe` (or `.dll`) — `build/debug/PVG03_RPG.exe`, `build/release/PVG03_RPG.exe`, `build/dll/PVG03_RPG.dll`. **No** `_debug` / `_release` suffixes on the file names — the sub-folder disambiguates. Matches the convention from Karl Zylinski's hot-reload template (`OUT_DIR=build/debug`).
 - **Zed** has its own `tasks.json` mirroring the PowerShell wrapper tasks (key use: `Odin: Run Debug`).
 - To add a new sub-project, you duplicate four things. See [Adding a new sub-project](#adding-a-new-sub-project).
 
 ## The hang we fixed (historical context, still relevant)
 
-When a `preLaunchTask` is `type: "shell"` and invokes `powershell.exe -File ...odin_task.ps1 ...`, three processes get spawned in series (`cmd.exe` → `powershell.exe` → `odin`). VS Code tracks the foreground `cmd.exe` PID but does not always observe early termination of the inner PowerShell pipe, so it stays on "Waiting for preLaunchTask ..." indefinitely even though the build actually succeeded and the binary was launched.
+When a `preLaunchTask` invokes `powershell.exe -File ...odin_task.ps1 ...`, three processes get spawned in series (`cmd.exe` → `powershell.exe` → `odin`). When the wrapper task is `type: "shell"`, VS Code tracks the foreground `cmd.exe` PID but does not always observe early termination of the inner PowerShell pipe, so it stays on "Waiting for preLaunchTask ..." indefinitely even though the build actually succeeded and the binary was launched.
 
 Two real fixes were applied together:
 
-1. **The 4 F5 launches use `[BUILD_PVG03] Build with Odin (Debug/Release/Check)` + `[BUILD_PVG03] build_and_run (Raddebugger)` tasks with `type: "process"` and `command: "odin"` (or `cmd` for the Raddebugger one)**. VS Code tracks the process directly, no pipe ambiguity.
+1. **The F5 launches now use `type: "process"` + `command: "powershell"` for all `odin_task.ps1` invocations**, with the script args passed as a real array (no more `command: "powershell -NoProfile ..."` monolithic strings that VS Code would mis-resolve as a path). VS Code tracks the process directly, no pipe ambiguity.
 2. The Raddebugger task uses `cmd /c _tools\build_and_run_OdinRAG.bat ...`. The `.bat` ends with `start "" cmd /c "...raddbg_start.bat"`, which **detaches** `raddbg.exe` from the `cmd` chain. The task exits in ~50 ms, leaving raddbg as a free-floating window. Without this, "Waiting for preLaunchTask ..." comes back immediately because `raddbg.exe` keeps the cmd pipe alive.
 
 Other hang sources we removed:
@@ -40,56 +40,60 @@ Other hang sources we removed:
 
 | Path                                                                            | Role                                                                                                                                                                                                                                              |
 | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `.vscode/tasks.json`                                                            | Both workspace menus (Run Task) AND `preLaunchTask` targets. 4 `[BUILD_PVG03]` `type: "process"` tasks are used by F5. They hardcode `PVG03_RPG` paths.                                                                                           |
-| `.vscode/launch.json`                                                           | 6 debug configurations (all `type: "cppvsdbg"`). Every config has a `preLaunchTask` referencing one of the `[BUILD_PVG03]` tasks.                                                                                                                 |
+| `.vscode/tasks.json`                                                            | 15 tasks total: 6 PowerShell-wrapper Odin tasks (`[BUILD]`, `[BUILD+RUN]`, `[DEV]`), 1 `[SCRAPE]`, 3 `[DIAG]`, 3 `[PUBLISH]`, 2 misc. All `type: "process"`. F5 launch configs reference the `[BUILD]` / `[BUILD+RUN]` / `[DEV]` tasks.        |
+| `.vscode/launch.json`                                                           | 4 debug configurations (all `type: "cppvsdbg"`). Each config's `preLaunchTask` references a `odin_task.ps1` task by label.                                                                                                                       |
 | `.zed/tasks.json`                                                               | Mirror of a subset of the PowerShell-wrapper tasks (build-debug, build-release, build-dll, run-debug, check, format). Variables: `$ZED_WORKTREE_ROOT`, `$ZED_FILE`.                                                                               |
-| `_tools/build_and_run_OdinRAG.bat`                                              | Mirror of `code/projects/PVG03_RPG/_tools/build_and_run.bat`. Pipeline: `odin build` → copy raddbg config into `build/` → spawn raddbg detached. Entry point for the Raddebugger flow.                                                            |
+| `_tools/build_and_run_OdinRAG.bat`                                              | Mirror of `code/projects/PVG03_RPG/_tools/build_and_run.bat`. Pipeline: `odin build` → copy raddbg config into `build/` → spawn raddbg detached. Entry point for the Raddebugger flow. Supports `--release` in addition to `--debug`.           |
 | `code/projects/PVG03_RPG/_tools/build_and_run.bat`                              | The original. `_tools/build_and_run_OdinRAG.bat` mirrors it.                                                                                                                                                                                      |
-| `code/projects/PVG03_RPG/.vscode/launch.json`                                   | Standalone-project mirror of the root `.vscode/launch.json` (7 configs). Uses **legacy** `[BUILD] *` / `build_and_run *` naming instead of `[BUILD_PVG03] *` - see the in-file `// NOMENCLATURE` block and the “Child project naming” note below. |
+| `code/projects/PVG03_RPG/.vscode/launch.json`                                   | Standalone-project mirror of the root `.vscode/launch.json`. Uses **legacy** `[BUILD] *` / `build_and_run *` naming instead of the PowerShell-wrapper `[BUILD] odin_task *` naming - see [Child project naming](#child-project-naming-codeprojectspvg03_rpgvscode). |
 | `code/projects/PVG03_RPG/_tools/project.raddbg_project` / `project.raddbg_user` | Source of truth for the raddbg project/user files. Copied into `build/` by the `.bat` on first run.                                                                                                                                               |
-| `_Helpers/scripts/dev/odin_task.ps1`                                            | PowerShell wrapper used by the `[BUILD] / [RUN] / [DEV]` shell tasks AND by all Zed tasks. Detects the project from `${file}` / `$ZED_FILE` via regex `^code[\\/]projects[\\/]([^\\/]+)`. Uses a `src/`-prefers-`source/` tie-breaker per mode.   |
+| `_Helpers/scripts/dev/odin_task.ps1`                                            | PowerShell wrapper used by all `[BUILD]` / `[BUILD+RUN]` / `[DEV]` VS Code tasks AND by all Zed tasks. Detects the project from `${file}` / `$ZED_FILE` via regex `^code[\\/]projects[\\/]([^\\/]+)`. Uses a `src/`-prefers-`source/` tie-breaker per mode. Writes outputs to `build/debug/`, `build/release/`, `build/dll/`. |
 
-## The 4 `[BUILD_PVG03]` tasks (F5-only)
+## The PowerShell-wrapper tasks used by F5
 
-All four are `type: "process"`, hardcoded to `PVG03_RPG`, and live at the top of `.vscode/tasks.json`. They are the **only** tasks referenced by `launch.json`.
+All F5-reachable tasks are `type: "process"` and invoke `powershell.exe` as a process (not as a shell wrapper) with explicit args. They live in `.vscode/tasks.json`. They are the **only** tasks referenced by `launch.json`.
 
-| Label                                       | Command | Key args                                                                                                                                                   | Called by (launch.json configs)                                                                |
-| ------------------------------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| `[BUILD_PVG03] Build with Odin (Debug)`     | `odin`  | `build`, `${workspaceFolder}/code/projects/PVG03_RPG/source`, `-debug`, `-vet`, `-strict-style`, `-use-separate-modules`, `-out:build/PVG03_RPG_debug.exe` | `Build Source using Odin (debug)`, `build_and_run Source (debug)`, `build_and_run Src (debug)` |
-| `[BUILD_PVG03] Build with Odin (Release)`   | `odin`  | `build`, `...source`, `-o:speed`, `-no-bounds-check`, `-use-separate-modules`, `-out:build/PVG03_RPG.exe`                                                  | `build_and_run Source (release)`                                                               |
-| `[BUILD_PVG03] Check with Odin (vet)`       | `odin`  | `check`, `...source`, `-vet`, `-strict-style`                                                                                                              | `[DIAG] Odin: Check (vet only) - then attach`                                                  |
-| `[BUILD_PVG03] build_and_run (Raddebugger)` | `cmd`   | `/c`, `_tools\build_and_run_OdinRAG.bat`, `build`, `--src`, `--out`, `--debug`, `--raddebugger`, `--verbose`                                               | `Build + open Raddebugger on PVG03_RPG`                                                        |
+| Label                                                | Command       | Mode arg         | Key args                                                                                                                                                                              | Output                                                                                              |
+| ---------------------------------------------------- | ------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| `[BUILD] odin_task (debug)`                          | `powershell`  | `build-debug`    | `-NoProfile -ExecutionPolicy Bypass -File _Helpers/scripts/dev/odin_task.ps1 -WorkspaceFolder ... -ActiveFile ... -Mode build-debug`                                                  | `build/debug/<Project>.exe` (e.g. `code/projects/PVG03_RPG/build/debug/PVG03_RPG.exe`)              |
+| `[BUILD] odin_task (release)`                        | `powershell`  | `build-release`  | (same wrapper)                                                                                                                                                                        | `build/release/<Project>.exe`                                                                       |
+| `[BUILD] Hot Reload with odin_task (Build DLL)`      | `powershell`  | `build-dll`      | (same wrapper)                                                                                                                                                                        | `build/dll/<Project>.dll`                                                                           |
+| `[BUILD] odin_task (Debug + Raddebugger)`            | `powershell`  | `build-raddebug` | (same wrapper)                                                                                                                                                                        | `build/debug/<Project>.exe` then launches `raddbg.exe`                                              |
+| `[BUILD+RUN] odin_task (debug)`                      | `powershell`  | `run-debug`      | (same wrapper)                                                                                                                                                                        | `build/debug/<Project>.exe` then runs it (build + run in one task)                                  |
+| `[BUILD+RUN] odin_task (release)`                    | `powershell`  | `run-release`    | (same wrapper)                                                                                                                                                                        | `build/release/<Project>.exe` then runs it                                                          |
+| `[DEV] odin_task Check Source folder`                | `powershell`  | `check`          | (same wrapper)                                                                                                                                                                        | no output - `odin check -vet -strict-style`                                                         |
 
-- All three `odin` tasks use `options.cwd: ${workspaceFolder}/code/projects/PVG03_RPG` so Odin resolves relative paths from the project root.
-- They share the `problemMatcher` regex `^(.*?)(\\((\\d+):(\\d+)\\))\\s+(Syntax\\s+)?(Error|Warning):\\s+(.+)$`, so warnings/errors surface in the Problems panel.
-- The Raddebugger task has `problemMatcher: []` (cmd /c + .bat chain does not produce Odin-style errors) and `presentation.clear: true` so the panel does not keep "task running" indefinitely.
-- `presentation.reveal: "always"` and `presentation.clear: true` on all four for the same reason (the panel must not keep stale output between runs).
+- `odin_task.ps1` itself is `type: process` from VS Code's perspective: the `command: "powershell"` field is the executable, the wrapper args are passed as an explicit array. This avoids the "Path to shell executable ... does not exist" error that hit when the full command line was inlined in a single string with spaces.
+- They share the `problemMatcher` only via `odin_task.ps1`'s own stderr parsing; VS Code surfaces `odin` warnings/errors in the Problems panel when the script exits non-zero.
+- `presentation.clear: true` is set on tasks that should not leave stale output in the terminal panel.
+- `odin_task.ps1` ensures `build/debug/`, `build/release/`, `build/dll/` exist before invoking Odin (creates them on first run).
 
-## The 6 launch configurations
+## The 4 launch configurations
 
 All in `.vscode/launch.json`, all `type: "cppvsdbg"`, all `request: "launch"`, all hardcode `PVG03_RPG`. Only the Raddebugger entry uses `noDebug: true`. There is **no** `${input:odinProject}` anywhere.
 
-| Name                                          | preLaunchTask                               | Behavior                                                                                                                                                                          |
-| --------------------------------------------- | ------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `Build Source using Odin (debug)`             | `[BUILD_PVG03] Build with Odin (Debug)`     | Build then attach VS Code debugger. Exe launched by VS Code, breakpoints honored.                                                                                                 |
-| `build_and_run Source (debug)`                | `[BUILD_PVG03] Build with Odin (Debug)`     | Same as above (alias; matches the child project's naming).                                                                                                                        |
-| `build_and_run Source (release)`              | `[BUILD_PVG03] Build with Odin (Release)`   | Release build, `cppvsdbg` attach.                                                                                                                                                 |
-| `build_and_run Src (debug)`                   | `[BUILD_PVG03] Build with Odin (Debug)`     | Mirrors the child variant in case `src/` is used instead of `source/`. With the current PVG03_RPG layout (only `source/`), behaves identically to `build_and_run Source (debug)`. |
-| `Build + open Raddebugger on PVG03_RPG`       | `[BUILD_PVG03] build_and_run (Raddebugger)` | `noDebug: true`. The preLaunchTask opens `raddbg.exe` detached; the launch itself is a no-op so VS Code does not attach a second debugger that would conflict with raddbg.        |
-| `[DIAG] Odin: Check (vet only) - then attach` | `[BUILD_PVG03] Check with Odin (vet)`       | Runs `odin check -vet -strict-style` then attempts to attach to the existing `build/PVG03_RPG_debug.exe` binary. Useful as a CI-style smoke test.                                 |
+| Name                                          | preLaunchTask                                  | Behavior                                                                                                                                                                          |
+| --------------------------------------------- | ---------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `[BUILD_PVG03] build_and_run Source (debug)`  | `[BUILD] odin_task (debug)`                    | Build then attach VS Code debugger. Exe launched by VS Code, breakpoints honored.                                                                                                 |
+| `[BUILD_PVG03] build_and_run Source (release)`| `[BUILD] odin_task (release)`                  | Release build, `cppvsdbg` attach.                                                                                                                                                 |
+| `[BUILD_PVG03] Build + open Raddebugger (debug)` | `[BUILD] odin_task (Debug + Raddebugger)`   | `noDebug: true`. The preLaunchTask opens `raddbg.exe` detached; the launch itself is a no-op so VS Code does not attach a second debugger that would conflict with raddbg.        |
+| `[DIAG] Odin: Check (vet only) - then attach` | `[DEV] odin_task Check Source folder`          | Runs `odin check -vet -strict-style`. The launch attaches to `build/debug/PVG03_RPG.exe` if present, no-op otherwise. Useful as a CI-style smoke test before launching.          |
 
-## PowerShell-wrapper tasks (menu use, NOT used by F5)
+All `program` paths point to `build/debug/PVG03_RPG.exe` (or `build/release/PVG03_RPG.exe` for the release config).
 
-These tasks are `type: "shell"`, invoke `powershell.exe -File _Helpers/scripts/dev/odin_task.ps1 ...`, and detect the project from `${file}`. They are **not** referenced by any `preLaunchTask`. Use them via `Ctrl+Shift+P > Run Task > <label>`.
+## PowerShell-wrapper tasks (menu use)
+
+All Odin-related VS Code tasks go through the PowerShell wrapper, including the ones referenced by `launch.json`. The ones listed here are also surfaced in `Ctrl+Shift+P > Run Task > <label>` for menu workflows:
 
 | Label                                                | Mode arg         | Purpose                                                                                                                                                              | group             |
 | ---------------------------------------------------- | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------- |
-| `[BUILD] Build with odin_task (Debug)`               | `build-debug`    | Debug build of the project containing `${file}`. Marked `isDefault: true` for the `build` group.                                                                     | `build` (default) |
-| `[BUILD] Build with odin_task (Release)`             | `build-release`  | Release build (`-o:speed`).                                                                                                                                          | `build`           |
+| `[BUILD] odin_task (debug)`                          | `build-debug`    | Debug build of the project containing `${file}`. Marked `isDefault: true` for the `build` group.                                                                     | `build` (default) |
+| `[BUILD] odin_task (release)`                        | `build-release`  | Release build (`-o:speed`).                                                                                                                                          | `build`           |
 | `[BUILD] Hot Reload with odin_task (Build DLL)`      | `build-dll`      | Builds the hot-reload DLL (`-build-mode:dll`). For this mode the script prefers `source/` over `src/`.                                                               | `build`           |
-| `[BUILD] Build with odin_task (Debug + Raddebugger)` | `build-raddebug` | Builds the debug binary and launches `raddbg.exe` (via the `.bat`).                                                                                                  | `build`           |
-| `[RUN] Run with odin_task (Debug)`                   | `run-debug`      | Builds then runs the debug binary. The `odin_task.ps1 -Mode run-debug` script does `odin build` and then `& $exePath` - so it must NOT be used as a `preLaunchTask`. | `test` (default)  |
-| `[DEV] Check Source folder with odin_task`           | `check`          | `odin check -vet -strict-style` on the project containing `${file}`.                                                                                                 | `build`           |
+| `[BUILD] odin_task (Debug + Raddebugger)`            | `build-raddebug` | Builds the debug binary and launches `raddbg.exe` (via the `.bat`).                                                                                                  | `build`           |
+| `[BUILD+RUN] odin_task (debug)`                      | `run-debug`      | Builds then runs the debug binary. The `odin_task.ps1 -Mode run-debug` script does `odin build` and then `& $exePath` - so it must NOT be used as a `preLaunchTask`. | `test` (default)  |
+| `[BUILD+RUN] odin_task (release)`                    | `run-release`    | Same as `run-debug` but in release mode.                                                                                                                            | `test`            |
+| `[DEV] odin_task Check Source folder`                | `check`          | `odin check -vet -strict-style` on the project containing `${file}`.                                                                                                 | `build`           |
 
 ### `odin_task.ps1` - source-folder detection
 
@@ -108,14 +112,14 @@ They are also the only path that gives you `[BUILD] Hot Reload with odin_task (B
 
 ## Diagnostic / utility tasks
 
-Also in `.vscode/tasks.json`, all `type: "shell"`, all `python ...`. Not used by F5.
+Also in `.vscode/tasks.json`, all `type: "process"`, all `python ...` with explicit args. Not used by F5.
 
 | Label                                                        | Script                                                                                                        |
 | ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------- |
 | `[DIAG] Audit Consistency READMEs`                           | `_Helpers/scripts/diagnostic/auditReadmeCoherence.py`                                                         |
 | `[DIAG] Vault Diagnostic`                                    | `_Helpers/scripts/diagnostic/vaultDiagnostic.py`                                                              |
 | `[DIAG] Validate Frontmatter`                                | `_Helpers/scripts/diagnostic/validateFrontmatter.py --fail-on-error`                                          |
-| `[DIAG PVG03] Code Audit with code_auditor`                  | `_Helpers/scripts/diagnostic/code_auditor/code_auditor.py --path code/projects/PVG03_RPG/source --report ...` |
+| `[DIAG] Audit with code_auditor (single file prompt)`        | `_Helpers/scripts/diagnostic/code_auditor/code_auditor.py` (prompts for file/path)                            |
 | `[PUBLISH] publish_public --check (dry-run)`                 | `_Helpers/scripts/diagnostic/publish_public.py --check`                                                       |
 | `[PUBLISH] publish_public --full (private + regen + public)` | `_Helpers/scripts/diagnostic/publish_public.py`                                                               |
 | `[PUBLISH] publish_public --skip-private`                    | `_Helpers/scripts/diagnostic/publish_public.py --skip-private`                                                |
@@ -140,87 +144,82 @@ Format on save is wired through `.zed/settings.json` (`languages.Odin.format_on_
 
 ## Flow walkthrough
 
-### F5 - `Build Source using Odin (debug)`
+### F5 - `[BUILD_PVG03] build_and_run Source (debug)`
 
 ```
 VS Code (F5)
   |
-  preLaunchTask: [BUILD_PVG03] Build with Odin (Debug)
-    -> odin build ${workspaceFolder}/code/projects/PVG03_RPG/source -out:...build/PVG03_RPG_debug.exe -debug -vet -strict-style -use-separate-modules
-    -> exit 0
+  preLaunchTask: [BUILD] odin_task (debug)
+    -> powershell -NoProfile -ExecutionPolicy Bypass -File _Helpers/scripts/dev/odin_task.ps1 -WorkspaceFolder ... -ActiveFile ... -Mode build-debug
+         -> Resolve-ProjectContext: detects project name (PVG03_RPG), picks source/ vs src/
+         -> mkdir build\debug (creates if missing)
+         -> odin build source -out:build/debug/PVG03_RPG.exe -debug -vet -strict-style -use-separate-modules
+         -> exit 0
   |
-  request: "launch", type: "cppvsdbg", program = ${workspaceFolder}/code/projects/PVG03_RPG/build/PVG03_RPG_debug.exe
+  request: "launch", type: "cppvsdbg", program = .../code/projects/PVG03_RPG/build/debug/PVG03_RPG.exe
     -> VS Code (Windows debugger) attaches and runs the binary
 ```
 
-### F5 - `Build + open Raddebugger on PVG03_RPG`
+### F5 - `[BUILD_PVG03] Build + open Raddebugger (debug)`
 
 ```
 VS Code (F5)
   |
-  preLaunchTask: [BUILD_PVG03] build_and_run (Raddebugger)
-    -> cmd /c _tools\build_and_run_OdinRAG.bat build --src ...source --out ...build\PVG03_RPG_debug.exe --debug --raddebugger --verbose
-         |
-         | 1) odin build source -debug -o:none + -vet-unused/-vet-style/-vet-semicolon/...
-         | 2) copy code/projects/PVG03_RPG/_tools/project.raddbg_project  -> build\
-         |    copy code/projects/PVG03_RPG/_tools/project.raddbg_user      -> build\
-         | 3) write build\raddbg_start.bat:
-         |      @echo off
-         |      "<raddbg.exe>" --user:"<build>\project.raddbg_user" \
-         |                    --project:"<build>\project.raddbg_project" \
-         |                    "<build>\PVG03_RPG_debug.exe"
-         | 4) start "" cmd /c "build\raddbg_start.bat"
-         |    -> raddbg.exe opens in its own window, detached from this cmd
-         -> cmd (the parent of step 4) exits in ~50ms
+  preLaunchTask: [BUILD] odin_task (Debug + Raddebugger)
+    -> powershell ... -Mode build-raddebug
+         -> odin build source -out:build/debug/PVG03_RPG.exe -debug -vet -strict-style
+         -> if raddbg.exe in PATH: & raddbg.exe -g build/debug/PVG03_RPG.exe --PID 0  (detached, task exits ~50 ms)
+         -> else: prints "binary ready: build/debug/PVG03_RPG.exe"
     -> task done, "Waiting for preLaunchTask ..." status cleared
   |
   request: "launch", type: "cppvsdbg", noDebug: true
     -> VS Code marks the launch as complete (no debugger attached)
 ```
 
-The arg order `--user:` then `--project:` then target exe is required by RAD Debugger.
+The arg order `--user:` then `--project:` then target exe (used in the child project's `.bat`) is required by RAD Debugger.
 
-### `Ctrl+Shift+P > Run Task > [RUN] Run with odin_task (Debug)`
+### `Ctrl+Shift+P > Run Task > [BUILD+RUN] odin_task (debug)`
 
 ```
 VS Code (menu picker)
   |
-  Task: [RUN] Run with odin_task (Debug)
+  Task: [BUILD+RUN] odin_task (debug)
     -> powershell -File _Helpers/scripts/dev/odin_task.ps1 -WorkspaceFolder ... -ActiveFile ${file} -Mode run-debug
          -> Resolve-ProjectContext: detects project name from ${file} (regex ^code[\\/]projects[\\/]([^\\/]+))
          -> picks source/ or src/ (src preferred here)
-         -> odin build <src> -out:build/<proj>_debug.exe -debug -vet -strict-style
-         -> if OK: & "<build>\<proj>_debug.exe"
+         -> mkdir build\debug
+         -> odin build <src> -out:build/debug/<proj>.exe -debug -vet -strict-style
+         -> if OK: & "build/debug/<proj>.exe"
     -> the binary blocks the task until exit
 ```
 
 ## Child project naming (`code/projects/PVG03_RPG/.vscode/`)
 
-The standalone project uses a **legacy naming** for its tasks/launches (`[BUILD] *` prefix / `build_and_run Source/Src *`) instead of the root's `[BUILD_PVG03] *`. That is **intentional**:
+The standalone project uses a **legacy naming** for its tasks/launches (`[BUILD] *` prefix / `build_and_run Source/Src *`) instead of the root's PowerShell-wrapper `[BUILD] odin_task *` naming. That is **intentional**:
 
-- Naming was already that way before the root workspace's `[BUILD_PVG03]` family was introduced.
+- Naming was already that way before the root workspace was consolidated around the PowerShell wrapper.
 - Anyone opening `code/projects/PVG03_RPG/project.code-workspace` standalone should not have to relearn muscle memory.
 - Both families call the same Odin + same `_tools/build_and_run.bat`, so behavior is identical.
 
 ### Inventory of the child project's launches
 
-7 configs (vs the 6 at the root). The extras are a `Src` mirror for when the project grows a `src/` folder:
+7 configs (vs the 4 at the root). The extras are a `Src` mirror for when the project grows a `src/` folder, plus the standalone variants of every build mode:
 
 | Name                                          | preLaunchTask                         | Notes                                                                      |
 | --------------------------------------------- | ------------------------------------- | -------------------------------------------------------------------------- |
-| `Build Source using Odin (debug)`             | `Build Source using Odin (debug)`     | Same as root `[BUILD_PVG03] Build with Odin (Debug)` + attach.             |
+| `Build Source using Odin (debug)`             | `Build Source using Odin (debug)`     | Same as root `[BUILD] odin_task (debug)` + attach.                          |
 | `Build Src using Odin (debug)`                | `Build Src using Odin (debug)`        | Mirror for the (future) `src/` folder.                                     |
-| `build_and_run Source (debug)`                | `build_and_run Source (debug)`        | Same as root `[BUILD_PVG03] Build with Odin (Debug)` via `.bat`.           |
-| `build_and_run Source (release)`              | `build_and_run Source (release)`      | Same as root `[BUILD_PVG03] Build with Odin (Release)`.                    |
+| `build_and_run Source (debug)`                | `build_and_run Source (debug)`        | Same as root `[BUILD] odin_task (debug)` via `.bat`.                       |
+| `build_and_run Source (release)`              | `build_and_run Source (release)`      | Same as root `[BUILD] odin_task (release)`.                                 |
 | `build_and_run Src (debug)`                   | `build_and_run Src (debug)`           | Mirror for `src/`.                                                         |
-| `build_and_run Source (Raddebug)`             | `build_and_run Source (Raddebug)`     | Same as root `[BUILD_PVG03] build_and_run (Raddebug)` (detached, noDebug). |
+| `build_and_run Source (Raddebug)`             | `build_and_run Source (Raddebug)`     | Same as root `[BUILD] odin_task (Debug + Raddebugger)` (detached, noDebug).|
 | `[DIAG] Odin: Check (vet only) - then attach` | `[DEV] Check Source folder with odin` | Vet-only attach - mirrors root `[DIAG]` config.                            |
 
 ## Why `raddbg.exe` resolution uses `%FLD_APPS%` first
 
 The child project's `build_and_run.bat` uses `set raddebuggerExe=%FLD_APPS%\Raddebugger\raddbg.exe` and **never** looks in `PATH`. The OdinRAG mirror follows the same logic, then falls back to `where raddbg.exe` for users who installed Raddebugger elsewhere. If both fail, the task still exits 0 and prints the binary path so you can attach manually.
 
-## `presentation.clear: true` on the `[BUILD_PVG03]` tasks
+## `presentation.clear: true` on the build tasks
 
 ```jsonc
 "presentation": { "reveal": "always", "panel": "shared", "clear": true }
@@ -232,8 +231,8 @@ The child project's `build_and_run.bat` uses `set raddebuggerExe=%FLD_APPS%\Radd
 
 Suppose you add `code/projects/PVG02_Raylib/`.
 
-1. **Duplicate the 4 `[BUILD_PVG03]` tasks** in `.vscode/tasks.json` (search for `BUILD_PVG03` and replace `PVG03_RPG` by `PVG02_Raylib`). Keep `type: "process"` and the same args/options structure (just path adjustments).
-2. **Duplicate the 6 launches** in `.vscode/launch.json` (search for `PVG03_RPG` and replace). For the Raddebugger config, also edit the `preLaunchTask` label to point at the new `[BUILD_PVG02] build_and_run (Raddebugger)` task.
+1. **Add a new `program` + `preLaunchTask` line in `.vscode/launch.json` only if you need F5 for that project** - search for `PVG03_RPG` and replace. The PowerShell-wrapper tasks in `.vscode/tasks.json` auto-detect the project from `${file}`, so no new task entries are required.
+2. **Duplicate the 4 launches** if you add them at the root workspace. The preLaunchTask labels stay the same (`[BUILD] odin_task (debug)` etc.) - they are project-agnostic.
 3. **Zed does not need changes** - the `Odin: ...` tasks auto-detect the project from `$ZED_FILE` via `odin_task.ps1`.
 4. Update `_tools/build_and_run_OdinRAG.bat`: change `defaultProject=PVG03_RPG` to `PVG02_Raylib` (or add a `--project` flag if you want both). The `childToolsDir` resolution is relative to `defaultProject`, so it works out.
 5. If you want full project-local fidelity, also copy `code/projects/PVG03_RPG/_tools/build_and_run.bat` (and the `project.raddbg_*` files) into `code/projects/PVG02_Raylib/_tools/`.
@@ -245,7 +244,7 @@ There is no `pickString` to update - we learned to keep the prompt out of `launc
 Diagnose in this order:
 
 1. Open `Ctrl+Shift+P > Developer: Reload Window`. Stale caches from previous edits cause spurious hangs.
-2. Check the task you triggered really is one of the `[BUILD_PVG03]` `type: "process"` tasks (or `[BUILD_PVG03] build_and_run (Raddebugger)`). Open `.vscode/launch.json`, find the config name, read its `preLaunchTask` value.
+2. Check the task you triggered really is one of the PowerShell-wrapper tasks (`[BUILD] / [BUILD+RUN] / [DEV] odin_task *`) and that the wrapper is invoked as `type: "process"` + `command: "powershell"` (NOT `type: "shell"` with the full command line inlined). Open `.vscode/launch.json`, find the config name, read its `preLaunchTask` value.
 3. Run the task standalone via `Ctrl+Shift+P > Run Task > <name>`. If it exits 0 in the panel and you see the expected log, the task itself is fine - the hang is launch-side. Confirm `request: "launch"` and `type: "cppvsdbg"` (or `type: "cppvsdbg" + noDebug: true`) are set.
 4. If the task still hangs standalone, the pipe is leaking. Switch the task back to a direct `odin` invocation (no `powershell`, no `cmd /c` wrapper). The `.bat` is the only allowed exception because it ends with `start ""` to detach the long-lived process.
-5. If `raddbg.exe` is being launched but does not honor the project file, verify that `build/project.raddbg_project` exists. The `.bat` copies it from `code/projects/PVG03_RPG/_tools/project.raddbg_project` on first run, but if you wiped `build/` it copies again. If the file is missing at the source, the `.bat` warns and continues without it (raddbg then has no breakpoint on `main.odin:1`).
+5. If `raddbg.exe` is being launched but does not honor the project file, verify that `build/debug/project.raddbg_project` exists (the `.bat` copies it from `code/projects/PVG03_RPG/_tools/project.raddbg_project` on first run; if you wiped `build/` it copies again). If the file is missing at the source, the `.bat` warns and continues without it (raddbg then has no breakpoint on `main.odin:1`).

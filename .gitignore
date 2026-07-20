@@ -52,6 +52,7 @@ Thumbs.db
 .vscode/*
 # but user tasks.json is tracked for the benefit of collaborators, so we don't ignore it:
 !.vscode/tasks.json
+!.vscode/launch.json
 
 # === Zed project config ===
 # Mirror of the .vscode/* pattern above: the .zed/ folder is versioned so that

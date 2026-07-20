@@ -2,166 +2,23 @@
   "version": "2.0.0",
   "tasks": [
     {
-      // Direct Odin invocation (type: process) - used by F5 / launch.json preLaunchTask.
-      // No PowerShell wrapper: avoids the "Waiting for preLaunchTask..." hang caused by
-      // the wrapper closing pipes asynchronously. Mirrors what the per-project tasks.json
-      // does (its child task is `type: "process", command: "odin"`).
-      // Hardcoded to PVG03_RPG for now. To add another project, duplicate this entry
-      // with a different `label` + path, and reference it from launch.json.
-      "label": "[BUILD_PVG03] Build with Odin (Debug)",
+      "label": "[BUILD] odin_task (debug)",
+      "detail": "Build (debug) the project containing the active file. Project is detected from ${file} (must live under code/projects/<project>/).",
       "type": "process",
-      "command": "odin",
+      "command": "powershell",
       "args": [
-        "build",
-        "${workspaceFolder}/code/projects/PVG03_RPG/source",
-        "-out:${workspaceFolder}/code/projects/PVG03_RPG/build/PVG03_RPG_debug.exe",
-        "-debug",
-        "-vet",
-        "-strict-style",
-        "-use-separate-modules"
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/_Helpers/scripts/dev/odin_task.ps1",
+        "-WorkspaceFolder",
+        "${workspaceFolder}",
+        "-ActiveFile",
+        "${file}",
+        "-Mode",
+        "build-debug"
       ],
-      "options": {
-        "cwd": "${workspaceFolder}/code/projects/PVG03_RPG"
-      },
-      "group": "build",
-      "problemMatcher": {
-        "owner": "odin",
-        "source": "Odin",
-        "fileLocation": "absolute",
-        "pattern": {
-          "regexp": "^(.*?)(\\((\\d+):(\\d+)\\))\\s+(Syntax\\s+)?(Error|Warning):\\s+(.+)$",
-          "file": 1,
-          "line": 3,
-          "column": 4,
-          "severity": 6,
-          "message": 7
-        }
-      },
-      "presentation": {
-        "reveal": "always",
-        "panel": "shared",
-        "clear": true
-      },
-      "detail": "Direct `odin build` of PVG03_RPG (no PowerShell wrapper). Used by F5 launch configs to avoid pipe-tracking hang."
-    },
-    {
-      // Direct Odin invocation for release builds launched from F5.
-      "label": "[BUILD_PVG03] Build with Odin (Release)",
-      "type": "process",
-      "command": "odin",
-      "args": [
-        "build",
-        "${workspaceFolder}/code/projects/PVG03_RPG/source",
-        "-out:${workspaceFolder}/code/projects/PVG03_RPG/build/PVG03_RPG.exe",
-        "-o:speed",
-        "-no-bounds-check",
-        "-use-separate-modules"
-      ],
-      "options": {
-        "cwd": "${workspaceFolder}/code/projects/PVG03_RPG"
-      },
-      "group": "build",
-      "problemMatcher": {
-        "owner": "odin",
-        "source": "Odin",
-        "fileLocation": "absolute",
-        "pattern": {
-          "regexp": "^(.*?)(\\((\\d+):(\\d+)\\))\\s+(Syntax\\s+)?(Error|Warning):\\s+(.+)$",
-          "file": 1,
-          "line": 3,
-          "column": 4,
-          "severity": 6,
-          "message": 7
-        }
-      },
-      "presentation": {
-        "reveal": "always",
-        "panel": "shared",
-        "clear": true
-      },
-      "detail": "Direct `odin build` (release) of PVG03_RPG. Used by the F5 release config."
-    },
-    {
-      // Direct Odin invocation for vet-only checks launched from F5.
-      "label": "[BUILD_PVG03] Check with Odin (vet)",
-      "type": "process",
-      "command": "odin",
-      "args": [
-        "check",
-        "${workspaceFolder}/code/projects/PVG03_RPG/source",
-        "-vet",
-        "-strict-style"
-      ],
-      "options": {
-        "cwd": "${workspaceFolder}/code/projects/PVG03_RPG"
-      },
-      "group": "build",
-      "problemMatcher": {
-        "owner": "odin",
-        "source": "Odin",
-        "fileLocation": "absolute",
-        "pattern": {
-          "regexp": "^(.*?)(\\((\\d+):(\\d+)\\))\\s+(Syntax\\s+)?(Error|Warning):\\s+(.+)$",
-          "file": 1,
-          "line": 3,
-          "column": 4,
-          "severity": 6,
-          "message": 7
-        }
-      },
-      "presentation": {
-        "reveal": "always",
-        "panel": "shared",
-        "clear": true
-      },
-      "detail": "Direct `odin check` (vet only) of PVG03_RPG. Used by the F5 [DIAG] config."
-    },
-    {
-      // RAD Debugger launcher - mirrors the pipeline used by the child project's
-      // _tools/build_and_run.bat --raddebugger (so behavior is identical whether you
-      // open the project directly or F5 from OdinRAG root).
-      // Pipeline:
-      //   1. odin build (PVG03_RPG_debug.exe)
-      //   2. copy project.raddbg_project + project.raddbg_user from
-      //      code/projects/PVG03_RPG/_tools to build/ if missing
-      //   3. create build/raddbg_start.bat with args
-      //      `--user: ... --project: ... <exe>` (order matters per raddbg docs)
-      //   4. `start "" cmd /c "...raddbg_start.bat"` detaches raddbg.exe so this
-      //      task returns in ~50 ms and VS Code clears the
-      //      "Waiting for preLaunchTask ..." status.
-      // Resolves raddbg.exe from %FLD_APPS%\Raddebugger\ first, then falls back
-      // to PATH.
-      "label": "[BUILD_PVG03] build_and_run (Raddebugger)",
-      "type": "process",
-      "command": "cmd",
-      "args": [
-        "/c",
-        "${workspaceFolder}\\_tools\\build_and_run_OdinRAG.bat",
-        "build",
-        "--src",
-        "${workspaceFolder}\\code\\projects\\PVG03_RPG\\source",
-        "--out",
-        "${workspaceFolder}\\code\\projects\\PVG03_RPG\\build\\PVG03_RPG_debug.exe",
-        "--debug",
-        "--raddebugger",
-        "--verbose"
-      ],
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "group": "build",
-      "problemMatcher": [],
-      "presentation": {
-        "reveal": "always",
-        "panel": "shared",
-        "clear": true
-      },
-      "detail": "Builds PVG03_RPG (debug) via OdinRAG's _tools/build_and_run_OdinRAG.bat, then opens RAD Debugger (EpicGames/raddebugger) detached. Mirrors the project-local _tools/build_and_run.bat pipeline."
-    },
-    {
-      "label": "[BUILD] Build with odin_task (Debug)",
-      "type": "shell",
-      "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"${workspaceFolder}/_Helpers/scripts/dev/odin_task.ps1\" -WorkspaceFolder \"${workspaceFolder}\" -ActiveFile \"${file}\" -Mode build-debug",
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -175,34 +32,73 @@
         "panel": "shared",
         "clear": true
       },
-      "detail": "Build (debug) the project containing the active file. Project is detected from ${file} (must live under code/projects/<project>/)."
     },
     {
-      "label": "[BUILD] Build with odin_task (Release)",
-      "type": "shell",
-      "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"${workspaceFolder}/_Helpers/scripts/dev/odin_task.ps1\" -WorkspaceFolder \"${workspaceFolder}\" -ActiveFile \"${file}\" -Mode build-release",
+      "label": "[BUILD] odin_task (release)",
+      "detail": "Build (release, -o:speed) the project containing the active file.",
+      "type": "process",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/_Helpers/scripts/dev/odin_task.ps1",
+        "-WorkspaceFolder",
+        "${workspaceFolder}",
+        "-ActiveFile",
+        "${file}",
+        "-Mode",
+        "build-release"
+      ],
       "options": {
         "cwd": "${workspaceFolder}"
       },
       "group": "build",
       "problemMatcher": [],
-      "detail": "Build (release, -o:speed) the project containing the active file."
     },
     {
       "label": "[BUILD] Hot Reload with odin_task (Build DLL)",
-      "type": "shell",
-      "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"${workspaceFolder}/_Helpers/scripts/dev/odin_task.ps1\" -WorkspaceFolder \"${workspaceFolder}\" -ActiveFile \"${file}\" -Mode build-dll",
+      "detail": "Build the hot-reload DLL for the project containing the active file.",
+      "type": "process",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/_Helpers/scripts/dev/odin_task.ps1",
+        "-WorkspaceFolder",
+        "${workspaceFolder}",
+        "-ActiveFile",
+        "${file}",
+        "-Mode",
+        "build-dll"
+      ],
       "options": {
         "cwd": "${workspaceFolder}"
       },
       "group": "build",
       "problemMatcher": [],
-      "detail": "Build the hot-reload DLL for the project containing the active file."
     },
     {
-      "label": "[BUILD] Build with odin_task (Debug + Raddebugger)",
-      "type": "shell",
-      "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"${workspaceFolder}/_Helpers/scripts/dev/odin_task.ps1\" -WorkspaceFolder \"${workspaceFolder}\" -ActiveFile \"${file}\" -Mode build-raddebug",
+      "label": "[BUILD] odin_task (Debug + Raddebugger)",
+      "detail": "Build the debug binary then launch RAD Debugger (raddbg.exe from EpicGames/raddebugger) on it. If raddbg.exe is not in PATH, the build still succeeds and the binary path is printed.",
+      "type": "process",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/_Helpers/scripts/dev/odin_task.ps1",
+        "-WorkspaceFolder",
+        "${workspaceFolder}",
+        "-ActiveFile",
+        "${file}",
+        "-Mode",
+        "build-raddebug"
+      ],
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -213,12 +109,25 @@
         "panel": "shared",
         "clear": true
       },
-      "detail": "Build the debug binary then launch RAD Debugger (raddbg.exe from EpicGames/raddebugger) on it. If raddbg.exe is not in PATH, the build still succeeds and the binary path is printed."
     },
     {
-      "label": "[RUN] Run with odin_task (Debug)",
-      "type": "shell",
-      "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"${workspaceFolder}/_Helpers/scripts/dev/odin_task.ps1\" -WorkspaceFolder \"${workspaceFolder}\" -ActiveFile \"${file}\" -Mode run-debug",
+      "label": "[BUILD+RUN] odin_task (debug)",
+      "detail": "Build then run the debug binary for the project containing the active file.",
+      "type": "process",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/_Helpers/scripts/dev/odin_task.ps1",
+        "-WorkspaceFolder",
+        "${workspaceFolder}",
+        "-ActiveFile",
+        "${file}",
+        "-Mode",
+        "run-debug"
+      ],
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -232,23 +141,70 @@
         "panel": "shared",
         "clear": true
       },
-      "detail": "Build then run the debug binary for the project containing the active file."
     },
     {
-      "label": "[DEV] Check Source folder with odin_task",
-      "type": "shell",
-      "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"${workspaceFolder}/_Helpers/scripts/dev/odin_task.ps1\" -WorkspaceFolder \"${workspaceFolder}\" -ActiveFile \"${file}\" -Mode check",
+      "label": "[BUILD+RUN] odin_task (release)",
+      "detail": "Build then run the release binary for the project containing the active file.",
+      "type": "process",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/_Helpers/scripts/dev/odin_task.ps1",
+        "-WorkspaceFolder",
+        "${workspaceFolder}",
+        "-ActiveFile",
+        "${file}",
+        "-Mode",
+        "run-release"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": {
+        "kind": "test",
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared",
+        "clear": true
+      },
+    },
+    {
+      "label": "[DEV] odin_task Check Source folder",
+      "detail": "Run odin check (vet + strict-style) on the project containing the active file.",
+      "type": "process",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/_Helpers/scripts/dev/odin_task.ps1",
+        "-WorkspaceFolder",
+        "${workspaceFolder}",
+        "-ActiveFile",
+        "${file}",
+        "-Mode",
+        "check"
+      ],
       "options": {
         "cwd": "${workspaceFolder}"
       },
       "group": "build",
       "problemMatcher": [],
-      "detail": "Run odin check (vet + strict-style) on the project containing the active file."
     },
     {
       "label": "[DIAG] Audit Consistency READMEs",
-      "type": "shell",
-      "command": "python _Helpers/scripts/diagnostic/auditReadmeCoherence.py",
+      "detail": "Audit README <-> filesystem coherence (wikilinks, missing files, unlisted files). Use --fail-on-error in CI.",
+      "type": "process",
+      "command": "python",
+      "args": [
+        "_Helpers/scripts/diagnostic/auditReadmeCoherence.py"
+      ],
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -257,12 +213,14 @@
         "panel": "shared"
       },
       "problemMatcher": [],
-      "detail": "Audit README <-> filesystem coherence (wikilinks, missing files, unlisted files). Use --fail-on-error in CI."
     },
     {
       "label": "[DIAG] Vault Diagnostic",
-      "type": "shell",
-      "command": "python _Helpers/scripts/diagnostic/vaultDiagnostic.py",
+      "type": "process",
+      "command": "python",
+      "args": [
+        "_Helpers/scripts/diagnostic/vaultDiagnostic.py"
+      ],
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -275,8 +233,13 @@
     },
     {
       "label": "[DIAG] Validate Frontmatter",
-      "type": "shell",
-      "command": "python _Helpers/scripts/diagnostic/validateFrontmatter.py --fail-on-error",
+      "detail": "Validate every .md file's YAML frontmatter against the 8-field OdinRAG schema. Exits 2 on any error. Runs an auto-fix for long dashes (en-dash/em-dash/horizontal bar -> ASCII '-').",
+      "type": "process",
+      "command": "python",
+      "args": [
+        "_Helpers/scripts/diagnostic/validateFrontmatter.py",
+        "--fail-on-error"
+      ],
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -285,26 +248,14 @@
         "panel": "shared"
       },
       "problemMatcher": [],
-      "detail": "Validate every .md file's YAML frontmatter against the 8-field OdinRAG schema. Exits 2 on any error. Runs an auto-fix for long dashes (en-dash/em-dash/horizontal bar -> ASCII '-')."
     },
     {
-      "label": "[DIAG PVG03] Code Audit with code_auditor",
-      "type": "shell",
-      "command": "python _Helpers/scripts/diagnostic/code_auditor/code_auditor.py --path code/projects/PVG03_RPG/source --report _Helpers/scripts/diagnostic/code_auditor/latest_audit.md",
-      "options": {
-        "cwd": "${workspaceFolder}"
-      },
-      "presentation": {
-        "reveal": "always",
-        "panel": "new"
-      },
-      "problemMatcher": [],
-      "detail": "Run the headless Odin code auditor against PVG03_RPG/source. Writes the Markdown report to _Helpers/scripts/diagnostic/code_auditor/latest_audit.md. Exit code is non-zero on error (2) or warning+--strict (1)."
-    },
-    {
-      "label": "[DIAG] Code Audit with code_auditor (single file prompt)",
-      "type": "shell",
-      "command": "python _Helpers/scripts/diagnostic/code_auditor/code_auditor.py",
+      "label": "[DIAG] Audit with code_auditor (single file prompt)",
+      "type": "process",
+      "command": "python",
+      "args": [
+        "_Helpers/scripts/diagnostic/code_auditor/code_auditor.py"
+      ],
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -317,8 +268,12 @@
     },
     {
       "label": "[PUBLISH] publish_public --check (dry-run)",
-      "type": "shell",
-      "command": "python _Helpers/scripts/diagnostic/publish_public.py --check",
+      "type": "process",
+      "command": "python",
+      "args": [
+        "_Helpers/scripts/diagnostic/publish_public.py",
+        "--check"
+      ],
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -332,8 +287,12 @@
     },
     {
       "label": "[PUBLISH] publish_public --full (private + regen + public)",
-      "type": "shell",
-      "command": "python _Helpers/scripts/diagnostic/publish_public.py",
+      "detail": "Daily publish flow: push main to private, regenerate public (filtered), push public to remote. Refuses on dirty working tree. Uses --force-with-lease on the public push.",
+      "type": "process",
+      "command": "python",
+      "args": [
+        "_Helpers/scripts/diagnostic/publish_public.py"
+      ],
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -342,13 +301,17 @@
         "panel": "new"
       },
       "problemMatcher": [],
-      "detail": "Daily publish flow: push main to private, regenerate public (filtered), push public to remote. Refuses on dirty working tree. Uses --force-with-lease on the public push.",
       "group": "build"
     },
     {
       "label": "[PUBLISH] publish_public --skip-private",
-      "type": "shell",
-      "command": "python _Helpers/scripts/diagnostic/publish_public.py --skip-private",
+      "detail": "Same as [PUBLISH] publish_public --full but skip the private push (use when you already pushed main to private manually).",
+      "type": "process",
+      "command": "python",
+      "args": [
+        "_Helpers/scripts/diagnostic/publish_public.py",
+        "--skip-private"
+      ],
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -357,13 +320,16 @@
         "panel": "new"
       },
       "problemMatcher": [],
-      "detail": "Same as [PUBLISH] publish_public --full but skip the private push (use when you already pushed main to private manually).",
       "group": "build"
     },
     {
       "label": "[SCRAPE] Run all scrapers (interactive)",
-      "type": "shell",
-      "command": "python _Helpers/scripts/scrapers/run_all_scrapers.py",
+      "detail": "Launch every scraper in _Helpers/scripts/scrapers/ interactively. Lists each with its description and prompts [O/n/q] before launch. Supports --check (dry-run inventory), --yes (non-interactive), --only <substr>, --skip <substr> (both repeatable).",
+      "type": "process",
+      "command": "python",
+      "args": [
+        "_Helpers/scripts/scrapers/run_all_scrapers.py"
+      ],
       "options": {
         "cwd": "${workspaceFolder}"
       },
@@ -373,7 +339,6 @@
         "focus": true
       },
       "problemMatcher": [],
-      "detail": "Launch every scraper in _Helpers/scripts/scrapers/ interactively. Lists each with its description and prompts [O/n/q] before launch. Supports --check (dry-run inventory), --yes (non-interactive), --only <substr>, --skip <substr> (both repeatable)."
     }
   ]
 }

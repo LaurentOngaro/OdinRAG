@@ -1,0 +1,86 @@
+{
+  // Run/Debug for any Odin sub-project under code/projects/<project>/.
+  //
+  // Mirrors the 6 configurations exposed in code/projects/PVG03_RPG/.vscode/launch.json
+  // (Build Source (debug), build_and_run Source (debug),
+  //  build_and_run Source (release), build_and_run Src (debug), build_and_run Source (Raddebug))
+  // plus a [DIAG] Check-only entry, so you can hit F5 from the OdinRAG root workspace
+  // just like from the child workspace.
+  //
+  // For per-project fidelity (assets, deps, .gitignore, Raddebugger integration)
+  // open the child directly via `code projects/PVG03_RPG/project.code-workspace`.
+  //
+  // IMPORTANT - no `${input:odinProject}` here:
+  //   Using a pickString inside a `program` field combined with a `preLaunchTask`
+  //   causes VS Code to hang on "Waiting for preLaunchTask ..." when the pickString
+  //   prompt is resolved after the task starts. The project path is HARDCODED so the
+  //   task and the program resolve deterministically. To add another project,
+  //   duplicate this file (or these configurations) under
+  //   code/projects/<ProjectName>/.vscode/launch.json and replace PVG03_RPG.
+  //
+  // Variable mapping vs the child launch.json:
+  //   ${workspaceFolder}             -> ${workspaceFolder}/code/projects/PVG03_RPG
+  //   ${workspaceFolderBasename}     -> PVG03_RPG
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "[BUILD] odin_task (debug)",
+      "type": "cppvsdbg",
+      "request": "launch",
+      "preLaunchTask": "[BUILD] odin_task (debug)",
+      "program": "cmd.exe",
+      "args": [
+        "/c",
+        "exit 0"
+      ],
+      "stopAtEntry": false,
+      "environment": [],
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "[BUILD] odin_task (release)",
+      "type": "cppvsdbg",
+      "request": "launch",
+      "preLaunchTask": "[BUILD] odin_task (release)",
+      "program": "cmd.exe",
+      "args": [
+        "/c",
+        "exit 0"
+      ],
+      "stopAtEntry": false,
+      "environment": [],
+      "console": "integratedTerminal"
+    },
+    {
+      // Raddebugger-only: no cppvsdbg attach. The preLaunchTask already opens RAD
+      // Debugger (EpicGames/raddebugger) on the binary in a detached process.
+      // Here we only emit a no-op launch (`noDebug: true`) so VS Code clears its
+      // preLaunchTask state without spawning a second debugger that would
+      // conflict with raddbg.exe.
+      "name": "[BUILD] odin_task (Debug + Raddebugger)",
+      "type": "cppvsdbg",
+      "request": "launch",
+      "preLaunchTask": "[BUILD] odin_task (Debug + Raddebugger)",
+      "program": "cmd.exe",
+      "args": [
+        "/c",
+        "exit 0"
+      ],
+      "stopAtEntry": false,
+      "environment": [],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    },
+    {
+      "name": "[DIAG] Odin: Check (vet only) - then attach",
+      "type": "cppvsdbg",
+      "request": "launch",
+      "preLaunchTask": "[BUILD_PVG03] Check with Odin (vet)",
+      "program": "${workspaceFolder}/code/projects/PVG03_RPG/build/debug/PVG03_RPG.exe",
+      "args": [],
+      "stopAtEntry": false,
+      "environment": [],
+      "console": "integratedTerminal"
+    }
+  ]
+}
