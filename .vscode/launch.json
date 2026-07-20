@@ -75,7 +75,6 @@
       "stopAtEntry": false,
       "environment": [],
       "console": "integratedTerminal",
-      "cwd": "${workspaceFolder}"
     },
     // =====================================================================
     // Project-specific configs (one entry per project x mode).
@@ -91,7 +90,7 @@
     // The .vscode/tasks.json is NOT touched.
     // =====================================================================
     {
-      "name": "[PVG03] build (debug)",
+      "name": "[Select] build (debug)",
       "type": "cppvsdbg",
       "request": "launch",
       "preLaunchTask": "[BUILD] odin_task (debug)",
@@ -100,10 +99,10 @@
       "stopAtEntry": false,
       "environment": [],
       "console": "integratedTerminal",
-      "cwd": "${workspaceFolder}/code/projects/PVG03_RPG"
+      "cwd": "${workspaceFolder}"
     },
     {
-      "name": "[PVG03] build (release)",
+      "name": "[Select] build (release)",
       "type": "cppvsdbg",
       "request": "launch",
       "preLaunchTask": "[BUILD] odin_task (release)",
@@ -112,10 +111,10 @@
       "stopAtEntry": false,
       "environment": [],
       "console": "integratedTerminal",
-      "cwd": "${workspaceFolder}/code/projects/PVG03_RPG"
+      "cwd": "${workspaceFolder}"
     },
     {
-      "name": "[PVG03] build (check)",
+      "name": "[Select] build (check)",
       "type": "cppvsdbg",
       "request": "launch",
       "preLaunchTask": "[DEV] odin_task Check Source folder",
@@ -124,7 +123,7 @@
       "stopAtEntry": false,
       "environment": [],
       "console": "integratedTerminal",
-      "cwd": "${workspaceFolder}/code/projects/PVG03_RPG"
+      "cwd": "${workspaceFolder}"
     }
   ]
 }
