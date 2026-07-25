@@ -29,7 +29,10 @@
       "request": "launch",
       "preLaunchTask": "[BUILD] odin_task (debug)",
       "program": "cmd.exe",
-      "args": ["/c", "exit 0"],
+      "args": [
+        "/c",
+        "exit 0"
+      ],
       "stopAtEntry": false,
       "environment": [],
       "console": "integratedTerminal",
@@ -41,7 +44,10 @@
       "request": "launch",
       "preLaunchTask": "[BUILD] odin_task (release)",
       "program": "cmd.exe",
-      "args": ["/c", "exit 0"],
+      "args": [
+        "/c",
+        "exit 0"
+      ],
       "stopAtEntry": false,
       "environment": [],
       "console": "integratedTerminal",
@@ -58,11 +64,13 @@
       "request": "launch",
       "preLaunchTask": "[BUILD] odin_task (Debug + Raddebugger)",
       "program": "cmd.exe",
-      "args": ["/c", "exit 0"],
+      "args": [
+        "/c",
+        "exit 0"
+      ],
       "stopAtEntry": false,
       "environment": [],
       "console": "integratedTerminal",
-      "internalConsoleOptions": "neverOpen",
       "cwd": "${workspaceFolder}"
     },
     {
@@ -71,10 +79,14 @@
       "request": "launch",
       "preLaunchTask": "[DEV] odin_task Check Source folder",
       "program": "cmd.exe",
-      "args": ["/c", "exit 0"],
+      "args": [
+        "/c",
+        "exit 0"
+      ],
       "stopAtEntry": false,
       "environment": [],
       "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}"
     },
     // =====================================================================
     // Project-specific configs (one entry per project x mode).
@@ -95,7 +107,10 @@
       "request": "launch",
       "preLaunchTask": "[BUILD] odin_task (debug)",
       "program": "cmd.exe",
-      "args": ["/c", "exit 0"],
+      "args": [
+        "/c",
+        "exit 0"
+      ],
       "stopAtEntry": false,
       "environment": [],
       "console": "integratedTerminal",
@@ -107,7 +122,10 @@
       "request": "launch",
       "preLaunchTask": "[BUILD] odin_task (release)",
       "program": "cmd.exe",
-      "args": ["/c", "exit 0"],
+      "args": [
+        "/c",
+        "exit 0"
+      ],
       "stopAtEntry": false,
       "environment": [],
       "console": "integratedTerminal",
@@ -119,7 +137,10 @@
       "request": "launch",
       "preLaunchTask": "[DEV] odin_task Check Source folder",
       "program": "cmd.exe",
-      "args": ["/c", "exit 0"],
+      "args": [
+        "/c",
+        "exit 0"
+      ],
       "stopAtEntry": false,
       "environment": [],
       "console": "integratedTerminal",
