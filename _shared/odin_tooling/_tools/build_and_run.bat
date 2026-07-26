@@ -7,7 +7,7 @@ echo.
 
 :: we don't use the full path to the odin compiler because we want to use the one in the PATH
 set buildCommand=odin
-set buildOptions=-thread-count:14 -vet-unused -vet-unused-variables -vet-unused-imports -vet-shadowing -vet-style -vet-semicolon -vet-cast -use-separate-modules
+set buildOptions=-thread-count:14 -vet-unused -vet-unused-variables -vet-unused-imports -vet-shadowing -vet-style -vet-semicolon -vet-cast -missing-blank-lines-between-procs -use-separate-modules
 :: additional build options here
 :: add timings info at the start of the build process
 :: set buildOptions=%buildOptions% -show-timings

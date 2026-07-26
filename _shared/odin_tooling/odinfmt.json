@@ -1,0 +1,22 @@
+{
+  "$schema": "https://raw.githubusercontent.com/DanielGavin/ols/master/misc/odinfmt.schema.json",
+  "character_width": 150,
+  "sort_imports": true,
+  "spaces": 2,
+  "newline_limit": 1,
+  "tabs": false,
+  "tabs_width": 2,
+  "convert_do": false,
+  "exp_multiline_composite_literals": false,
+  "brace_style": "_1TBS",
+  "indent_cases": false,
+  "newline_style": "CRLF",
+  "insert_blank_lines": {
+    "after_procedure": 1,
+    "after_struct": 0,
+    "after_constants": 0,
+    "after_globals": 0,
+    "after_when": 0
+  },
+  "inline_single_stmt_case": false
+}
