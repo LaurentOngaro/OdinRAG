@@ -19,7 +19,7 @@ updatedBy: "Kilo Code (resolved Family B cwd propagation via ${input:pvProjectDi
 - The launches all use the **PowerShell wrapper** `[BUILD] / [DEV] odin_task *` tasks (`type: "process"` + `command: "powershell"`). They were also `type: "shell"` historically but are now `type: "process"` with the shell kept as the process - this still lets us detect the project from `${file}` while avoiding the "Waiting for preLaunchTask..." pipe-tracking hang that motivated the original split.
 - The Raddebugger flow stays generic (no `.bat` involved - `odin_task.ps1` builds then launches `raddbg.exe` directly).
 - **Sub-project mode**: when `odin_task.ps1` is invoked from a project-specific launch config (its `cwd` is inside `code/projects/<X>/`), it detects the sub-project's `_tools\build_and_run.bat` and delegates to it for build-debug / build-release / run-debug / run-release. The `check` mode is always generic. This preserves the pipeline used by the standalone workspace without duplicating tasks in the root `.vscode/tasks.json`.
-- **Binary convention**: outputs go to `build/<mode>/<Project>.exe` (or `.dll`) — `build/debug/PVG03_RPG.exe`, `build/release/PVG03_RPG.exe`, `build/dll/PVG03_RPG.dll`. **No** `_debug` / `_release` suffixes on the file names — the sub-folder disambiguates. Matches the convention from Karl Zylinski's hot-reload template (`OUT_DIR=build/debug`).
+- **Binary convention**: outputs go to `build/<mode>/<Project>.exe` (or `.dll`) - `build/debug/PVG03_RPG.exe`, `build/release/PVG03_RPG.exe`, `build/dll/PVG03_RPG.dll`. **No** `_debug` / `_release` suffixes on the file names - the sub-folder disambiguates. Matches the convention from Karl Zylinski's hot-reload template (`OUT_DIR=build/debug`).
 - **Zed** has its own `tasks.json` mirroring the PowerShell wrapper tasks (key use: `Odin: Run Debug`).
 - To add a new sub-project, add 3 project-specific launch configs (see [Adding a new sub-project](#adding-a-new-sub-project)). `tasks.json` is NOT touched.
 
@@ -72,7 +72,7 @@ All F5-reachable tasks are `type: "process"` and invoke `powershell.exe` as a pr
 
 All in `.vscode/launch.json`, all `type: "cppvsdbg"`, all `request: "launch"`. Two families:
 
-### Family A — generic (4 configs)
+### Family A - generic (4 configs)
 
 Project is auto-detected from `${file}` by `odin_task.ps1`. `cwd` is `${workspaceFolder}` (no hardcoded project). You need an editor tab inside the project for these to work.
 
@@ -83,7 +83,7 @@ Project is auto-detected from `${file}` by `odin_task.ps1`. `cwd` is `${workspac
 | `[BUILD] odin_task (Debug + Raddebugger)`     | `[BUILD] odin_task (Debug + Raddebugger)` | `cmd.exe /c exit 0` | `false`   | Builds then launches `raddbg.exe` detached. The launch is a no-op so VS Code does not attach a second debugger that would conflict with raddbg.                                        |
 | `[DIAG] Odin: Check (vet only) - then attach` | `[DEV] odin_task Check Source folder`     | `cmd.exe /c exit 0` | `false`   | Runs `odin check -vet -strict-style`. Smoke test before launching.                                                                                                                     |
 
-### Family B — project-specific (3 configs per project)
+### Family B - project-specific (3 configs per project)
 
 `cwd` is HARDCODED to the sub-project folder. This makes the build work even if the active editor tab is not under that project. `odin_task.ps1` detects the `cwd` and delegates to the project's `_tools/build_and_run.bat`. You duplicate these 3 entries per sub-project.
 
