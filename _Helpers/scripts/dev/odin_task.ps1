@@ -111,7 +111,9 @@ The script needs either:
 function Resolve-SubprojectBat {
   param([string] $ProjectRoot)
   $bat = Join-Path $ProjectRoot '_tools\build_and_run.bat'
-  if (Test-Path -LiteralPath $bat -PathType Leaf) { return $bat }
+  if (Test-Path -LiteralPath $bat -PathType Leaf) {
+    return $bat 
+  }
   return $null
 }
 
@@ -145,23 +147,39 @@ foreach ($d in @($ctx.DebugDir, $ctx.ReleaseDir, $ctx.DllDir)) {
 # template: OUT_DIR=build/debug, OUT_DIR=build/release).
 $exeBaseName = "$($ctx.ProjectName).exe"
 $dllBaseName = "$($ctx.ProjectName).dll"
-$debugExe   = Join-Path $ctx.DebugDir   $exeBaseName
+$debugExe = Join-Path $ctx.DebugDir   $exeBaseName
 $releaseExe = Join-Path $ctx.ReleaseDir $exeBaseName
-$dllOut     = Join-Path $ctx.DllDir     $dllBaseName
+$dllOut = Join-Path $ctx.DllDir     $dllBaseName
 
 # Helper: invoke the sub-project's build_and_run.bat with consistent flags.
+# Calls the .bat directly (no cmd /c shim) so quoting is consistent. Always
+# passes --no-pause so the .bat does not block waiting for keyboard input
+# when invoked from VS Code (the build is run inside a task panel).
 function Invoke-SubprojectBuild {
   param([string] $Bat, [string] $Src, [string] $Out, [bool] $IsDebug, [bool] $DoExec)
 
-  $args = @('build', '--src', $Src, '--out', $Out)
+  # GUARD: if any path is empty or the .bat doesn't exist, refuse to invoke.
+  # Calling a non-existent .bat would either fail silently or, worse, trigger
+  # cmd.exe to fall back to its own PATH search and pollute the workspace root
+  # with stray files via copy /y side-effects inside the .bat.
+  if (-not (Test-Path -LiteralPath $Bat -PathType Leaf)) {
+    Write-Host "[odin_task] ERROR: sub-project .bat not found at '$Bat' - skipping build" -ForegroundColor Red
+    return 1
+  }
+  if ([string]::IsNullOrWhiteSpace($Src) -or [string]::IsNullOrWhiteSpace($Out)) {
+    Write-Host "[odin_task] ERROR: empty --src or --out (src='$Src' out='$Out') - skipping build" -ForegroundColor Red
+    return 1
+  }
+
+  $cmdargs = @('build', '--src', $Src, '--out', $Out, '--no-pause')
   if ($IsDebug) {
-    $args += '--debug'
+    $cmdargs += '--debug'
   }
   if ($DoExec) {
-    $args += '--exec'
+    $cmdargs += '--exec'
   }
-  Write-Host "[odin_task] cmd /c `"$Bat`" $($args -join ' ')"
-  & cmd /c "`"$Bat`"" $args
+  Write-Host "[odin_task] & `"$Bat`" $($cmdargs -join ' ')"
+  & $Bat @cmdargs
   return $LASTEXITCODE
 }
 
@@ -169,21 +187,33 @@ switch ($Mode) {
   'build-debug' {
     if ($subprojectBat) {
       $code = Invoke-SubprojectBuild -Bat $subprojectBat -Src $ctx.Src -Out $debugExe -IsDebug $true -DoExec $Exec
-      if ($code -ne 0) { exit $code }
+      if ($code -ne 0) {
+        exit $code 
+      }
     } else {
       & $OdinExe build $ctx.Src -out:$debugExe -debug -vet -strict-style
-      if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-      if ($Exec) { & $debugExe }
+      if ($LASTEXITCODE -ne 0) {
+        exit $LASTEXITCODE 
+      }
+      if ($Exec) {
+        & $debugExe 
+      }
     }
   }
   'build-release' {
     if ($subprojectBat) {
       $code = Invoke-SubprojectBuild -Bat $subprojectBat -Src $ctx.Src -Out $releaseExe -IsDebug $false -DoExec $Exec
-      if ($code -ne 0) { exit $code }
+      if ($code -ne 0) {
+        exit $code 
+      }
     } else {
       & $OdinExe build $ctx.Src -out:$releaseExe -o:speed -no-bounds-check
-      if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-      if ($Exec) { & $releaseExe }
+      if ($LASTEXITCODE -ne 0) {
+        exit $LASTEXITCODE 
+      }
+      if ($Exec) {
+        & $releaseExe 
+      }
     }
   }
   'build-dll' {
@@ -195,20 +225,28 @@ switch ($Mode) {
     # build-debug + Exec, but routed through the .bat if available for parity.
     if ($subprojectBat) {
       $code = Invoke-SubprojectBuild -Bat $subprojectBat -Src $ctx.Src -Out $debugExe -IsDebug $true -DoExec $true
-      if ($code -ne 0) { exit $code }
+      if ($code -ne 0) {
+        exit $code 
+      }
     } else {
       & $OdinExe build $ctx.Src -out:$debugExe -debug -vet -strict-style
-      if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      if ($LASTEXITCODE -ne 0) {
+        exit $LASTEXITCODE 
+      }
       & $debugExe
     }
   }
   'run-release' {
     if ($subprojectBat) {
       $code = Invoke-SubprojectBuild -Bat $subprojectBat -Src $ctx.Src -Out $releaseExe -IsDebug $false -DoExec $true
-      if ($code -ne 0) { exit $code }
+      if ($code -ne 0) {
+        exit $code 
+      }
     } else {
       & $OdinExe build $ctx.Src -out:$releaseExe -o:speed -no-bounds-check
-      if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      if ($LASTEXITCODE -ne 0) {
+        exit $LASTEXITCODE 
+      }
       & $releaseExe
     }
   }
@@ -222,7 +260,9 @@ switch ($Mode) {
     # raddbg.exe is from EpicGames/raddebugger (see KB: odin-knowledge-base/
     #   docs/karl_zylinski/hot-reload-gameplay-code.md, section "RAD Debugger").
     & $OdinExe build $ctx.Src -out:$debugExe -debug -vet -strict-style
-    if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+    if ($LASTEXITCODE -ne 0) {
+      exit $LASTEXITCODE 
+    }
     $raddbg = Get-Command raddbg.exe -ErrorAction SilentlyContinue
     if ($raddbg) {
       Write-Host "[odin_task] launching raddbg.exe on $debugExe"

@@ -34,6 +34,7 @@ set cls=0
 set verbose=0
 set wipe=0
 set raddebugger=0
+set noPause=0
 
 if "%~1"=="" (
   echo Parameters for this script are missing.
@@ -64,6 +65,8 @@ if "%~1"=="-w" set wipe=1
 if "%~1"=="--wipe" set wipe=1
 if "%~1"=="--rd" set raddebugger=1
 if "%~1"=="--raddebugger" set raddebugger=1
+if "%~1"=="-np" set noPause=1
+if "%~1"=="--no-pause" set noPause=1
 
 :: set values
 if "%~1"=="-s" (
@@ -125,6 +128,7 @@ echo "-i , --interactive    Ask the user for some confirmations. If not present,
 echo "-c , --cls            Clear the console before run."
 echo "-w , --wipe           Wipe all the existing output data (including folders and files created during previous build processes) before running the task."
 echo "-rd, --raddebugger    Open the the output file as target in Raddebugger. Only works if the -d or --debug flag is set."
+echo "-np, --no-pause       Skip the final pause on success or error. Use when invoked from VS Code tasks or CI."
 echo "-v , --verbose        Verbose mode: print more details during the processus."
 echo "----"
 echo "Commands to be executed by the script:"
@@ -227,7 +231,40 @@ if %ERRORLEVEL% neq 0 (
   goto :ERROR
 )
 
+:: ============================================================================
+:: RADDEBUGGER BLOCK - launched when --raddebugger is passed.
+:: ============================================================================
+:: The raddebugger logic lives in a subroutine (:DO_RADDEBUGGER) at the bottom
+:: of this file. Calling a subroutine is the only safe way to run conditional
+:: complex logic in cmd.exe - putting it inline after `if (...)` risks the
+:: parser consuming the rest of the file as if it were inside the block.
 if %raddebugger%==1 (
+  call :DO_RADDEBUGGER
+)
+
+:: ============================================================================
+:: --EXEC BLOCK - launched when --exec is passed (independent of --raddebugger)
+:: ============================================================================
+:AFTER_RADDEBUGGER
+if "%execfile%"=="1" (
+  echo.
+  echo -------------
+  echo "3 RUNNING -> %outputFile%"
+  echo -------------
+  echo.
+  "%outputFile%"
+  if %ERRORLEVEL% neq 0 (
+    echo Error running outputfile
+    goto :ERROR
+  )
+)
+goto :EOF
+
+:: ============================================================================
+:: SUBROUTINES
+:: ============================================================================
+
+:DO_RADDEBUGGER
   :: Resolve raddbg.exe portably: prefer %FLD_APPS%, fall back to PATH.
   if not exist "%raddebuggerExe%" (
     for /f "delims=" %%r in ('where raddbg.exe 2^>nul') do (
@@ -237,7 +274,7 @@ if %raddebugger%==1 (
   if not exist "%raddebuggerExe%" (
     echo raddbg.exe not found - set FLD_APPS or add it to PATH.
     echo Binary ready: %outputFile%
-    goto EOF
+    goto :EOF
   )
 
   set RaddbgProjectFilename=project.raddbg_project
@@ -257,17 +294,19 @@ if %raddebugger%==1 (
     echo RaddbgCmd=!RaddbgCmd!
   )
 
-  :: create the raddebugger startup files id they don't exist
+  :: create the raddebugger startup files if they don't exist
   :: NOTE: we are in the tool folder, where the raddebugger initial startup files are located
-  :: we need to copy the project file and the user file to the output folder
-  if not exist !RaddbgProjectFilename! (
-    if %verbose%==1 echo Creating the project file: !RaddbgProjectFile!
-    copy /y %toolsFolder%!RaddbgProjectFilename! !RaddbgProjectFile!
-  )
-  if not exist !RaddbgUserFile! (
-    if %verbose%==1 echo Creating the user file: !RaddbgUserFile!
-    copy /y %toolsFolder%!RaddbgUserFilename! !RaddbgUserFile!
-  )
+  :: we need to copy the project file and the user file to the output folder.
+  :: GUARD: if any variable is empty, cmd.exe's `copy /y` will silently fall back to
+  :: copying the source folder into the CURRENT DIRECTORY (which is the workspace
+  :: root in VS Code tasks), polluting the root with stray tooling files. Skip
+  :: the copy entirely if any path is missing.
+  if "!outputFolder!"=="" goto :DO_RADDEBUGGER_SKIP_COPY
+  if "!RaddbgProjectFile!"=="" goto :DO_RADDEBUGGER_SKIP_COPY
+  if "!RaddbgUserFile!"=="" goto :DO_RADDEBUGGER_SKIP_COPY
+  copy /y %toolsFolder%\project.raddbg_project !RaddbgProjectFile! >nul 2>&1
+  copy /y %toolsFolder%\project.raddbg_user !RaddbgUserFile! >nul 2>&1
+  :DO_RADDEBUGGER_SKIP_COPY
   if %verbose%==1 echo Creating the raddebugger startup file
   echo @echo off > !RaddbgStartupFile!
   echo !RaddbgCmd! >> !RaddbgStartupFile!
@@ -285,28 +324,19 @@ if %raddebugger%==1 (
     echo Error launching Raddebugger
     goto :ERROR
   )
-  ) else (
-  if %execfile%==1 (
-    echo.
-    echo -------------
-    echo "2 RUNNING -> %outputFile%"
-    echo -------------
-    echo.
-    %outputFile%
-    if %ERRORLEVEL% neq 0 (
-      echo Error running outputfile
-      goto :ERROR
-    )
-  )
-)
 goto :EOF
 
 :ERROR
 echo.
 echo At least error occurred running the script.
-pause
+if %noPause%==0 (
+  pause
+)
 exit /b 1
 
 :EOF
 echo DONE
+if %noPause%==0 (
+  pause
+)
 exit /b 0

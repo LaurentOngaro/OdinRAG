@@ -28,11 +28,7 @@
       "type": "cppvsdbg",
       "request": "launch",
       "preLaunchTask": "[BUILD] odin_task (debug)",
-      "program": "cmd.exe",
-      "args": [
-        "/c",
-        "exit 0"
-      ],
+      "program": "H:\\Sync\\Scripts\\Windows\\04a_tools\\nop.exe",
       "stopAtEntry": false,
       "environment": [],
       "console": "integratedTerminal",
@@ -43,11 +39,7 @@
       "type": "cppvsdbg",
       "request": "launch",
       "preLaunchTask": "[BUILD] odin_task (release)",
-      "program": "cmd.exe",
-      "args": [
-        "/c",
-        "exit 0"
-      ],
+      "program": "H:\\Sync\\Scripts\\Windows\\04a_tools\\nop.exe",
       "stopAtEntry": false,
       "environment": [],
       "console": "integratedTerminal",
@@ -63,11 +55,7 @@
       "type": "cppvsdbg",
       "request": "launch",
       "preLaunchTask": "[BUILD] odin_task (Debug + Raddebugger)",
-      "program": "cmd.exe",
-      "args": [
-        "/c",
-        "exit 0"
-      ],
+      "program": "H:\\Sync\\Scripts\\Windows\\04a_tools\\nop.exe",
       "stopAtEntry": false,
       "environment": [],
       "console": "integratedTerminal",
@@ -78,39 +66,32 @@
       "type": "cppvsdbg",
       "request": "launch",
       "preLaunchTask": "[DEV] odin_task Check Source folder",
-      "program": "cmd.exe",
-      "args": [
-        "/c",
-        "exit 0"
-      ],
+      "program": "H:\\Sync\\Scripts\\Windows\\04a_tools\\nop.exe",
       "stopAtEntry": false,
       "environment": [],
       "console": "integratedTerminal",
       "cwd": "${workspaceFolder}"
     },
     // =====================================================================
-    // Project-specific configs (one entry per project x mode).
+    // FAMILY B - [Select] configs
+    // =====================================================================
+    // Project is picked via the pvProjectDir pickstring (declared in tasks.json).
+    // Each [Select] * config here points to a SINGLE [Select] * task per mode
+    // (e.g. "[Select] build (debug)"). The pickstring is shared by all 5
+    // [Select] tasks, so changing the picked project switches all modes at once.
     //
-    // These differ from the generic [BUILD] odin_task (*) configs above by:
-    //   - `cwd` is HARDCODED to the sub-project's folder. This makes the build work even if the active editor tab is not under that project (the generic configs require ${file} to be inside).
-    //   - Because `cwd` lands inside code/projects/<project>, the odin_task.ps1 wrapper detects the sub-project's _tools/build_and_run.bat and delegates to it (preserving the pipeline used by the standalone workspace).
+    // There is ONE task per mode, NOT one task per (project, mode) combination.
+    // The pickstring picks the project, the mode is in the label.
     //
-    // To add a new project:
-    // - duplicate the 3 entries below and replace PVG03_RPG with your project name
-    // - update the `cwd` and the `program` paths.
-    //
-    // The .vscode/tasks.json is NOT touched.
+    // To add a new sub-project: append the new path to the `options` array in
+    // the inputs section in tasks.json. No duplication needed in launch.json.
     // =====================================================================
     {
       "name": "[Select] build (debug)",
       "type": "cppvsdbg",
       "request": "launch",
-      "preLaunchTask": "[BUILD] odin_task (debug)",
-      "program": "cmd.exe",
-      "args": [
-        "/c",
-        "exit 0"
-      ],
+      "preLaunchTask": "[Select] build (debug)",
+      "program": "H:\\Sync\\Scripts\\Windows\\04a_tools\\nop.exe",
       "stopAtEntry": false,
       "environment": [],
       "console": "integratedTerminal",
@@ -120,12 +101,8 @@
       "name": "[Select] build (release)",
       "type": "cppvsdbg",
       "request": "launch",
-      "preLaunchTask": "[BUILD] odin_task (release)",
-      "program": "cmd.exe",
-      "args": [
-        "/c",
-        "exit 0"
-      ],
+      "preLaunchTask": "[Select] build (release)",
+      "program": "H:\\Sync\\Scripts\\Windows\\04a_tools\\nop.exe",
       "stopAtEntry": false,
       "environment": [],
       "console": "integratedTerminal",
@@ -135,12 +112,8 @@
       "name": "[Select] build (check)",
       "type": "cppvsdbg",
       "request": "launch",
-      "preLaunchTask": "[DEV] odin_task Check Source folder",
-      "program": "cmd.exe",
-      "args": [
-        "/c",
-        "exit 0"
-      ],
+      "preLaunchTask": "[Select] build (check)",
+      "program": "H:\\Sync\\Scripts\\Windows\\04a_tools\\nop.exe",
       "stopAtEntry": false,
       "environment": [],
       "console": "integratedTerminal",

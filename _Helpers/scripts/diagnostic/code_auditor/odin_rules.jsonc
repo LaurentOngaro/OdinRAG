@@ -23,7 +23,7 @@
         "odin-knowledge-base/courses/programvideogames/vertical-slice-and-dice-v10/rpg/088-26. Tracking Allocator.md"
       ],
       "lesson_refs": ["088"],
-      "fix_suggestion": "Wrap the instantiation in `when ODIN_RUN_MODE == .Debug { ... }`"
+      "fix_suggestion": "Wrap the instantiation in `when ODIN_DEBUG { ... }`"
     },
     {
       "id": "ALLOC-002",

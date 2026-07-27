@@ -1,26 +1,27 @@
 {
   "version": "2.0.0",
+  // =============================================================================
+  // INPUTS - shared between Family B launch configs (project picker)
+  // =============================================================================
+  //
   // `pvProjectDir` is the project root passed to odin_task.ps1 via `-Cwd`.
-  // It is ONLY consumed by Family B launch configs (which hardcode the path).
-  // For Family A, the input is never resolved (the task is invoked from the
-  // menu picker, not from a launch), so odin_task.ps1 falls back to
-  // (Get-Location) for project detection.
+  // It is consumed ONLY by Family B launch configs (the [Select] family).
   //
   // Why `pickString` and not `command`:
-  //   * `command` input would let us auto-detect projects from
+  //   - `command` input would let us auto-detect projects from
   //     `code/projects/*`, but on this machine VS Code refuses to spawn
   //     any executable from a `command` input (PATH not inherited,
   //     ${workspaceFolder} not resolved in the `command` field).
-  //   * `pickString` is native, supports a `default` value, and the user
+  //   - `pickString` is native, supports a `default` value, and the user
   //     just presses Enter to validate. No hang risk.
-  //   * The list is HARDCODED. To add a new sub-project, append a new
+  //   - The list is HARDCODED. To add a new sub-project, append a new
   //     entry in `options` below (and mirror it in `default` if you want
   //     it pre-selected). No script needed for the common case.
   "inputs": [
     {
       "id": "pvProjectDir",
       "type": "pickString",
-      "description": "Select the project to build (Hard Coded list)",
+      "description": "Select the project to build (Family B only)",
       "options": [
         "${workspaceFolder}/code/projects/PVG03_RPG",
         "${workspaceFolder}/code/projects/PVG02_Metroidvania",
@@ -30,9 +31,15 @@
     }
   ],
   "tasks": [
+    // ===========================================================================
+    // Family A - GENERIC tasks, project detected from ${file}
+    // ===========================================================================
+    // These tasks use ${file} (the active editor tab) to detect the project via
+    // odin_task.ps1. They DO NOT consume pvProjectDir - no pickString prompt.
+    // Use these when you have an .odin file open under the project you want to build.
     {
       "label": "[BUILD] odin_task (debug)",
-      "detail": "Build (debug) the project containing the active file. Project is detected from ${file} (must live under code/projects/<project>/). Pass -Exec if the launch config needs the binary to be launched (the corresponding [PVG03] build configs do).",
+      "detail": "Build (debug) the project containing the active file (${file}). No pickstring prompt - the project is inferred from the file path.",
       "type": "process",
       "command": "powershell",
       "args": [
@@ -47,9 +54,7 @@
         "${file}",
         "-Mode",
         "build-debug",
-        "-Exec",
-        "-Cwd",
-        "${input:pvProjectDir}"
+        "-Exec"
       ],
       "options": {
         "cwd": "${workspaceFolder}"
@@ -67,7 +72,7 @@
     },
     {
       "label": "[BUILD] odin_task (release)",
-      "detail": "Build (release, -o:speed) the project containing the active file. Pass -Exec if the launch config needs the binary to be launched.",
+      "detail": "Build (release, -o:speed) the project containing the active file (${file}). No pickstring prompt.",
       "type": "process",
       "command": "powershell",
       "args": [
@@ -82,9 +87,7 @@
         "${file}",
         "-Mode",
         "build-release",
-        "-Exec",
-        "-Cwd",
-        "${input:pvProjectDir}"
+        "-Exec"
       ],
       "options": {
         "cwd": "${workspaceFolder}"
@@ -94,7 +97,7 @@
     },
     {
       "label": "[BUILD] Hot Reload with odin_task (Build DLL)",
-      "detail": "Build the hot-reload DLL for the project containing the active file.",
+      "detail": "Build the hot-reload DLL for the project containing the active file (${file}). No pickstring prompt.",
       "type": "process",
       "command": "powershell",
       "args": [
@@ -108,9 +111,7 @@
         "-ActiveFile",
         "${file}",
         "-Mode",
-        "build-dll",
-        "-Cwd",
-        "${input:pvProjectDir}"
+        "build-dll"
       ],
       "options": {
         "cwd": "${workspaceFolder}"
@@ -120,7 +121,7 @@
     },
     {
       "label": "[BUILD] odin_task (Debug + Raddebugger)",
-      "detail": "Build the debug binary then launch RAD Debugger (raddbg.exe from EpicGames/raddebugger) on it. If raddbg.exe is not in PATH, the build still succeeds and the binary path is printed.",
+      "detail": "Build the debug binary then launch RAD Debugger (raddbg.exe) on it. Project detected from ${file}. No pickstring prompt.",
       "type": "process",
       "command": "powershell",
       "args": [
@@ -134,9 +135,7 @@
         "-ActiveFile",
         "${file}",
         "-Mode",
-        "build-raddebug",
-        "-Cwd",
-        "${input:pvProjectDir}"
+        "build-raddebug"
       ],
       "options": {
         "cwd": "${workspaceFolder}"
@@ -151,7 +150,7 @@
     },
     {
       "label": "[BUILD+RUN] odin_task (debug)",
-      "detail": "Build then run the debug binary for the project containing the active file.",
+      "detail": "Build then run the debug binary. Project detected from ${file}. No pickstring prompt.",
       "type": "process",
       "command": "powershell",
       "args": [
@@ -165,9 +164,7 @@
         "-ActiveFile",
         "${file}",
         "-Mode",
-        "run-debug",
-        "-Cwd",
-        "${input:pvProjectDir}"
+        "run-debug"
       ],
       "options": {
         "cwd": "${workspaceFolder}"
@@ -185,7 +182,7 @@
     },
     {
       "label": "[BUILD+RUN] odin_task (release)",
-      "detail": "Build then run the release binary for the project containing the active file.",
+      "detail": "Build then run the release binary. Project detected from ${file}. No pickstring prompt.",
       "type": "process",
       "command": "powershell",
       "args": [
@@ -199,9 +196,7 @@
         "-ActiveFile",
         "${file}",
         "-Mode",
-        "run-release",
-        "-Cwd",
-        "${input:pvProjectDir}"
+        "run-release"
       ],
       "options": {
         "cwd": "${workspaceFolder}"
@@ -218,7 +213,7 @@
     },
     {
       "label": "[DEV] odin_task Check Source folder",
-      "detail": "Run odin check (vet + strict-style) on the project containing the active file.",
+      "detail": "Run odin check (vet + strict-style) on the project containing the active file (${file}). No pickstring prompt.",
       "type": "process",
       "command": "powershell",
       "args": [
@@ -232,6 +227,94 @@
         "-ActiveFile",
         "${file}",
         "-Mode",
+        "check"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "problemMatcher": [],
+    },
+    // ===========================================================================
+    // Family B - PROJECT-PICKED tasks, project chosen via pvProjectDir pickstring
+        // ===========================================================================
+    // Family B - PROJECT-PICKED tasks, project chosen via pvProjectDir pickstring
+    // ===========================================================================
+    // The pickString is declared in the "inputs" section at the top of this file.
+    // The same pickString is shared by all 5 Family B tasks, so changing the
+    // picked project switches all modes at once.
+    //
+    // The launch configs in .vscode/launch.json (the [Select] family) reference
+    // these tasks. There is ONE task per mode, NOT one task per (project, mode)
+    // combination - the pickString picks the project, the mode is in the label.
+    //
+    // To add a new sub-project: append the new path to the `options` array in
+    // the inputs section at the top. No task duplication needed.
+    // ===========================================================================
+    {
+      "label": "[Select] build (debug)",
+      "detail": "Build (debug) the project picked via the pvProjectDir pickstring. The project is NOT taken from ${file}, so you can be anywhere in the workspace.",
+      "type": "process",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/_Helpers/scripts/dev/odin_task.ps1",
+        "-WorkspaceFolder",
+        "${workspaceFolder}",
+        "-Mode",
+        "build-debug",
+        "-Exec",
+        "-Cwd",
+        "${input:pvProjectDir}"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "problemMatcher": [],
+    },
+    {
+      "label": "[Select] build (release)",
+      "detail": "Build (release, -o:speed) the project picked via the pvProjectDir pickstring.",
+      "type": "process",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/_Helpers/scripts/dev/odin_task.ps1",
+        "-WorkspaceFolder",
+        "${workspaceFolder}",
+        "-Mode",
+        "build-release",
+        "-Exec",
+        "-Cwd",
+        "${input:pvProjectDir}"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "build",
+      "problemMatcher": [],
+    },
+    {
+      "label": "[Select] build (check)",
+      "detail": "Run odin check (vet + strict-style) on the project picked via the pvProjectDir pickstring.",
+      "type": "process",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/_Helpers/scripts/dev/odin_task.ps1",
+        "-WorkspaceFolder",
+        "${workspaceFolder}",
+        "-Mode",
         "check",
         "-Cwd",
         "${input:pvProjectDir}"
@@ -242,6 +325,57 @@
       "group": "build",
       "problemMatcher": [],
     },
+    {
+      "label": "[Select] build (debug + run)",
+      "detail": "Build then run the project picked via the pvProjectDir pickstring.",
+      "type": "process",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/_Helpers/scripts/dev/odin_task.ps1",
+        "-WorkspaceFolder",
+        "${workspaceFolder}",
+        "-Mode",
+        "run-debug",
+        "-Cwd",
+        "${input:pvProjectDir}"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "test",
+      "problemMatcher": [],
+    },
+    {
+      "label": "[Select] build (release + run)",
+      "detail": "Build then run the release binary of the project picked via the pvProjectDir pickstring.",
+      "type": "process",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/_Helpers/scripts/dev/odin_task.ps1",
+        "-WorkspaceFolder",
+        "${workspaceFolder}",
+        "-Mode",
+        "run-release",
+        "-Cwd",
+        "${input:pvProjectDir}"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": "test",
+      "problemMatcher": [],
+    },
+// ===========================================================================
+    // Diagnostic / utility tasks (unchanged)
+    // ===========================================================================
     {
       "label": "[DIAG] Audit Consistency READMEs",
       "detail": "Audit README <-> filesystem coherence (wikilinks, missing files, unlisted files). Use --fail-on-error in CI.",
