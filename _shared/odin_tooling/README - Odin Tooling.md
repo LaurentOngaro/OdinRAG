@@ -22,20 +22,20 @@ The Odin Skeleton is now a consumer, not a source. Editing a file here and runni
 
 ## Files in this directory
 
-| File                                             | Role                                           | Sync target          |
-| ------------------------------------------------ | ---------------------------------------------- | -------------------- |
-| `odinfmt.json`                                   | Formatter config (odinfmt)                     | project root         |
-| `ols.json`                                       | LSP config (ols) + lint rules                  | project root         |
-| `_tools/build_and_run.bat`                       | build + run + raddebugger wrapper              | `_tools/`            |
-| `_tools/check_and_format.bat`                    | CI pipeline: `odinfmt -w` + `odin check`       | `_tools/`            |
-| `_tools/create_junctions.ps1`                    | Creates `_refs/` junctions to Odin SDK         | `_tools/`            |
-| `_tools/project.raddbg_project`                  | RadDebugger initial project config             | `_tools/`            |
-| `templates/TPL_tasks.json`                       | VS Code tasks (use `${workspaceFolder}`)       | `.vscode/tasks.json` (seed) |
-| `templates/TPL_install_full_env.ps1`             | Odin + BuildTools env installer (merged PVG00) | `_tools/` (seed)     |
-| `templates/TPL_project.raddbg_user`              | raddbg user config (default)                   | `_tools/` (seed)     |
-| `templates/TPL_README.md`                       | tools folder README                            | `_tools/` (seed)     |
-| `sync-tooling.ps1`                               | One-way sync to all known projects             | (this dir)           |
-| `README - Odin Tooling.md`                       | This documentation                             | n/a                  |
+| File                                 | Role                                           | Sync target                 |
+| ------------------------------------ | ---------------------------------------------- | --------------------------- |
+| `odinfmt.json`                       | Formatter config (odinfmt)                     | project root                |
+| `ols.json`                           | LSP config (ols) + lint rules                  | project root                |
+| `_tools/build_and_run.bat`           | build + run + raddebugger wrapper              | `_tools/`                   |
+| `_tools/check_and_format.bat`        | CI pipeline: `odinfmt -w` + `odin check`       | `_tools/`                   |
+| `_tools/create_junctions.ps1`        | Creates `_refs/` junctions to Odin SDK         | `_tools/`                   |
+| `_tools/project.raddbg_project`      | RadDebugger initial project config             | `_tools/`                   |
+| `templates/TPL_tasks.json`           | VS Code tasks (use `${workspaceFolder}`)       | `.vscode/tasks.json` (seed) |
+| `templates/TPL_install_full_env.ps1` | Odin + BuildTools env installer (merged PVG00) | `_tools/` (seed)            |
+| `templates/TPL_project.raddbg_user`  | raddbg user config (default)                   | `_tools/` (seed)            |
+| `templates/TPL_README.md`            | tools folder README                            | `_tools/` (seed)            |
+| `sync-tooling.ps1`                   | One-way sync to all known projects             | (this dir)                  |
+| `README - Odin Tooling.md`           | This documentation                             | n/a                         |
 
 ### Template naming convention
 
@@ -52,12 +52,12 @@ Template files use the `TPL_` prefix instead of a `.template` extension. This ke
 
 These come from `templates/TPL_*`. They are copied only if the destination does not exist locally. Use `-Force` to overwrite (with a per-file warning) - in particular, be careful with `project.raddbg_user` which is per-user.
 
-| Source                                           | Destination                          | Why seeded-only (not canonical)                           |
-| ------------------------------------------------ | ------------------------------------ | --------------------------------------------------------- |
-| `templates/TPL_tasks.json`                       | `.vscode/tasks.json`                  | VS Code tasks (per-project customisations possible)        |
-| `templates/TPL_install_full_env.ps1`       | `_tools/install_full_env.ps1`         | Script to bootstrap Odin + BuildTools on a new dev machine |
-| `templates/TPL_project.raddbg_user`        | `_tools/project.raddbg_user`          | Per-user RadDebugger config (custom breakpoints, layout)  |
-| `templates/TPL_README.md`                 | `_tools/README.md`                    | Short project-specific tools-folder documentation         |
+| Source                               | Destination                   | Why seeded-only (not canonical)                            |
+| ------------------------------------ | ----------------------------- | ---------------------------------------------------------- |
+| `templates/TPL_tasks.json`           | `.vscode/tasks.json`          | VS Code tasks (per-project customisations possible)        |
+| `templates/TPL_install_full_env.ps1` | `_tools/install_full_env.ps1` | Script to bootstrap Odin + BuildTools on a new dev machine |
+| `templates/TPL_project.raddbg_user`  | `_tools/project.raddbg_user`  | Per-user RadDebugger config (custom breakpoints, layout)   |
+| `templates/TPL_README.md`            | `_tools/README.md`            | Short project-specific tools-folder documentation          |
 
 ### Force mode
 
