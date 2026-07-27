@@ -1,10 +1,4 @@
 {
-  // See https://go.microsoft.com/fwlink/?LinkId=733558
-  // for the documentation about the tasks.json format
-  //
-  // Tasks.json template - copy to <project>/.vscode/tasks.json and adjust
-  // paths if needed. All file paths use ${workspaceFolder} so the file is
-  // portable across machines and OS.
   "version": "2.0.0",
   "presentation": {
     "reveal": "always",
@@ -122,7 +116,6 @@
         "-vet-style",
         "-vet-semicolon",
         "-vet-cast",
-        "-missing-blank-lines-between-procs",
         "-use-separate-modules"
       ],
       "options": {
@@ -149,7 +142,6 @@
         "-vet-style",
         "-vet-semicolon",
         "-vet-cast",
-        "-missing-blank-lines-between-procs",
         "-use-separate-modules"
       ],
       "options": {
@@ -179,7 +171,6 @@
         "-vet-style",
         "-vet-semicolon",
         "-vet-cast",
-        "-missing-blank-lines-between-procs",
         "-use-separate-modules"
       ],
       "options": {
@@ -208,7 +199,6 @@
         "-vet-style",
         "-vet-semicolon",
         "-vet-cast",
-        "-missing-blank-lines-between-procs",
         "-use-separate-modules"
       ],
       "options": {

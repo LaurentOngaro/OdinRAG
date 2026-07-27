@@ -25,7 +25,7 @@
   "enable_checker_only_saved": true,
   "enable_references": false,
   "enable_rename": true,
-  "checker_args": "-vet-unused -vet-unused-variables -vet-unused-imports -vet-shadowing -vet-style -vet-semicolon -vet-cast -missing-blank-lines-between-procs",
+  "checker_args": "-vet-unused -vet-unused-variables -vet-unused-imports -vet-shadowing -vet-style -vet-semicolon -vet-cast",
   "verbose": false,
   "profiles": [
     {

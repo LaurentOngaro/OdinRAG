@@ -14,7 +14,6 @@
       Project root:
         - odinfmt.json
         - ols.json
-        - .vscode/tasks.json (from tasks.json.template)
 
       _tools/ (mutualised):
         - build_and_run.bat
@@ -22,16 +21,20 @@
         - create_junctions.ps1
         - project.raddbg_project  (skip if .raddbg_user exists and is customised)
 
-  - **Templates (copied ONLY if missing)**: files that have a sensible default
-    but should be customised per-user/per-project. `sync-tooling.ps1` only
-    seeds them - it never overwrites an existing local copy.
+  - **Templates (copied ONLY if missing by default)**: files that have a sensible
+    default but should be customised per-user/per-project. With -Force, they
+    are overwritten (with a per-file warning so you don't silently nuke
+    project-local customisations like `project.raddbg_user`).
 
-      _tools/ (seeded only if missing):
-        - install_full_env.ps1   (from templates/_tools/install_full_env.ps1.template)
-        - project.raddbg_user    (from templates/_tools/project.raddbg_user.template)
-        - README.md              (from templates/_tools/README.md.template)
+      .vscode/ (seeded only if missing, or always with -Force):
+        - tasks.json             (from templates/TPL_tasks.json)
 
-  Files that are INTENTIONALLY left local (never synced):
+      _tools/ (seeded only if missing, or always with -Force):
+        - install_full_env.ps1   (from templates/TPL_install_full_env.ps1)
+        - project.raddbg_user    (from templates/TPL_project.raddbg_user)
+        - README.md              (from templates/TPL_README.md)
+
+  Files that are INTENTIONALLY left local (never synced, even with -Force):
     - (none - templates cover the previous "left local" list)
 
   Usage (interactive, default targets):
@@ -54,6 +57,14 @@
 
 .PARAMETER SkipTemplates
   If set, do not seed the template files (canonical-only sync).
+
+.PARAMETER Force
+  Overwrite existing template files at the destination (canonical files are
+  always overwritten, this flag only changes template behaviour). For each
+  template file that already exists locally, a warning is printed before
+  overwriting so you can spot project-local customisations being clobbered.
+  Use with care - in particular, `project.raddbg_user` is per-user and
+  should rarely be force-synced.
 #>
 [CmdletBinding(SupportsShouldProcess=$true)]
 param(
@@ -63,7 +74,8 @@ param(
         "D:\Projets_Perso\03_Code\Odin\OdinRAG\code\projects\PVG03_RPG"
     ),
     [string]$Source = $PSScriptRoot,
-    [switch]$SkipTemplates
+    [switch]$SkipTemplates,
+    [switch]$Force
 )
 
 $ErrorActionPreference = "Stop"
@@ -75,7 +87,6 @@ $ErrorActionPreference = "Stop"
 $canonical = @{
     "odinfmt.json"                       = Join-Path $Source "odinfmt.json"
     "ols.json"                           = Join-Path $Source "ols.json"
-    ".vscode\tasks.json"                 = Join-Path $Source "tasks.json.template"
     "_tools\build_and_run.bat"           = Join-Path $Source "_tools\build_and_run.bat"
     "_tools\check_and_format.bat"        = Join-Path $Source "_tools\check_and_format.bat"
     "_tools\create_junctions.ps1"        = Join-Path $Source "_tools\create_junctions.ps1"
@@ -83,21 +94,29 @@ $canonical = @{
 }
 
 # =============================================================================
-# Template files (seeded ONLY if missing locally).
+# Template files (seeded ONLY if missing locally; -Force overrides with warning).
 # rel-path inside the project -> absolute source inside templates/
-# These are customised per user/project (e.g. project.raddbg_user), so we
-# never overwrite - the first sync seeds them, subsequent syncs leave them alone.
+# Convention: files use the TPL_ prefix (e.g. TPL_project.raddbg_user) so the
+# extension remains native (raddbg_user, README.md, .ps1, .json) and linters/
+# editors recognise them. All templates live directly in templates/ (no nested
+# subfolders - the prefix + extension is enough to identify the target type).
 # =============================================================================
 $templates = @{
-    "_tools\install_full_env.ps1"  = Join-Path $Source "templates\_tools\install_full_env.ps1.template"
-    "_tools\project.raddbg_user"    = Join-Path $Source "templates\_tools\project.raddbg_user.template"
-    "_tools\README.md"             = Join-Path $Source "templates\_tools\README.md.template"
+    ".vscode\tasks.json"                 = Join-Path $Source "templates\TPL_tasks.json"
+    "_tools\install_full_env.ps1"        = Join-Path $Source "templates\TPL_install_full_env.ps1"
+    "_tools\project.raddbg_user"         = Join-Path $Source "templates\TPL_project.raddbg_user"
+    "_tools\README.md"                   = Join-Path $Source "templates\TPL_README.md"
 }
 
 # Sanity check: every source path must exist before we attempt anything.
 Write-Host ""
 Write-Host "=== Odin Tooling Sync ===" -ForegroundColor Cyan
 Write-Host "Source (canonical): $Source"
+if ($Force) {
+    Write-Host "Mode: FORCE (templates will overwrite existing files with warning)" -ForegroundColor Yellow
+} else {
+    Write-Host "Mode: default (templates only seed missing files)"
+}
 
 $missing = @()
 foreach ($rel in $canonical.Keys) {
@@ -121,9 +140,10 @@ Write-Host ""
 
 # Statistics
 $stats = @{
-    copied  = 0
-    seeded  = 0
-    skipped = 0
+    copied        = 0
+    seeded        = 0
+    skipped       = 0
+    forceOverwrite = 0
 }
 
 foreach ($target in $Targets) {
@@ -152,17 +172,24 @@ foreach ($target in $Targets) {
         }
     }
 
-    # 2) Template files - copy ONLY if destination is missing.
+    # 2) Template files - copy ONLY if destination is missing (or always with -Force).
     if (-not $SkipTemplates) {
         foreach ($rel in $templates.Keys) {
             $src = $templates[$rel]
             if (-not (Test-Path $src)) { continue }  # skip silently if source missing
             $dst = Join-Path $target $rel
-            if (Test-Path $dst) {
+            $exists = Test-Path $dst
+            if ($exists -and -not $Force) {
                 # Local file already exists - never overwrite.
                 Write-Host "    . $rel (exists, skipped)" -ForegroundColor DarkGray
                 $stats.skipped++
                 continue
+            }
+            if ($exists -and $Force) {
+                # Force mode: warn BEFORE overwriting so the user can spot
+                # project-local customisations being clobbered.
+                Write-Warning ("  ! FORCE: overwriting existing {0} - any project-local customisation will be LOST" -f $rel)
+                $stats.forceOverwrite++
             }
             $dstDir = Split-Path $dst -Parent
             if (-not (Test-Path $dstDir)) {
@@ -172,8 +199,12 @@ foreach ($target in $Targets) {
             }
             if ($PSCmdlet.ShouldProcess($dst, "Seed from $src")) {
                 Copy-Item -Path $src -Destination $dst -Force
-                Write-Host "    * $rel (seeded)" -ForegroundColor Cyan
-                $stats.seeded++
+                if ($exists) {
+                    Write-Host "    ! $rel (force-overwritten)" -ForegroundColor Yellow
+                } else {
+                    Write-Host "    * $rel (seeded)" -ForegroundColor Cyan
+                    $stats.seeded++
+                }
             }
         }
     }
@@ -183,8 +214,11 @@ foreach ($target in $Targets) {
 Write-Host "=== Sync complete ===" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "Summary:" -ForegroundColor Cyan
-Write-Host ("  Canonical copied : {0}" -f $stats.copied) -ForegroundColor Green
-Write-Host ("  Templates seeded : {0}" -f $stats.seeded) -ForegroundColor Cyan
-Write-Host ("  Templates skipped: {0} (already exists locally)" -f $stats.skipped) -ForegroundColor DarkGray
+Write-Host ("  Canonical copied   : {0}" -f $stats.copied) -ForegroundColor Green
+Write-Host ("  Templates seeded   : {0}" -f $stats.seeded) -ForegroundColor Cyan
+Write-Host ("  Templates skipped  : {0} (already exists locally)" -f $stats.skipped) -ForegroundColor DarkGray
+if ($Force) {
+    Write-Host ("  Force-overwritten  : {0}" -f $stats.forceOverwrite) -ForegroundColor Yellow
+}
 Write-Host ""
 Write-Host "Tip: review the diff in each project before committing." -ForegroundColor Yellow

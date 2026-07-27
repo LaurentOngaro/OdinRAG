@@ -11,12 +11,5 @@
   "brace_style": "_1TBS",
   "indent_cases": false,
   "newline_style": "CRLF",
-  "insert_blank_lines": {
-    "after_procedure": 1,
-    "after_struct": 0,
-    "after_constants": 0,
-    "after_globals": 0,
-    "after_when": 0
-  },
   "inline_single_stmt_case": false
 }
