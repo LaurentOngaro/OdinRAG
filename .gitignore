@@ -77,6 +77,13 @@ Thumbs.db
 .kilo/skills/*/_index_*.md
 .kilo/skills/*/local.patch
 
+# === Local-only Copilot skill mirror (Windows NTFS junction to .kilo/skills) ===
+# .agents/skills is a local `mklink /J` junction pointing at .kilo/skills, created
+# so GitHub Copilot's default skill-discovery path finds the same skills as Kilo Code.
+# Not portable (junctions are Windows-only, not stored by Git) - .kilo/skills/*
+# remains the single tracked source of truth.
+.agents/
+
 # === Obsidian ===
 /.obsidian
 
