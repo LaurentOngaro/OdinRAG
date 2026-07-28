@@ -112,7 +112,7 @@ function Resolve-SubprojectBat {
   param([string] $ProjectRoot)
   $bat = Join-Path $ProjectRoot '_tools\build_and_run.bat'
   if (Test-Path -LiteralPath $bat -PathType Leaf) {
-    return $bat 
+    return $bat
   }
   return $null
 }
@@ -188,15 +188,15 @@ switch ($Mode) {
     if ($subprojectBat) {
       $code = Invoke-SubprojectBuild -Bat $subprojectBat -Src $ctx.Src -Out $debugExe -IsDebug $true -DoExec $Exec
       if ($code -ne 0) {
-        exit $code 
+        exit $code
       }
     } else {
-      & $OdinExe build $ctx.Src -out:$debugExe -debug -vet -strict-style
+      & $OdinExe build $ctx.Src -out:$debugExe -debug -o:none -vet -strict-style
       if ($LASTEXITCODE -ne 0) {
-        exit $LASTEXITCODE 
+        exit $LASTEXITCODE
       }
       if ($Exec) {
-        & $debugExe 
+        & $debugExe
       }
     }
   }
@@ -204,34 +204,34 @@ switch ($Mode) {
     if ($subprojectBat) {
       $code = Invoke-SubprojectBuild -Bat $subprojectBat -Src $ctx.Src -Out $releaseExe -IsDebug $false -DoExec $Exec
       if ($code -ne 0) {
-        exit $code 
+        exit $code
       }
     } else {
       & $OdinExe build $ctx.Src -out:$releaseExe -o:speed -no-bounds-check
       if ($LASTEXITCODE -ne 0) {
-        exit $LASTEXITCODE 
+        exit $LASTEXITCODE
       }
       if ($Exec) {
-        & $releaseExe 
+        & $releaseExe
       }
     }
   }
   'build-dll' {
     # DLL is always generic - the sub-project .bat does not have a build-dll mode.
-    & $OdinExe build $ctx.Src -build-mode:dll -out:$dllOut -debug -vet
+    & $OdinExe build $ctx.Src -build-mode:dll -out:$dllOut -debug -o:none -vet
   }
   'run-debug' {
     # Kept for back-compat with [BUILD+RUN] odin_task (debug). Equivalent to
     # build-debug + Exec, but routed through the .bat if available for parity.
     if ($subprojectBat) {
       $code = Invoke-SubprojectBuild -Bat $subprojectBat -Src $ctx.Src -Out $debugExe -IsDebug $true -DoExec $true
-      if ($code -ne 0) {
-        exit $code 
+    if ($code -ne 0 -and $code -ne -2147483645) {
+        exit $code
       }
     } else {
-      & $OdinExe build $ctx.Src -out:$debugExe -debug -vet -strict-style
+      & $OdinExe build $ctx.Src -out:$debugExe -debug -o:none -vet -strict-style
       if ($LASTEXITCODE -ne 0) {
-        exit $LASTEXITCODE 
+        exit $LASTEXITCODE
       }
       & $debugExe
     }
@@ -240,12 +240,12 @@ switch ($Mode) {
     if ($subprojectBat) {
       $code = Invoke-SubprojectBuild -Bat $subprojectBat -Src $ctx.Src -Out $releaseExe -IsDebug $false -DoExec $true
       if ($code -ne 0) {
-        exit $code 
+        exit $code
       }
     } else {
       & $OdinExe build $ctx.Src -out:$releaseExe -o:speed -no-bounds-check
       if ($LASTEXITCODE -ne 0) {
-        exit $LASTEXITCODE 
+        exit $LASTEXITCODE
       }
       & $releaseExe
     }
@@ -259,9 +259,9 @@ switch ($Mode) {
     # Builds the debug binary AND launches RAD Debugger (raddbg.exe) on it.
     # raddbg.exe is from EpicGames/raddebugger (see KB: odin-knowledge-base/
     #   docs/karl_zylinski/hot-reload-gameplay-code.md, section "RAD Debugger").
-    & $OdinExe build $ctx.Src -out:$debugExe -debug -vet -strict-style
+    & $OdinExe build $ctx.Src -out:$debugExe -debug -o:none -vet -strict-style -define:ODIN_RADDEBUG=true
     if ($LASTEXITCODE -ne 0) {
-      exit $LASTEXITCODE 
+      exit $LASTEXITCODE
     }
     $raddbg = Get-Command raddbg.exe -ErrorAction SilentlyContinue
     if ($raddbg) {

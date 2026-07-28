@@ -24,25 +24,33 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "[BUILD] odin_task (debug)",
+      "name": "[BUILD+RUN] odin_task (debug)",
       "type": "cppvsdbg",
       "request": "launch",
-      "preLaunchTask": "[BUILD] odin_task (debug)",
-      "program": "H:\\Sync\\Scripts\\Windows\\04a_tools\\nop.exe",
-      "stopAtEntry": false,
+      "preLaunchTask": "[BUILD+RUN] odin_task (debug)",
+      "program": "C:\\Windows\\System32\\cmd.exe",
+      "args": [
+        "/c",
+        "pause"
+      ],
+      "internalConsoleOptions": "neverOpen",
+      "suppressMultipleSessionWarning": true,
       "environment": [],
-      "console": "integratedTerminal",
       "cwd": "${workspaceFolder}"
     },
     {
-      "name": "[BUILD] odin_task (release)",
+      "name": "[BUILD+RUN] odin_task (release)",
       "type": "cppvsdbg",
       "request": "launch",
-      "preLaunchTask": "[BUILD] odin_task (release)",
-      "program": "H:\\Sync\\Scripts\\Windows\\04a_tools\\nop.exe",
-      "stopAtEntry": false,
+      "preLaunchTask": "[BUILD+RUN] odin_task (release)",
+      "program": "C:\\Windows\\System32\\cmd.exe",
+      "args": [
+        "/c",
+        "pause"
+      ],
+      "internalConsoleOptions": "neverOpen",
+      "suppressMultipleSessionWarning": true,
       "environment": [],
-      "console": "integratedTerminal",
       "cwd": "${workspaceFolder}"
     },
     {

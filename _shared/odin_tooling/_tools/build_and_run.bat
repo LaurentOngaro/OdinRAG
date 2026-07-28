@@ -1,7 +1,55 @@
 @echo off
+:: ============================================================================
+:: build_and_run.bat -- generic Odin build + RadDebugger launcher
+:: ============================================================================
+::
+:: HISTORY & CURRENT STATE (2026-07-27 refactor)
+:: ----------------------------------------------
+:: This script went through several raddbg-version-related regressions:
+::
+::  1. Original: copied `_tools/project.raddbg_*` into `build\debug\` on
+::  every run with `copy /y`, which clobbered the user's personalized
+::  copies on each build.
+::  -> Fixed: switched to `if not exist ... (copy /y ...)` so seeds are
+::  only applied on first launch / after `-w`.
+::
+::  2. raddbg 0.9.26 (May 2025) moved breakpoints from project file to user
+::  file. We mirrored the move in the seeds.
+::
+::  3. Empirical testing showed raddbg 0.9.27 silently DROPS every seeded
+::  setting (project AND user file) on the first launch of a fresh
+::  `build\debug\`, including the breakpoint. A grep of the 0.9.27 binary
+::  confirms the offending sections (`exception_code_filters`,
+::  `color_preset`, `press_animations`, etc.) no longer exist in the
+::  format - they were removed between 0.9.20 and 0.9.27.
+::
+::  4. While chasing the seed issue we discovered the real culprit of the
+::  "no source mapping" symptom: the `-debug` flag was NEVER being passed
+::  to Odin after `--wipe`, because the translation block sat AFTER a
+::  `goto :RUN_CMD` that bypassed it. Fixed by moving the block earlier.
+::  Without `-debug`, Odin produced no PDB, so raddbg had no debug info.
+::
+::  5. After both fixes were in place, the cleanest reliable way to make
+::  raddbg open `main.odin` on first launch is no longer the seeds - it
+::  is `intrinsics.debug_trap()` injected at the top of `main()`
+::  (gated by `when ODIN_DEBUG`). Combined with the PDB that the `-debug`
+::  flag now produces, raddbg auto-loads the PDB, stops at the trap,
+::  and opens `main.odin` in the source view automatically.
+::
+:: CONCLUSION
+:: ----------
+:: The two seed files in `_tools/project.raddbg_*` are now dead weight:
+:: raddbg 0.9.27 ignores them entirely and raddbg 0.9.x<27 will write its
+:: own defaults over them anyway. They have been DELETED. The auto-source-
+:: linking now relies on:
+::  1. `-debug` in the Odin build command (produces PDB, see fix #4).
+::  2. `intrinsics.debug_trap()` in `source/main.odin` (see fix #5).
+:: This script no longer copies any seed file; `:DO_RADDEBUGGER` just
+:: launches raddbg pointing at the binary.
+:: ============================================================================
+
 setlocal enableextensions enabledelayedexpansion
 echo.
-:: echo CMD:%0 %*
 
 :: !!! THIS SCRIPT WON'T WORK if there are spaces in some paths !!!
 
@@ -9,7 +57,6 @@ echo.
 set buildCommand=odin
 set buildOptions=-thread-count:14 -vet-unused -vet-unused-variables -vet-unused-imports -vet-shadowing -vet-style -vet-semicolon -vet-cast -use-separate-modules
 :: additional build options here
-:: add timings info at the start of the build process
 :: set buildOptions=%buildOptions% -show-timings
 :: Resolve raddbg.exe portably:
 ::  1. Prefer %FLD_APPS%\Raddebugger\raddbg.exe (set by the user's env).
@@ -24,6 +71,7 @@ set cwd=%~dp0
 set toolsFolder=%cwd%
 
 set debug=0
+set debugMode=
 set fileMode=
 set action=
 set src=
@@ -45,7 +93,7 @@ if "%~1"=="" (
 :: set flags
 if "%~1"=="-v" set verbose=1
 if "%~1"=="--verbose" set verbose=1
-if %verbose%==1 (
+if !verbose!==1 (
   echo Analysing "%~1%" parameter:
 )
 :: !important! DO no use optimize flags (-o:XXX) when debugging because the source code and the debugged code will be different (aka breakpoints won't work or not been set in the correct lines)
@@ -100,11 +148,11 @@ if "%~1"=="test" set action=test
 shift
 :: no more parameters to process and action is set
 if "%~1"=="" (
-  if %cls%==1 (
+  if !cls!==1 (
     cls
     echo THE CONSOLE OUTPUT HAS BEEN CLEARED
   )
-  if %verbose%==1 (
+  if !verbose!==1 (
     goto DEBUG_INFO
     ) else (
     goto CHECK_CMD
@@ -113,9 +161,7 @@ if "%~1"=="" (
 goto LOOP
 
 :HELP
-:: Add usage instructions here
 echo Usage: "build_and_run.bat [h|help] [b|build] [r|run] [-s|--src <src>] [-o|--out <output_file>] [-d|--debug] [-e|--exec] [-v|--verbose]"
-:: add more instructions here
 echo ----
 echo Flags to change the behavior of the script:
 echo ----
@@ -131,7 +177,7 @@ echo "-rd, --raddebugger    Open the the output file as target in Raddebugger. O
 echo "-np, --no-pause       Skip the final pause on success or error. Use when invoked from VS Code tasks or CI."
 echo "-v , --verbose        Verbose mode: print more details during the processus."
 echo "----"
-echo "Commands to be executed by the script:"
+echo Commands to be executed by the script:
 echo "----"
 echo "-h, --help : Display this help message."
 echo "-b, --build: Build the source file or folder."
@@ -157,6 +203,7 @@ echo cls=%cls%
 echo verbose=%verbose%
 echo wipe=%wipe%
 echo raddebugger=%raddebugger%
+echo debugMode=%debugMode%
 echo.
 
 :CHECK_CMD
@@ -175,7 +222,7 @@ if "%action%"=="clean" (
   for %%i in ("%outputFile%") do set outputFileName=%%~ni
 )
 
-if %wipe%==1 (
+if !wipe!==1 (
   if exist "%outputFolder%" (
     rmdir /s /q "%outputFolder%\"
     echo The output folder "%outputFolder%" has been wiped.
@@ -183,18 +230,34 @@ if %wipe%==1 (
 )
 if "%action%"=="clean" goto EOF
 
-if "%src%" == "" (
+:: Translate internal --debug flag into the Odin compiler flag (-debug).
+:: `-o:none` is added so source lines and breakpoints stay in sync with the
+:: running code. This block MUST run BEFORE the wipe-recreate block below:
+:: that block does `goto :RUN_CMD` when the output folder does not exist
+:: (which is ALWAYS the case after --wipe), so placing the translation later
+:: silently skipped it and Odin produced an exe with no PDB. See HISTORY #4.
+if !debug!==1 (
+  set debugMode=-debug -o:none
+  ) else (
+  set debugMode=
+)
+
+if !raddebugger!==1 (
+  set debugMode=-debug -o:none -define:ODIN_RADDEBUG=true
+)
+
+if "!src!" == "" (
   echo A source file or folder to build must be specified using the "-s <folder_or_file>" or "--src <folder_or_file>"command line option.
   goto :ERROR
 )
 
-if not exist "%src%" (
-  echo The Source file or folder "%src%" does not exist.
+if not exist "!src!" (
+  echo The Source file or folder "!src!" does not exist.
   goto :ERROR
 )
 
 if not exist "%outputFolder%" (
-  if %interactive%==0 (
+  if !interactive!==0 (
     echo The output folder "%outputFolder%" will be created.
     set answer=y
     ) else (
@@ -202,7 +265,7 @@ if not exist "%outputFolder%" (
     set /p answer="Do you want to create it [y/n] ?"
   )
   if /i "!answer!"=="y" (
-    mkdir %outputFolder%
+    mkdir "%outputFolder%"
     goto :RUN_CMD
   )
   goto :ERROR
@@ -211,14 +274,17 @@ if not exist "%outputFolder%" (
 :RUN_CMD
 :: run the command "where link.exe" and if it fails, then we are not in a Visual Studio environment
 where link.exe >nul 2>&1
-if %ERRORLEVEL% neq 0 (
+if !ERRORLEVEL! neq 0 (
   :: set the path to the build tools
   :: BUILD_TOOLS_BIN=E:\Apps\PortableBuildTools\Windows Kits\10\bin\10.0.26100.0\x64
   :: echo "%BUILD_TOOLS_BIN%\..\..\..\..\..\..\..\devcmd.bat"
   call "%BUILD_TOOLS_BIN%\..\..\..\..\..\..\..\devcmd.bat"
 )
 
-set odin_build_cmd=%buildCommand% %action% %src% %debugMode% %fileMode% %buildOptions% -out:%outputFile%
+:: !debugMode! (delayed expansion) is required because it was set inside an
+:: `if () ()` block above - immediate expansion `%debugMode%` would freeze
+:: the empty pre-block value here.
+set odin_build_cmd=%buildCommand% %action% %src% !debugMode! %fileMode% %buildOptions% -out:%outputFile%
 
 echo.
 echo -------------
@@ -226,7 +292,7 @@ echo "1 BUILDING -> %odin_build_cmd%"
 echo -------------
 echo.
 %odin_build_cmd%
-if %ERRORLEVEL% neq 0 (
+if !ERRORLEVEL! neq 0 (
   echo Error building the source file
   goto :ERROR
 )
@@ -234,11 +300,13 @@ if %ERRORLEVEL% neq 0 (
 :: ============================================================================
 :: RADDEBUGGER BLOCK - launched when --raddebugger is passed.
 :: ============================================================================
-:: The raddebugger logic lives in a subroutine (:DO_RADDEBUGGER) at the bottom
-:: of this file. Calling a subroutine is the only safe way to run conditional
-:: complex logic in cmd.exe - putting it inline after `if (...)` risks the
-:: parser consuming the rest of the file as if it were inside the block.
-if %raddebugger%==1 (
+:: Just launches raddbg pointing at the freshly-built binary. No seed files
+:: are copied anymore (raddbg 0.9.27 ignores them, see HISTORY #3 and #5).
+:: The auto-source-link to main.odin relies on:
+::  - the PDB that `-debug` produced (debug info, line mapping, etc.)
+::  - `intrinsics.debug_trap()` in main.odin (forces raddbg to stop there
+::  on first run, which makes raddbg open main.odin automatically).
+if !raddebugger!==1 (
   call :DO_RADDEBUGGER
 )
 
@@ -253,7 +321,14 @@ if "%execfile%"=="1" (
   echo -------------
   echo.
   "%outputFile%"
-  if %ERRORLEVEL% neq 0 (
+  set rc=!ERRORLEVEL!
+  if !rc! neq 0 (
+    if "!debug!"=="1" if !rc! equ -2147483645 (
+      echo [debug_trap] STATUS_BREAKPOINT hit - this is the expected RAD Debugger attach point.
+      set rc=0
+    )
+  )
+  if !rc! neq 0 (
     echo Error running outputfile
     goto :ERROR
   )
@@ -265,78 +340,63 @@ goto :EOF
 :: ============================================================================
 
 :DO_RADDEBUGGER
-  :: Resolve raddbg.exe portably: prefer %FLD_APPS%, fall back to PATH.
-  if not exist "%raddebuggerExe%" (
-    for /f "delims=" %%r in ('where raddbg.exe 2^>nul') do (
-      set raddebuggerExe=%%r
-    )
+:: Resolve raddbg.exe portably: prefer %FLD_APPS%, fall back to PATH.
+if not exist "!raddebuggerExe!" (
+  for /f "delims=" %%r in ('where raddbg.exe 2^>nul') do (
+    set raddebuggerExe=%%r
   )
-  if not exist "%raddebuggerExe%" (
-    echo raddbg.exe not found - set FLD_APPS or add it to PATH.
-    echo Binary ready: %outputFile%
-    goto :EOF
-  )
+)
+if not exist "!raddebuggerExe!" (
+  echo raddbg.exe not found - set FLD_APPS or add it to PATH.
+  echo Binary ready: %outputFile%
+  goto :EOF
+)
 
-  set RaddbgProjectFilename=project.raddbg_project
-  set RaddbgProjectFile=!outputFolder!!RaddbgProjectFilename!
-  set RaddbgUserFilename=project.raddbg_user
-  set RaddbgUserFile=!outputFolder!!RaddbgUserFilename!
-  set RaddbgStartupFile=!outputFolder!raddbg_start.bat
-  :: the order of the parameters is important and must not be changed without reading the raddebugger documentation before
-  :: see the Raddebugger README (path is installation-dependent; check %FLD_APPS%\Raddebugger\raddbg_readme.md)
-  set RaddbgCmd=!raddebuggerExe! --user:!RaddbgUserFile! --project:!RaddbgProjectFile! !outputFile!
-  if %verbose%==1 (
-    echo.
-    echo RadDebugger parameters:
-    echo -----
-    echo RaddbgProject=!RaddbgProjectFile!
-    echo RaddbgUserFile=!RaddbgUserFile!
-    echo RaddbgCmd=!RaddbgCmd!
-  )
-
-  :: create the raddebugger startup files if they don't exist
-  :: NOTE: we are in the tool folder, where the raddebugger initial startup files are located
-  :: we need to copy the project file and the user file to the output folder.
-  :: GUARD: if any variable is empty, cmd.exe's `copy /y` will silently fall back to
-  :: copying the source folder into the CURRENT DIRECTORY (which is the workspace
-  :: root in VS Code tasks), polluting the root with stray tooling files. Skip
-  :: the copy entirely if any path is missing.
-  if "!outputFolder!"=="" goto :DO_RADDEBUGGER_SKIP_COPY
-  if "!RaddbgProjectFile!"=="" goto :DO_RADDEBUGGER_SKIP_COPY
-  if "!RaddbgUserFile!"=="" goto :DO_RADDEBUGGER_SKIP_COPY
-  copy /y %toolsFolder%\project.raddbg_project !RaddbgProjectFile! >nul 2>&1
-  copy /y %toolsFolder%\project.raddbg_user !RaddbgUserFile! >nul 2>&1
-  :DO_RADDEBUGGER_SKIP_COPY
-  if %verbose%==1 echo Creating the raddebugger startup file
-  echo @echo off > !RaddbgStartupFile!
-  echo !RaddbgCmd! >> !RaddbgStartupFile!
-  :: echo DONE >> !RaddbgStartupFile!
-  :: echo pause >> !RaddbgStartupFile!
-
+:: Build raddbg invocation. We deliberately do NOT pass --user / --project
+:: anymore: raddbg 0.9.27 ignores any pre-seeded config file and writes
+:: its own defaults to %APPDATA%\raddbg\ on first launch. The binary is
+:: the only argument that matters - everything else (PDB discovery,
+:: source mapping, stop on intrinsics.debug_trap) is handled by raddbg
+:: + the PDB we just produced.
+set RaddbgStartupFile=!outputFolder!raddbg_start.bat
+set RaddbgCmd="!raddebuggerExe!" "!outputFile!"
+if !verbose!==1 (
   echo.
-  echo -------------
-  echo "2 DEBUGGING -> !RaddbgCmd!"
-  echo -------------
-  echo.
-  :: start the debugger
-  !RaddbgStartupFile!
-  if %ERRORLEVEL% neq 0 (
-    echo Error launching Raddebugger
-    goto :ERROR
-  )
+  echo RadDebugger parameters:
+  echo -----
+  echo RaddbgStartupFile=!RaddbgStartupFile!
+  echo RaddbgCmd=!RaddbgCmd!
+)
+
+if !verbose!==1 echo Creating the raddebugger startup file
+echo @echo off > "!RaddbgStartupFile!"
+echo !RaddbgCmd! >> "!RaddbgStartupFile!"
+
+echo.
+echo -------------
+echo "2 DEBUGGING -> !RaddbgCmd!"
+echo -------------
+echo.
+:: start the debugger (non-blocking: raddbg_start.bat exits immediately,
+:: raddbg.exe keeps running with its own window).
+call "!RaddbgStartupFile!"
+if !ERRORLEVEL! neq 0 (
+  echo Error launching Raddebugger
+  goto :ERROR
+)
 goto :EOF
 
 :ERROR
 echo.
 echo At least error occurred running the script.
-if %noPause%==0 (
+if !noPause!==0 (
   pause
 )
 exit /b 1
 
 :EOF
 echo DONE
-if %noPause%==0 (
+if !noPause!==0 (
   pause
 )
 exit /b 0

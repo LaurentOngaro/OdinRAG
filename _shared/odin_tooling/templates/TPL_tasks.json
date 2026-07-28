@@ -207,7 +207,7 @@
       "dependsOn": "[BUILD] Create build folder (release)"
     },
     {
-      "label": "[BUILD] build_and_run on Source (debug)",
+      "label": "[BUILD+RUN] build_and_run on Source (debug)",
       "group": "build",
       "type": "process",
       "command": "cmd",
@@ -219,12 +219,12 @@
         "${workspaceFolder}\\source",
         "--out",
         "${workspaceFolder}\\build\\debug\\${workspaceFolderBasename}.exe",
-        "--exec",
+        "--no-pause",
         "--debug"
       ]
     },
     {
-      "label": "[BUILD] build_and_run on Source (release)",
+      "label": "[BUILD+RUN] build_and_run on Source (release)",
       "group": {
         "kind": "build"
       },
@@ -238,11 +238,11 @@
         "${workspaceFolder}\\source",
         "--out",
         "${workspaceFolder}\\build\\release\\${workspaceFolderBasename}.exe",
-        "--exec"
+        "--no-pause"
       ]
     },
     {
-      "label": "[BUILD] build_and_run on Source (Raddebug)",
+      "label": "[BUILD+RUN] build_and_run on Source (Raddebug)",
       "group": {
         "kind": "build"
       },
@@ -259,6 +259,7 @@
         "--verbose",
         "--debug",
         "--wipe",
+        "--no-pause",
         "--raddebugger"
       ]
     },
@@ -299,7 +300,7 @@
         "kind": "build"
       },
       "type": "process",
-      "command": "${fileBasename}.exe",
+      "command": "${workspaceFolderBasename}.exe",
       "options": {
         "cwd": "${workspaceFolder}\\build\\debug"
       }
@@ -310,7 +311,7 @@
         "kind": "build"
       },
       "type": "process",
-      "command": "${fileBasename}.exe",
+      "command": "${workspaceFolderBasename}.exe",
       "options": {
         "cwd": "${workspaceFolder}\\build\\release"
       }

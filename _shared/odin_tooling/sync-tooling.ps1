@@ -19,19 +19,17 @@
         - build_and_run.bat
         - check_and_format.bat
         - create_junctions.ps1
-        - project.raddbg_project  (skip if .raddbg_user exists and is customised)
 
   - **Templates (copied ONLY if missing by default)**: files that have a sensible
     default but should be customised per-user/per-project. With -Force, they
     are overwritten (with a per-file warning so you don't silently nuke
-    project-local customisations like `project.raddbg_user`).
+    project-local customisations.
 
       .vscode/ (seeded only if missing, or always with -Force):
         - tasks.json             (from templates/TPL_tasks.json)
 
       _tools/ (seeded only if missing, or always with -Force):
         - install_full_env.ps1   (from templates/TPL_install_full_env.ps1)
-        - project.raddbg_user    (from templates/TPL_project.raddbg_user)
         - README.md              (from templates/TPL_README.md)
 
   Files that are INTENTIONALLY left local (never synced, even with -Force):
@@ -63,8 +61,6 @@
   always overwritten, this flag only changes template behaviour). For each
   template file that already exists locally, a warning is printed before
   overwriting so you can spot project-local customisations being clobbered.
-  Use with care - in particular, `project.raddbg_user` is per-user and
-  should rarely be force-synced.
 #>
 [CmdletBinding(SupportsShouldProcess=$true)]
 param(
@@ -90,7 +86,6 @@ $canonical = @{
     "_tools\build_and_run.bat"           = Join-Path $Source "_tools\build_and_run.bat"
     "_tools\check_and_format.bat"        = Join-Path $Source "_tools\check_and_format.bat"
     "_tools\create_junctions.ps1"        = Join-Path $Source "_tools\create_junctions.ps1"
-    "_tools\project.raddbg_project"      = Join-Path $Source "_tools\project.raddbg_project"
 }
 
 # =============================================================================
@@ -104,7 +99,6 @@ $canonical = @{
 $templates = @{
     ".vscode\tasks.json"                 = Join-Path $Source "templates\TPL_tasks.json"
     "_tools\install_full_env.ps1"        = Join-Path $Source "templates\TPL_install_full_env.ps1"
-    "_tools\project.raddbg_user"         = Join-Path $Source "templates\TPL_project.raddbg_user"
     "_tools\README.md"                   = Join-Path $Source "templates\TPL_README.md"
 }
 
