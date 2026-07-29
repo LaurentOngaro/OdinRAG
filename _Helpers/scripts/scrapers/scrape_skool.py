@@ -4,14 +4,28 @@ _Helpers/scripts/scrapers/scrape_skool.py - Skool Course Scraper (programvideoga
 
 Extracts every lesson of the Skool "programvideogames" group (courses ->
 modules -> lessons) and exports them as structured Markdown with frontmatter
-metadata (title, duration, associated YouTube video). Optionally downloads
-the YouTube videos and/or the support files (ZIP) attached to the lessons.
+metadata (title, duration, associated video). Optionally downloads the
+videos (YouTube links + Skool HLS streams) and/or the support files (ZIP)
+attached to the lessons.
+
+Two video flavours are handled transparently by `--download-video`:
+- YouTube lessons: `metadata.videoLink` is a `youtu.be` URL. Downloaded
+    with yt-dlp using the 3-cycle anti-bot strategy (android_vr -> web+cookies
+    -> ios+cookies).
+- Skool HLS lessons: `metadata.videoLink` is empty but `metadata.videoId`
+    is set. The signed m3u8 URL is embedded in the SSR HTML of the lesson
+    page (`playbackId` + `playbackToken`). Playwright loads the page (bypasses
+    AWS WAF; urllib is blocked), the URL is parsed via regex, and yt-dlp
+    downloads the stream with `--referer "https://skool.com"`.
 
 Usage:
 python _Helpers/scripts/scrapers/scrape_skool.py [options]
 
 Options:
---download-video, -dv              Also download the lessons' YouTube videos via yt-dlp.
+--download-video, -dv              Download the lessons' videos via yt-dlp.
+                                    Covers BOTH YouTube lessons AND Skool HLS
+                                    lessons (m3u8 streams). For HLS, requires
+                                    Playwright (already a prereq of skool-cli).
 --download-video-folder PATH       Target folder for YouTube videos. Default: DEFAULT_DOWNLOAD_VIDEO_FOLDER.
 --download-support-files, -ds      Also download the attached files (ZIP, images, etc.) declared in metadata.resources. Placed in <course>/Support Files/<NNN-slug>/<file>.
                                     Idempotent: does not re-download already-present files.
@@ -22,14 +36,18 @@ Options:
                                     --lesson "editor-side-panel" matches the title "2.41 - Editor Side Panel (ImGui) (10:53)".
                                     Ex: --lesson "entities state physics" only processes the lesson whose title contains those words.
                                     Without --lesson: all the lessons of the course are exported.
---skip-until INDEX                 Skip the first INDEX lessons (global counter across all courses) and start processing from lesson INDEX+1. Useful to resume a long scrape after an interruption.
+--skip-until INDEX, -s             Skip the first INDEX lessons (global counter across all courses) and start processing from lesson INDEX+1. Useful to resume a long scrape after an interruption.
                                     Ex: --skip-until 50 skips lessons 1..50 and processes from the 51st.
                                     Without --skip-until: no lesson is skipped by this mechanism (--lesson remains priority for filtering).
---add-index                        Add a numeric index prefix to the downloaded videos
+--number N, -n N                    Limit the number of lessons processed (global, across all courses, after --skip-until and --lesson filters).
+                                    Combined with --skip-until: lessons processed are positions [skip_until+1 .. skip_until+N].
+                                    Ex: --number 5 processes 5 lessons across all the courses. Combined: --skip-until 10 --number 5 → lessons 11..15.
+                                    Without --number: every lesson (after --lesson / --skip-until filters) is processed.
+--add-index, -i                    Add a numeric index prefix to the downloaded videos
                                     ({i+1:03d}-{slug}.mp4 instead of {slug}.mp4). By default
                                     (False), videos use a stable name based on the slug only - avoids name collisions between runs
                                     when --lesson is used (the index changes with the filtered list). Markdown lessons always keep their index prefix for reading order.
---add-duration                     Keep the duration suffix (MM:SS or H:MM:SS) of the Skool title in the filename -> the slug ends with the duration digits (ex: ...editor-side-panel-imgui-1053).
+--add-duration, -d                 Keep the duration suffix (MM:SS or H:MM:SS) of the Skool title in the filename -> the slug ends with the duration digits (ex: ...editor-side-panel-imgui-1053).
                                     By default (False), this suffix is removed -> shorter name (ex: ...editor-side-panel-imgui). The duration stays visible in the Markdown frontmatter.
 
 Prerequisites:
@@ -58,6 +76,12 @@ import os
 import re
 import sys
 import time
+# Force UTF-8 stdout/stderr on Windows (otherwise cp1252 chokes on → etc.)
+try:
+    sys.stdout.reconfigure(encoding="utf-8")  # type: ignore[attr-defined]
+    sys.stderr.reconfigure(encoding="utf-8")  # type: ignore[attr-defined]
+except Exception:
+    pass
 import html
 from pathlib import Path
 from datetime import datetime
@@ -68,7 +92,6 @@ from urllib.error import URLError, HTTPError
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from lib.text_clean import repair_mojibake
 from fixes.odin_format import format_path_if_odin
-
 
 # get root directory
 ROOT_DIR = Path(__file__).resolve().parents[3]
@@ -88,51 +111,54 @@ CREDENTIALS_FILE = ROOT_DIR / "_Private" / ".config" / "skool_credentials.txt"
 #   4. Set YOUTUBE_COOKIES_FILE=/path/to/cookies.txt (env var) or fill in here:
 YOUTUBE_COOKIES_FILE: str | Path | None = ROOT_DIR / "_Private" / ".config" / "cookies.txt"
 
-
 # ─── CONFIG ───────────────────────────────────────────────────────────────────
-SKOOL_GROUP     = "programvideogames"  # nom du groupe Skool
-OUTPUT_DIR     = ROOT_DIR / "odin-knowledge-base" / "courses" / "programvideogames"
-DELAY_BETWEEN  = 1.0   # secondes entre chaque appel Skool (politesse)
+SKOOL_GROUP = "programvideogames"  # nom du groupe Skool
+OUTPUT_DIR = ROOT_DIR / "odin-knowledge-base" / "courses" / "programvideogames"
+DELAY_BETWEEN = 1.0  # secondes entre chaque appel Skool (politesse)
 
 # yt-dlp: read in this order - env var YT_DLP_EXE > user_config.jsonc paths.yt_dlp_exe > empty string
 from lib.user_config import env_or_config
-YT_DLP_EXE     = env_or_config("paths.yt_dlp_exe", "YT_DLP_EXE")
+
+YT_DLP_EXE = env_or_config("paths.yt_dlp_exe", "YT_DLP_EXE")
 
 # Video download
-VIDEO_DELAY_BETWEEN = 8.0   # seconds between each YouTube download
+VIDEO_DELAY_BETWEEN = 8.0  # seconds between each YouTube download
+HLS_REFERER = "https://skool.com"  # passed to yt-dlp for m3u8 streams
+HLS_PAGE_TIMEOUT_MS = 60_000  # Playwright page.goto timeout per HLS lesson
+HLS_BROWSER_TIMEOUT_S = 30  # hard cap if page never finishes loading
 
 # Support files download (ZIP attached to lessons)
-SUPPORT_FILES_DELAY = 1.0   # seconds between each support download
+SUPPORT_FILES_DELAY = 1.0  # seconds between each support download
 
 # Retry limit for YouTube video download (yt-dlp) and Skool API calls (get-lesson, download-url)
 MAX_VIDEO_RETRIES = 3
+
+# Regex to extract the Skool HLS playback data from the SSR HTML of a lesson
+# page. The Next.js hydration JSON embeds the video object as:
+#   ...,"video":{"id":"<videoId>","playbackId":"<fileId>","playbackToken":"<jwt>",...
+# The m3u8 URL is constructed as
+#   https://stream.video.skool.com/<fileId>.m3u8?token=<jwt>
+# `playbackId` and `playbackToken` are captured; the `id` is the same value as
+# `metadata.videoId` so we don't need it here. First match = current lesson.
+_HLS_VIDEO_OBJECT_RE = re.compile(r'"video":\{[^{}]*?"playbackId":"(?P<pid>[^"]+)"[^{}]*?"playbackToken":"(?P<token>[^"]+)"[^{}]*?\}')
 
 # ZIPs are referenced via metadata.resources (JSON-encoded) in the get-lesson
 # response. URL resolution goes through the Skool API:
 # Cookies are stored by skool-cli on connection.
 SKOOL_AUTH_STATE = Path.home() / ".skool-cli" / "auth-state.json"
-SKOOL_API_BASE   = "https://api2.skool.com"
+SKOOL_API_BASE = "https://api2.skool.com"
 
 # stderr markers that indicate a YouTube rate-limit / anti-bot
-ANTI_BOT_MARKERS: tuple[str, ...] = (
-    "Sign in to confirm",
-    "not a bot",
-    "HTTP Error 429",
-    "HTTP Error 403",
-)
+ANTI_BOT_MARKERS: tuple[str, ...] = ("Sign in to confirm", "not a bot", "HTTP Error 429", "HTTP Error 403", )
 
 # Default YouTube videos download folder
-DEFAULT_DOWNLOAD_VIDEO_FOLDER = (
-    "M:/Elearning_EnCours/Game Dev Autres/Odin"
-    "/Dylan Falconer - Program Video Game"
-)
+DEFAULT_DOWNLOAD_VIDEO_FOLDER = ("M:/Elearning_EnCours/Game Dev Autres/Odin"
+                                 "/Dylan Falconer - Program Video Game")
 
 # Pattern de durée en fin de titre Skool : "(10:53)" ou "(1:23:45)".
 # Capturé en suffixe des titres de leçons, supprimé par défaut du slug
 # (--add-duration option to keep it).
-_DURATION_RE = re.compile(
-    r"\s*\(\s*\d+(?::\d{1,2}){0,2}\s*(?:min)?\s*\)\s*$"
-)
+_DURATION_RE = re.compile(r"\s*\(\s*\d+(?::\d{1,2}){0,2}\s*(?:min)?\s*\)\s*$")
 
 
 def slugify(text: str, keep_duration: bool = False) -> str:
@@ -150,6 +176,7 @@ def slugify(text: str, keep_duration: bool = False) -> str:
     text = re.sub(r"[\s_-]+", "-", text)
     text = re.sub(r"^-+|-+$", "", text)
     return text or "untitled"
+
 
 # Lesson-number pattern at the start of the title: "2.06 - ", "1.5 - ", etc.
 # Utilisé par `lesson_filename_from_title` pour produire un préfixe naturel
@@ -190,8 +217,7 @@ def _init_log(reset: bool = False) -> None:
                 f"=== Script : {Path(__file__).name}\n"
                 f"=== Log level : {LOG_LEVEL}\n"
                 f"=== Groupe    : {SKOOL_GROUP}\n"
-                f"=== Output    : {OUTPUT_DIR}\n"
-                + "=" * 70 + "\n"
+                f"=== Output    : {OUTPUT_DIR}\n" + "=" * 70 + "\n"
             )
         _LOG_ENABLED = True
         action = "reset" if reset else "append"
@@ -226,8 +252,8 @@ def _parse_credentials_file(path: Path) -> dict[str, str]:
         print(f"[!] Impossible de lire {path}: {e}")
         return credentials
 
-    SKOOL_EMAIL=lines[0].strip()
-    SKOOL_PASSWORD=lines[1].strip()
+    SKOOL_EMAIL = lines[0].strip()
+    SKOOL_PASSWORD = lines[1].strip()
     credentials["SKOOL_EMAIL"] = SKOOL_EMAIL
     credentials["SKOOL_PASSWORD"] = SKOOL_PASSWORD
     # for raw in lines:
@@ -404,10 +430,7 @@ def run_skool(args: list[str], retries: int = 3) -> dict | list | None:
     for attempt in range(retries):
         result = None
         try:
-            result = subprocess.run(
-                cmd,
-                capture_output=True, text=True, check=True, timeout=120
-            )
+            result = subprocess.run(cmd, capture_output=True, text=True, check=True, timeout=120)
             raw = result.stdout.strip()
             if not raw:
                 _log("DEBUG", f"run_skool OK (empty body) : {' '.join(cmd)}")
@@ -439,8 +462,7 @@ def login() -> bool:
     print(f"[*] Connexion en tant que {SKOOL_EMAIL}...")
     try:
         subprocess.run(
-            ["skool.cmd", "login", "--email", SKOOL_EMAIL, "--password", SKOOL_PASSWORD],
-            check=True, capture_output=True, text=True, timeout=120
+            ["skool.cmd", "login", "--email", SKOOL_EMAIL, "--password", SKOOL_PASSWORD], check=True, capture_output=True, text=True, timeout=120
         )
         print("[+] Connecté.")
         return True
@@ -471,19 +493,16 @@ def get_lessons(course_name: str) -> list[dict]:
         if item.get("type") == "folder":
             folder_name = item.get("name", "")
             for child in item.get("children", []):
-                flat.append({
-                    "title":  child.get("name", "Sans titre"),
-                    "id":     child.get("id", ""),
-                    "folder": folder_name,
-                    "href":   child.get("href", ""),
-                })
+                flat.append(
+                    {
+                        "title": child.get("name", "Sans titre"),
+                        "id": child.get("id", ""),
+                        "folder": folder_name,
+                        "href": child.get("href", ""),
+                    }
+                )
         else:
-            flat.append({
-                "title":  item.get("name", "Sans titre"),
-                "id":     item.get("id", ""),
-                "folder": None,
-                "href":   item.get("href", ""),
-            })
+            flat.append({"title": item.get("name", "Sans titre"), "id": item.get("id", ""), "folder": None, "href": item.get("href", ""), })
     return flat
 
 
@@ -504,10 +523,7 @@ def _count_total_lessons(courses: list[dict], lesson_filter: str | None) -> int:
         if lesson_filter:
             norm_pattern = _normalize_for_match(lesson_filter)
             norm_re = re.compile(re.escape(norm_pattern), re.IGNORECASE)
-            lessons = [
-                ls for ls in lessons
-                if norm_re.search(_normalize_for_match(ls.get("title", "")))
-            ]
+            lessons = [ls for ls in lessons if norm_re.search(_normalize_for_match(ls.get("title", "")))]
         total += len(lessons)
     return total
 
@@ -531,20 +547,17 @@ def html_to_markdown(raw_html: str) -> str:
     s = raw_html
 
     s = re.sub(r"(?i)<br\s*/?>", "\n", s)
-    s = re.sub(r"(?is)<pre>\s*<code[^>]*class=\"language-([^\"]*)\"[^>]*>(.*?)</code>\s*</pre>",
-                lambda m: f"\n\n```{m.group(1)}\n{m.group(2).strip()}\n```\n\n", s)
-    s = re.sub(r"(?is)<pre>\s*<code[^>]*>(.*?)</code>\s*</pre>",
-                lambda m: f"\n\n```odin\n{m.group(1).strip()}\n```\n\n", s)
-    s = re.sub(r"(?is)<pre>(.*?)</pre>",
-                lambda m: f"\n\n```odin\n{m.group(1).strip()}\n```\n\n", s)
+    s = re.sub(
+        r"(?is)<pre>\s*<code[^>]*class=\"language-([^\"]*)\"[^>]*>(.*?)</code>\s*</pre>",
+        lambda m: f"\n\n```{m.group(1)}\n{m.group(2).strip()}\n```\n\n", s
+    )
+    s = re.sub(r"(?is)<pre>\s*<code[^>]*>(.*?)</code>\s*</pre>", lambda m: f"\n\n```odin\n{m.group(1).strip()}\n```\n\n", s)
+    s = re.sub(r"(?is)<pre>(.*?)</pre>", lambda m: f"\n\n```odin\n{m.group(1).strip()}\n```\n\n", s)
 
-    s = re.sub(r"(?is)<img\s+[^>]*src=\"([^\"]+)\"[^>]*alt=\"([^\"]*)\"[^>]*/?>",
-                lambda m: f"\n\n![{m.group(2)}]({m.group(1)})\n\n", s)
-    s = re.sub(r"(?is)<img\s+[^>]*src=\"([^\"]+)\"[^>]*/?>",
-                lambda m: f"\n\n![]({m.group(1)})\n\n", s)
+    s = re.sub(r"(?is)<img\s+[^>]*src=\"([^\"]+)\"[^>]*alt=\"([^\"]*)\"[^>]*/?>", lambda m: f"\n\n![{m.group(2)}]({m.group(1)})\n\n", s)
+    s = re.sub(r"(?is)<img\s+[^>]*src=\"([^\"]+)\"[^>]*/?>", lambda m: f"\n\n![]({m.group(1)})\n\n", s)
 
-    s = re.sub(r"(?is)<a\s+[^>]*href=\"([^\"]+)\"[^>]*>(.*?)</a>",
-                lambda m: f"[{re.sub(r'<[^>]+>', '', m.group(2)).strip()}]({m.group(1)})", s)
+    s = re.sub(r"(?is)<a\s+[^>]*href=\"([^\"]+)\"[^>]*>(.*?)</a>", lambda m: f"[{re.sub(r'<[^>]+>', '', m.group(2)).strip()}]({m.group(1)})", s)
 
     s = re.sub(r"(?is)<strong[^>]*>(.*?)</strong>", r"**\1**", s)
     s = re.sub(r"(?is)<b[^>]*>(.*?)</b>", r"**\1**", s)
@@ -631,19 +644,18 @@ def html_to_markdown(raw_html: str) -> str:
 
 def lesson_to_markdown(lesson: dict, course_name: str, folder: str | None, content: dict) -> str:
     """Generate the full Markdown of a lesson."""
-    title     = lesson.get("title", "Sans titre")
+    title = lesson.get("title", "Sans titre")
     lesson_id = lesson.get("id", "")
-    metadata  = content.get("metadata", {}) or {}
-    video_url  = metadata.get("videoLink")  or content.get("videoLink", "")
-    thumb_url  = metadata.get("videoThumbnail", "")
+    metadata = content.get("metadata", {}) or {}
+    video_url = metadata.get("videoLink") or content.get("videoLink", "")
+    video_id = metadata.get("videoId", "") or ""
+    thumb_url = metadata.get("videoThumbnail", "")
     duration_ms = metadata.get("videoLenMs", 0)
     duration_min = round(duration_ms / 60000, 1) if duration_ms else 0
-    body      = content.get("html", "")
+    body = content.get("html", "")
+    lesson_url = content.get("url", "") or ""
 
-    lines = [
-        "---",
-        f"Cours: \"{course_name}\"",
-    ]
+    lines = ["---", f"Cours: \"{course_name}\"", ]
     if folder:
         lines.append(f"Module: \"{folder}\"")
     if lesson_id:
@@ -658,13 +670,25 @@ def lesson_to_markdown(lesson: dict, course_name: str, folder: str | None, conte
     lines.append("")
     lines.append(f"# {title_for_md}")
     lines.append("")
-    if video_url:
+    # Always emit the "🎬 Vidéo" section if we have EITHER a YouTube link
+    # (videoLink set) OR a videoId (HLS stream). For HLS, the m3u8 URL is
+    # short-lived (signed JWT, ~8h) so we link to the lesson page instead
+    # of the stream URL.
+    if video_url or video_id:
         lines.append("## 🎬 Vidéo")
         lines.append("")
         if thumb_url:
-            lines.append(f"[![Vidéo]({thumb_url})]({video_url})")
+            lines.append(f"[![Vidéo]({thumb_url})]({lesson_url or video_url})")
             lines.append("")
-        lines.append(f"- **Lien** : [{video_url}]({video_url})")
+        if video_url:
+            lines.append(f"- **Lien** : [{video_url}]({video_url})")
+        else:
+            # HLS lesson: link to the lesson page (stable) rather than the
+            # transient m3u8 URL.
+            if lesson_url:
+                lines.append(f"- **Lien** : [{lesson_url}]({lesson_url})  _(stream HLS)_")
+            else:
+                lines.append("- **Lien** : _(stream HLS, URL éphémère)_")
         if duration_min:
             lines.append(f"- **Durée** : {duration_min} min")
         lines.append("")
@@ -703,9 +727,7 @@ def download_video(video_url: str, target_dir: Path, lesson_slug: str) -> Path |
     target_dir.mkdir(parents=True, exist_ok=True)
     output_template = str(target_dir / f"{lesson_slug}.%(ext)s")
 
-    yt_exe = YT_DLP_EXE if (YT_DLP_EXE and Path(YT_DLP_EXE).exists()) else (
-        shutil.which("yt-dlp") or shutil.which("yt-dlp.exe") or "yt-dlp"
-    )
+    yt_exe = YT_DLP_EXE if (YT_DLP_EXE and Path(YT_DLP_EXE).exists()) else (shutil.which("yt-dlp") or shutil.which("yt-dlp.exe") or "yt-dlp")
     has_ffmpeg = bool(shutil.which("ffmpeg") or shutil.which("ffmpeg.exe"))
 
     # Cookies: config OR env variable, normalised as Path.
@@ -720,9 +742,9 @@ def download_video(video_url: str, target_dir: Path, lesson_slug: str) -> Path |
     # Formats par qualité (mp4 m4a muxés si ffmpeg, sinon combiné 18).
     if has_ffmpeg:
         fmts: list[tuple[str, bool]] = [
-            ("137+140", True),   # 1080p vidéo + audio m4a
-            ("136+140", True),   # 720p
-            ("18",     False),   # 360p combiné (fallback si ffmeg ou rate-limit)
+            ("137+140", True),  # 1080p vidéo + audio m4a
+            ("136+140", True),  # 720p
+            ("18", False),  # 360p combiné (fallback si ffmeg ou rate-limit)
         ]
     else:
         fmts = [("18", False)]
@@ -732,8 +754,8 @@ def download_video(video_url: str, target_dir: Path, lesson_slug: str) -> Path |
     # On change de famille uniquement entre cycles (backoff anti-bot).
     cycle_families: list[tuple[str, bool]] = [
         ("android_vr", False),  # Cycle 1 : default, formats élevés
-        ("web",        True),   # Cycle 2 : rate-limit fallback
-        ("ios",        True),   # Cycle 3: last resort
+        ("web", True),  # Cycle 2 : rate-limit fallback
+        ("ios", True),  # Cycle 3: last resort
     ]
 
     def make_cmd(client: str, fmt: str, needs_merge: bool, use_cookies: bool) -> list[str]:
@@ -743,13 +765,7 @@ def download_video(video_url: str, target_dir: Path, lesson_slug: str) -> Path |
         args += ["-f", fmt]
         if needs_merge:
             args += ["--merge-output-format", "mp4"]
-        args += [
-            "--no-progress",
-            "--sleep-interval", "3",
-            "--max-sleep-interval", "8",
-            "-o", output_template,
-            video_url,
-        ]
+        args += ["--no-progress", "--sleep-interval", "3", "--max-sleep-interval", "8", "-o", output_template, video_url, ]
         return args
 
     def _report_success() -> Path | None:
@@ -758,10 +774,7 @@ def download_video(video_url: str, target_dir: Path, lesson_slug: str) -> Path |
             print(f"  [✓] Video downloaded: {mp4_path.name}")
             _log("INFO", f"  [video OK] {mp4_path.name} ({mp4_path.stat().st_size // (1024*1024)} MB)")
             return mp4_path
-        candidates = [
-            p for p in target_dir.glob(f"{lesson_slug}.*")
-            if not p.name.endswith(".part")
-        ]
+        candidates = [p for p in target_dir.glob(f"{lesson_slug}.*") if not p.name.endswith(".part")]
         if candidates:
             print(f"  [✓] Video downloaded: {candidates[0].name}")
             _log("INFO", f"  [video OK] {candidates[0].name} ({candidates[0].stat().st_size // (1024*1024)} MB)")
@@ -769,9 +782,7 @@ def download_video(video_url: str, target_dir: Path, lesson_slug: str) -> Path |
         return None
 
     def _cleanup_partial() -> None:
-        for pattern in (f"{lesson_slug}.*.part",
-                        f"{lesson_slug}.f*.mp4",
-                        f"{lesson_slug}.f*.m4a"):
+        for pattern in (f"{lesson_slug}.*.part", f"{lesson_slug}.f*.mp4", f"{lesson_slug}.f*.m4a"):
             for f in target_dir.glob(pattern):
                 f.unlink(missing_ok=True)
 
@@ -785,7 +796,7 @@ def download_video(video_url: str, target_dir: Path, lesson_slug: str) -> Path |
         cookie_tag = "+cookies" if use_cookies else ""
         for n, (fmt, needs_merge) in enumerate(fmts, 1):
             tag = (f"cycle {cycle}/{len(cycles_to_run)}, "
-                f"tentative {n}/{len(fmts)} ({client}{cookie_tag}, {fmt})")
+                   f"tentative {n}/{len(fmts)} ({client}{cookie_tag}, {fmt})")
             print(f"  [↓] yt-dlp ({tag}) → {target_dir.name}/{lesson_slug}")
             cmd = make_cmd(client, fmt, needs_merge, use_cookies)
             _log("DEBUG", f"yt-dlp {tag}: {' '.join(cmd[:4])}…")
@@ -797,7 +808,7 @@ def download_video(video_url: str, target_dir: Path, lesson_slug: str) -> Path |
                 return None
             except FileNotFoundError:
                 print(f"  [ERR] yt-dlp introuvable (essayé: {yt_exe}). "
-                "Check YT_DLP_EXE or the system PATH.")
+                      "Check YT_DLP_EXE or the system PATH.")
                 _log("ERROR", f"  [video FAIL] yt-dlp introuvable: {yt_exe}")
                 return None
 
@@ -812,26 +823,23 @@ def download_video(video_url: str, target_dir: Path, lesson_slug: str) -> Path |
             err_text = result.stderr or result.stdout or ""
             cycle_stderr += err_text
             err_lines = err_text.strip().splitlines()
-            diagnostic = next(
-                (ln for ln in err_lines if "ERROR" in ln or "WARNING" in ln), ""
-            )
-            print(f"  [WARN] {tag} failed (code {result.returncode})"
-            + (f" : {diagnostic[:160]}" if diagnostic else ""))
+            diagnostic = next((ln for ln in err_lines if "ERROR" in ln or "WARNING" in ln), "")
+            print(f"  [WARN] {tag} failed (code {result.returncode})" + (f" : {diagnostic[:160]}" if diagnostic else ""))
             _log("DEBUG", f"yt-dlp FAIL {tag} code={result.returncode} | {diagnostic[:120]}")
 
             # Early-exit : si anti-bot détecté, ne pas gaspiller les formats
             # restants dans ce cycle → passer au backoff + cycle suivant.
             if _is_anti_bot(err_text):
                 print(f"  [!!] Anti-bot détecté → arrêt du cycle {cycle}, "
-                "passage au suivant après backoff.")
+                      "passage au suivant après backoff.")
                 _log("WARNING", f"  [video anti-bot] cycle {cycle} ({client}{cookie_tag})")
                 break
 
         # All the strategies of the cycle failed. Anti-bot -> backoff + retry.
         if _is_anti_bot(cycle_stderr) and cycle < len(cycles_to_run):
-            cooldown = 90 * (2 ** (cycle - 1))   # 90, 180
+            cooldown = 90 * (2 ** (cycle - 1))  # 90, 180
             print(f"  [!!] Anti-bot YouTube confirmé → pause {cooldown}s "
-            f"avant cycle {cycle + 1}/{len(cycles_to_run)}...")
+                  f"avant cycle {cycle + 1}/{len(cycles_to_run)}...")
             time.sleep(cooldown)
             continue
 
@@ -840,6 +848,191 @@ def download_video(video_url: str, target_dir: Path, lesson_slug: str) -> Path |
         _log("ERROR", f"  [video FAIL] {video_url} (all strategies)")
         return None
 
+    return None
+
+
+def build_hls_url(html: str) -> str | None:
+    """Extract the signed m3u8 URL from a Skool lesson page HTML.
+
+    Skool's Next.js app embeds the video playback data in the SSR HTML as
+    `"video":{"id":"<videoId>","playbackId":"<fileId>","playbackToken":"<jwt>"}`.
+    The actual stream URL is `https://stream.video.skool.com/<fileId>.m3u8?token=<jwt>`.
+
+    Returns the URL (with token query string) or None if no video object is
+    present in the HTML (paywall, login page, or anti-bot challenge).
+    """
+    m = _HLS_VIDEO_OBJECT_RE.search(html)
+    if not m:
+        return None
+    pid = m.group("pid")
+    token = m.group("token")
+    return f"https://stream.video.skool.com/{pid}.m3u8?token={token}"
+
+
+class HLSUrlExtractor:
+    """Reusable Playwright session to load Skool lesson pages and extract the
+    signed m3u8 URL from their SSR HTML.
+
+    The browser is launched headless with the Skool cookies copied from
+    `~/.skool-cli/auth-state.json`. Reusing a single browser across lessons
+    keeps the per-lesson cost to ~1-2 s (just the page navigation) instead
+    of ~3-5 s per launch.
+
+    Use as a context manager:
+
+        with HLSUrlExtractor() as ext:
+            url = ext.extract("https://www.skool.com/.../classroom?...?md=...")
+    """
+
+    def __init__(self) -> None:
+        self._pw = None
+        self._browser = None
+        self._context = None
+        self._page = None
+
+    def __enter__(self) -> "HLSUrlExtractor":
+        try:
+            from playwright.sync_api import sync_playwright
+        except ImportError as e:
+            raise RuntimeError(
+                "Playwright Python is required for HLS video extraction. "
+                "Install it with: pip install playwright && playwright install chromium"
+            ) from e
+        self._pw = sync_playwright().start()
+        self._browser = self._pw.chromium.launch(headless=True)
+        self._context = self._browser.new_context()
+        # Copy Skool cookies from the skool-cli session into the Playwright
+        # context. auth-state.json also has an aws-waf-token that AWS WAF
+        # checks on requests; injecting it bypasses the WAF challenge.
+        pw_cookies: list[dict[str, str]] = []
+        if SKOOL_AUTH_STATE.exists():
+            try:
+                state = json.loads(SKOOL_AUTH_STATE.read_text(encoding="utf-8"))
+                for c in state.get("cookies", []):
+                    pw_cookies.append({"name": c["name"], "value": c["value"], "domain": c.get("domain", ".skool.com"), "path": c.get("path", "/"), })
+            except (OSError, json.JSONDecodeError, KeyError, TypeError) as e:
+                _log("WARNING", f"HLSUrlExtractor: lecture cookies échouée: {e}")
+        if pw_cookies:
+            self._context.add_cookies(pw_cookies)  # type: ignore[arg-type]
+            _log(
+                "DEBUG", f"HLS cookies injectées: {len(pw_cookies)} "
+                f"(auth_token={any(c['name']=='auth_token' for c in pw_cookies)}, "
+                f"aws-waf-token={any(c['name']=='aws-waf-token' for c in pw_cookies)})"
+            )
+        else:
+            _log("WARNING", "HLS: aucun cookie Skool chargé (auth-state.json absent?)")
+        self._page = self._context.new_page()
+        return self
+
+    def __exit__(self, exc_type, exc, tb) -> None:
+        try:
+            if self._page is not None:
+                self._page.close()
+        finally:
+            try:
+                if self._context is not None:
+                    self._context.close()
+            finally:
+                try:
+                    if self._browser is not None:
+                        self._browser.close()
+                finally:
+                    if self._pw is not None:
+                        self._pw.stop()
+                    self._page = self._context = self._browser = self._pw = None
+
+    def extract(self, lesson_url: str) -> str | None:
+        """Navigate to `lesson_url` and extract the m3u8 URL from the page.
+
+        Returns None if the page does not embed a video object (no access,
+        WAF challenge, or wrong URL).
+        """
+        if self._page is None:
+            raise RuntimeError("HLSUrlExtractor used outside its `with` block")
+        _log("DEBUG", f"HLS goto: {lesson_url}")
+        try:
+            # `networkidle` (vs `domcontentloaded`) is required because the
+            # AWS WAF challenge runs as a JS challenge on first hit and only
+            # resolves after a few round-trips. Without it, page.content()
+            # returns the WAF challenge page (2081 bytes) instead of the
+            # SSR HTML that contains `playbackToken`.
+            self._page.goto(lesson_url, wait_until="networkidle", timeout=HLS_PAGE_TIMEOUT_MS, )
+        except Exception as e:
+            print(f"  [WARN] Playwright goto({lesson_url}): {e}")
+            _log("WARNING", f"HLS goto FAIL: {lesson_url} | {e}")
+            return None
+        try:
+            html = self._page.content()
+        except Exception as e:
+            print(f"  [WARN] Playwright content(): {e}")
+            _log("WARNING", f"HLS content() FAIL: {lesson_url} | {e}")
+            return None
+        url = build_hls_url(html)
+        if url:
+            _log("DEBUG", f"HLS OK: {lesson_url} -> {url[:80]}...")
+            return url
+        # Diagnostic: save HTML + report page title to help diagnose
+        # silent failures (WAF challenge, login redirect, page restructure).
+        try:
+            title = self._page.title()
+        except Exception:
+            title = "<unknown>"
+        _log(
+            "DEBUG", f"HLS no video object in: {lesson_url} | title={title!r} | "
+            f"playbackToken_in_html={'playbackToken' in html} | "
+            f"'video object in HTML'={'\"video\":{' in html} | "
+            f"html_len={len(html)}"
+        )
+        return None
+
+
+def download_hls_video(m3u8_url: str, target_dir: Path, lesson_slug: str) -> Path | None:
+    """Download an HLS video stream (.m3u8) via yt-dlp.
+
+    The m3u8 URL already contains the signed JWT as a `?token=...` query
+    string, so no extra auth headers are required beyond `--referer` (which
+    the stream.video.skool.com edge expects). Returns the path of the
+    downloaded file, or None on failure.
+    """
+    target_dir.mkdir(parents=True, exist_ok=True)
+    output_template = str(target_dir / f"{lesson_slug}.%(ext)s")
+
+    yt_exe = YT_DLP_EXE if (YT_DLP_EXE and Path(YT_DLP_EXE).exists()) else (shutil.which("yt-dlp") or shutil.which("yt-dlp.exe") or "yt-dlp")
+
+    cmd = [yt_exe, "--no-progress", "--referer", HLS_REFERER, "-o", output_template, m3u8_url, ]
+    _log("DEBUG", f"yt-dlp HLS: {m3u8_url[:80]}... -> {lesson_slug}.%(ext)s")
+    print(f"  [↓] yt-dlp HLS ({lesson_slug}) → {target_dir.name}/")
+    try:
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=900)
+    except subprocess.TimeoutExpired:
+        print(f"  [ERR] yt-dlp HLS timeout après 900s pour {m3u8_url[:80]}...")
+        _log("ERROR", f"  [HLS FAIL] {lesson_slug} | timeout 900s")
+        return None
+    except FileNotFoundError:
+        print(f"  [ERR] yt-dlp introuvable (essayé: {yt_exe}). "
+              "Check YT_DLP_EXE or the system PATH.")
+        _log("ERROR", f"  [HLS FAIL] yt-dlp introuvable: {yt_exe}")
+        return None
+
+    if result.returncode != 0:
+        err = (result.stderr or result.stdout or "").strip().splitlines()
+        diagnostic = next((ln for ln in err if "ERROR" in ln or "WARNING" in ln), "")
+        print(f"  [WARN] yt-dlp HLS code={result.returncode}" + (f" : {diagnostic[:160]}" if diagnostic else ""))
+        _log("WARNING", f"  [HLS FAIL] {lesson_slug} code={result.returncode} | {diagnostic[:120]}")
+        return None
+
+    mp4_path = target_dir / f"{lesson_slug}.mp4"
+    if mp4_path.exists():
+        print(f"  [✓] HLS downloaded: {mp4_path.name}")
+        _log("INFO", f"  [HLS OK] {mp4_path.name} ({mp4_path.stat().st_size // (1024*1024)} MB)")
+        return mp4_path
+    candidates = [p for p in target_dir.glob(f"{lesson_slug}.*") if not p.name.endswith(".part")]
+    if candidates:
+        print(f"  [✓] HLS downloaded: {candidates[0].name}")
+        _log("INFO", f"  [HLS OK] {candidates[0].name} ({candidates[0].stat().st_size // (1024*1024)} MB)")
+        return candidates[0]
+    print(f"  [ERR] yt-dlp HLS code=0 mais aucun fichier produit pour {lesson_slug}")
+    _log("ERROR", f"  [HLS FAIL] {lesson_slug} | aucun fichier produit")
     return None
 
 
@@ -989,16 +1182,20 @@ def sanitize_filename(name: str) -> str:
     return cleaned or "support.zip"
 
 
-def export_course(course: dict, download_videos: bool = False,
-            video_download_dir: Path | None = None,
-            overwrite_existing_lessons: bool = False,
-            download_support_files: bool = False,
-            lesson_filter: str | None = None,
-            add_index: bool = False,
-            add_duration: bool = False,
-            skip_until: int | None = None,
-            lesson_counter: int = 0,
-            total_lessons_run: int = 0) -> tuple[int, int]:
+def export_course(
+    course: dict,
+    download_videos: bool = False,
+    video_download_dir: Path | None = None,
+    overwrite_existing_lessons: bool = False,
+    download_support_files: bool = False,
+    lesson_filter: str | None = None,
+    add_index: bool = False,
+    add_duration: bool = False,
+    skip_until: int | None = None,
+    max_lesson: int | None = None,
+    lesson_counter: int = 0,
+    total_lessons_run: int = 0
+) -> tuple[int, int]:
     """Exporte toutes les leçons d'un cours vers des fichiers Markdown.
 
     Affiche en début de chaque leçon :
@@ -1042,9 +1239,9 @@ def export_course(course: dict, download_videos: bool = False,
     où `<module>` est le dossier Skool de la leçon (slugifié) - réplique
     la structure des markdown (`metroidvania/`, `rpg/`, etc.).
     """
-    course_name  = course.get("title", course.get("name", "unknown"))
-    course_slug  = slugify(course_name)
-    course_dir   = OUTPUT_DIR / course_slug
+    course_name = course.get("title", course.get("name", "unknown"))
+    course_slug = slugify(course_name)
+    course_dir = OUTPUT_DIR / course_slug
     course_dir.mkdir(parents=True, exist_ok=True)
 
     print(f"\n[*] Cours : '{course_name}' → {course_dir}")
@@ -1053,10 +1250,7 @@ def export_course(course: dict, download_videos: bool = False,
     # Dossier vidéos dédié à ce cours (un sous-dossier par cours)
     course_video_dir: Path | None = None
     if download_videos:
-        course_video_dir = (
-            (video_download_dir / course_slug) if video_download_dir
-            else course_dir / "videos"
-        )
+        course_video_dir = ((video_download_dir / course_slug) if video_download_dir else course_dir / "videos")
         assert course_video_dir is not None  # narrow for type-checker
         course_video_dir.mkdir(parents=True, exist_ok=True)
         print(f"  [i] Videos -> {course_video_dir}")
@@ -1076,15 +1270,14 @@ def export_course(course: dict, download_videos: bool = False,
         # → "editor-side-panel" matche "Editor Side Panel (ImGui)..." (espaces vs tirets).
         norm_pattern = _normalize_for_match(lesson_filter)
         norm_re = re.compile(re.escape(norm_pattern), re.IGNORECASE)
-        matched = [
-            ls for ls in lessons
-            if norm_re.search(_normalize_for_match(ls.get("title", "")))
-        ]
-        print(f"  [+] {len(lessons)} leçons trouvées, "
+        matched = [ls for ls in lessons if norm_re.search(_normalize_for_match(ls.get("title", "")))]
+        print(
+            f"  [+] {len(lessons)} leçons trouvées, "
             f"{len(matched)} retenue(s) par --lesson '{lesson_filter}' "
-            f"(normalisé: '{norm_pattern}').")
+            f"(normalisé: '{norm_pattern}')."
+        )
         _log("INFO", f"  Filtre '{lesson_filter}' (norm='{norm_pattern}'): "
-            f"{len(matched)}/{len(lessons)} leçons retenues")
+             f"{len(matched)}/{len(lessons)} leçons retenues")
         if not matched:
             print(f"  [!] No lesson matches the pattern.")
             _log("WARNING", f"  Filtre '{lesson_filter}': 0 match")
@@ -1095,20 +1288,21 @@ def export_course(course: dict, download_videos: bool = False,
         print(f"  [+] {len(lessons)} leçons trouvées.")
         _log("INFO", f"  {len(lessons)} leçons trouvées")
 
-    index_lines = [
-        f"# Index - {course_name}",
-        f"\nExporté le {datetime.now().strftime('%Y-%m-%d %H:%M')}",
-        "",
-    ]
+    index_lines = [f"# Index - {course_name}", f"\nExporté le {datetime.now().strftime('%Y-%m-%d %H:%M')}", "", ]
 
     current_folder = None
     lesson_count = 0
 
-    for i, lesson in enumerate(lessons):
-        folder  = lesson.get("folder")
-        title   = lesson.get("title", f"Leçon {i+1}")
+    # Lazy HLS extractor: opened only when the first HLS lesson is met,
+    # closed at the end of the course. Reused across all HLS lessons of the
+    # course (~1-2 s/lesson instead of ~3-5 s).
+    hls_extractor: HLSUrlExtractor | None = None
 
-        # ─── Compteur global (skip-until + progress) ──────────────────────
+    for i, lesson in enumerate(lessons):
+        folder = lesson.get("folder")
+        title = lesson.get("title", f"Leçon {i+1}")
+
+        # ─── Compteur global (skip-until + --number + progress) ───────────
         # Incrémenté AVANT tout traitement pour que la 1ère leçon = 1.
         # Skip "first N" : avec --skip-until N, on saute les N premières leçons
         # (compteur 1..N) et on commence à traiter à la leçon N+1.
@@ -1117,6 +1311,12 @@ def export_course(course: dict, download_videos: bool = False,
             print(f"  [⏭] #{lesson_counter}/{skip_until} skip --skip-until : {title}")
             _log("INFO", f"  [skip-until] #{lesson_counter} <= {skip_until} : {title}")
             continue
+        # --number : stoppe le traitement une fois la N-ième leçon après
+        # skip-until franchie. Combiné : max_lesson = skip_until + N.
+        if max_lesson is not None and lesson_counter > max_lesson:
+            print(f"  [⏭] #{lesson_counter} > max={max_lesson} (--number limit) → stop cours")
+            _log("INFO", f"  [--number stop] #{lesson_counter} > {max_lesson} : {title}")
+            break
 
         # Compteur de progression (toujours affiché, sauf si --skip-until
         # vient de skipper cette leçon).
@@ -1126,9 +1326,7 @@ def export_course(course: dict, download_videos: bool = False,
         # Nom de fichier unifié pour cette leçon : .md, .mp4, et le dossier
         # Support Files/<lesson_name>/ partagent ce même basename (titre
         # sanitised natural). The lesson number ("2.06") becomes the prefix "206-".
-        lesson_name = lesson_filename_from_title(
-            title, idx=i, keep_duration=add_duration,
-        )
+        lesson_name = lesson_filename_from_title(title, idx=i, keep_duration=add_duration, )
         # --add-index ajoute un préfixe positionnel `NNN-` par-dessus (legacy).
         if add_index:
             lesson_name = f"{i+1:03d}-{lesson_name}"
@@ -1174,7 +1372,7 @@ def export_course(course: dict, download_videos: bool = False,
             _log("INFO", f"  [write] {filename}")
         lesson_count += 1
 
-        # ─── YouTube Video ───────────────────────────────────────────────────
+        # ─── Vidéo : YouTube (videoLink) OU Skool HLS (videoId) ───────────
         # Vérifiée même pour les leçons déjà exportées (skip_lesson=True) tant
         # --download-video is active. Idempotent: does not re-download if
         # le fichier .mp4 existe déjà, sauf si --overwrite-existing-lessons.
@@ -1182,7 +1380,8 @@ def export_course(course: dict, download_videos: bool = False,
             assert course_video_dir is not None  # narrowed by line 472 guard
             meta = (content.get("metadata") or {})
             video_url = meta.get("videoLink") or content.get("videoLink", "")
-            if video_url:
+            video_id = meta.get("videoId", "") or ""
+            if video_url or video_id:
                 # Sous-dossier par module (réplique la structure des markdown).
                 if folder:
                     video_subdir = course_video_dir / slugify(folder)
@@ -1199,25 +1398,49 @@ def export_course(course: dict, download_videos: bool = False,
                     _log("DEBUG", f"video overwrite: {video_path.name} supprimée")
 
                 if not video_path.exists():
-                    download_video(video_url, video_subdir, lesson_name)
+                    if video_url:
+                        # YouTube: existing 3-cycle anti-bot strategy.
+                        download_video(video_url, video_subdir, lesson_name)
+                    elif video_id:
+                        # Skool HLS: extract the signed m3u8 URL via Playwright
+                        # (bypasses AWS WAF, urllib is blocked) and pipe it to
+                        # yt-dlp with --referer.
+                        lesson_full_url = content.get("url", "")
+                        if not lesson_full_url:
+                            print(f"  [WARN] HLS détecté mais URL de leçon absente ({title})")
+                            _log("WARNING", f"  [HLS FAIL] URL leçon absente: {title}")
+                        else:
+                            if hls_extractor is None:
+                                try:
+                                    hls_extractor = HLSUrlExtractor()
+                                    hls_extractor.__enter__()
+                                except RuntimeError as e:
+                                    print(f"  [ERR] {e}")
+                                    _log("ERROR", f"  [HLS FAIL] extracteur init: {e}")
+                                    hls_extractor = None
+                            if hls_extractor is not None:
+                                m3u8_url = hls_extractor.extract(lesson_full_url)
+                                if m3u8_url:
+                                    download_hls_video(m3u8_url, video_subdir, lesson_name)
+                                else:
+                                    print(f"  [WARN] HLS: m3u8 non extrait (page sans video object) pour {title}")
+                                    _log("WARNING", f"  [HLS FAIL] m3u8 absent: {title}")
                 else:
                     print(f"  [=] Video already present: {video_path.name}")
                     _log("INFO", f"  [video skip] {video_path.name} (déjà présent)")
                 # Anti-rate-limit pause between each YouTube download
-                time.sleep(VIDEO_DELAY_BETWEEN)
+                # (skipped for HLS to keep the per-course Playwright session snappy;
+                # Skool m3u8 URLs are already rate-limited per account).
+                if video_url:
+                    time.sleep(VIDEO_DELAY_BETWEEN)
 
         # ─── Fichiers de support (ZIP) : via metadata.resources ───────────
         if download_support_files and content is not None:
-            resources = parse_resources_field(
-                (content.get("metadata") or {}).get("resources", "")
-            )
+            resources = parse_resources_field((content.get("metadata") or {}).get("resources", ""))
             # Fallback : si metadata.resources absent, scanner le .md
             if not resources:
                 md_for_scan = filepath.read_text(encoding="utf-8")
-                resources = [
-                    {"file_name": fname, "read_url": url}
-                    for url, fname in find_zip_urls_in_markdown(md_for_scan)
-                ]
+                resources = [{"file_name": fname, "read_url": url} for url, fname in find_zip_urls_in_markdown(md_for_scan)]
 
             if resources:
                 cookie_header = load_skool_cookies()
@@ -1239,8 +1462,7 @@ def export_course(course: dict, download_videos: bool = False,
                         target = support_dir / file_name
 
                         # Overwrite: delete the existing file before re-downloading
-                        if (overwrite_existing_lessons
-                                and target.exists() and target.stat().st_size > 0):
+                        if (overwrite_existing_lessons and target.exists() and target.stat().st_size > 0):
                             target.unlink(missing_ok=True)
                             for part in support_dir.glob(f"{file_name}.part"):
                                 part.unlink(missing_ok=True)
@@ -1258,7 +1480,7 @@ def export_course(course: dict, download_videos: bool = False,
                                 read_url = get_file_signed_url(file_id, cookie_header)
                         if not read_url:
                             print(f"  [WARN] URL introuvable pour {file_name} "
-                                f"(file_id={res.get('file_id', '?')[:12]}…)")
+                                  f"(file_id={res.get('file_id', '?')[:12]}…)")
                             _log("WARNING", f"  [support FAIL] URL introuvable: {file_name} (file_id={res.get('file_id', '?')[:12]}…)")
                             continue
 
@@ -1269,6 +1491,14 @@ def export_course(course: dict, download_videos: bool = False,
                 _log("DEBUG", f"  [no support] {filename}")
 
         time.sleep(DELAY_BETWEEN)
+
+    # Fermeture du navigateur Playwright (HLS) à la fin du cours.
+    if hls_extractor is not None:
+        try:
+            hls_extractor.__exit__(None, None, None)
+        except Exception as e:
+            _log("WARNING", f"HLSUrlExtractor close: {e}")
+        hls_extractor = None
 
     index_path = course_dir / "README.md"
     index_path.write_text("\n".join(index_lines), encoding="utf-8")
@@ -1281,12 +1511,8 @@ def export_course(course: dict, download_videos: bool = False,
 def write_global_index(courses: list[dict], total: int):
     """Generate a global README for the whole knowledge base."""
     lines = [
-        "# Odin Game Dev Knowledge Base - programvideogames",
-        f"\nExporté le {datetime.now().strftime('%Y-%m-%d %H:%M')}",
-        f"Total : {total} leçons exportées",
-        "",
-        "## Cours disponibles",
-        "",
+        "# Odin Game Dev Knowledge Base - programvideogames", f"\nExporté le {datetime.now().strftime('%Y-%m-%d %H:%M')}",
+        f"Total : {total} leçons exportées", "", "## Cours disponibles", "",
     ]
     for course in courses:
         name = course.get("title", course.get("name", "unknown"))
@@ -1315,13 +1541,15 @@ def main():
     print("  Skool Course Scraper - Odin Knowledge Base")
     print("=" * 60)
 
-    parser = argparse.ArgumentParser(
-        description="Scrape les leçons Skool et exporte en Markdown."
-    )
+    parser = argparse.ArgumentParser(description="Scrape les leçons Skool et exporte en Markdown.")
     parser.add_argument(
-        "--download-video", "-dv",
+        "--download-video",
+        "-dv",
         action="store_true",
-        help="Download the YouTube videos present in the lessons via yt-dlp.",
+        help="Download the lessons' videos via yt-dlp. Covers BOTH YouTube "
+        "lessons (metadata.videoLink) AND Skool HLS lessons (metadata.videoId "
+        "+ signed m3u8 URL parsed from the lesson page). The HLS path "
+        "requires Playwright (already a prereq of skool-cli).",
     )
     parser.add_argument(
         "--download-video-folder",
@@ -1329,66 +1557,86 @@ def main():
         help=f"Target folder for the YouTube videos download. Default: {DEFAULT_DOWNLOAD_VIDEO_FOLDER}",
     )
     parser.add_argument(
-        "--download-support-files", "-ds",
+        "--download-support-files",
+        "-ds",
         action="store_true",
-        help="Also download the support files (.zip) linked in each lesson. Placed in <course>/Support Files/<NNN-slug>/<file>.zipip. Idempotent : ne télécharge pas les fichiers déjà présents (non vides).",
+        help=
+        "Also download the support files (.zip) linked in each lesson. Placed in <course>/Support Files/<NNN-slug>/<file>.zipip. Idempotent : ne télécharge pas les fichiers déjà présents (non vides).",
     )
     parser.add_argument(
-        "--overwrite-existing-lessons", "-f",
+        "--overwrite-existing-lessons",
+        "-f",
         action="store_true",
-        help="Rewrite the Markdown files of already exported lessons (re-download from Skool). By default, lessons already present aret réutilisées (idempotence : aucun appel Skool, aucune réécriture).",
+        help=
+        "Rewrite the Markdown files of already exported lessons (re-download from Skool). By default, lessons already present aret réutilisées (idempotence : aucun appel Skool, aucune réécriture).",
     )
     parser.add_argument(
-        "--lesson", "-l",
+        "--lesson",
+        "-l",
         metavar="PATTERN",
         help="Filtre les leçons à traiter (substring fuzzy case-insensitive sur le "
-            "titre normalisé). La normalisation remplace tout caractère non-"
-            "alphanumérique par un espace, donc --lesson 'editor-side-panel' "
-            "matche '2.41 - Editor Side Panel (ImGui) (10:53)' (tirets vs "
-            "espaces). Le pattern est un substring (re.search), pas une regex. "
-            "Ex: --lesson 'entities state physics' ne traite que la leçon dont "
-            "le titre contient ces mots. Sans --lesson : toutes les leçons.",
+        "titre normalisé). La normalisation remplace tout caractère non-"
+        "alphanumérique par un espace, donc --lesson 'editor-side-panel' "
+        "matche '2.41 - Editor Side Panel (ImGui) (10:53)' (tirets vs "
+        "espaces). Le pattern est un substring (re.search), pas une regex. "
+        "Ex: --lesson 'entities state physics' ne traite que la leçon dont "
+        "le titre contient ces mots. Sans --lesson : toutes les leçons.",
     )
     parser.add_argument(
         "--skip-until",
+        "-s",
         type=int,
         metavar="INDEX",
         default=None,
         help="Saute les INDEX premières leçons (tous cours confondus) et "
-            "commence à traiter à partir de la leçon INDEX+1. Le compteur "
-            "s'incrémente par leçon (pas par cours, pas par vidéo), ce qui "
-            "useful to resume a long scrape after an interruption. "
-            "Ex: --skip-until 50 saute les leçons 1..50 et traite à partir "
-            "de la 51e. Sans --skip-until : aucune leçon n'est sautée par ce "
-            "mécanisme (--lesson reste prioritaire pour filtrer).",
+        "commence à traiter à partir de la leçon INDEX+1. Le compteur "
+        "s'incrémente par leçon (pas par cours, pas par vidéo), ce qui "
+        "useful to resume a long scrape after an interruption. "
+        "Ex: --skip-until 50 saute les leçons 1..50 et traite à partir "
+        "de la 51e. Sans --skip-until : aucune leçon n'est sautée par ce "
+        "mécanisme (--lesson reste prioritaire pour filtrer).",
+    )
+    parser.add_argument(
+        "--number", "-n",
+        type=int,
+        metavar="N",
+        default=None,
+        help="Limite le nombre total de leçons traitées (global, tous cours "
+            "confondus, après application des filtres --lesson / --skip-until). "
+            "Combiné avec --skip-until : les leçons traitées vont de "
+            "skip_until+1 à skip_until+N. Ex: --number 5 traite 5 leçons "
+            "au total ; --skip-until 10 --number 5 → leçons 11..15. "
+            "Sans --number : toutes les leçons retenues sont traitées.",
     )
     parser.add_argument(
         "--add-index",
+        "-i",
         action="store_true",
         help="Add a numeric index prefix to the downloaded videos: "
-            "{i+1:03d}-{slug}.mp4 au lieu de {slug}.mp4. Par défaut (False), "
-            "les vidéos utilisent un nom stable basé uniquement sur le slug, "
-            "ce qui évite les collisions quand --lesson est utilisé (l'index "
-            "changes with the filtered list). Markdown lessons always keep "
-            "toujours leur préfixe d'index pour l'ordre de lecture.",
+        "{i+1:03d}-{slug}.mp4 au lieu de {slug}.mp4. Par défaut (False), "
+        "les vidéos utilisent un nom stable basé uniquement sur le slug, "
+        "ce qui évite les collisions quand --lesson est utilisé (l'index "
+        "changes with the filtered list). Markdown lessons always keep "
+        "toujours leur préfixe d'index pour l'ordre de lecture.",
     )
     parser.add_argument(
         "--add-duration",
+        "-d",
         action="store_true",
         help="Keep the duration suffix (MM:SS or H:MM:SS) of the Skool title "
-            "dans le nom de fichier → le slug se termine par les chiffres de "
-            "durée (ex: `...editor-side-panel-imgui-1053`). Par défaut "
-            "(False), ce suffixe est retiré → `...editor-side-panel-imgui` "
-            "(nom plus court, durée déjà présente dans le frontmatter du MD).",
+        "dans le nom de fichier → le slug se termine par les chiffres de "
+        "durée (ex: `...editor-side-panel-imgui-1053`). Par défaut "
+        "(False), ce suffixe est retiré → `...editor-side-panel-imgui` "
+        "(nom plus court, durée déjà présente dans le frontmatter du MD).",
     )
     parser.add_argument(
         "--log-reset",
         action="store_true",
         help="Écrase (reset) le fichier de log au démarrage du run au lieu "
-            "de l'append. Par défaut (False), les runs successifs ajoutent "
-            "leurs lignes (séparées par un marqueur '=== RUN START ===') ce "
-            "that allows keeping the download errors of previous runs "
-            "précédents. Sans --log-reset : comportement cumulatif.",
+        "de l'append. Par défaut (False), les runs successifs ajoutent "
+        "leurs lignes (séparées par un marqueur '=== RUN START ===') ce "
+        "that allows keeping the download errors of previous runs "
+        "précédents. Sans --log-reset : comportement cumulatif.",
     )
     args = parser.parse_args()
     _init_log(reset=args.log_reset)
@@ -1448,15 +1696,46 @@ def main():
         print(f"[*] --skip-until {args.skip_until} → saute les {args.skip_until} premières leçons (compteur global tous cours)")
         _log("INFO", f"--skip-until {args.skip_until} activé")
 
+    # --number : limite le nombre total de leçons traitées (tous cours
+    # confondus, après --skip-until). Combiné avec --skip-until :
+    #   max_lesson = skip_until + N
+    # Validé : N >= 0 (un N négatif est ignoré avec un avertissement).
+    max_lesson: int | None = None
+    if args.number is not None:
+        if args.number < 0:
+            print(f"[!] --number doit être >= 0 (reçu: {args.number}), ignoré.")
+            _log("WARNING", f"--number négatif ignoré: {args.number}")
+        else:
+            base = args.skip_until or 0
+            max_lesson = base + args.number
+            print(f"[*] --number {args.number} → traite au plus {args.number} leçons"
+                  + (f" (positions {max_lesson - args.number + 1}..{max_lesson} après skip-until)"
+                     if args.skip_until else f" (positions 1..{max_lesson})"))
+            _log("INFO", f"--number {args.number} activé (max_lesson={max_lesson})")
+
     # Compteur total upfront (1 appel list-lessons par cours, en plus de
     # celui dans export_course). Sert à afficher la progression "N/TOTAL".
+    # Capé par max_lesson (skip_until + N) quand --number est actif, pour que
+    # le "N/TOTAL" affiche une borne réelle et non le total du cours.
     total_lessons_run = _count_total_lessons(courses, args.lesson)
+    if max_lesson is not None and total_lessons_run > max_lesson:
+        # Cas fréquent : --number appliqué mais _count_total_lessons a compté
+        # au-delà de la limite (e.g., --lesson réduit le set, mais le set
+        # entier dépasse quand même la limite). On cap.
+        total_lessons_run = max_lesson
     print(f"[*] Total leçons à traiter dans ce run : {total_lessons_run}")
     _log("INFO", f"Total leçons à traiter (run) : {total_lessons_run}")
 
     total_lessons = 0
     lesson_counter = 0  # Compteur global tous cours confondus (pour --skip-until)
     for course in courses:
+        # Garde-fou : si on a déjà dépassé --number, on arrête d'itérer sur
+        # les cours suivants. (sécurité en complément du `break` interne
+        # à export_course, qui peut avoir stoppé au milieu du cours précédent.)
+        if max_lesson is not None and lesson_counter >= max_lesson:
+            print(f"[*] --number atteint ({lesson_counter}/{max_lesson}) → arrêt des cours suivants")
+            _log("INFO", f"--number atteint: stop après cours '{course.get('title', course.get('name','?'))}'")
+            break
         n, lesson_counter = export_course(
             course,
             download_videos=download_videos,
@@ -1467,6 +1746,7 @@ def main():
             add_index=args.add_index,
             add_duration=args.add_duration,
             skip_until=args.skip_until,
+            max_lesson=max_lesson,
             lesson_counter=lesson_counter,
             total_lessons_run=total_lessons_run,
         )
