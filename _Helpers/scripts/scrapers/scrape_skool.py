@@ -414,6 +414,108 @@ def _clean_md_titles(root: Path) -> tuple[int, int]:
     return cleaned, scanned
 
 
+def _parse_simple_frontmatter(text: str) -> dict[str, str]:
+    """Parse a minimal ``--- key: value ---`` frontmatter.
+
+    Used only to read a handful of well-known keys (``Cours``, ``Module``,
+    ``ID``, ``Durée``) emitted by ``lesson_to_markdown``. No YAML lib:
+    each line is split on the first colon and the value is stripped of
+    surrounding quotes. Returns an empty dict if the file does not start
+    with ``---``.
+    """
+    fm: dict[str, str] = {}
+    if not text.startswith("---"):
+        return fm
+    end = text.find("\n---", 3)
+    if end < 0:
+        return fm
+    block = text[3:end].strip()
+    for raw in block.splitlines():
+        line = raw.strip()
+        if not line or ":" not in line:
+            continue
+        key, _, value = line.partition(":")
+        fm[key.strip()] = value.strip().strip('"').strip("'")
+    return fm
+
+
+def _natural_sort_key(s: str) -> tuple:
+    """Return a sort key that orders strings naturally (``2 < 10``).
+
+    Splits on digit runs; numeric tokens become ``(0, int)`` and string
+    tokens become ``(1, lowered_str)`` so the resulting tuple can be
+    compared element-wise in Python 3 (no int/str cross-type compare).
+    """
+    parts = re.split(r"(\d+)", s)
+    key: list[tuple[int, object]] = []
+    for p in parts:
+        if p.isdigit():
+            key.append((0, int(p)))
+        else:
+            key.append((1, p.lower()))
+    return tuple(key)
+
+
+def _build_course_readme_from_disk(course_dir: Path, course_name: str) -> tuple[str, int]:
+    """Rebuild the per-course ``README.md`` by scanning EVERY lesson on disk.
+
+    Independent of the current scrape run: a lesson is listed if its
+    ``.md`` file is present under ``course_dir``, regardless of whether it
+    was processed, skipped, or filtered out (``--lesson`` / ``--number``
+    / ``--skip-until``). Modules are read from each file's frontmatter
+    (``Module:``) and lessons are sorted naturally by filename within each
+    module.
+
+    Returns ``(markdown_text, total_lessons_found)``.
+    """
+    md_files = [
+        p for p in course_dir.rglob("*.md") if p.name.lower() != "readme.md"
+        # exclude the `Support Files/` subtree (zip folders live there, no .md)
+        and "support files" not in p.parts
+    ]
+
+    # Group by Module, preserving first-appearance order.
+    modules: dict[str, list[tuple[Path, str]]] = {}
+    module_order: list[str] = []
+    for p in md_files:
+        try:
+            text = p.read_text(encoding="utf-8")
+        except OSError:
+            continue
+        fm = _parse_simple_frontmatter(text)
+        module = fm.get("Module") or "(Sans module)"
+        # Title: prefer the H1 (matches what `lesson_to_markdown` emits).
+        title = ""
+        for line in text.splitlines():
+            s = line.strip()
+            if s.startswith("# ") and not s.startswith("## "):
+                title = s[2:].strip()
+                break
+        if not title:
+            title = p.stem
+        modules.setdefault(module, []).append((p, title))
+        if module not in module_order:
+            module_order.append(module)
+
+    # Natural sort within each module; alphabetical sort across modules
+    # (deterministic; the existing folders introduction/metroidvania/rpg
+    # already line up alphabetically with the Skool order).
+    for mod in modules:
+        modules[mod].sort(key=lambda pt: _natural_sort_key(pt[0].name))
+    module_order.sort(key=_natural_sort_key)
+
+    lines: list[str] = [f"# Index - {course_name}", "", f"Exporté le {datetime.now().strftime('%Y-%m-%d %H:%M')}", "", ]
+    for module in module_order:
+        lines.append(f"## {module}")
+        lines.append("")
+        for path, title in modules[module]:
+            rel = path.relative_to(course_dir).as_posix()
+            lines.append(f"- [{title}]({rel})")
+        lines.append("")
+
+    return "\n".join(lines).rstrip() + "\n", len(md_files)
+
+
 def _normalize_for_match(s: str) -> str:
     """Normalise une chaîne pour le matching fuzzy du filtre --lesson.
 
@@ -1500,19 +1602,39 @@ def export_course(
             _log("WARNING", f"HLSUrlExtractor close: {e}")
         hls_extractor = None
 
+    # Rebuild the course README from EVERY .md present on disk, not just the
+    # lessons processed this run. This keeps entries for lessons skipped via
+    # --lesson / --number / --skip-until or already-present-on-disk (idempotent).
+    # The in-memory `index_lines` is discarded; the disk is the source of truth.
+    readme_text, n_on_disk = _build_course_readme_from_disk(course_dir, course_name)
     index_path = course_dir / "README.md"
-    index_path.write_text("\n".join(index_lines), encoding="utf-8")
-    print(f"  [+] Index créé : {index_path}")
-    _log("INFO", f"  Cours {course_name} terminé: {lesson_count} leçons exportées")
+    index_path.write_text(readme_text, encoding="utf-8")
+    if n_on_disk != lesson_count:
+        print(f"  [+] Index créé : {index_path} "
+              f"({lesson_count} traitées ce run, {n_on_disk} listées au total sur disque)")
+        _log("INFO", f"  Cours {course_name} terminé: {lesson_count} traitées, "
+             f"{n_on_disk} listées dans le README (delta = skipped/legacy).",
+            )
+    else:
+        print(f"  [+] Index créé : {index_path} ({n_on_disk} leçons)")
+        _log("INFO", f"  Cours {course_name} terminé: {lesson_count} leçons exportées")
 
     return lesson_count, lesson_counter
 
 
 def write_global_index(courses: list[dict], total: int):
-    """Generate a global README for the whole knowledge base."""
+    """Generate a global README for the whole knowledge base.
+
+    The ``Total`` line reflects the actual state of the disk, not just the
+    current run's counter, so a partial scrape (``--lesson`` /
+    ``--number`` / ``--skip-until``) doesn't make the global README report
+    a misleading number. ``total`` (lessons updated by this run) is shown
+    as a secondary stat.
+    """
+    on_disk_total = sum(1 for p in OUTPUT_DIR.rglob("*.md") if p.name.lower() != "readme.md" and "support files" not in p.parts)
     lines = [
-        "# Odin Game Dev Knowledge Base - programvideogames", f"\nExporté le {datetime.now().strftime('%Y-%m-%d %H:%M')}",
-        f"Total : {total} leçons exportées", "", "## Cours disponibles", "",
+        "# Odin Game Dev Knowledge Base - programvideogames", "", f"Exporté le {datetime.now().strftime('%Y-%m-%d %H:%M')}",
+        f"Total : {on_disk_total} leçons sur disque ({total} mises à jour lors de ce run)", "", "## Cours disponibles", "",
     ]
     for course in courses:
         name = course.get("title", course.get("name", "unknown"))
@@ -1521,7 +1643,7 @@ def write_global_index(courses: list[dict], total: int):
 
     readme = OUTPUT_DIR / "README.md"
     readme.write_text("\n".join(lines), encoding="utf-8")
-    print(f"\n[+] Index global : {readme}")
+    print(f"\n[+] Index global : {readme} ({on_disk_total} leçons sur disque)")
 
 
 def check_prerequisites():
@@ -1597,16 +1719,17 @@ def main():
         "mécanisme (--lesson reste prioritaire pour filtrer).",
     )
     parser.add_argument(
-        "--number", "-n",
+        "--number",
+        "-n",
         type=int,
         metavar="N",
         default=None,
         help="Limite le nombre total de leçons traitées (global, tous cours "
-            "confondus, après application des filtres --lesson / --skip-until). "
-            "Combiné avec --skip-until : les leçons traitées vont de "
-            "skip_until+1 à skip_until+N. Ex: --number 5 traite 5 leçons "
-            "au total ; --skip-until 10 --number 5 → leçons 11..15. "
-            "Sans --number : toutes les leçons retenues sont traitées.",
+        "confondus, après application des filtres --lesson / --skip-until). "
+        "Combiné avec --skip-until : les leçons traitées vont de "
+        "skip_until+1 à skip_until+N. Ex: --number 5 traite 5 leçons "
+        "au total ; --skip-until 10 --number 5 → leçons 11..15. "
+        "Sans --number : toutes les leçons retenues sont traitées.",
     )
     parser.add_argument(
         "--add-index",
@@ -1708,9 +1831,12 @@ def main():
         else:
             base = args.skip_until or 0
             max_lesson = base + args.number
-            print(f"[*] --number {args.number} → traite au plus {args.number} leçons"
-                  + (f" (positions {max_lesson - args.number + 1}..{max_lesson} après skip-until)"
-                     if args.skip_until else f" (positions 1..{max_lesson})"))
+            print(
+                f"[*] --number {args.number} → traite au plus {args.number} leçons" + (
+                    f" (positions {max_lesson - args.number + 1}..{max_lesson} après skip-until)" if args.
+                    skip_until else f" (positions 1..{max_lesson})"
+                )
+            )
             _log("INFO", f"--number {args.number} activé (max_lesson={max_lesson})")
 
     # Compteur total upfront (1 appel list-lessons par cours, en plus de
@@ -1768,7 +1894,7 @@ def main():
 
     print("\n" + "=" * 60)
     print(f"  ✓ Export terminé : {total_lessons} leçons dans {OUTPUT_DIR}")
-    print(f"  → Indexe dans RAGnarōk : Topic 'programvideogames'")
+    print(f"  → Indexe dans le RAG : Topic 'programvideogames'")
     print("=" * 60)
     _log("INFO", f"Terminé : {total_lessons} leçons exportées dans {OUTPUT_DIR}")
     _log("INFO", f"Log finalisé dans {LOG_FILE}")
