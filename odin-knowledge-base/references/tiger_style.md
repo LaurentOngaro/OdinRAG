@@ -6,13 +6,11 @@ type: reference
 status: active
 version: 1.0.0
 lastUpdated: "2026-07-10"
-updatedBy: "MiniMax-M3 (Kilo Code)"
+updatedBy: "MiniMax-M3 (Kilo Code) via download_tiger_style.py"
 summary: "TigerBeetle's coding style guide for safety-critical systems, distilled for Odin projects - safety, performance, naming, off-by-one prevention."
 ---
 
 # TigerStyle
-
-source: [TIGER_STYLE](https://github.com/tigerbeetle/tigerbeetle/blob/main/docs/TIGER_STYLE.md)
 
 ## The Essence Of Style
 
@@ -208,7 +206,7 @@ Beyond these rules:
   form is easy to get right (and understand):
 
   ```zig
-  if (index < length) {
+  if (index < count) {
     // The invariant holds.
   } else {
     // The invariant doesn't hold.
@@ -216,10 +214,10 @@ Beyond these rules:
   ```
 
   This form is harder, and also goes against the grain of how `index` would typically be compared to
-  `length`, for example, in a loop condition:
+  `count`, for example, in a loop condition:
 
   ```zig
-  if (index >= length) {
+  if (index >= count) {
     // It's not true that the invariant holds.
   }
   ```

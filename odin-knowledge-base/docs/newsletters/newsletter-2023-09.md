@@ -1,4 +1,4 @@
-## Compiler Updates [#](#compiler-updates)
+# Compiler Updates [#compiler-updates]
 
 [Monthly Release](https://github.com/odin-lang/Odin/releases/tag/dev-2023-10) including a few new language features and LLVM 17.0.1 support for windows.
 
@@ -10,7 +10,7 @@
 
 ---
 
-## Socials [#](#socials)
+## Socials [#socials]
 
 We’ll split up the different social platforms this time around.
 
@@ -27,7 +27,7 @@ We’ll split up the different social platforms this time around.
 
 ---
 
-## Games [#](#games)
+## Games [#games]
 
 [](https://cdn.discordapp.com/attachments/568871319425515531/1155521114722812046/astrodrift.mp4)
 
@@ -37,15 +37,15 @@ Astro Drift is a short roguelike rocket-drifting shooter. Destroy the asteroids 
 
 ---
 
-## Editors [#](#editors)
+## Editors [#editors]
 
 ***Sentient Coffee*** has added support for the [focus editor](https://github.com/focus-editor/focus). Check out the discord [link / explanation](https://discord.com/channels/568138951836172421/568871319425515531/1156585773290762341).
 
 ---
 
-## New Bindings / Ports [#](#new-bindings--ports)
+## New Bindings / Ports [#new-bindings--ports]
 
-- [Fractal-Buddhabrot](ttps://github.com/joaocarvalhoopen/Fractal-Buddhabrot-in-Odin) Port of Fractal Buddhabrot - `JoaCarvalho`
+- [Fractal-Buddhabrot](https://github.com/joaocarvalhoopen/Fractal-Buddhabrot-in-Odin) Port of Fractal Buddhabrot - `JoaCarvalho`
   OLD
 - [pegasus](https://github.com/dvrd/pegasus) Reimplemented golangs `gpeg` - `dvrd`
 - [Moog-Ladder-Filter](https://github.com/joaocarvalhoopen/Moog-Ladder-Filter-in-Odin) Moog Ladder Filter - `JoaoCarvalho`
@@ -54,11 +54,11 @@ Astro Drift is a short roguelike rocket-drifting shooter. Destroy the asteroids 
 
 ---
 
-## New / Updated Packages [#](#new--updated-packages)
+## New / Updated Packages [#new--updated-packages]
 
 I’ll try posting the comments the authors posted for their packages.
 
-### Odin Dear ImGui - `L4` [#](#odin-dear-imgui---l4)
+### Odin Dear ImGui - `L4` [#odin-dear-imgui---l4]
 
 [odin-imgui](https://gitlab.com/L-4/odin-imgui) Generated Dear ImGui bindings using dear\_bindings
 
@@ -71,7 +71,7 @@ I’ll try posting the comments the authors posted for their packages.
 - Includes several examples which can be used as a reference
 - `GLFW + OpenGL, SDL2 + D3D11, SDL2 + Metal, SDL2 + OpenGL, SDL2 + SDL2 Renderer, SDL2 + Vulkan`
 
-### LBP-Serialization - `jakubtomsu (Jacob)` [#](#lbp-serialization---jakubtomsu-jacob)
+### LBP-Serialization - `jakubtomsu (Jacob)` [#lbp-serialization---jakubtomsu-jacob]
 
 [LBP-Serialization](https://github.com/jakubtomsu/odin-lbp-serialization) “I made my LBP serialization code open-source, it’s still kinda experimental though.”
 
@@ -109,7 +109,7 @@ serialize_bar :: proc(s: ^Serializer, bar: ^Bar, loc := #caller_location) -> boo
     return true
 }
 ```odin
-### Getopts - `Pix` [#](#getopts---pix)
+### Getopts - `Pix` [#getopts---pix]
 
 [Getopts](https://github.com/Pix-xiP/getopts) A Odin command line argument parser, loosely based on the `getopts_long`.
 
@@ -133,15 +133,15 @@ for opt in opts.opts {
     case "flag":
       // Something
     case "required":
-      // Something else 
+      // Something else
     case:
       // default? Usage!
-  }  
+  }
 }
 ```odin
 ---
 
-## Categories [#](#categories)
+## Categories [#categories]
 
 This month we’ll do categories again.
 
@@ -150,7 +150,7 @@ This month we’ll do categories again.
 - Tools & UI
 - Miscellaneous
 
-### Game Development [#](#game-development)
+### Game Development [#game-development]
 
 ![...](https://media.discordapp.net/attachments/568871319425515531/1146935058465304606/simulator.png)
 
@@ -192,7 +192,7 @@ Super basic physics demo based off this repo - master jonsie
 
 Before vs after comparison of new art style! The new style uses only 8 colors 🎨 - karl\_zylinski
 
-### Graphics [#](#graphics)
+### Graphics [#graphics]
 
 [](https://cdn.discordapp.com/attachments/568871319425515531/1147077104920449075/ply_60.mp4)
 
@@ -219,7 +219,7 @@ Made some good progress porting/rewriting my Game in Odin. Here is a diffuse lig
 
 Shadow Maps - Jesse
 
-### Tools & UI [#](#tools--ui)
+### Tools & UI [#tools--ui]
 
 ![...](https://cdn.discordapp.com/attachments/568871319425515531/1147751924372877373/image.png)
 
@@ -233,7 +233,7 @@ Line Input project: focused on making the input responsive, smooth and appealing
 
 My project for the Wheel Reinvention Jam is entirely in Odin, and it's been very delightful - Stvff
 
-### Miscellaneous [#](#miscellaneous)
+### Miscellaneous [#miscellaneous]
 
 [![...](https://cdn.discordapp.com/attachments/568871319425515531/1156349244282773514/image.png)](https://git.xslendi.xyz/slendi/odin-efi)
 

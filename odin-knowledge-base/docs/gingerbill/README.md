@@ -29,6 +29,8 @@ If you want the full articles on your machine:
 
 Articles that the scraper can pull (specific count depends on your local run):
 
+- **Everyone Says Assembly Is Untyped—Everyone Is Wrong** (2026-08-20) - https://www.gingerbill.org/article/2026/08/20/designing-odins-inline-asm
+- **Good Tools Are Invisible** (2026-07-10) - https://www.gingerbill.org/article/2026/07/10/good-tools-are-invisible
 - **The Aesthetic Problem of Namespacing** (2026-05-13) - https://www.gingerbill.org/article/2026/05/13/aesthetic-namespacing
 - **Signed By Default Camp** (2026-05-03) - https://www.gingerbill.org/article/2026/05/03/signed-by-default
 - **Blessed Syntax and Ergonomics** (2026-04-29) - https://www.gingerbill.org/article/2026/04/29/blessed-syntax-and-ergonomics
@@ -39,7 +41,7 @@ Articles that the scraper can pull (specific count depends on your local run):
 - **The Only Two Markup Languages** (2026-01-19) - https://www.gingerbill.org/article/2026/01/19/two-families-of-markup-languages
 - **Mitigating the Billion Dollar Mistake** (2026-01-11) - https://www.gingerbill.org/article/2026/01/11/mitigating-the-billion-dollar-mistake
 - **Was it really a Billion Dollar Mistake?** (2026-01-02) - https://www.gingerbill.org/article/2026/01/02/was-it-really-a-billion-dollar-mistake
-- **contextâ€”Odin's Most Misunderstood Feature** (2025-12-15) - https://www.gingerbill.org/article/2025/12/15/odins-most-misunderstood-feature-context
+- **context - Odin's Most Misunderstood Feature** (2025-12-15) - https://www.gingerbill.org/article/2025/12/15/odins-most-misunderstood-feature-context
 - **Package Managers are Evil** (2025-09-08) - https://www.gingerbill.org/article/2025/09/08/package-managers-are-evil
 - **If Odin Had Macros** (2025-07-31) - https://www.gingerbill.org/article/2025/07/31/if-odin-had-macros
 - **Unstructured Thoughts on the Problems of OSS/FOSS** (2025-04-22) - https://www.gingerbill.org/article/2025/04/22/unstructured-thoughts-on-oss

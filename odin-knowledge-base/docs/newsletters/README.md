@@ -9,6 +9,9 @@
 
 ## How to scrape locally
 
+
+Run `python _Helpers/scripts/scrapers/scrape_newsletters.py` to scrape all newsletters (re-entrant, `--force` to rewrite, `--check` to dry-run).
+
 Run `python _Helpers/scripts/scrapers/scrape_newsletters.py` to scrape all newsletters (re-entrant, `--force` to rewrite, `--check` to dry-run).
 
 Run `python _Helpers/scripts/scrapers/scrape_newsletters.py` to scrape all newsletters (re-entrant, `--force` to rewrite, `--check` to dry-run).

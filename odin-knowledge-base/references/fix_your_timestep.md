@@ -12,7 +12,7 @@ summary: "Glenn Fiedler's canonical article on game loop timesteps: fixed-step a
 
 Fix Your Timestep! | Gaffer On Games
 
-# Fix Your Timestep!
+# Fix Your Timestep
 
 Jun 10, 2004
 
@@ -24,7 +24,7 @@ Jun 10, 2004
 
 Hello readers, I'm no longer posting new content on gafferongames.com
 
-### Please check out my new blog at [mas-bandwidth.com](https://mas-bandwidth.com/xdp-for-game-programmers)!
+### Please check out my new blog at [mas-bandwidth.com](https://mas-bandwidth.com/xdp-for-game-programmers)
 
 ---
 
@@ -41,7 +41,6 @@ But how to choose this delta time value? This may seem like a trivial subject bu
 The simplest way to step forward is with fixed delta time, like 1/60th of a second:
 
 ```c
-
     double t = 0.0;
     double dt = 1.0 / 60.0;
 
@@ -104,7 +103,7 @@ With this knowledge at hand, here's a simple trick to ensure that you never pass
         double newTime = hires_time_in_seconds();
         double frameTime = newTime - currentTime;
         currentTime = newTime;
-              
+
         while ( frameTime > 0.0 )
         {
             float deltaTime = min( frameTime, dt );
@@ -142,7 +141,6 @@ If you head just exploded don't worry, all that is needed to solve this is to ch
 For example:
 
 ```c
-
     double t = 0.0;
     const double dt = 0.01;
 
@@ -181,7 +179,6 @@ Now consider that the majority of render frames will have some small remainder o
 One solution to this problem is to interpolate between the previous and current physics state based on how much time is left in the accumulator:
 
 ```c
-
     double t = 0.0;
     double dt = 0.01;
 
@@ -211,7 +208,7 @@ One solution to this problem is to interpolate between the previous and current 
 
         const double alpha = accumulator / dt;
 
-        State state = currentState * alpha + 
+        State state = currentState * alpha +
             previousState * ( 1.0 - alpha );
 
         render( state );
@@ -228,7 +225,7 @@ We can use this remainder value to get a blending factor between the previous an
 
 Hello readers, I'm no longer posting new content on gafferongames.com
 
-### Please check out my new blog at [mas-bandwidth.com](https://mas-bandwidth.com/xdp-for-game-programmers)!
+### Please check out my new blog at [mas-bandwidth.com](https://mas-bandwidth.com/xdp-for-game-programmers)
 
 ---
 
