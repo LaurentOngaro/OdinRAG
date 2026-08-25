@@ -10,8 +10,8 @@ attached to the lessons.
 
 Two video flavours are handled transparently by `--download-video`:
 - YouTube lessons: `metadata.videoLink` is a `youtu.be` URL. Downloaded
-    with yt-dlp using the 3-cycle anti-bot strategy (android_vr -> web+cookies
-    -> ios+cookies).
+    with yt-dlp using intelligent client negotiation (visionos/ios/android)
+    with cookies and dynamic resolution selectors up to 1080p60.
 - Skool HLS lessons: `metadata.videoLink` is empty but `metadata.videoId`
     is set. The signed m3u8 URL is embedded in the SSR HTML of the lesson
     page (`playbackId` + `playbackToken`). Playwright loads the page (bypasses
@@ -22,50 +22,53 @@ Usage:
 python _Helpers/scripts/scrapers/scrape_skool.py [options]
 
 Options:
---download-video, -dv              Download the lessons' videos via yt-dlp.
-                                    Covers BOTH YouTube lessons AND Skool HLS
-                                    lessons (m3u8 streams). For HLS, requires
-                                    Playwright (already a prereq of skool-cli).
---download-video-folder PATH       Target folder for YouTube videos. Default: DEFAULT_DOWNLOAD_VIDEO_FOLDER.
---download-support-files, -ds      Also download the attached files (ZIP, images, etc.) declared in metadata.resources. Placed in <course>/Support Files/<NNN-slug>/<file>.
-                                    Idempotent: does not re-download already-present files.
-                                    Strategy: parse metadata.resources (JSON), resolve the signed URL
-                                    via POST https://api2.skool.com/files/<file_id>/download-url (auth via skool-cli cookies). Fallback: scan .zip links in the already-exported Markdown.
---overwrite-existing-lessons, -f   Force the re-download and re-write of already-exported lessons (default: idempotent skip).
---lesson, -l PATTERN               Filter the lessons to process (fuzzy case-insensitive substring on the normalised title). The normalisation replaces every non-alphanumeric character by a space, so
-                                    --lesson "editor-side-panel" matches the title "2.41 - Editor Side Panel (ImGui) (10:53)".
-                                    Ex: --lesson "entities state physics" only processes the lesson whose title contains those words.
-                                    Without --lesson: all the lessons of the course are exported.
---skip-until INDEX, -s             Skip the first INDEX lessons (global counter across all courses) and start processing from lesson INDEX+1. Useful to resume a long scrape after an interruption.
-                                    Ex: --skip-until 50 skips lessons 1..50 and processes from the 51st.
-                                    Without --skip-until: no lesson is skipped by this mechanism (--lesson remains priority for filtering).
---number N, -n N                    Limit the number of lessons processed (global, across all courses, after --skip-until and --lesson filters).
-                                    Combined with --skip-until: lessons processed are positions [skip_until+1 .. skip_until+N].
-                                    Ex: --number 5 processes 5 lessons across all the courses. Combined: --skip-until 10 --number 5 → lessons 11..15.
-                                    Without --number: every lesson (after --lesson / --skip-until filters) is processed.
---add-index, -i                    Add a numeric index prefix to the downloaded videos
-                                    ({i+1:03d}-{slug}.mp4 instead of {slug}.mp4). By default
-                                    (False), videos use a stable name based on the slug only - avoids name collisions between runs
-                                    when --lesson is used (the index changes with the filtered list). Markdown lessons always keep their index prefix for reading order.
---add-duration, -d                 Keep the duration suffix (MM:SS or H:MM:SS) of the Skool title in the filename -> the slug ends with the duration digits (ex: ...editor-side-panel-imgui-1053).
-                                    By default (False), this suffix is removed -> shorter name (ex: ...editor-side-panel-imgui). The duration stays visible in the Markdown frontmatter.
+--login, -L                    Test connection and session validity with Skool without scraping.
+--download-video, -dv          Download the lessons' videos via yt-dlp.
+                                Covers BOTH YouTube lessons AND Skool HLS
+                                lessons (m3u8 streams). For HLS, requires
+                                Playwright (already a prereq of skool-cli).
+--download-video-folder PATH   Target folder for YouTube videos. Default: DEFAULT_DOWNLOAD_VIDEO_FOLDER.
+--download-support-files, -ds  Also download the attached files (ZIP, images, etc.) declared in metadata.resources. Placed in <course>/Support Files/<NNN-slug>/<file>.
+                                Idempotent: does not re-download already-present files.
+                                Strategy: parse metadata.resources (JSON), resolve the signed URL
+                                via POST https://api2.skool.com/files/<file_id>/download-url (auth via skool-cli cookies). Fallback: scan .zip links in the already-exported Markdown.
+--overwrite-existing-lessons, -f Force the re-download and re-write of already-exported lessons (default: idempotent skip).
+--lesson, -l PATTERN           Filter the lessons to process (fuzzy case-insensitive substring on the normalised title). The normalisation replaces every non-alphanumeric character by a space, so
+                                --lesson "editor-side-panel" matches the title "2.41 - Editor Side Panel (ImGui) (10:53)".
+                                Ex: --lesson "entities state physics" only processes the lesson whose title contains those words.
+                                Without --lesson: all the lessons of the course are exported.
+--skip-until INDEX, -s         Skip the first INDEX lessons (global counter across all courses) and start processing from lesson INDEX+1. Useful to resume a long scrape after an interruption.
+                                Ex: --skip-until 50 skips lessons 1..50 and processes from the 51st.
+                                Without --skip-until: no lesson is skipped by this mechanism (--lesson remains priority for filtering).
+--number N, -n N               Limit the number of lessons processed (global, across all courses, after --skip-until and --lesson filters).
+                                Combined with --skip-until: lessons processed are positions [skip_until+1 .. skip_until+N].
+                                Ex: --number 5 processes 5 lessons across all the courses. Combined: --skip-until 10 --number 5 -> lessons 11..15.
+                                Without --number: every lesson (after --lesson / --skip-until filters) is processed.
+--add-index, -i                Add a numeric index prefix to the downloaded videos
+                                ({i+1:03d}-{slug}.mp4 instead of {slug}.mp4). By default
+                                (False), videos use a stable name based on the slug only - avoids name collisions between runs
+                                when --lesson is used (the index changes with the filtered list). Markdown lessons always keep their index prefix for reading order.
+--add-duration, -d             Keep the duration suffix (MM:SS or H:MM:SS) of the Skool title in the filename -> the slug ends with the duration digits (ex: ...editor-side-panel-imgui-1053).
+                                By default (False), this suffix is removed -> shorter name (ex: ...editor-side-panel-imgui). The duration stays visible in the Markdown frontmatter.
+--log-reset                    Reset the log file on run start instead of appending.
 
 Prerequisites:
 - Windows: DEFENDER FIREWALL DISABLED (OTHERWISE PLAYWRIGHT CHROMIUM -> ERR_NETWORK_ACCESS_DENIED)
 - Python 3.10+
-- Node.js + npm:  npm install -g skool-cli  then  npx playwright install chromium
+- Node.js + npm: npm install -g skool-cli then npx playwright install chromium
 - For --download-video: yt-dlp (PATH or YT_DLP_EXE); ffmpeg recommended
 - skool-cli patches applied in %AppData%/npm/node_modules/skool-cli/dist/core/
     browser-manager.js: blocks *.awssaf.com (AWS WAF challenge.js)
-    page-ops.js        : goto retries with waitUntil:"commit" on timeout
+    page-ops.js : goto retries with waitUntil:"commit" on timeout
 
 Credentials (priority order):
-1. Env vars SKOOL_EMAIL / SKOOL_PASSWORD  (CI, containers)
-2. File .private/skool_credentials.txt        (gitignored, local)
-3. Interactive prompt (password masked via getpass)
+1. Env vars SKOOL_EMAIL / SKOOL_PASSWORD (CI, containers)
+2. Field skool.email of _Private/.config/user_config.jsonc
+3. File _Private/.config/skool_credentials.txt (gitignored, local)
+4. Interactive prompt (password masked via getpass)
 
-YouTube cookies (optional but recommended to avoid the rate-limit):
-- Env var YOUTUBE_COOKIES_FILE=/path/cookies.txt (Netscape format)
+YouTube cookies (optional but recommended to avoid rate-limits):
+- File _Private/.config/cookies.txt or env var YOUTUBE_COOKIES_FILE=/path/cookies.txt (Netscape format)
 """
 
 import argparse
@@ -554,22 +557,34 @@ def run_skool(args: list[str], retries: int = 3) -> dict | list | None:
     return None
 
 
-def login() -> bool:
+def login(force: bool = False) -> bool:
     """Authentification via skool-cli (stocke la session dans ~/.skool-cli/)."""
     auth_state = Path.home() / ".skool-cli" / "auth-state.json"
-    if auth_state.exists():
-        print(f"[*] Session déjà active ({auth_state}), skip login.")
-        return True
+    if not force and auth_state.exists():
+        try:
+            res = subprocess.run(["skool.cmd", "whoami", "-g", SKOOL_GROUP], capture_output=True, text=True, timeout=20, )
+            if res.returncode == 0 and "active" in res.stdout.lower():
+                print(f"[*] Session active validée ({auth_state}).")
+                return True
+        except Exception:
+            pass
+        if auth_state.exists():
+            print(f"[*] Session déjà active ({auth_state}), skip login.")
+            return True
+
+    if not SKOOL_EMAIL or not SKOOL_PASSWORD:
+        print("[ERR] SKOOL_EMAIL ou SKOOL_PASSWORD manquant pour la connexion.")
+        return False
 
     print(f"[*] Connexion en tant que {SKOOL_EMAIL}...")
     try:
         subprocess.run(
-            ["skool.cmd", "login", "--email", SKOOL_EMAIL, "--password", SKOOL_PASSWORD], check=True, capture_output=True, text=True, timeout=120
+            ["skool.cmd", "login", "--email", SKOOL_EMAIL, "--password", SKOOL_PASSWORD], check=True, capture_output=True, text=True, timeout=120,
         )
         print("[+] Connecté.")
         return True
     except subprocess.CalledProcessError as e:
-        print(f"[ERR] Login échoué: {e.stderr}")
+        print(f"[ERR] Login échoué: {e.stderr or e.stdout}")
         return False
 
 
@@ -841,27 +856,38 @@ def download_video(video_url: str, target_dir: Path, lesson_slug: str) -> Path |
             print(f"  [WARN] Fichier cookies introuvable : {cookies_path} (ignoré)")
             cookies_path = None
 
-    # Formats par qualité (mp4 m4a muxés si ffmpeg, sinon combiné 18).
+    # Formats par qualité (mp4 m4a muxés si ffmpeg, sinon combiné).
+    # Utilise des sélecteurs dynamiques (supporte 30fps itag 137, 60fps itag 299, etc.).
     if has_ffmpeg:
         fmts: list[tuple[str, bool]] = [
-            ("137+140", True),  # 1080p vidéo + audio m4a
-            ("136+140", True),  # 720p
-            ("18", False),  # 360p combiné (fallback si ffmeg ou rate-limit)
+            ("bv*[height<=1080][ext=mp4]+ba[ext=m4a]/bv*[height<=1080]+ba/b[height<=1080]/best", True),  # 1080p max
+            ("bv*[height<=720][ext=mp4]+ba[ext=m4a]/bv*[height<=720]+ba/b[height<=720]/best", True),  # 720p max
+            ("best[ext=mp4]/best", False),  # combiné direct
         ]
     else:
-        fmts = [("18", False)]
-        print("  [i] ffmpeg missing -> reduced quality (360p combined)")
+        fmts = [("best[ext=mp4]/best", False)]
+        print("  [i] ffmpeg missing -> reduced quality (combined single stream)")
 
-    # 3 cycles × 1 famille × 3 formats. Chaque cycle est homogène (même client).
-    # On change de famille uniquement entre cycles (backoff anti-bot).
-    cycle_families: list[tuple[str, bool]] = [
-        ("android_vr", False),  # Cycle 1 : default, formats élevés
-        ("web", True),  # Cycle 2 : rate-limit fallback
-        ("ios", True),  # Cycle 3: last resort
-    ]
+    # Stratégie en cycles avec négociation intelligente des clients YouTube :
+    # Si cookies présents : Cycle 1 = négociation par défaut (visionos/ios) avec cookies, puis fallback iOS/Android.
+    # Si sans cookies : Cycle 1 = négociation par défaut, puis fallback iOS/Android.
+    if cookies_path:
+        cycle_families: list[tuple[str | None, bool]] = [
+            (None, True),  # Cycle 1 : default negotiation + cookies
+            ("ios", True),  # Cycle 2 : ios + cookies
+            ("android", True),  # Cycle 3 : android + cookies
+        ]
+    else:
+        cycle_families = [
+            (None, False),  # Cycle 1 : default negotiation (sans cookies)
+            ("ios", False),  # Cycle 2 : ios (sans cookies)
+            ("android", False),  # Cycle 3 : android (sans cookies)
+        ]
 
-    def make_cmd(client: str, fmt: str, needs_merge: bool, use_cookies: bool) -> list[str]:
-        args = [yt_exe, "--extractor-args", f"youtube:player_client={client}"]
+    def make_cmd(client: str | None, fmt: str, needs_merge: bool, use_cookies: bool) -> list[str]:
+        args = [yt_exe]
+        if client:
+            args += ["--extractor-args", f"youtube:player_client={client}"]
         if use_cookies and cookies_path:
             args += ["--cookies", str(cookies_path)]
         args += ["-f", fmt]
@@ -895,10 +921,11 @@ def download_video(video_url: str, target_dir: Path, lesson_slug: str) -> Path |
     for cycle_idx, (client, use_cookies) in enumerate(cycles_to_run):
         cycle = cycle_idx + 1
         cycle_stderr = ""
-        cookie_tag = "+cookies" if use_cookies else ""
+        client_name = client or "default"
+        cookie_tag = "+cookies" if (use_cookies and cookies_path) else ""
         for n, (fmt, needs_merge) in enumerate(fmts, 1):
             tag = (f"cycle {cycle}/{len(cycles_to_run)}, "
-                   f"tentative {n}/{len(fmts)} ({client}{cookie_tag}, {fmt})")
+                   f"tentative {n}/{len(fmts)} ({client_name}{cookie_tag})")
             print(f"  [↓] yt-dlp ({tag}) → {target_dir.name}/{lesson_slug}")
             cmd = make_cmd(client, fmt, needs_merge, use_cookies)
             _log("DEBUG", f"yt-dlp {tag}: {' '.join(cmd[:4])}…")
@@ -1663,46 +1690,36 @@ def main():
     print("  Skool Course Scraper - Odin Knowledge Base")
     print("=" * 60)
 
-    parser = argparse.ArgumentParser(description="Scrape les leçons Skool et exporte en Markdown.")
+    parser = argparse.ArgumentParser(description="Scrape les cours et leçons Skool (programvideogames) et exporte en Markdown.")
+    parser.add_argument("--login", "-L", action="store_true", help="Tester uniquement la connexion et la session Skool sans lancer de scrape.", )
     parser.add_argument(
         "--download-video",
         "-dv",
         action="store_true",
-        help="Download the lessons' videos via yt-dlp. Covers BOTH YouTube "
-        "lessons (metadata.videoLink) AND Skool HLS lessons (metadata.videoId "
-        "+ signed m3u8 URL parsed from the lesson page). The HLS path "
-        "requires Playwright (already a prereq of skool-cli).",
+        help="Télécharger les vidéos des leçons via yt-dlp (leçons YouTube et flux HLS Skool m3u8).",
     )
     parser.add_argument(
         "--download-video-folder",
         default=DEFAULT_DOWNLOAD_VIDEO_FOLDER,
-        help=f"Target folder for the YouTube videos download. Default: {DEFAULT_DOWNLOAD_VIDEO_FOLDER}",
+        help=f"Dossier de destination des vidéos téléchargées. Par défaut : {DEFAULT_DOWNLOAD_VIDEO_FOLDER}",
     )
     parser.add_argument(
         "--download-support-files",
         "-ds",
         action="store_true",
-        help=
-        "Also download the support files (.zip) linked in each lesson. Placed in <course>/Support Files/<NNN-slug>/<file>.zipip. Idempotent : ne télécharge pas les fichiers déjà présents (non vides).",
+        help="Télécharger également les fichiers de support (.zip, assets) joints aux leçons. Idempotent.",
     )
     parser.add_argument(
         "--overwrite-existing-lessons",
         "-f",
         action="store_true",
-        help=
-        "Rewrite the Markdown files of already exported lessons (re-download from Skool). By default, lessons already present aret réutilisées (idempotence : aucun appel Skool, aucune réécriture).",
+        help="Forcer la réécriture et le re-téléchargement des leçons déjà exportées (par défaut : saut idempotent).",
     )
     parser.add_argument(
         "--lesson",
         "-l",
         metavar="PATTERN",
-        help="Filtre les leçons à traiter (substring fuzzy case-insensitive sur le "
-        "titre normalisé). La normalisation remplace tout caractère non-"
-        "alphanumérique par un espace, donc --lesson 'editor-side-panel' "
-        "matche '2.41 - Editor Side Panel (ImGui) (10:53)' (tirets vs "
-        "espaces). Le pattern est un substring (re.search), pas une regex. "
-        "Ex: --lesson 'entities state physics' ne traite que la leçon dont "
-        "le titre contient ces mots. Sans --lesson : toutes les leçons.",
+        help="Filtrer les leçons à traiter par sous-chaîne dans le titre (insensible à la casse). Ex: --lesson 'editor-side-panel'.",
     )
     parser.add_argument(
         "--skip-until",
@@ -1710,56 +1727,25 @@ def main():
         type=int,
         metavar="INDEX",
         default=None,
-        help="Saute les INDEX premières leçons (tous cours confondus) et "
-        "commence à traiter à partir de la leçon INDEX+1. Le compteur "
-        "s'incrémente par leçon (pas par cours, pas par vidéo), ce qui "
-        "useful to resume a long scrape after an interruption. "
-        "Ex: --skip-until 50 saute les leçons 1..50 et traite à partir "
-        "de la 51e. Sans --skip-until : aucune leçon n'est sautée par ce "
-        "mécanisme (--lesson reste prioritaire pour filtrer).",
+        help="Sauter les INDEX premières leçons (tous cours confondus) et démarrer à INDEX+1. Utile pour reprendre un scrape.",
     )
     parser.add_argument(
-        "--number",
-        "-n",
-        type=int,
-        metavar="N",
-        default=None,
-        help="Limite le nombre total de leçons traitées (global, tous cours "
-        "confondus, après application des filtres --lesson / --skip-until). "
-        "Combiné avec --skip-until : les leçons traitées vont de "
-        "skip_until+1 à skip_until+N. Ex: --number 5 traite 5 leçons "
-        "au total ; --skip-until 10 --number 5 → leçons 11..15. "
-        "Sans --number : toutes les leçons retenues sont traitées.",
+        "--number", "-n", type=int, metavar="N", default=None, help="Limiter le nombre total de leçons à traiter lors de cette exécution.",
     )
     parser.add_argument(
         "--add-index",
         "-i",
         action="store_true",
-        help="Add a numeric index prefix to the downloaded videos: "
-        "{i+1:03d}-{slug}.mp4 au lieu de {slug}.mp4. Par défaut (False), "
-        "les vidéos utilisent un nom stable basé uniquement sur le slug, "
-        "ce qui évite les collisions quand --lesson est utilisé (l'index "
-        "changes with the filtered list). Markdown lessons always keep "
-        "toujours leur préfixe d'index pour l'ordre de lecture.",
+        help="Ajouter un préfixe numérique d'index au nom des vidéos ({i+1:03d}-{slug}.mp4 au lieu de {slug}.mp4).",
     )
     parser.add_argument(
         "--add-duration",
         "-d",
         action="store_true",
-        help="Keep the duration suffix (MM:SS or H:MM:SS) of the Skool title "
-        "dans le nom de fichier → le slug se termine par les chiffres de "
-        "durée (ex: `...editor-side-panel-imgui-1053`). Par défaut "
-        "(False), ce suffixe est retiré → `...editor-side-panel-imgui` "
-        "(nom plus court, durée déjà présente dans le frontmatter du MD).",
+        help="Conserver le suffixe de durée dans le nom de fichier (ex: ...-1053 au lieu de retirer la durée du slug).",
     )
     parser.add_argument(
-        "--log-reset",
-        action="store_true",
-        help="Écrase (reset) le fichier de log au démarrage du run au lieu "
-        "de l'append. Par défaut (False), les runs successifs ajoutent "
-        "leurs lignes (séparées par un marqueur '=== RUN START ===') ce "
-        "that allows keeping the download errors of previous runs "
-        "précédents. Sans --log-reset : comportement cumulatif.",
+        "--log-reset", action="store_true", help="Réinitialiser (écraser) le fichier de log au démarrage au lieu d'ajouter à la suite.",
     )
     args = parser.parse_args()
     _init_log(reset=args.log_reset)
@@ -1800,6 +1786,23 @@ def main():
 
     # Credentials depuis env vars > fichier .private/ > prompt interactif
     setup_credentials()
+
+    if args.login:
+        print("=" * 60)
+        print("  Test de connexion Skool")
+        print("=" * 60)
+        if login(force=False):
+            print(f"[*] Vérification de l'accès au groupe '{SKOOL_GROUP}'...")
+            courses = get_courses()
+            if courses:
+                print(f"[+] Succès : {len(courses)} cours accessibles sur '{SKOOL_GROUP}'.")
+                sys.exit(0)
+            else:
+                print(f"[!] Session active mais aucun cours récupéré pour '{SKOOL_GROUP}'.")
+                sys.exit(1)
+        else:
+            print("[ERR] Échec de la connexion Skool.")
+            sys.exit(1)
 
     if not login():
         _log("ERROR", "Authentification Skool échouée")

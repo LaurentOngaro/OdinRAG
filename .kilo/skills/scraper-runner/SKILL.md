@@ -61,6 +61,9 @@ python _Helpers/scripts/scrapers/scrape_skool.py --download-video
 # Also download the ZIPs attached to lessons
 python _Helpers/scripts/scrapers/scrape_skool.py --download-support-files
 
+# Test connection / session validity only (fast check)
+python _Helpers/scripts/scrapers/scrape_skool.py --login
+
 # With explicit credentials (otherwise interactive prompt)
 export SKOOL_EMAIL="your@email.com"
 export SKOOL_PASSWORD="yourpassword"
