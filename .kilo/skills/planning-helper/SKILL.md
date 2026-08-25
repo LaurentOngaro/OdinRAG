@@ -5,8 +5,7 @@ description: "Manage day-by-day planning files (_Private/planning/daily/J_YYYY-M
 
 # Planning helper - daily management
 
-Skill for managing daily notes in `_Private/planning/daily/`.
-The format is detailed in [`_Helpers/templates/planning-daily/J_YYYY-MM-DD.md`] and the YAML convention in [`_Helpers/docs/003_yaml_frontmatter_conventions.md`]
+Skill for managing daily notes in `_Private/planning/daily/`. The format is detailed in [`_Helpers/templates/planning-daily/J_YYYY-MM-DD.md`] and the YAML convention in [`_Helpers/docs/003_yaml_frontmatter_conventions.md`]
 
 ## When to invoke
 

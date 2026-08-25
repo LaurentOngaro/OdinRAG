@@ -33,6 +33,7 @@ OdinRAG/
 │
 ├── odin-knowledge-base/     <- Bucket 1 - Odin KB (sanitized in public branch, full in local main)
 ├── code/                    <- Bucket 1b - Public code references + personal projects (sanitized in public)
+├── _shared/                 <- Canonical mirror for shared project tooling (odinfmt.json, ols.json, build scripts, templates)
 ├── _Helpers/                <- Bucket 2 - Public RAG management
 └── _Private/                <- Bucket 3 - Private (tracked in local main, absent from public branch)
 ```
@@ -86,6 +87,7 @@ _Helpers/
 ├── README - helpers.md
 ├── scripts/                 <- thematic sub-folders
 │   ├── README - scripts.md
+│   ├── dev/                 <- editor integration scripts (odin_task.ps1)
 │   ├── diagnostic/          <- audit_public_safety.py, auditReadmeCoherence.py, publish_public.py, vaultConfigOdinRAG.py + vaultDiagnostic.py + validateFrontmatter.py (R2 TerraBloom port)
 │   │   └── code_auditor/    <- code_auditor.py + odin_rules.{jsonc,schema.json} + rule_loader.py + scanner.py + kb_index.py + context_builder.py + reporter.py + README - code_auditor.md (self-contained package, Phase 1+2+3)
 │   ├── fixes/               <- format_odin_in_files, fix_mojibake, reflow_md, odin_format, book_html_to_md, lint_pylance
@@ -99,7 +101,9 @@ _Helpers/
 │   ├── 003_yaml_frontmatter_conventions.md
 │   ├── 004_markdown_style.md
 │   ├── 005_public_release_checklist.md
-│   ├── ...
+│   ├── 007_mixing_public_and_private_history.md
+│   ├── 008_tasks_and_launch_wiring.md
+│   └── ...
 ├── templates/               <- INTERNAL OdinRAG templates (clone these, never edit in place)
 │   ├── README - templates.md
 │   ├── odin-project/        <- project scaffold (AGENTS, README, src/main.odin, devlog, subagent)
@@ -137,7 +141,7 @@ _Private/
     └── Perplexity decisions/<- decision drafts in transit before ADR validation
 ```
 
-> `_Private/` content is **NOT gitignored** - it is tracked in the local `main` branch and pushed to the private remote `OdinRag-private`, then excluded from the public `public` branch via `refresh_public_branch.py` (two-branch strategy). Local `git status` keeps personal paths quiet via `.git/info/exclude` (LOCAL only, never version-controlled). Only `/_Private/.config/` is doubly protected (also in the tracked `.gitignore`) because credentials must never reach history.
+> `_Private/` content is **NOT gitignored** - it is tracked in the local `main` branch and pushed to the private remote `OdinRag-private`, then excluded from the public `public` branch via `publish_public.py` (two-branch strategy). Local `git status` keeps personal paths quiet via `.git/info/exclude` (LOCAL only, never version-controlled). Only `/_Private/.config/` is doubly protected (also in the tracked `.gitignore`) because credentials must never reach history.
 >
 > The `archives/` subfolder keeps the evolution of decisions traceable when a doc is rewritten or translated.
 > See [`_Private/archives/README - archives.md`](../../_Private/archives/README%20-%20archives.md) for the convention (when to archive, naming, frontmatter annotations).
@@ -160,8 +164,8 @@ Perplexity uses GitHub MCP (read + write) to push directly into `OdinRAG-private
 
 ## Where this file is referenced
 
-- [`AGENTS.md`](AGENTS.md) - global agent context (top-level reference)
-- [`README.md`](README.md) - top-level repo intro (top-level reference)
+- [`AGENTS.md`](../../AGENTS.md) - global agent context (top-level reference)
+- [`README.md`](../../README.md) - top-level repo intro (top-level reference)
 - All `README - <topic>.md` files in authored folders (one per folder)
 - This is the only place where the full tree lives; everything else links here.
 

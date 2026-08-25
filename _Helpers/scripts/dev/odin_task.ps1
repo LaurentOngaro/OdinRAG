@@ -225,7 +225,7 @@ switch ($Mode) {
     # build-debug + Exec, but routed through the .bat if available for parity.
     if ($subprojectBat) {
       $code = Invoke-SubprojectBuild -Bat $subprojectBat -Src $ctx.Src -Out $debugExe -IsDebug $true -DoExec $true
-    if ($code -ne 0 -and $code -ne -2147483645) {
+      if ($code -ne 0 -and $code -ne -2147483645) {
         exit $code
       }
     } else {

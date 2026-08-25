@@ -48,19 +48,17 @@ MANUAL_END = "<!-- END MANUAL -->"
 
 # ─── CONFIG ───────────────────────────────────────────────────────────────────
 KB_PATHS = {
-    "skool":   ROOT / "odin-knowledge-base",
-    "karl":    ROOT / "odin-knowledge-base" / "docs" / "karl_zylinski",
-    "zylinski":ROOT / "odin-knowledge-base" / "docs" / "karl_zylinski",
-    "official":ROOT / "odin-knowledge-base" / "docs" / "official",
-    "gitIngest":ROOT / "odin-knowledge-base" / "gitIngest",
-    "examples":ROOT / "code" / "examples",
+    "skool": ROOT / "odin-knowledge-base",
+    "karl": ROOT / "odin-knowledge-base" / "docs" / "karl_zylinski",
+    "zylinski": ROOT / "odin-knowledge-base" / "docs" / "karl_zylinski",
+    "official": ROOT / "odin-knowledge-base" / "docs" / "official",
+    "gitIngest": ROOT / "odin-knowledge-base" / "gitIngest",
+    "examples": ROOT / "code" / "examples",
 }
 INDEX_PATH = ROOT / "odin-knowledge-base" / "INDEX.md"
 FRONTMATTER_RE = re.compile(r"^---\n(.+?)\n---\n", re.DOTALL)
 CHAPTER_LINK_RE = re.compile(r"\[(\d+)\s*[–-]\s*([^\]]+)\]\(([^)]+)\)")
-_SECTION_RE = re.compile(
-    r"<!-- BEGIN MANUAL[^>]*-->(.*?)<!-- END MANUAL -->", re.DOTALL
-)
+_SECTION_RE = re.compile(r"<!-- BEGIN MANUAL[^>]*-->(.*?)<!-- END MANUAL -->", re.DOTALL)
 _DESCRIPTION = "Regenerate odin-knowledge-base/INDEX.md from the KB."
 
 
@@ -120,11 +118,7 @@ def parse_karl_readme(readme: Path) -> list[dict]:
         if in_table:
             m = re.search(r"\*\*Chapter\s+(\d+)\*\*\s*[-–-]\s*\[([^\]]+)\]\(([^)]+)\)", s)
             if m:
-                chapters.append({
-                    "number": m.group(1),
-                    "title":  m.group(2),
-                    "path":   m.group(3),
-                })
+                chapters.append({"number": m.group(1), "title": m.group(2), "path": m.group(3), })
             elif "**Appendix" in s:
                 in_table = False
     return chapters
@@ -158,13 +152,13 @@ def has_markers(text: str) -> bool:
 def build_source_overview() -> str:
     """Section 'Overview by source' with file count + size."""
     skool_count, skool_size = count_md_files(KB_PATHS["skool"] / "courses")
-    karl_count, karl_size   = count_md_files(KB_PATHS["karl"] / "odin-book")
-    zyl_count, zyl_size     = count_md_files(KB_PATHS["zylinski"])
+    karl_count, karl_size = count_md_files(KB_PATHS["karl"] / "odin-book")
+    zyl_count, zyl_size = count_md_files(KB_PATHS["zylinski"])
     zyl_count -= karl_count
-    zyl_size   -= karl_size
-    off_count, off_size     = count_md_files(KB_PATHS["official"])
-    gi_count,  gi_size      = count_snapshot_files(KB_PATHS["gitIngest"])
-    ex_count,  ex_size      = count_md_files(KB_PATHS["examples"])
+    zyl_size -= karl_size
+    off_count, off_size = count_md_files(KB_PATHS["official"])
+    gi_count, gi_size = count_snapshot_files(KB_PATHS["gitIngest"])
+    ex_count, ex_size = count_md_files(KB_PATHS["examples"])
 
     def fmt_size(n: int) -> str:
         if n < 1024:
@@ -174,17 +168,13 @@ def build_source_overview() -> str:
         return f"{n // (1024 * 1024)} MB"
 
     lines = [
-        "## Overview (by source)",
-        "",
-        "| Source | Files | Format | Why |",
-        "| ------ | ----- | ------ | --- |",
+        "## Overview (by source)", "", "| Source | Files | Format | Why |", "| ------ | ----- | ------ | --- |",
         f"| `odin-knowledge-base/` | {skool_count} | Skool 'programvideogames' lessons (Markdown with frontmatter) | Concrete implementation, complete code, game patterns |",
         f"| `odin-knowledge-base/docs/karl_zylinski/odin-book/` | {karl_count} | Karl's book **'Understanding the Odin Programming Language'** split into 1 file per chapter | Language reference, pure concept, minimal example |",
         f"| `odin-knowledge-base/docs/karl_zylinski/*.md` | {zyl_count} | Karl Zylinski blog articles | Game dev patterns, opinions, hot take |",
         f"| `odin-knowledge-base/docs/official/` | {off_count} | Official odin-lang.org docs + awesome-odin | Official language reference |",
         f"| `odin-knowledge-base/gitIngest/` | {gi_count} | gitingest snapshots of local Odin repo clones (karl_zylinski, falconerd, odin-lang) | Fallback context layer when MCP GitHub is unavailable |",
-        "| `code/examples/demo.odin` | 1 | Official language demo | Exhaustive feature reference |",
-        "",
+        "| `code/examples/demo.odin` | 1 | Official language demo | Exhaustive feature reference |", "",
         f"**Total**: ~{skool_count + karl_count + zyl_count + off_count + gi_count + 1} files, ~{fmt_size(skool_size + karl_size + zyl_size + off_size + gi_size)} of MD.",
         "",
     ]
@@ -198,9 +188,7 @@ def build_skool_section() -> str:
         return ""
 
     lines = [
-        "## Skool courses (programvideogames)",
-        "",
-        "See the detail in [`courses/programvideogames/README.md`](courses/programvideogames/README.md).",
+        "## Skool courses (programvideogames)", "", "See the detail in [`courses/programvideogames/README.md`](courses/programvideogames/README.md).",
         "",
     ]
 
@@ -219,7 +207,7 @@ def build_skool_section() -> str:
                     modules.append((module_dir.name, mc))
                     lesson_count += mc
 
-        readme_rel = f"courses/programvideogames/{course_dir.name}/README.md"
+        readme_rel = f"courses/{course_dir.name}/README.md"
         lines.append(f"- **{course_dir.name}** ({lesson_count} lessons) - [`{readme_rel}`]({readme_rel})")
         for module_name, mc in modules:
             lines.append(f"  - `{module_name}/`: {mc} lessons")
@@ -237,15 +225,12 @@ def build_karl_book_section() -> str:
     appendices = parse_karl_appendices(KB_PATHS["karl"])
 
     lines = [
-        "## Karl Zylinski book (28 chapters + 4 appendices in `odin-knowledge-base/docs/karl_zylinski/odin-book/`)",
-        "",
-        "**Absolute** reference for the Odin language. For any fundamental question, start here.",
-        "",
-        "| # | Chapter | Topic |",
+        "## Karl Zylinski book (28 chapters + 4 appendices in `odin-knowledge-base/docs/karl_zylinski/odin-book/`)", "",
+        "**Absolute** reference for the Odin language. For any fundamental question, start here.", "", "| # | Chapter | Topic |",
         "| - | ------- | ----- |",
     ]
     for ch in chapters:
-        path = f"odin-knowledge-base/docs/karl_zylinski/odin-book/{ch['path']}"
+        path = f"docs/karl_zylinski/odin-book/{ch['path']}"
         lines.append(f"| {ch['number']} | [{ch['title']}]({path}) | |")
     lines.append("| A-D | Appendices (4 files in `odin-book/appendices/`) | Handle-based array, fixed arrays only, dropdown, Box2D+Raylib |")
     lines.append("")
@@ -261,14 +246,9 @@ def build_stats_section() -> str:
     off_count, _ = count_md_files(KB_PATHS["official"])
 
     lines = [
-        "## Statistics",
-        "",
-        f"- **{skool_count}** Skool lessons (Vertical Slice and Dice v1.0 + Metroidvania 1.0)",
-        f"- **{karl_count}** Karl book files (28 chapters + 4 appendices + about-author)",
-        f"- **{zyl_count}** Zylinski articles",
-        f"- **{off_count}** official odin-lang.org docs",
-        "- **1** official demo (`code/examples/demo.odin`)",
-        "",
+        "## Statistics", "", f"- **{skool_count}** Skool lessons (Vertical Slice and Dice v1.0 + Metroidvania 1.0)",
+        f"- **{karl_count}** Karl book files (28 chapters + 4 appendices + about-author)", f"- **{zyl_count}** Zylinski articles",
+        f"- **{off_count}** official odin-lang.org docs", "- **1** official demo (`code/examples/demo.odin`)", "",
     ]
     return "\n".join(lines)
 
@@ -285,12 +265,7 @@ def build_skills_section() -> str:
     if not skills:
         return ""
 
-    lines = [
-        "## Skill to navigate",
-        "",
-        f"{len(skills)} Kilo skills to query the KB and the workspace:",
-        "",
-    ]
+    lines = ["## Skill to navigate", "", f"{len(skills)} Kilo skills to query the KB and the workspace:", "", ]
     for skill in skills:
         lines.append(f"- `.kilo/skills/{skill}/SKILL.md`")
     lines.append("")
@@ -422,22 +397,13 @@ def build_index_content(existing_manual: str = "") -> str:
 
     # AUTO zone
     auto = (
-        AUTO_START + "\n\n"
-        + build_source_overview() + "\n"
-        + build_skool_section() + "\n"
-        + build_karl_book_section() + "\n"
-        + build_stats_section() + "\n"
-        + build_skills_section() + "\n"
-        + AUTO_END + "\n"
+        AUTO_START + "\n\n" + build_source_overview() + "\n" + build_skool_section() + "\n" + build_karl_book_section() + "\n" +
+        build_stats_section() + "\n" + build_skills_section() + "\n" + AUTO_END + "\n"
     )
 
     # MANUAL zone (preserve existing if present, else default)
     manual_body = existing_manual.strip("\n") if existing_manual.strip() else default_manual_content()
-    manual = (
-        MANUAL_START + "\n\n"
-        + manual_body + "\n"
-        + MANUAL_END + "\n"
-    )
+    manual = (MANUAL_START + "\n\n" + manual_body + "\n" + MANUAL_END + "\n")
 
     return frontmatter + auto + "\n" + manual
 
@@ -445,10 +411,8 @@ def build_index_content(existing_manual: str = "") -> str:
 # ─── MAIN ─────────────────────────────────────────────────────────────────────
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=_DESCRIPTION)
-    parser.add_argument("--check", action="store_true",
-                        help="Dry-run: don't write, just display what would change.")
-    parser.add_argument("--out", default=str(INDEX_PATH),
-                        help=f"Path of the INDEX file (default: {INDEX_PATH.relative_to(ROOT)})")
+    parser.add_argument("--check", action="store_true", help="Dry-run: don't write, just display what would change.")
+    parser.add_argument("--out", default=str(INDEX_PATH), help=f"Path of the INDEX file (default: {INDEX_PATH.relative_to(ROOT)})")
     args = parser.parse_args(argv)
 
     out = Path(args.out)

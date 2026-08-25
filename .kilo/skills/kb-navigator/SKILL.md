@@ -55,9 +55,9 @@ Skool lessons can be filtered by Obsidian **hierarchical tag**:
 | -------------------------------- | -------------------------------------------------------------------- |
 | All allocator lessons            | `grep -lr "topic/allocator" odin-knowledge-base/`                    |
 | Skool lessons on FSM             | `grep -lr "topic/state-machine" odin-knowledge-base/`                |
-| Official Odin lessons (language) | `grep -lr "source/official" docs/`                                   |
+| Official Odin lessons (language) | `grep -lr "source/official" odin-knowledge-base/docs/official/`     |
 | Karl Zylinski articles           | `grep -lr "source/zylinski" odin-knowledge-base/docs/karl_zylinski/` |
-| Whole KB for one topic           | `grep -rli "topic/raylib" odin-knowledge-base/ docs/`                |
+| Whole KB for one topic           | `grep -rli "topic/raylib" odin-knowledge-base/`                      |
 
 ## Search strategy
 

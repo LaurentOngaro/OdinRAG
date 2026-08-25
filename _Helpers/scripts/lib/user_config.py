@@ -27,14 +27,9 @@ from pathlib import Path
 from typing import Any
 
 # JSONC: fallback order - env var > this JSONC file in _Private/.config/
-CONFIG_PATH = Path(
-    os.environ.get("ODINRAG_CONFIG")
-    or (Path(__file__).resolve().parents[3] / "_Private" / ".config" / "user_config.jsonc")
-)
+CONFIG_PATH = Path(os.environ.get("ODINRAG_CONFIG") or (Path(__file__).resolve().parents[3] / "_Private" / ".config" / "user_config.jsonc"))
 
-EXAMPLE_PATH = (
-    Path(__file__).resolve().parents[2] / "templates" / "user_config.example.jsonc"
-)
+EXAMPLE_PATH = (Path(__file__).resolve().parents[2] / "templates" / "user_config.example.jsonc")
 
 DEFAULTS: dict[str, Any] = {
     "paths": {
@@ -63,16 +58,53 @@ DEFAULTS: dict[str, Any] = {
     },
 }
 
-# Strip // line comments and /* */ block comments from JSONC text
-_JSONC_COMMENT_RE = re.compile(
-    r"//.*?$|/\*.*?\*/",
-    re.DOTALL | re.MULTILINE,
-)
-
 
 def _strip_jsonc_comments(text: str) -> str:
-    """Strip // line comments and /* */ block comments from a JSONC string."""
-    return _JSONC_COMMENT_RE.sub("", text)
+    """Strip // line comments and /* */ block comments from a JSONC string.
+
+    Respects string literals so that URLs (https://...) or strings containing
+    '//' or '/*' are not broken.
+    """
+    if not text:
+        return text
+
+    out: list[str] = []
+    i = 0
+    n = len(text)
+    in_string = False
+    while i < n:
+        ch = text[i]
+        if in_string:
+            out.append(ch)
+            if ch == "\\":
+                if i + 1 < n:
+                    out.append(text[i + 1])
+                    i += 2
+                    continue
+            elif ch == '"':
+                in_string = False
+            i += 1
+            continue
+        if ch == '"':
+            out.append(ch)
+            in_string = True
+            i += 1
+            continue
+        if ch == "/" and i + 1 < n:
+            nxt = text[i + 1]
+            if nxt == "/":
+                while i < n and text[i] != "\n":
+                    i += 1
+                continue
+            if nxt == "*":
+                i += 2
+                while i + 1 < n and not (text[i] == "*" and text[i + 1] == "/"):
+                    i += 1
+                i = min(i + 2, n)
+                continue
+        out.append(ch)
+        i += 1
+    return "".join(out)
 
 
 def load_config() -> dict:
@@ -126,16 +158,4 @@ def where_to_create() -> str:
     return str(CONFIG_PATH)
 
 
-__all__ = [
-    "CONFIG_PATH",
-    "EXAMPLE_PATH",
-    "DEFAULTS",
-    "load_config",
-    "get",
-    "env_or_config",
-    "PATHS",
-    "SKOOL",
-    "SCRAPER",
-    "KB",
-    "where_to_create",
-]
+__all__ = ["CONFIG_PATH", "EXAMPLE_PATH", "DEFAULTS", "load_config", "get", "env_or_config", "PATHS", "SKOOL", "SCRAPER", "KB", "where_to_create", ]

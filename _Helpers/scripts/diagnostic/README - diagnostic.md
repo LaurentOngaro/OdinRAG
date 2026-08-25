@@ -69,7 +69,9 @@ Use `--fail-on-error` in CI to break the build on any frontmatter error. On 2026
 
 ## `code_auditor/` package (Phase 2)
 
-The `code_auditor/` package (CLI + 6 heuristics) lives in its own self-contained subfolder. See [`code_auditor/README - code_auditor.md`](code_auditor/README%20-%20code_auditor.md) for the full doc. Wired via `[AUDIT] Odin Code Audit (PVG03_RPG)` task.
+The `code_auditor/` package (CLI + 6 heuristics) lives in its own self-contained subfolder.
+See [`code_auditor/README - code_auditor.md`](code_auditor/README - code_auditor.md) for the full doc.
+Wired via `[AUDIT] Odin Code Audit (PVG03_RPG)` task.
 
 ## For the public release checklist
 

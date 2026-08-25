@@ -15,4 +15,4 @@ Each script is idempotent and accepts `--check` for dry-run.
 
 ## Cross-references
 
-Full folder tree: [`001_folder_structure.md`](../../../docs/001_folder_structure.md)
+Full folder tree: [`001_folder_structure.md`](../../docs/001_folder_structure.md)

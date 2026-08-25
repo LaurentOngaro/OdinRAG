@@ -43,7 +43,7 @@ Re-entrant downloaders for tracked code references (raw `.odin` source, formatte
 
 ## Cross-references
 
-- Full folder tree: [`001_folder_structure.md`](../../../docs/001_folder_structure.md).
+- Full folder tree: [`001_folder_structure.md`](../../docs/001_folder_structure.md).
 - Scraper runbook (flags, prereqs, common diagnostics): [`.kilo/skills/scraper-runner/SKILL.md`](../../../.kilo/skills/scraper-runner/SKILL.md).
 - Pre-push audit (public-branch leak detection): [`.kilo/skills/audit-public-safety/SKILL.md`](../../../.kilo/skills/audit-public-safety/SKILL.md).
 - Markdown style + lint gates (one-paragraph-per-line, ASCII punctuation): [`.kilo/skills/markdown-style/SKILL.md`](../../../.kilo/skills/markdown-style/SKILL.md).

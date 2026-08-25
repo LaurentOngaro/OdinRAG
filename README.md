@@ -1,4 +1,4 @@
-﻿# README
+# README
 
 > A personal RAG knowledge base for the [Odin programming language](https://odin-lang.org/) applied to game development (Raylib, Sokol, hot-reload, allocators).
 > Built and curated end-to-end with **MiniMax-M3** as the structural engineering agent.
@@ -78,7 +78,7 @@ Keep credentials out of the JSON - use env vars like `SKOOL_PASSWORD` for secret
 
 ## Built with MiniMax-M3
 
-This whole project - the scraper architecture, the frontmatter schema, the agent prompts, the 6 Kilo skills, the subagent design, the lint configs - was designed and iterated with [MiniMax-M3](https://minimax.io), powered via [Kilo Code](https://kilo.ai) as the agentic IDE.
+This whole project - the scraper architecture, the frontmatter schema, the agent prompts, the 9 Kilo skills, the subagent design, the lint configs - was designed and iterated with [MiniMax-M3](https://minimax.io), powered via [Kilo Code](https://kilo.ai) as the agentic IDE.
 M3 acts as the structural engineer; I act as the domain curator.
 
 Every file in this repo is the result of a prompt + a code review between us. There is no `git blame` you can read to tell which line was M3's first draft and which was my edit - that's the point.

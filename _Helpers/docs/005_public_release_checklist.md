@@ -47,8 +47,7 @@ python _Helpers/scripts/diagnostic/refresh_public_branch.py --verify
 This regenerates `refs/heads/public` from the current tip of `main`, stripping the personal paths above via `git filter-branch --index-filter --prune-empty`.
 The `--verify` flag also runs the audit immediately afterwards. Idempotent: if the public branch already represents a clean view of main, the script exits without changes.
 
-Filter-branch refuses to run on a dirty working tree. If you have unstaged
-changes:
+Filter-branch refuses to run on a dirty working tree. If you have unstaged changes:
 
 ```bash
 git stash push -u -m "wip-refresh"
@@ -66,9 +65,9 @@ python _Helpers/scripts/diagnostic/audit_public_safety.py --verbose       # list
 
 Expected output: `[OK] Public safety audit (branch): clean`.
 
-Exit code `0` -> you can push.
-Exit code `1` -> fix the leak (re-run `refresh_public_branch.py --verify` if it's a branch issue, or update ignore patterns if it's a tree issue).
-Exit code `2` -> error (git missing, branch absent, ...).
+- Exit code `0` -> you can push.
+- Exit code `1` -> fix the leak (re-run `refresh_public_branch.py --verify` if it's a branch issue, or update ignore patterns if it's a tree issue).
+- Exit code `2` -> error (git missing, branch absent, ...).
 
 ### 4. Push
 

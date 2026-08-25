@@ -22,7 +22,6 @@ from markdownify import markdownify as md
 
 from .http_client import fetch
 
-
 # Tags to strip before conversion (page chrome, never content).
 _NON_CONTENT_TAGS = ("nav", "script", "style", "aside", "footer")
 
@@ -72,10 +71,7 @@ def scrape_to_markdown(
         return False
 
     soup = BeautifulSoup(resp.text, "html.parser")
-    container = next(
-        (soup.find(tag) for tag in prefer_tags if soup.find(tag)),
-        soup.body,
-    )
+    container = next((soup.find(tag) for tag in prefer_tags if soup.find(tag)), soup.body, )
     if container is None:
         return False
 
@@ -106,9 +102,36 @@ def _collapse_blank_lines(text: str) -> str:
 
 
 def _tag_odin_code_blocks(text: str) -> str:
-    """Replace bare ``` with ```odin so odinfmt formats the code blocks. Preserves blocks that already have a language tag."""
-    import re
-    return re.sub(r"```\s*\n", "```odin\n", text)
+    """Replace bare opening ``` with ```odin so odinfmt formats the code blocks.
+
+    Preserves blocks that already have a language tag and never touches closing fences.
+    """
+    lines: list[str] = []
+    in_fence = False
+    fence_delim = ""
+    for line in text.splitlines():
+        stripped = line.strip()
+        if not in_fence:
+            if stripped.startswith("```"):
+                in_fence = True
+                fence_delim = "```"
+                if stripped == "```":
+                    indent = line[:line.find("`")]
+                    lines.append(f"{indent}```odin")
+                    continue
+            elif stripped.startswith("~~~"):
+                in_fence = True
+                fence_delim = "~~~"
+                if stripped == "~~~":
+                    indent = line[:line.find("~")]
+                    lines.append(f"{indent}~~~odin")
+                    continue
+        else:
+            if stripped == fence_delim or (stripped.startswith(fence_delim) and stripped.replace(fence_delim[0], "") == ""):
+                in_fence = False
+                fence_delim = ""
+        lines.append(line)
+    return "\n".join(lines)
 
 
 __all__ = ["html_to_markdown", "scrape_to_markdown"]

@@ -4,6 +4,7 @@
 
 Thematic sub-folders:
 
+- `dev/` - editor integration scripts (`odin_task.ps1`)
 - `diagnostic/` - pre-flight audits (`audit_public_safety.py`, `auditReadmeCoherence.py`)
 - `fixes/` - one-shot maintenance (`format_odin_in_files.py`, `fix_mojibake.py`, `reflow_md.py`, `odin_format.py`, `book_html_to_md.py`, `lint_pylance.py`)
 - `indexing/` - KB index regeneration (`build_kb_index.py`)
@@ -17,4 +18,4 @@ Thematic sub-folders:
 
 ## Cross-references
 
-Full folder tree: [`001_folder_structure.md`](../../docs/001_folder_structure.md)
+Full folder tree: [`001_folder_structure.md`](../docs/001_folder_structure.md)

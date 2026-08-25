@@ -39,9 +39,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from fixes.odin_format import format_path_if_odin  # noqa: E402
 
 _API_BASE = "https://api.github.com/repos/odin-lang/Odin/contents"
-_API_PATHS: list[str] = [
-    "examples/demo",
-]
+_API_PATHS: list[str] = ["examples/demo", ]
 RAW_BASE = "https://raw.githubusercontent.com/odin-lang/Odin/master"
 
 OUT_DIR = Path(__file__).resolve().parents[3] / "code" / "examples"
@@ -117,25 +115,14 @@ def _download_file(entry: dict) -> str | None:
 
 
 def _generate_readme(files: list[str]) -> str:
-    """Generate the README.md content from the list of present .odin filenames."""
-    descriptions: dict[str, str] = {
-        "demo.odin": "Exhaustive demo of every language feature",
-    }
+    """Generate the README - examples.md content from the list of present .odin filenames."""
+    descriptions: dict[str, str] = {"demo.odin": "Exhaustive demo of every language feature", }
 
     lines = [
-        "# Official Odin examples",
-        "",
-        "> `demo.odin` (2966 lines) is the **most exhaustive single-file example** of the Odin language.",
-        "> It covers procedures, structs, unions, foreign imports, SIMD, streams, Vulkan, and more.",
-        "",
-        "## Source",
-        "",
+        "# README - examples", "", "> `demo.odin` (2966 lines) is the **most exhaustive single-file example** of the Odin language.",
+        "> It covers procedures, structs, unions, foreign imports, SIMD, streams, Vulkan, and more.", "", "## Source", "",
         "Official example files from the [odin-lang/Odin](https://github.com/odin-lang/Odin) repository.",
-        "Downloaded via `_Helpers/scripts/scrapers/download_odin_examples.py`.",
-        "",
-        "## Files",
-        "",
-        "| File | Lines | Description |",
+        "Downloaded via `_Helpers/scripts/scrapers/download_odin_examples.py`.", "", "## Files", "", "| File | Lines | Description |",
         "| ---- | ----- | ----------- |",
     ]
     for fname in sorted(files):
@@ -145,9 +132,11 @@ def _generate_readme(files: list[str]) -> str:
         lines.append(f"| `{fname}` | {line_count} | {desc} |")
 
     lines.append("")
-    lines.append("> The `all_*.odin` files (import lists for the doc generator) were intentionally excluded "
-                "-- they contain no instructional code, only `import` statements. "
-                "See [`odin-knowledge-base/docs/official/overview.md`](../odin-knowledge-base/docs/official/overview.md) for the language overview.")
+    lines.append(
+        "> The `all_*.odin` files (import lists for the doc generator) were intentionally excluded "
+        "-- they contain no instructional code, only `import` statements. "
+        "See [`odin-knowledge-base/docs/official/overview.md`](../../odin-knowledge-base/docs/official/overview.md) for the language overview."
+    )
 
     return "\n".join(lines) + "\n"
 
@@ -157,14 +146,8 @@ def main(argv: list[str] | None = None) -> int:
         description="Download official Odin example .odin files from GitHub into code/examples/.",
         epilog="Re-entrant: skips files already present. --force to redownload. --check for dry-run.",
     )
-    parser.add_argument(
-        "--force", action="store_true",
-        help="Redownload every .odin file even if already present.",
-    )
-    parser.add_argument(
-        "--check", action="store_true",
-        help="Dry-run: list what would be downloaded/skipped, exit 0, never write.",
-    )
+    parser.add_argument("--force", action="store_true", help="Redownload every .odin file even if already present.", )
+    parser.add_argument("--check", action="store_true", help="Dry-run: list what would be downloaded/skipped, exit 0, never write.", )
     args = parser.parse_args(argv)
 
     print("=" * 60)
@@ -212,18 +195,16 @@ def main(argv: list[str] | None = None) -> int:
         downloaded += 1
         time.sleep(REQUEST_DELAY)
 
-    # Update README.md
-    present_files = sorted(
-        p.name for p in OUT_DIR.glob("*.odin") if p.is_file()
-    )
-    readme_path = OUT_DIR / "README.md"
+    # Update README - examples.md
+    present_files = sorted(p.name for p in OUT_DIR.glob("*.odin") if p.is_file())
+    readme_path = OUT_DIR / "README - examples.md"
     new_readme = _generate_readme(present_files)
 
     if not args.force and readme_path.exists() and readme_path.read_text(encoding="utf-8") == new_readme:
-        print(f"\n  [SKIP] README.md - unchanged")
+        print(f"\n  [SKIP] README - examples.md - unchanged")
     else:
         readme_path.write_text(new_readme, encoding="utf-8")
-        print(f"\n  [OK] README.md updated")
+        print(f"\n  [OK] README - examples.md updated")
 
     print("\n" + "=" * 60)
     print(f"  {downloaded} downloaded, {skipped} already present, {failed} failures")

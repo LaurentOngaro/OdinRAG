@@ -1,13 +1,17 @@
 # README - examples
 
-## Contents
+> `demo.odin` (2966 lines) is the **most exhaustive single-file example** of the Odin language.
+> It covers procedures, structs, unions, foreign imports, SIMD, streams, Vulkan, and more.
 
-- `demo.odin` - the official Odin demo, mirrored for quick reference
+## Source
 
-## Sources
+Official example files from the [odin-lang/Odin](https://github.com/odin-lang/Odin) repository.
+Downloaded via `_Helpers/scripts/scrapers/download_odin_examples.py`.
 
-Scraped by [`_Helpers/scripts/scrapers/download_odin_examples.py`](../../_Helpers/scripts/scrapers/download_odin_examples.py).
+## Files
 
-## Cross-references
+| File        | Lines | Description                               |
+| ----------- | ----- | ----------------------------------------- |
+| `demo.odin` | 2626  | Exhaustive demo of every language feature |
 
-Full folder tree: [`001_folder_structure.md`](../../_Helpers/docs/001_folder_structure.md)
+> The `all_*.odin` files (import lists for the doc generator) were intentionally excluded -- they contain no instructional code, only `import` statements. See [`odin-knowledge-base/docs/official/overview.md`](../../odin-knowledge-base/docs/official/overview.md) for the language overview.

@@ -42,8 +42,7 @@ def cprint(msg: str, color: str = "", bold: bool = False) -> None:
     reset = COLORS.get("RESET", "")
     # Encode-safe replacement of common Unicode chars that break Windows console
     safe_msg = (
-        msg
-        .replace("\u2192", "->")  # right arrow
+        msg.replace("\u2192", "->")  # right arrow
         .replace("\u2190", "<-")  # left arrow
         .replace("\u2194", "<->")  # left-right arrow
         .replace("\u2026", "...")
@@ -73,27 +72,39 @@ except ImportError:
     except ImportError:
         pass
 
-
 # Folders to skip during scan
 SKIP_DIRS = {
     # Generic / tooling
-    ".git", ".vscode", ".obsidian", "node_modules", "__pycache__",
-    "_Data_consolidation", "_History", ".pytest_cache",
-    "_Helpers/_obsoletes", "_Helpers/__pycache__",
-    "Library", "Temp", "obj", "Builds", "Build",
-    "Logs", "UserSettings",
+    ".git",
+    ".vscode",
+    ".obsidian",
+    "node_modules",
+    "__pycache__",
+    "_Data_consolidation",
+    "_History",
+    ".pytest_cache",
+    "_Helpers/_obsoletes",
+    "_Helpers/__pycache__",
+    "Library",
+    "Temp",
+    "obj",
+    "Builds",
+    "Build",
+    "Logs",
+    "UserSettings",
     # OdinRAG-specific
-    "odin-knowledge-base",   # gitignored, contains scraped SKOOL content
-    "_Private",              # gitignored, personal drafts and config
-    "_Raw",                  # legacy name for _Private/raw, gitignored
-    "logs",                  # cumulative scraper logs (gitignored)
-    ".private",              # personal user_config.jsonc (gitignored)
-    ".kilo",                 # Kilo runtime config + node_modules
-    "_TEMPLATE_",            # project template (not real content)
-    "out",                   # scrapers output
-    "__pycache__",           # python bytecode cache (duplicate safety)
+    "odin-knowledge-base",  # gitignored, contains scraped SKOOL content
+    "_Private",  # gitignored, personal drafts and config
+    "_Raw",  # legacy name for _Private/raw, gitignored
+    "logs",  # cumulative scraper logs (gitignored)
+    ".private",  # personal user_config.jsonc (gitignored)
+    ".kilo",  # Kilo runtime config + node_modules
+    ".agents",  # Junction to .kilo
+    ".zed",  # Zed editor config
+    "_TEMPLATE_",  # project template (not real content)
+    "out",  # scrapers output
+    "__pycache__",  # python bytecode cache (duplicate safety)
 }
-
 
 # Regex patterns
 WIKILINK_PATTERN = re.compile(r"\[\[([^\]\|#]+)(?:#[^\]|]+)?(?:\|[^\]]+)?\]\]")
@@ -120,42 +131,51 @@ def iter_readmes(scope: Path) -> Iterable[Path]:
         yield path
 
 
-def extract_references(readme: Path, host_dir: Path) -> tuple[set[str], set[str], set[str]]:
-    """Extract file/subdir/wikilink references from a README.
+def extract_references(readme: Path, host_dir: Path) -> tuple[set[str], set[str], set[str], set[str], set[str]]:
+    """Extract file/subdir/wikilink/markdown link references from a README.
 
     Returns:
         wikilinks: names referenced via [[wikilinks]] (no folder path)
         filenames: names referenced inline as paths
         subdirs: subdirectory names referenced inline (without trailing slash)
-
-    Notes:
-        - Wikilinks with explicit folder paths (e.g. [[Folder/Name]]) are skipped (they're vault-wide references, not local consistency checks).
-        - Inline filenames are matched conservatively (no premature cutoff at spaces).
-        - Content inside markdown code blocks (between ``` fences) is skipped (examples should not be checked for filesystem consistency).
+        md_links: local target paths from [label](target)
+        backtick_items: items referenced in inline `item` code
     """
     wikilinks: set[str] = set()
     filenames: set[str] = set()
     subdirs: set[str] = set()
+    md_links: set[str] = set()
+    backtick_items: set[str] = set()
 
     try:
         text = readme.read_text(encoding="utf-8", errors="ignore")
     except Exception:
-        return wikilinks, filenames, subdirs
+        return wikilinks, filenames, subdirs, md_links, backtick_items
 
     # Strip content inside markdown code blocks (```...```)
-    # This excludes code-fenced examples from being checked
     text_no_code = re.sub(r"```.*?```", "", text, flags=re.DOTALL)
+
+    # Extract markdown links [label](target)
+    for m in re.finditer(r"\[([^\]]+)\]\(([^)]+)\)", text_no_code):
+        target = m.group(2).strip()
+        if not target.startswith(("http://", "https://", "#", "mailto:")):
+            clean_target = target.split("#")[0].split("?")[0].rstrip("/")
+            if clean_target:
+                md_links.add(clean_target)
+
+    # Extract inline backtick files and dirs
+    for m in re.finditer(r"`([A-Za-z0-9_.-]+(?:/[A-Za-z0-9_.-]+)*/?)`", text_no_code):
+        item = m.group(1).strip()
+        if item and not item.startswith(("-", "*", "=")):
+            backtick_items.add(item)
+
     # Also strip inline code `...`
     text_no_code = re.sub(r"`[^`]+`", "", text_no_code)
 
     # Extract wikilinks (skip those with explicit folder paths)
     for m in WIKILINK_PATTERN.finditer(text_no_code):
         target = m.group(1).strip()
-        # Skip vault-wide references with explicit paths
-        if "/" in target:
-            continue
-        # Skip Obsidian internal references
-        if target.startswith("#") or not target:
+        if "/" in target or target.startswith("#") or not target:
             continue
         wikilinks.add(target)
 
@@ -171,7 +191,7 @@ def extract_references(readme: Path, host_dir: Path) -> tuple[set[str], set[str]
     for m in DIRNAME_PATTERN.finditer(text_no_code):
         subdirs.add(m.group(1).strip())
 
-    return wikilinks, filenames, subdirs
+    return wikilinks, filenames, subdirs, md_links, backtick_items
 
 
 def resolve_wikilink(target: str, host_dir: Path, vault_root: Path) -> Path | None:
@@ -199,32 +219,55 @@ def resolve_wikilink(target: str, host_dir: Path, vault_root: Path) -> Path | No
 
 
 def audit_readme(readme: Path, vault_root: Path) -> dict:
-    """Audit a single README against its host directory.
-
-    Returns a dict with keys:
-        missing_files: filenames referenced but not found
-        missing_subdirs: subdir names referenced but not found
-        present_files_unlisted: files in the dir that look like they should be in README
-        present_subdirs_unlisted: subdirs in the dir that look like they should be in README
-        resolved_count: number of references that resolved
-        unresolved_count: number of references that did not resolve
-    """
+    """Audit a single README against its host directory."""
     host_dir = readme.parent
-    wikilinks, filenames, subdirs = extract_references(readme, host_dir)
+    wikilinks, filenames, subdirs, md_links, backtick_items = extract_references(readme, host_dir)
 
     missing_files: list[str] = []
     missing_subdirs: list[str] = []
     resolved_count = 0
     unresolved_count = 0
+    referenced_local_files: set[str] = set()
+    referenced_local_subdirs: set[str] = set()
+
+    # Resolve markdown links
+    for link in sorted(md_links):
+        cand = (host_dir / link).resolve()
+        if cand.exists():
+            resolved_count += 1
+            if cand.parent == host_dir:
+                if cand.is_file():
+                    referenced_local_files.add(cand.name)
+                elif cand.is_dir():
+                    referenced_local_subdirs.add(cand.name)
+        else:
+            cand_root = (vault_root / link.lstrip("/")).resolve()
+            if cand_root.exists():
+                resolved_count += 1
+            else:
+                missing_files.append(link)
+                unresolved_count += 1
+
+    # Check backtick items in host dir
+    for item in backtick_items:
+        clean_item = item.rstrip("/")
+        cand = host_dir / clean_item
+        if cand.exists():
+            if cand.is_file():
+                referenced_local_files.add(cand.name)
+            elif cand.is_dir():
+                referenced_local_subdirs.add(cand.name)
 
     # Resolve wikilinks
     for target in sorted(wikilinks):
-        # Strip "Folder/" prefix if present (wikilinks can include path)
         name = target.rsplit("/", 1)[-1].strip()
         if not name or name.startswith("_"):
             continue  # skip auto-generated indexes
-        if resolve_wikilink(name, host_dir, vault_root):
+        resolved = resolve_wikilink(name, host_dir, vault_root)
+        if resolved:
             resolved_count += 1
+            if resolved.parent == host_dir:
+                referenced_local_files.add(resolved.name)
         else:
             missing_files.append(name)
             unresolved_count += 1
@@ -236,80 +279,56 @@ def audit_readme(readme: Path, vault_root: Path) -> dict:
         candidate = host_dir / fname
         if candidate.exists():
             resolved_count += 1
+            referenced_local_files.add(candidate.name)
+        elif (host_dir.parent / fname).exists():
+            resolved_count += 1
         else:
-            # Try one level up (common pattern)
-            if (host_dir.parent / fname).exists():
-                resolved_count += 1
-            else:
-                missing_files.append(fname)
-                unresolved_count += 1
+            missing_files.append(fname)
+            unresolved_count += 1
 
     # Resolve inline subdirs
     for subdir in sorted(subdirs):
         candidate = host_dir / subdir
         if candidate.exists() and candidate.is_dir():
             resolved_count += 1
+            referenced_local_subdirs.add(candidate.name)
         else:
             missing_subdirs.append(subdir)
             unresolved_count += 1
 
     # Detect present files/subdirs that might be missing from README
-    # Only flag if README has a "📁 Structure" or similar section that should enumerate them
     try:
         text = readme.read_text(encoding="utf-8", errors="ignore")
     except Exception:
         text = ""
 
-    has_structure_section = bool(re.search(r"##\s*📁.*Structure|##\s*Structure\s+du|##\s*Contenu\s+du\s+Vault|##\s*Files?\s+in|##\s*Folder\s+Structure", text, re.IGNORECASE))
+    has_structure_section = bool(
+        re.search(r"##\s*📁.*Structure|##\s*Structure\s+du|##\s*Contenu\s+du\s+Vault|##\s*Files?\s+in|##\s*Folder\s+Structure", text, re.IGNORECASE)
+    )
 
     present_files_unlisted: list[str] = []
     present_subdirs_unlisted: list[str] = []
 
     if has_structure_section:
-        # Get actual content of host_dir (excluding README itself and auto-generated indexes)
         try:
             entries = list(host_dir.iterdir())
         except Exception:
             entries = []
 
         actual_md_files = {
-            e.name for e in entries
-            if e.is_file() and e.suffix == ".md"
-            and not e.name.startswith("README")
-            and not e.name.startswith("_index_")
+            e.name for e in entries if e.is_file() and e.suffix == ".md" and not e.name.startswith("README") and not e.name.startswith("_index_")
         }
         actual_subdirs = {
-            e.name for e in entries
-            if e.is_dir() and not e.name.startswith(".")
-            and not e.name.startswith("_")
-            and e.name not in SKIP_DIRS
+            e.name for e in entries if e.is_dir() and not e.name.startswith(".") and not e.name.startswith("_") and e.name not in SKIP_DIRS
         }
 
-        # Files referenced by README
-        referenced_files = set()
-        for fname in filenames:
-            referenced_files.add(fname)
-        for target in wikilinks:
-            name = target.rsplit("/", 1)[-1].strip()
-            if name:
-                referenced_files.add(f"{name}.md")
-
-        # Subdirs referenced (from inline + folder wikilinks)
-        referenced_subdirs = set(subdirs)
-        # Also add subdirs inferred from file wikilinks that point to host dir
-        for target in wikilinks:
-            name = target.rsplit("/", 1)[-1].strip()
-            if name and (host_dir / name).exists() and (host_dir / name).is_dir():
-                referenced_subdirs.add(name)
-
         # Find unlisted
-        for f in sorted(actual_md_files - referenced_files):
-            # Don't flag very generic names
+        for f in sorted(actual_md_files - referenced_local_files):
             if f.startswith("_") or f == "README.md":
                 continue
             present_files_unlisted.append(f)
 
-        for d in sorted(actual_subdirs - referenced_subdirs):
+        for d in sorted(actual_subdirs - referenced_local_subdirs):
             present_subdirs_unlisted.append(d)
 
     return {
@@ -356,7 +375,8 @@ def main() -> int:
         total_resolved += result["resolved_count"]
         total_unresolved += result["unresolved_count"]
 
-        n_issues = len(result["missing_files"]) + len(result["missing_subdirs"]) + len(result["present_files_unlisted"]) + len(result["present_subdirs_unlisted"])
+        n_issues = len(result["missing_files"]) + len(result["missing_subdirs"]) + len(result["present_files_unlisted"]
+                                                                                      ) + len(result["present_subdirs_unlisted"])
 
         if n_issues == 0:
             if not args.quiet:

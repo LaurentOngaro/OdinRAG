@@ -35,7 +35,7 @@ If the request does not match any pre-curated topic, **grep with discriminant**:
 
 ```bash
 # Topic: "how to handle queues"
-grep -rli "queue\|fifo\|ring" odin-knowledge-base/ docs/ 2>/dev/null
+grep -rli "queue\|fifo\|ring" odin-knowledge-base/ 2>/dev/null
 # -> lists files containing the pattern
 ```
 

@@ -5,8 +5,7 @@ description: "Run pyright (Pylance engine) on Python files and fix every reporte
 
 # Pylance check
 
-This repo enforces **zero Pylance warnings** on every `.py` file (see `AGENTS.md` § Python).
-The lint is reproducible via the open-source `pyright` engine wrapped by a durable script:
+This repo enforces **zero Pylance warnings** on every `.py` file (see `AGENTS.md` § Python). The lint is reproducible via the open-source `pyright` engine wrapped by a durable script:
 
 ```bash
 python _Helpers/scripts/fixes/lint_pylance.py <path>
@@ -19,8 +18,7 @@ python _Helpers/scripts/fixes/lint_pylance.py <path>
 
 ## When to invoke
 
-After **any** edit to a `.py` file, before considering the task done.
-Also useful as a sanity check before opening a PR / pushing to the public repo.
+After **any** edit to a `.py` file, before considering the task done. Also useful as a sanity check before opening a PR / pushing to the public repo.
 
 ## Typical workflow
 

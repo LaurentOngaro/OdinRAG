@@ -63,7 +63,11 @@
       "type": "cppvsdbg",
       "request": "launch",
       "preLaunchTask": "[BUILD] odin_task (Debug + Raddebugger)",
-      "program": "H:\\Sync\\Scripts\\Windows\\04a_tools\\nop.exe",
+      "program": "C:\\Windows\\System32\\cmd.exe",
+      "args": [
+        "/c",
+        "exit 0"
+      ],
       "stopAtEntry": false,
       "environment": [],
       "console": "integratedTerminal",
@@ -74,7 +78,11 @@
       "type": "cppvsdbg",
       "request": "launch",
       "preLaunchTask": "[DEV] odin_task Check Source folder",
-      "program": "H:\\Sync\\Scripts\\Windows\\04a_tools\\nop.exe",
+      "program": "C:\\Windows\\System32\\cmd.exe",
+      "args": [
+        "/c",
+        "exit 0"
+      ],
       "stopAtEntry": false,
       "environment": [],
       "console": "integratedTerminal",
@@ -99,7 +107,11 @@
       "type": "cppvsdbg",
       "request": "launch",
       "preLaunchTask": "[Select] build (debug)",
-      "program": "H:\\Sync\\Scripts\\Windows\\04a_tools\\nop.exe",
+      "program": "C:\\Windows\\System32\\cmd.exe",
+      "args": [
+        "/c",
+        "exit 0"
+      ],
       "stopAtEntry": false,
       "environment": [],
       "console": "integratedTerminal",
@@ -110,7 +122,11 @@
       "type": "cppvsdbg",
       "request": "launch",
       "preLaunchTask": "[Select] build (release)",
-      "program": "H:\\Sync\\Scripts\\Windows\\04a_tools\\nop.exe",
+      "program": "C:\\Windows\\System32\\cmd.exe",
+      "args": [
+        "/c",
+        "exit 0"
+      ],
       "stopAtEntry": false,
       "environment": [],
       "console": "integratedTerminal",
@@ -121,7 +137,11 @@
       "type": "cppvsdbg",
       "request": "launch",
       "preLaunchTask": "[Select] build (check)",
-      "program": "H:\\Sync\\Scripts\\Windows\\04a_tools\\nop.exe",
+      "program": "C:\\Windows\\System32\\cmd.exe",
+      "args": [
+        "/c",
+        "exit 0"
+      ],
       "stopAtEntry": false,
       "environment": [],
       "console": "integratedTerminal",

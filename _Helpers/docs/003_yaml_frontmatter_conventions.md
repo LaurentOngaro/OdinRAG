@@ -14,19 +14,23 @@ updatedBy: "MiniMax-M3 (Kilo Code)"
 **Goal**: standardise a minimal frontmatter, **Obsidian-compatible**, sufficient for RAG indexing (Kilo + LLM) without the complexity of TerraBloom (32+ hierarchical tags, `completion_*`, etc.).
 
 > For the full (reference) version, see the TerraBloom project.
-> For this project, we keep **5 main fields + Obsidian hierarchical tags**.
+> For this project, we enforce the **8 standard schema fields + Obsidian hierarchical tags** validated by `validateFrontmatter.py`.
 
 ## Recommended fields
 
-| Field      | Format                  | Example                           | Required?                 |
-| ---------- | ----------------------- | --------------------------------- | ------------------------- |
-| `title`    | string                  | `"Daily 2026-06-28 - Kilo setup"` | yes for personal notes    |
-| `date`     | ISO 8601 (`YYYY-MM-DD`) | `2026-06-28`                      | yes everywhere            |
-| `tags`     | array                   | `[OdinRAG, planning, daily]`      | yes everywhere            |
-| `type`     | enum (see list)         | `daily`                           | if applicable             |
-| `status`   | enum (see list)         | `active`                          | if applicable             |
-| `priority` | 1-3                     | `2`                               | optional                  |
-| `docId`    | string                  | `NAV_FM_001`                      | except for reference docs |
+| Field         | Format                  | Example                           | Required?                  |
+| ------------- | ----------------------- | --------------------------------- | -------------------------- |
+| `title`       | string                  | `"Folder structure reference"`    | yes everywhere             |
+| `date`        | ISO 8601 (`YYYY-MM-DD`) | `2026-07-01`                      | yes everywhere             |
+| `tags`        | array                   | `[OdinRAG, reference, structure]` | yes (must include OdinRAG) |
+| `type`        | enum (see list)         | `reference`                       | yes everywhere             |
+| `status`      | enum (see list)         | `active`                          | yes everywhere             |
+| `version`     | semver string           | `1.0.0`                           | yes everywhere             |
+| `lastUpdated` | ISO 8601 (`YYYY-MM-DD`) | `2026-07-05`                      | yes everywhere             |
+| `updatedBy`   | string                  | `"Laurent"` or agent name         | yes everywhere             |
+| `priority`    | 1-3                     | `2`                               | optional                   |
+| `docId`       | UPPER_SNAKE_CASE        | `NAV_FM_001`                      | optional                   |
+| `summary`     | string                  | `"Summary of document content"`   | optional                   |
 
 **Obsidian note**: Obsidian ignores fields it doesn't recognize and displays those it knows (`tags`, `aliases`, `cssclass`). Custom fields (`priority`, `docId`, etc.) don't break anything.
 

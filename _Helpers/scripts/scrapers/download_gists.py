@@ -31,7 +31,7 @@ except Exception:
 REPO_ROOT = Path(__file__).resolve().parents[3]
 AWESOME_MD = REPO_ROOT / "odin-knowledge-base" / "docs" / "official" / "awesome-odin.md"
 GISTS_DIR = REPO_ROOT / "code" / "gists"
-GISTS_README = GISTS_DIR / "README.md"
+GISTS_README = GISTS_DIR / "README - gists.md"
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from fixes.odin_format import format_path_if_odin  # noqa: E402
@@ -64,7 +64,7 @@ def existing_gist_mapping(gists_dir: Path) -> dict[str, Path]:
     if not gists_dir.is_dir():
         return mapping
     for p in gists_dir.iterdir():
-        if p.suffix.lower() not in (".odin", ".md") or p.name == "README.md":
+        if p.suffix.lower() not in (".odin", ".md") or p.name.startswith("README"):
             continue
         try:
             first_line = p.read_text(encoding="utf-8").split("\n")[0]

@@ -5,8 +5,7 @@ description: "Run a scraper (_Helpers/scripts/scrapers/scrape_*.py) with the rig
 
 # Run a scraper
 
-Skill for re-running one of the project's scrapers.
-All scrapers are **re-entrant**: an already exported file is skipped unless `--force` is passed.
+Skill for re-running one of the project's scrapers. All scrapers are **re-entrant**: an already exported file is skipped unless `--force` is passed.
 
 ## Overview
 

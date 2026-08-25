@@ -118,8 +118,8 @@ Three tiers (per the OdinRAG AGENTS.md):
 | 2    | `arena` (per-scene)  | Scene-stable data (entities, tilemaps) | One scene    |
 | 3    | `heap` (default)     | Save/load + permanent state            | Program-wide |
 
-See `odin-knowledge-base/courses/programvideogames/vertical-slice-and-dice-v10/rpg/088-26. Tracking Allocator.md`
-for the canonical reference (when present in the KB).
+See `odin-knowledge-base/courses/programvideogames/vertical-slice-and-dice-v10/rpg/088-26.
+Tracking Allocator.md` for the canonical reference (when present in the KB).
 
 ## 9. Linting rules
 

@@ -1,4 +1,4 @@
-# Odin Tooling - Canonical Source
+# README - Odin Tooling
 
 This directory is the **single source of truth** for Odin project tooling used across all projects in the OdinRAG workspace and its sibling Odin projects.
 
@@ -17,22 +17,21 @@ This directory is the **single source of truth** for Odin project tooling used a
                      no longer acts as a source)
 ```
 
-`_shared/odin_tooling/` is the **canonical mirror** for **all** tooling that should be identical across projects (JSON configs, build scripts, raddbg init file).
-The Odin Skeleton is now a consumer, not a source. Editing a file here and running `sync-tooling.ps1` propagates it everywhere.
+`_shared/odin_tooling/` is the **canonical mirror** for **all** tooling that should be identical across projects (JSON configs, build scripts). The Odin Skeleton is now a consumer, not a source. Editing a file here and running `sync-tooling.ps1` propagates it everywhere.
 
 ## Files in this directory
 
 | File                                 | Role                                           | Sync target                 |
 | ------------------------------------ | ---------------------------------------------- | --------------------------- |
+| `CODING_STYLE.md`                    | Coding conventions & style guide               | (reference)                 |
 | `odinfmt.json`                       | Formatter config (odinfmt)                     | project root                |
 | `ols.json`                           | LSP config (ols) + lint rules                  | project root                |
 | `_tools/build_and_run.bat`           | build + run + raddebugger wrapper              | `_tools/`                   |
 | `_tools/check_and_format.bat`        | CI pipeline: `odinfmt -w` + `odin check`       | `_tools/`                   |
 | `_tools/create_junctions.ps1`        | Creates `_refs/` junctions to Odin SDK         | `_tools/`                   |
-| `_tools/project.raddbg_project`      | RadDebugger initial project config             | `_tools/`                   |
+| `templates/`                         | Project template files                         | (see templates below)       |
 | `templates/TPL_tasks.json`           | VS Code tasks (use `${workspaceFolder}`)       | `.vscode/tasks.json` (seed) |
 | `templates/TPL_install_full_env.ps1` | Odin + BuildTools env installer (merged PVG00) | `_tools/` (seed)            |
-| `templates/TPL_project.raddbg_user`  | raddbg user config (default)                   | `_tools/` (seed)            |
 | `templates/TPL_README.md`            | tools folder README                            | `_tools/` (seed)            |
 | `sync-tooling.ps1`                   | One-way sync to all known projects             | (this dir)                  |
 | `README - Odin Tooling.md`           | This documentation                             | n/a                         |
@@ -50,13 +49,12 @@ Template files use the `TPL_` prefix instead of a `.template` extension. This ke
 
 ## Files seeded as templates (NOT overwritten by default)
 
-These come from `templates/TPL_*`. They are copied only if the destination does not exist locally. Use `-Force` to overwrite (with a per-file warning) - in particular, be careful with `project.raddbg_user` which is per-user.
+These come from `templates/TPL_*`. They are copied only if the destination does not exist locally. Use `-Force` to overwrite (with a per-file warning) - local customisations may be clobbered.
 
 | Source                               | Destination                   | Why seeded-only (not canonical)                            |
 | ------------------------------------ | ----------------------------- | ---------------------------------------------------------- |
 | `templates/TPL_tasks.json`           | `.vscode/tasks.json`          | VS Code tasks (per-project customisations possible)        |
 | `templates/TPL_install_full_env.ps1` | `_tools/install_full_env.ps1` | Script to bootstrap Odin + BuildTools on a new dev machine |
-| `templates/TPL_project.raddbg_user`  | `_tools/project.raddbg_user`  | Per-user RadDebugger config (custom breakpoints, layout)   |
 | `templates/TPL_README.md`            | `_tools/README.md`            | Short project-specific tools-folder documentation          |
 
 ### Force mode
@@ -64,7 +62,7 @@ These come from `templates/TPL_*`. They are copied only if the destination does 
 `sync-tooling.ps1 -Force` overwrites template files at the destination (canonical files are always overwritten, regardless of `-Force`). For each template file that already exists locally, a warning is printed **before** overwriting so you can spot project-local customisations being clobbered. Example output:
 
 ```
-! FORCE: overwriting existing _tools\project.raddbg_user - any project-local customisation will be LOST
+! FORCE: overwriting existing _tools\install_full_env.ps1 - any project-local customisation will be LOST
 ```
 
 Use with care.
@@ -106,7 +104,7 @@ No absolute Windows paths are baked into the synced files.
 For brand-new projects (no `_tools/` yet), the first sync will:
 
 - Seed canonical files (odinfmt.json, ols.json, tasks.json, the 4 mutualised `_tools/` files).
-- Seed template files (install_full_env.ps1, project.raddbg_user, README.md) since the destination does not exist.
+- Seed template files (install_full_env.ps1, README.md) since the destination does not exist.
 
 For existing projects, only the canonical files are overwritten; templates are skipped (local customisations preserved).
 
@@ -133,7 +131,7 @@ The flags used in `build_and_run.bat`, `check_and_format.bat`, `ols.json` and `t
 
 The following flags have been proposed in community discussions but **do not exist** in Odin as of `dev-2026-06` and are NOT used in the canonical tooling:
 
-- `-missing-blank-lines-between-procs` — does not exist. Style guide for blank lines is enforced by convention, not by tooling.
+- `-missing-blank-lines-between-procs` - does not exist. Style guide for blank lines is enforced by convention, not by tooling.
 
 If a future Odin version adds such a flag, update `_shared/odin_tooling/` first and re-run `sync-tooling.ps1`.
 

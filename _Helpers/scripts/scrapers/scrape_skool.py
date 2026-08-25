@@ -415,13 +415,13 @@ def _clean_md_titles(root: Path) -> tuple[int, int]:
 
 
 def _parse_simple_frontmatter(text: str) -> dict[str, str]:
-    """Parse a minimal ``--- key: value ---`` frontmatter.
+    """Parse a minimal `--- key: value ---` frontmatter.
 
-    Used only to read a handful of well-known keys (``Cours``, ``Module``,
-    ``ID``, ``Durée``) emitted by ``lesson_to_markdown``. No YAML lib:
+    Used only to read a handful of well-known keys (`Cours`, `Module`,
+    `ID`, `Durée`) emitted by `lesson_to_markdown`. No YAML lib:
     each line is split on the first colon and the value is stripped of
     surrounding quotes. Returns an empty dict if the file does not start
-    with ``---``.
+    with `---`.
     """
     fm: dict[str, str] = {}
     if not text.startswith("---"):
@@ -440,10 +440,10 @@ def _parse_simple_frontmatter(text: str) -> dict[str, str]:
 
 
 def _natural_sort_key(s: str) -> tuple:
-    """Return a sort key that orders strings naturally (``2 < 10``).
+    """Return a sort key that orders strings naturally (`2 < 10`).
 
-    Splits on digit runs; numeric tokens become ``(0, int)`` and string
-    tokens become ``(1, lowered_str)`` so the resulting tuple can be
+    Splits on digit runs; numeric tokens become `(0, int)` and string
+    tokens become `(1, lowered_str)` so the resulting tuple can be
     compared element-wise in Python 3 (no int/str cross-type compare).
     """
     parts = re.split(r"(\d+)", s)
@@ -457,16 +457,16 @@ def _natural_sort_key(s: str) -> tuple:
 
 
 def _build_course_readme_from_disk(course_dir: Path, course_name: str) -> tuple[str, int]:
-    """Rebuild the per-course ``README.md`` by scanning EVERY lesson on disk.
+    """Rebuild the per-course `README.md` by scanning EVERY lesson on disk.
 
     Independent of the current scrape run: a lesson is listed if its
-    ``.md`` file is present under ``course_dir``, regardless of whether it
-    was processed, skipped, or filtered out (``--lesson`` / ``--number``
-    / ``--skip-until``). Modules are read from each file's frontmatter
-    (``Module:``) and lessons are sorted naturally by filename within each
+    `.md` file is present under `course_dir`, regardless of whether it
+    was processed, skipped, or filtered out (`--lesson` / `--number`
+    / `--skip-until`). Modules are read from each file's frontmatter
+    (`Module:`) and lessons are sorted naturally by filename within each
     module.
 
-    Returns ``(markdown_text, total_lessons_found)``.
+    Returns `(markdown_text, total_lessons_found)`.
     """
     md_files = [
         p for p in course_dir.rglob("*.md") if p.name.lower() != "readme.md"
@@ -1625,10 +1625,10 @@ def export_course(
 def write_global_index(courses: list[dict], total: int):
     """Generate a global README for the whole knowledge base.
 
-    The ``Total`` line reflects the actual state of the disk, not just the
-    current run's counter, so a partial scrape (``--lesson`` /
-    ``--number`` / ``--skip-until``) doesn't make the global README report
-    a misleading number. ``total`` (lessons updated by this run) is shown
+    The `Total` line reflects the actual state of the disk, not just the
+    current run's counter, so a partial scrape (`--lesson` /
+    `--number` / `--skip-until`) doesn't make the global README report
+    a misleading number. `total` (lessons updated by this run) is shown
     as a secondary stat.
     """
     on_disk_total = sum(1 for p in OUTPUT_DIR.rglob("*.md") if p.name.lower() != "readme.md" and "support files" not in p.parts)

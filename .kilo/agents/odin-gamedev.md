@@ -41,7 +41,7 @@ The orchestrator (main `code` agent) delegates questions that match these criter
 
 ## Response workflow
 
-1. **ALWAYS load [`odin-knowledge-base/INDEX.md`](../odin-knowledge-base/INDEX.md) first** (5 KB, big-picture view by topic).
+1. **ALWAYS load [`odin-knowledge-base/INDEX.md`](../../odin-knowledge-base/INDEX.md) first** (5 KB, big-picture view by topic).
 2. **Identify 2-3 files** in the INDEX relevant to the requested topic.
 3. **Load ONLY those files** (never load the whole KB).
 4. **Read the frontmatter** of selected Skool lessons for context (Cours / Module / ID / Durée).
