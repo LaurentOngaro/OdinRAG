@@ -14,7 +14,7 @@ Pre-push audit for the `public` branch of OdinRAG. The repo uses a **single-repo
 - **Before any push** to the `public` remote (`git push public public`).
 - Before sharing a `git bundle` of the local repo.
 - Before mirroring on another platform (GitLab, Codeberg, etc.).
-- After adding a **new scraping source** (update `SOURCES.md`, `.gitignore`, `.git/info/exclude`, `audit_public_safety.py` `FORBIDDEN_PATTERNS`, and `refresh_public_branch.py` `STRIP_RULES`).
+- After adding a **new scraping source** (update `SOURCES.md`, `.gitignore`, `.git/info/exclude`, `audit_public_safety.py` `FORBIDDEN_PATTERNS`, and `publish_public.py` `STRIP_RULES`).
 - After adding a **new personal project folder** under `code/projects/` (update `.git/info/exclude` and the two scripts above).
 
 ## The 3 MUST-PASS conditions
@@ -49,15 +49,14 @@ Expected output: `[OK] Public safety audit (branch): clean`.
 The audit checks `refs/heads/public`, which is a filtered view of `main`. If you added new personal content since the last refresh, regenerate the branch first:
 
 ```bash
-python _Helpers/scripts/diagnostic/refresh_public_branch.py --verify
-# --verify also re-runs the audit immediately after
+python _Helpers/scripts/diagnostic/publish_public.py --check
 ```
 
 `filter-branch` refuses a dirty working tree. If needed:
 
 ```bash
 git stash push -u -m "wip-refresh"
-python _Helpers/scripts/diagnostic/refresh_public_branch.py --verify
+python _Helpers/scripts/diagnostic/publish_public.py --check
 git stash pop
 ```
 
@@ -65,7 +64,7 @@ git stash pop
 
 | Leak                                                | Cause                                | Fix                                                                                                       |
 | --------------------------------------------------- | ------------------------------------ | --------------------------------------------------------------------------------------------------------- |
-| `_Private/planning/daily/J_2026-XX-XX.md`           | Not in `.git/info/exclude`           | Add to `.git/info/exclude` + re-run `refresh_public_branch.py`                                            |
+| `_Private/planning/daily/J_2026-XX-XX.md`           | Not in `.git/info/exclude`           | Add to `.git/info/exclude` + re-run `publish_public.py --check`                                           |
 | `odin-knowledge-base/courses/programvideogames/...` | Paywalled content                    | Tracked in `main` only, stripped from `public` branch - verify with `--verbose`                           |
 | `_Private/.config/skool_credentials.txt`            | Credentials file accidentally staged | `git rm --cached` + verify `/_Private/.config/` is in `.gitignore` (doubly protected)                     |
 | `code/projects/PVG03_RPG/`                          | Personal project folder              | Tracked in `main` only, stripped from `public` branch - add to `.git/info/exclude` + update `STRIP_RULES` |

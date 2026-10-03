@@ -420,7 +420,7 @@ def detect_large_struct_mixed_access(
     for name, line_no, _end, fields in struct_blocks:
         totals = len(fields)
         procs_touching_small = 0
-        for proc_name, accessed in field_access_per_proc:
+        for _proc_name, accessed in field_access_per_proc:
             overlap = len(accessed & set(fields))
             if overlap and overlap / totals < 0.4:
                 procs_touching_small += 1
@@ -545,7 +545,6 @@ def _lesson_exists(lesson_id: str, file_path: Path, *, kb_root: Path | None) -> 
     for cand in candidates:
         if cand.exists():
             return True
-    normalised = str(kb_root).replace("\\", "/")
     for parent in kb_root.rglob(f"*{lesson_id}*"):
         parent_norm = str(parent).replace("\\", "/")
         if any(marker in parent_norm for marker in _KB_ROOT_MARKERS):

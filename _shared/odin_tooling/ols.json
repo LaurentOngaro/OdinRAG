@@ -3,15 +3,15 @@
   "collections": [
     {
       "name": "core",
-      "path": "_refs\\core"
+      "path": "_refs/core"
     },
     {
       "name": "examples",
-      "path": "_refs\\examples"
+      "path": "_refs/examples"
     },
     {
       "name": "vendor",
-      "path": "_refs\\vendor"
+      "path": "_refs/vendor"
     }
   ],
   "enable_format": true,
@@ -45,6 +45,48 @@
     {
       "name": "root_folder_profile",
       "os": "windows",
+      "checker_path": [
+        "."
+      ]
+    },
+    {
+      "name": "src_folder_profile",
+      "os": "linux",
+      "checker_path": [
+        "src"
+      ]
+    },
+    {
+      "name": "source_folder_profile",
+      "os": "linux",
+      "checker_path": [
+        "source"
+      ]
+    },
+    {
+      "name": "root_folder_profile",
+      "os": "linux",
+      "checker_path": [
+        "."
+      ]
+    },
+    {
+      "name": "src_folder_profile",
+      "os": "darwin",
+      "checker_path": [
+        "src"
+      ]
+    },
+    {
+      "name": "source_folder_profile",
+      "os": "darwin",
+      "checker_path": [
+        "source"
+      ]
+    },
+    {
+      "name": "root_folder_profile",
+      "os": "darwin",
       "checker_path": [
         "."
       ]

@@ -36,13 +36,11 @@ import argparse
 import sys
 import time
 from pathlib import Path
-from urllib.parse import urljoin, urlparse
 
 # Allow importing the _Helpers/lib package
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from lib.http_client import (  # noqa: E402
     crawl_links,
-    fetch,
     slug_from_url,
 )
 from lib.html2md import scrape_to_markdown  # noqa: E402
@@ -171,7 +169,7 @@ def main(argv: list[str] | None = None) -> int:
             print(f"          [OK] {slug}.md")
             scraped += 1
         else:
-            print(f"          [FAIL]")
+            print("          [FAIL]")
             failed += 1
         time.sleep(REQUEST_DELAY)
 
@@ -180,7 +178,7 @@ def main(argv: list[str] | None = None) -> int:
     print("\n" + "=" * 60)
     print(f"  {scraped} new, {skipped} already present, {failed} failures")
     print(f"  Total: {len(urls)} targeted entries ({source})")
-    print(f"  README generated")
+    print("  README generated")
     print(f"  -> {OUT}")
     print("=" * 60)
     return 0 if failed == 0 else 2

@@ -55,7 +55,18 @@ echo.
 
 :: we don't use the full path to the odin compiler because we want to use the one in the PATH
 set buildCommand=odin
-set buildOptions=-thread-count:14 -vet-unused -vet-unused-variables -vet-unused-imports -vet-shadowing -vet-style -vet-semicolon -vet-cast -use-separate-modules
+
+:: Derive the worker count from the host instead of hardcoding it, mirroring
+:: build_and_run.sh. Set ODIN_JOB_COUNT=1 for deterministic single-threaded
+:: output ordering when bisecting a build problem.
+if defined ODIN_JOB_COUNT (
+    set "jobCount=%ODIN_JOB_COUNT%"
+) else (
+    set "jobCount=%NUMBER_OF_PROCESSORS%"
+    if not defined jobCount set "jobCount=1"
+)
+
+set buildOptions=-thread-count:!jobCount! -vet-unused -vet-unused-variables -vet-unused-imports -vet-shadowing -vet-style -vet-semicolon -vet-cast -use-separate-modules
 :: additional build options here
 :: set buildOptions=%buildOptions% -show-timings
 :: Resolve raddbg.exe portably:

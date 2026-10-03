@@ -1,14 +1,9 @@
 {
   // Run/Debug for any Odin sub-project under code/projects/<project>/.
   //
-  // Mirrors the 6 configurations exposed in code/projects/PVG03_RPG/.vscode/launch.json
-  // (Build Source (debug), build_and_run Source (debug),
-  //  build_and_run Source (release), build_and_run Src (debug), build_and_run Source (Raddebug))
-  // plus a [DIAG] Check-only entry, so you can hit F5 from the OdinRAG root workspace
-  // just like from the child workspace.
-  //
-  // For per-project fidelity (assets, deps, .gitignore, Raddebugger integration)
-  // open the child directly via `code projects/PVG03_RPG/project.code-workspace`.
+  // Mirrors the configurations exposed in
+  // code/projects/PVG03_RPG/.vscode/launch.json so you can hit F5 from the
+  // OdinRAG root workspace just like from the child workspace.
   //
   // IMPORTANT - no `${input:odinProject}` here:
   //   Using a pickString inside a `program` field combined with a `preLaunchTask`
@@ -18,134 +13,187 @@
   //   duplicate this file (or these configurations) under
   //   code/projects/<ProjectName>/.vscode/launch.json and replace PVG03_RPG.
   //
-  // Variable mapping vs the child launch.json:
-  //   ${workspaceFolder}             -> ${workspaceFolder}/code/projects/PVG03_RPG
-  //   ${workspaceFolderBasename}     -> PVG03_RPG
+  // [WIN] / [LIN] PREFIX CONVENTION
+  //   [WIN] ...   cppvsdbg, the Visual Studio debugger (Windows only).
+  //   [LIN] ...   cppdbg + MIMode gdb (Linux/macOS).
+  //
+  //   Each configuration points at the task of the SAME family in
+  //   .vscode/tasks.json, so the build command matches the host: powershell ->
+  //   odin_task.ps1 -> _tools/build_and_run.bat on Windows, pwsh ->
+  //   odin_task.ps1 -> _tools/build_and_run.sh on POSIX.
+  //
+  //   These are no-ops (`noDebug`) on purpose: the task already runs the binary
+  //   (odin_task.ps1 -Mode run-*), so attaching a second process would conflict.
+  //   For real breakpoints, open the child project workspace and use its own
+  //   [LIN] configuration, which points `program` at the binary.
   "version": "0.2.0",
   "configurations": [
-    {
-      "name": "[BUILD+RUN] odin_task (debug)",
-      "type": "cppvsdbg",
-      "request": "launch",
-      "preLaunchTask": "[BUILD+RUN] odin_task (debug)",
-      "program": "C:\\Windows\\System32\\cmd.exe",
-      "args": [
-        "/c",
-        "pause"
-      ],
-      "internalConsoleOptions": "neverOpen",
-      "suppressMultipleSessionWarning": true,
-      "environment": [],
-      "cwd": "${workspaceFolder}"
-    },
-    {
-      "name": "[BUILD+RUN] odin_task (release)",
-      "type": "cppvsdbg",
-      "request": "launch",
-      "preLaunchTask": "[BUILD+RUN] odin_task (release)",
-      "program": "C:\\Windows\\System32\\cmd.exe",
-      "args": [
-        "/c",
-        "pause"
-      ],
-      "internalConsoleOptions": "neverOpen",
-      "suppressMultipleSessionWarning": true,
-      "environment": [],
-      "cwd": "${workspaceFolder}"
-    },
-    {
-      // Raddebugger-only: no cppvsdbg attach. The preLaunchTask already opens RAD
-      // Debugger (EpicGames/raddebugger) on the binary in a detached process.
-      // Here we only emit a no-op launch (`noDebug: true`) so VS Code clears its
-      // preLaunchTask state without spawning a second debugger that would
-      // conflict with raddbg.exe.
-      "name": "[BUILD] odin_task (Debug + Raddebugger)",
-      "type": "cppvsdbg",
-      "request": "launch",
-      "preLaunchTask": "[BUILD] odin_task (Debug + Raddebugger)",
-      "program": "C:\\Windows\\System32\\cmd.exe",
-      "args": [
-        "/c",
-        "exit 0"
-      ],
-      "stopAtEntry": false,
-      "environment": [],
-      "console": "integratedTerminal",
-      "cwd": "${workspaceFolder}"
-    },
-    {
-      "name": "[DIAG] Odin: Check (vet only) - then attach",
-      "type": "cppvsdbg",
-      "request": "launch",
-      "preLaunchTask": "[DEV] odin_task Check Source folder",
-      "program": "C:\\Windows\\System32\\cmd.exe",
-      "args": [
-        "/c",
-        "exit 0"
-      ],
-      "stopAtEntry": false,
-      "environment": [],
-      "console": "integratedTerminal",
-      "cwd": "${workspaceFolder}"
-    },
-    // =====================================================================
-    // FAMILY B - [Select] configs
-    // =====================================================================
-    // Project is picked via the pvProjectDir pickstring (declared in tasks.json).
-    // Each [Select] * config here points to a SINGLE [Select] * task per mode
-    // (e.g. "[Select] build (debug)"). The pickstring is shared by all 5
-    // [Select] tasks, so changing the picked project switches all modes at once.
-    //
-    // There is ONE task per mode, NOT one task per (project, mode) combination.
-    // The pickstring picks the project, the mode is in the label.
-    //
-    // To add a new sub-project: append the new path to the `options` array in
-    // the inputs section in tasks.json. No duplication needed in launch.json.
-    // =====================================================================
-    {
-      "name": "[Select] build (debug)",
-      "type": "cppvsdbg",
-      "request": "launch",
-      "preLaunchTask": "[Select] build (debug)",
-      "program": "C:\\Windows\\System32\\cmd.exe",
-      "args": [
-        "/c",
-        "exit 0"
-      ],
-      "stopAtEntry": false,
-      "environment": [],
-      "console": "integratedTerminal",
-      "cwd": "${workspaceFolder}"
-    },
-    {
-      "name": "[Select] build (release)",
-      "type": "cppvsdbg",
-      "request": "launch",
-      "preLaunchTask": "[Select] build (release)",
-      "program": "C:\\Windows\\System32\\cmd.exe",
-      "args": [
-        "/c",
-        "exit 0"
-      ],
-      "stopAtEntry": false,
-      "environment": [],
-      "console": "integratedTerminal",
-      "cwd": "${workspaceFolder}"
-    },
-    {
-      "name": "[Select] build (check)",
-      "type": "cppvsdbg",
-      "request": "launch",
-      "preLaunchTask": "[Select] build (check)",
-      "program": "C:\\Windows\\System32\\cmd.exe",
-      "args": [
-        "/c",
-        "exit 0"
-      ],
-      "stopAtEntry": false,
-      "environment": [],
-      "console": "integratedTerminal",
-      "cwd": "${workspaceFolder}"
-    }
+  {
+    "name": "[WIN] [BUILD+RUN] odin_task (debug)",
+    "type": "cppvsdbg",
+    "request": "launch",
+    "preLaunchTask": "[WIN] [BUILD+RUN] odin_task (debug)",
+    "program": "C:\\Windows\\System32\\cmd.exe",
+    "args": [
+      "/c",
+      "pause"
+    ],
+    "internalConsoleOptions": "neverOpen",
+    "suppressMultipleSessionWarning": true,
+    "cwd": "${workspaceFolder}"
+  },
+  {
+    "name": "[LIN] [BUILD+RUN] odin_task (debug)",
+    "type": "cppdbg",
+    "request": "launch",
+    "preLaunchTask": "[LIN] [BUILD+RUN] odin_task (debug)",
+    "program": "/bin/true",
+    "args": [],
+    "cwd": "${workspaceFolder}",
+    "MIMode": "gdb",
+    "suppressMultipleSessionWarning": true,
+    "internalConsoleOptions": "neverOpen"
+  },
+  {
+    "name": "[WIN] [BUILD+RUN] odin_task (release)",
+    "type": "cppvsdbg",
+    "request": "launch",
+    "preLaunchTask": "[WIN] [BUILD+RUN] odin_task (release)",
+    "program": "C:\\Windows\\System32\\cmd.exe",
+    "args": [
+      "/c",
+      "pause"
+    ],
+    "internalConsoleOptions": "neverOpen",
+    "suppressMultipleSessionWarning": true,
+    "cwd": "${workspaceFolder}"
+  },
+  {
+    "name": "[LIN] [BUILD+RUN] odin_task (release)",
+    "type": "cppdbg",
+    "request": "launch",
+    "preLaunchTask": "[LIN] [BUILD+RUN] odin_task (release)",
+    "program": "/bin/true",
+    "args": [],
+    "cwd": "${workspaceFolder}",
+    "MIMode": "gdb",
+    "suppressMultipleSessionWarning": true,
+    "internalConsoleOptions": "neverOpen"
+  },
+  {
+    "name": "[WIN] [BUILD] odin_task (Debug + Raddebugger)",
+    "type": "cppvsdbg",
+    "request": "launch",
+    "preLaunchTask": "[WIN] [BUILD] odin_task (Debug + Raddebugger)",
+    "program": "C:\\Windows\\System32\\cmd.exe",
+    "args": [
+      "/c",
+      "exit 0"
+    ],
+    "cwd": "${workspaceFolder}"
+  },
+  {
+    "name": "[LIN] [BUILD] odin_task (Debug + Raddebugger)",
+    "type": "cppdbg",
+    "request": "launch",
+    "preLaunchTask": "[LIN] [BUILD] odin_task (Debug + Raddebugger)",
+    "program": "/bin/true",
+    "args": [],
+    "cwd": "${workspaceFolder}",
+    "MIMode": "gdb",
+    "suppressMultipleSessionWarning": true
+  },
+  {
+    "name": "[WIN] [DIAG] Odin: Check (vet only) - then attach",
+    "type": "cppvsdbg",
+    "request": "launch",
+    "preLaunchTask": "[WIN] [DEV] odin_task Check Source folder",
+    "program": "C:\\Windows\\System32\\cmd.exe",
+    "args": [
+      "/c",
+      "exit 0"
+    ],
+    "cwd": "${workspaceFolder}"
+  },
+  {
+    "name": "[LIN] [DIAG] Odin: Check (vet only) - then attach",
+    "type": "cppdbg",
+    "request": "launch",
+    "preLaunchTask": "[LIN] [DEV] odin_task Check Source folder",
+    "program": "/bin/true",
+    "args": [],
+    "cwd": "${workspaceFolder}",
+    "MIMode": "gdb",
+    "suppressMultipleSessionWarning": true
+  },
+  {
+    "name": "[WIN] [Select] build (debug)",
+    "type": "cppvsdbg",
+    "request": "launch",
+    "preLaunchTask": "[WIN] [Select] build (debug)",
+    "program": "C:\\Windows\\System32\\cmd.exe",
+    "args": [
+      "/c",
+      "exit 0"
+    ],
+    "cwd": "${workspaceFolder}"
+  },
+  {
+    "name": "[LIN] [Select] build (debug)",
+    "type": "cppdbg",
+    "request": "launch",
+    "preLaunchTask": "[LIN] [Select] build (debug)",
+    "program": "/bin/true",
+    "args": [],
+    "cwd": "${workspaceFolder}",
+    "MIMode": "gdb",
+    "suppressMultipleSessionWarning": true
+  },
+  {
+    "name": "[WIN] [Select] build (release)",
+    "type": "cppvsdbg",
+    "request": "launch",
+    "preLaunchTask": "[WIN] [Select] build (release)",
+    "program": "C:\\Windows\\System32\\cmd.exe",
+    "args": [
+      "/c",
+      "exit 0"
+    ],
+    "cwd": "${workspaceFolder}"
+  },
+  {
+    "name": "[LIN] [Select] build (release)",
+    "type": "cppdbg",
+    "request": "launch",
+    "preLaunchTask": "[LIN] [Select] build (release)",
+    "program": "/bin/true",
+    "args": [],
+    "cwd": "${workspaceFolder}",
+    "MIMode": "gdb",
+    "suppressMultipleSessionWarning": true
+  },
+  {
+    "name": "[WIN] [Select] build (check)",
+    "type": "cppvsdbg",
+    "request": "launch",
+    "preLaunchTask": "[WIN] [Select] build (check)",
+    "program": "C:\\Windows\\System32\\cmd.exe",
+    "args": [
+      "/c",
+      "exit 0"
+    ],
+    "cwd": "${workspaceFolder}"
+  },
+  {
+    "name": "[LIN] [Select] build (check)",
+    "type": "cppdbg",
+    "request": "launch",
+    "preLaunchTask": "[LIN] [Select] build (check)",
+    "program": "/bin/true",
+    "args": [],
+    "cwd": "${workspaceFolder}",
+    "MIMode": "gdb",
+    "suppressMultipleSessionWarning": true
+  }
   ]
 }

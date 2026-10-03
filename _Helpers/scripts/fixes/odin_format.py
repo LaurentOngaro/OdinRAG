@@ -33,15 +33,30 @@ Exposes two functions that the scrapers call after writing `.md` or
 from __future__ import annotations
 
 import re
+import shutil
 import subprocess
 import sys
 from pathlib import Path
 
+# Allow importing lib.user_config when executed directly or imported
+_SCRIPTS_DIR = Path(__file__).resolve().parents[1]
+if str(_SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(_SCRIPTS_DIR))
+
 from lib.user_config import env_or_config
 
 # ─── CONFIG ───────────────────────────────────────────────────────────────────
-ODINFMT_EXE   = Path(env_or_config("paths.odinfmt_exe", "ODINFMT_EXE"))
-ODINFMT_CONFIG = Path(__file__).resolve().parents[3] / "odinfmt.json"
+_cfg_exe = env_or_config("paths.odinfmt_exe", "ODINFMT_EXE")
+if _cfg_exe:
+    ODINFMT_EXE = Path(_cfg_exe)
+elif shutil.which("odinfmt"):
+    ODINFMT_EXE = Path(shutil.which("odinfmt") or "")
+else:
+    ODINFMT_EXE = Path("")
+
+_root_config = Path(__file__).resolve().parents[3] / "odinfmt.json"
+_shared_config = Path(__file__).resolve().parents[3] / "_shared" / "odin_tooling" / "odinfmt.json"
+ODINFMT_CONFIG = _root_config if _root_config.is_file() else _shared_config
 MAX_FILE_BYTES = 5 * 1024 * 1024
 
 # odinfmt expects the `-config=PATH` syntax (single-dash, attached value).

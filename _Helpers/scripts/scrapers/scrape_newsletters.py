@@ -43,8 +43,6 @@ from urllib.parse import urljoin, urlparse
 # Allow importing the `_Helpers/lib` package from the archive.
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from lib.http_client import (  # noqa: E402
-    DEFAULT_HEADERS,
-    DEFAULT_TIMEOUT,
     crawl_links,
     fetch,
     normalize_url,
@@ -220,7 +218,7 @@ def main(argv: list[str] | None = None) -> int:
             print(f"          [OK] {slug}.md")
             scraped += 1
         else:
-            print(f"          [FAIL]")
+            print("          [FAIL]")
             failed += 1
         time.sleep(REQUEST_DELAY)
 

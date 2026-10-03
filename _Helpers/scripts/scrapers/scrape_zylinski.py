@@ -155,7 +155,7 @@ def main(argv: list[str] | None = None) -> int:
             print(f"          [OK] {slug}.md")
             scraped += 1
         else:
-            print(f"          [FAIL]")
+            print("          [FAIL]")
             failed += 1
         time.sleep(REQUEST_DELAY)
 

@@ -70,7 +70,7 @@ def scan_and_fix(root: Path, apply: bool) -> tuple[int, int, int]:
             continue
 
         rel = path.relative_to(root)
-        diff_chars = sum(1 for a, b in zip(original, repaired) if a != b)
+        diff_chars = sum(1 for a, b in zip(original, repaired, strict=False) if a != b)
         diff_chars += abs(len(repaired) - len(original))
         print(f"  [FIX] {rel}  ({diff_chars} char(s) modified)")
         fixed += 1

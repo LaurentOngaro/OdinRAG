@@ -1,6 +1,6 @@
 ---
 title: "OdinKB - Semantic index"
-date: 2026-08-25
+date: 2026-10-03
 tags: [OdinRAG, kb, doc/index, reference]
 type: reference
 status: active
@@ -19,21 +19,25 @@ summary: "Compact index (~5 KB) to navigate the ~180 files of the Odin KB withou
 
 | Source                                              | Files | Format                                                                                      | Why                                                   |
 | --------------------------------------------------- | ----- | ------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
-| `odin-knowledge-base/`                              | 114   | Skool 'programvideogames' lessons (Markdown with frontmatter)                               | Concrete implementation, complete code, game patterns |
+| `odin-knowledge-base/courses/`                      | 127   | Skool 'programvideogames' lessons (Markdown with frontmatter)                               | Concrete implementation, complete code, game patterns |
 | `odin-knowledge-base/docs/karl_zylinski/odin-book/` | 34    | Karl's book **'Understanding the Odin Programming Language'** split into 1 file per chapter | Language reference, pure concept, minimal example     |
 | `odin-knowledge-base/docs/karl_zylinski/*.md`       | 20    | Karl Zylinski blog articles                                                                 | Game dev patterns, opinions, hot take                 |
-| `odin-knowledge-base/docs/official/`                | 35    | Official odin-lang.org docs + awesome-odin                                                  | Official language reference                           |
+| `odin-knowledge-base/docs/official/`                | 38    | Official odin-lang.org docs + awesome-odin                                                  | Official language reference                           |
 | `odin-knowledge-base/gitIngest/`                    | 21    | gitingest snapshots of local Odin repo clones (karl_zylinski, falconerd, odin-lang)         | Fallback context layer when MCP GitHub is unavailable |
 | `code/examples/demo.odin`                           | 1     | Official language demo                                                                      | Exhaustive feature reference                          |
 
-**Total**: ~225 files, ~8 MB of MD.
+**Total**: ~241 files, ~8 MB of MD.
 
 ## Skool courses (programvideogames)
 
 See the detail in [`courses/programvideogames/README.md`](courses/programvideogames/README.md).
 
-- **programvideogames** (1 lessons) - [`courses/programvideogames/README.md`](courses/programvideogames/README.md)
-  - `vertical-slice-and-dice-v10/`: 1 lessons
+- **metroidvania-10** (9 lessons) - [`courses/programvideogames/metroidvania-10/README.md`](courses/programvideogames/metroidvania-10/README.md)
+  - `introduction/`: 9 lessons
+- **vertical-slice-and-dice-v10** (115 lessons) - [`courses/programvideogames/vertical-slice-and-dice-v10/README.md`](courses/programvideogames/vertical-slice-and-dice-v10/README.md)
+  - `introduction/`: 10 lessons
+  - `metroidvania/`: 53 lessons
+  - `rpg/`: 52 lessons
 
 > Every lesson has `Cours:` `Module:` `ID:` `Durée:` frontmatter (see `_Helpers/docs/003_yaml_frontmatter_conventions.md`).
 > For the full TOC per chapter, open the module's `README.md`.
@@ -76,10 +80,10 @@ See the detail in [`courses/programvideogames/README.md`](courses/programvideoga
 
 ## Statistics
 
-- **114** Skool lessons (Vertical Slice and Dice v1.0 + Metroidvania 1.0)
+- **127** Skool files (Vertical Slice and Dice v1.0 + Metroidvania 1.0)
 - **34** Karl book files (28 chapters + 4 appendices + about-author)
 - **20** Zylinski articles
-- **35** official odin-lang.org docs
+- **38** official odin-lang.org docs
 - **1** official demo (`code/examples/demo.odin`)
 
 ## Skill to navigate

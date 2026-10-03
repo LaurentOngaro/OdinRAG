@@ -201,10 +201,10 @@ def main(argv: list[str] | None = None) -> int:
     new_readme = _generate_readme(present_files)
 
     if not args.force and readme_path.exists() and readme_path.read_text(encoding="utf-8") == new_readme:
-        print(f"\n  [SKIP] README - examples.md - unchanged")
+        print("\n  [SKIP] README - examples.md - unchanged")
     else:
         readme_path.write_text(new_readme, encoding="utf-8")
-        print(f"\n  [OK] README - examples.md updated")
+        print("\n  [OK] README - examples.md updated")
 
     print("\n" + "=" * 60)
     print(f"  {downloaded} downloaded, {skipped} already present, {failed} failures")

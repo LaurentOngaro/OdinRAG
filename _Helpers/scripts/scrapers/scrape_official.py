@@ -31,20 +31,22 @@ Exit codes:
     1   no page discovered (all strategies exhausted)
     2   partial success (at least one page failed)
 """
+import argparse
+from pathlib import Path
 import sys
 import time
-from pathlib import Path
-import argparse
+
+try:
+    sys.stdout.reconfigure(encoding="utf-8")  # type: ignore[attr-defined]
+except Exception:
+    pass
 
 # Allow importing the `_Helpers/lib` package from the archive.
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from lib.http_client import (  # noqa: E402
-    DEFAULT_HEADERS,
-    DEFAULT_TIMEOUT,
     crawl_links,
     discover_via_sitemap,
     fetch,
-    normalize_url,
     path_to_filename,
 )
 from lib.html2md import scrape_to_markdown  # noqa: E402
@@ -74,7 +76,7 @@ FALLBACK_PAGES: list[str] = [
     "/docs/faq/", "/docs/guidelines/", "/docs/statements-and-declarations/",
     "/docs/types/", "/docs/procedures/", "/docs/control-flow/",
     "/docs/expressions/", "/docs/attributes/", "/docs/directives/",
-    "/docs/builtin/", "/docs/changelog/",
+    "/docs/builtin/", "/docs/changelog/", "/spec/", "/spec/grammar/",
 ]
 # ──────────────────────────────────────────────────────────────────────────────
 
@@ -96,9 +98,20 @@ def discover_all() -> list[str]:
     pages = discover_via_sitemap(
         SITEMAP_URL, base_host=BASE_URL, path_prefix="/docs/",
     )
-    if pages:
-        print(f"  [+] {len(pages)} pages via sitemap.xml")
-        return pages
+    spec_pages = discover_via_sitemap(
+        SITEMAP_URL, base_host=BASE_URL, path_prefix="/spec/",
+    )
+    if pages or spec_pages:
+        all_pages: list[str] = []
+        seen: set[str] = set()
+        for p in (pages or []) + (spec_pages or []):
+            if p not in seen:
+                seen.add(p)
+                all_pages.append(p)
+        if f"{BASE_URL}/spec/" in seen:
+            all_pages = [p for p in all_pages if p != f"{BASE_URL}/docs/spec/"]
+        print(f"  [+] {len(all_pages)} pages via sitemap.xml")
+        return all_pages
 
     print("  [i] sitemap unavailable, crawling /docs/...")
     pages = discover_via_index(DOCS_INDEX)
@@ -159,7 +172,7 @@ def main(argv: list[str] | None = None) -> int:
             print(f"          [OK] {filename}")
             scraped += 1
         else:
-            print(f"          [FAIL]")
+            print("          [FAIL]")
             failed += 1
         time.sleep(REQUEST_DELAY)
 

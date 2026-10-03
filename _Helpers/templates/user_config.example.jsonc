@@ -37,7 +37,10 @@
     // Where you clone + build Odin projects (this repo is NOT a build target).
     "external_odin_projects_dir": "",
     // Env var: ODINRAG_TEMP
-    "temp_dir": ""
+    "temp_dir": "",
+    // Env var: ODIN_SYNC_TARGETS
+    // Project root paths to sync tooling to via _shared/odin_tooling/sync-tooling.ps1
+    "sync_targets": []
   },
 
   "skool": {

@@ -15,6 +15,7 @@ Centralises the duplicated code from `scrape-official.py` and
 from __future__ import annotations
 
 import sys
+import urllib.parse
 from pathlib import Path
 
 from bs4 import BeautifulSoup
@@ -52,6 +53,7 @@ def scrape_to_markdown(
     source_url: str | None = None,
     prefer_tags: tuple[str, ...] = ("article", "main"),
     format_odin: bool = True,
+    _redirect_depth: int = 0,
 ) -> bool:
     """Download `url`, convert to Markdown, write into `output_path`.
 
@@ -65,18 +67,46 @@ def scrape_to_markdown(
     Returns:
         `True` on success, `False` on failure (non-200 HTTP, empty content).
     """
+    if _redirect_depth > 3:
+        return False
+
     source_url = source_url or url
     resp = fetch(url)
     if not resp or resp.status_code != 200:
         return False
 
     soup = BeautifulSoup(resp.text, "html.parser")
+
+    # Detect meta-refresh and follow the destination
+    meta_refresh = soup.find(
+        "meta",
+        attrs={"http-equiv": lambda v: bool(v and v.strip().lower() == "refresh")},
+    )
+    if meta_refresh and meta_refresh.get("content"):
+        content = str(meta_refresh.get("content", ""))
+        if "url=" in content.lower():
+            target = content.lower().split("url=", 1)[1].strip(" '\"")
+            next_url = urllib.parse.urljoin(url, target)
+            if next_url != url:
+                return scrape_to_markdown(
+                    next_url,
+                    output_path,
+                    source_url=next_url,
+                    prefer_tags=prefer_tags,
+                    format_odin=format_odin,
+                    _redirect_depth=_redirect_depth + 1,
+                )
+
     container = next((soup.find(tag) for tag in prefer_tags if soup.find(tag)), soup.body, )
     if container is None:
         return False
 
     markdown = html_to_markdown(str(container))
     if not markdown:
+        return False
+
+    # Guard against stub redirect pages when meta refresh was missed
+    if markdown.strip().startswith("Please click this [link]") and len(markdown.strip()) < 300:
         return False
 
     output_path = Path(output_path)

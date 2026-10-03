@@ -33,7 +33,10 @@ try:
 except Exception:
     pass
 
-# Allow importing odin_format from the same folder.
+# Allow importing lib and odin_format
+_SCRIPTS_DIR = Path(__file__).resolve().parents[1]
+if str(_SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(_SCRIPTS_DIR))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from odin_format import (  # noqa: E402
     MAX_FILE_BYTES,

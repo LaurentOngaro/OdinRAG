@@ -148,6 +148,22 @@ def has_markers(text: str) -> bool:
     return AUTO_START in text and MANUAL_START in text
 
 
+def format_markdown_table(headers: list[str], rows: list[list[str]]) -> list[str]:
+    """Format an aligned markdown table."""
+    widths = [len(h) for h in headers]
+    for row in rows:
+        for i, cell in enumerate(row):
+            if i < len(widths):
+                widths[i] = max(widths[i], len(cell))
+    header_line = "| " + " | ".join(h.ljust(widths[i]) for i, h in enumerate(headers)) + " |"
+    separator_line = "| " + " | ".join("-" * widths[i] for i in range(len(headers))) + " |"
+    table_lines = [header_line, separator_line]
+    for row in rows:
+        line = "| " + " | ".join(cell.ljust(widths[i]) for i, cell in enumerate(row)) + " |"
+        table_lines.append(line)
+    return table_lines
+
+
 # ─── AUTO SECTION BUILDERS ────────────────────────────────────────────────────
 def build_source_overview() -> str:
     """Section 'Overview by source' with file count + size."""
@@ -167,17 +183,56 @@ def build_source_overview() -> str:
             return f"{n // 1024} KB"
         return f"{n // (1024 * 1024)} MB"
 
+    headers = ["Source", "Files", "Format", "Why"]
+    rows = [
+        [
+            "`odin-knowledge-base/courses/`",
+            str(skool_count),
+            "Skool 'programvideogames' lessons (Markdown with frontmatter)",
+            "Concrete implementation, complete code, game patterns",
+        ],
+        [
+            "`odin-knowledge-base/docs/karl_zylinski/odin-book/`",
+            str(karl_count),
+            "Karl's book **'Understanding the Odin Programming Language'** split into 1 file per chapter",
+            "Language reference, pure concept, minimal example",
+        ],
+        [
+            "`odin-knowledge-base/docs/karl_zylinski/*.md`",
+            str(zyl_count),
+            "Karl Zylinski blog articles",
+            "Game dev patterns, opinions, hot take",
+        ],
+        [
+            "`odin-knowledge-base/docs/official/`",
+            str(off_count),
+            "Official odin-lang.org docs + awesome-odin",
+            "Official language reference",
+        ],
+        [
+            "`odin-knowledge-base/gitIngest/`",
+            str(gi_count),
+            "gitingest snapshots of local Odin repo clones (karl_zylinski, falconerd, odin-lang)",
+            "Fallback context layer when MCP GitHub is unavailable",
+        ],
+        [
+            "`code/examples/demo.odin`",
+            "1",
+            "Official language demo",
+            "Exhaustive feature reference",
+        ],
+    ]
+
     lines = [
-        "## Overview (by source)", "", "| Source | Files | Format | Why |", "| ------ | ----- | ------ | --- |",
-        f"| `odin-knowledge-base/` | {skool_count} | Skool 'programvideogames' lessons (Markdown with frontmatter) | Concrete implementation, complete code, game patterns |",
-        f"| `odin-knowledge-base/docs/karl_zylinski/odin-book/` | {karl_count} | Karl's book **'Understanding the Odin Programming Language'** split into 1 file per chapter | Language reference, pure concept, minimal example |",
-        f"| `odin-knowledge-base/docs/karl_zylinski/*.md` | {zyl_count} | Karl Zylinski blog articles | Game dev patterns, opinions, hot take |",
-        f"| `odin-knowledge-base/docs/official/` | {off_count} | Official odin-lang.org docs + awesome-odin | Official language reference |",
-        f"| `odin-knowledge-base/gitIngest/` | {gi_count} | gitingest snapshots of local Odin repo clones (karl_zylinski, falconerd, odin-lang) | Fallback context layer when MCP GitHub is unavailable |",
-        "| `code/examples/demo.odin` | 1 | Official language demo | Exhaustive feature reference |", "",
-        f"**Total**: ~{skool_count + karl_count + zyl_count + off_count + gi_count + 1} files, ~{fmt_size(skool_size + karl_size + zyl_size + off_size + gi_size)} of MD.",
+        "## Overview (by source)",
         "",
     ]
+    lines.extend(format_markdown_table(headers, rows))
+    lines.extend([
+        "",
+        f"**Total**: ~{skool_count + karl_count + zyl_count + off_count + gi_count + 1} files, ~{fmt_size(skool_size + karl_size + zyl_size + off_size + gi_size)} of MD.",
+        "",
+    ])
     return "\n".join(lines)
 
 
@@ -188,29 +243,35 @@ def build_skool_section() -> str:
         return ""
 
     lines = [
-        "## Skool courses (programvideogames)", "", "See the detail in [`courses/programvideogames/README.md`](courses/programvideogames/README.md).",
+        "## Skool courses (programvideogames)",
+        "",
+        "See the detail in [`courses/programvideogames/README.md`](courses/programvideogames/README.md).",
         "",
     ]
 
-    for course_dir in sorted(skool_root.iterdir()):
-        if not course_dir.is_dir():
+    for comm_dir in sorted(skool_root.iterdir()):
+        if not comm_dir.is_dir() or comm_dir.name.startswith("."):
             continue
-        readme = course_dir / "README.md"
-        if not readme.exists():
-            continue
-        lesson_count = 0
-        modules = []
-        for module_dir in sorted(course_dir.iterdir()):
-            if module_dir.is_dir():
-                mc = sum(1 for _ in module_dir.glob("*.md"))
-                if mc:
-                    modules.append((module_dir.name, mc))
-                    lesson_count += mc
+        for course_dir in sorted(comm_dir.iterdir()):
+            if not course_dir.is_dir() or course_dir.name.startswith("."):
+                continue
+            readme = course_dir / "README.md"
+            lesson_count = 0
+            modules: list[tuple[str, int]] = []
+            for module_dir in sorted(course_dir.iterdir()):
+                if module_dir.is_dir() and not module_dir.name.startswith("."):
+                    mc = sum(1 for p in module_dir.glob("*.md") if p.is_file() and p.name != "README.md")
+                    if mc:
+                        modules.append((module_dir.name, mc))
+                        lesson_count += mc
 
-        readme_rel = f"courses/{course_dir.name}/README.md"
-        lines.append(f"- **{course_dir.name}** ({lesson_count} lessons) - [`{readme_rel}`]({readme_rel})")
-        for module_name, mc in modules:
-            lines.append(f"  - `{module_name}/`: {mc} lessons")
+            readme_rel = f"courses/{comm_dir.name}/{course_dir.name}/README.md"
+            if readme.exists():
+                lines.append(f"- **{course_dir.name}** ({lesson_count} lessons) - [`{readme_rel}`]({readme_rel})")
+            else:
+                lines.append(f"- **{course_dir.name}** ({lesson_count} lessons)")
+            for module_name, mc in modules:
+                lines.append(f"  - `{module_name}/`: {mc} lessons")
     lines.append("")
     lines.append("> Every lesson has `Cours:` `Module:` `ID:` `Durée:` frontmatter (see `_Helpers/docs/003_yaml_frontmatter_conventions.md`).")
     lines.append("> For the full TOC per chapter, open the module's `README.md`.")
@@ -222,17 +283,20 @@ def build_karl_book_section() -> str:
     """Section 'Karl Book': table of 28 chapters + appendices."""
     readme = KB_PATHS["karl"] / "odin-book" / "README.md"
     chapters = parse_karl_readme(readme)
-    appendices = parse_karl_appendices(KB_PATHS["karl"])
 
     lines = [
-        "## Karl Zylinski book (28 chapters + 4 appendices in `odin-knowledge-base/docs/karl_zylinski/odin-book/`)", "",
-        "**Absolute** reference for the Odin language. For any fundamental question, start here.", "", "| # | Chapter | Topic |",
-        "| - | ------- | ----- |",
+        "## Karl Zylinski book (28 chapters + 4 appendices in `odin-knowledge-base/docs/karl_zylinski/odin-book/`)",
+        "",
+        "**Absolute** reference for the Odin language. For any fundamental question, start here.",
+        "",
     ]
+    headers = ["#", "Chapter", "Topic"]
+    rows: list[list[str]] = []
     for ch in chapters:
         path = f"docs/karl_zylinski/odin-book/{ch['path']}"
-        lines.append(f"| {ch['number']} | [{ch['title']}]({path}) | |")
-    lines.append("| A-D | Appendices (4 files in `odin-book/appendices/`) | Handle-based array, fixed arrays only, dropdown, Box2D+Raylib |")
+        rows.append([ch["number"], f"[{ch['title']}]({path})", ""])
+    rows.append(["A-D", "Appendices (4 files in `odin-book/appendices/`)", "Handle-based array, fixed arrays only, dropdown, Box2D+Raylib"])
+    lines.extend(format_markdown_table(headers, rows))
     lines.append("")
     return "\n".join(lines)
 
@@ -246,9 +310,14 @@ def build_stats_section() -> str:
     off_count, _ = count_md_files(KB_PATHS["official"])
 
     lines = [
-        "## Statistics", "", f"- **{skool_count}** Skool lessons (Vertical Slice and Dice v1.0 + Metroidvania 1.0)",
-        f"- **{karl_count}** Karl book files (28 chapters + 4 appendices + about-author)", f"- **{zyl_count}** Zylinski articles",
-        f"- **{off_count}** official odin-lang.org docs", "- **1** official demo (`code/examples/demo.odin`)", "",
+        "## Statistics",
+        "",
+        f"- **{skool_count}** Skool files (Vertical Slice and Dice v1.0 + Metroidvania 1.0)",
+        f"- **{karl_count}** Karl book files (28 chapters + 4 appendices + about-author)",
+        f"- **{zyl_count}** Zylinski articles",
+        f"- **{off_count}** official odin-lang.org docs",
+        "- **1** official demo (`code/examples/demo.odin`)",
+        "",
     ]
     return "\n".join(lines)
 

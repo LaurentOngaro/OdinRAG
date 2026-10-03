@@ -29,7 +29,6 @@ from __future__ import annotations
 import argparse
 import re
 import sys
-import unicodedata
 from collections import defaultdict
 from pathlib import Path
 from typing import Any
@@ -44,13 +43,10 @@ sys.path.insert(0, str(_DIAGNOSTIC_DIR))
 
 from vaultConfigOdinRAG import (  # noqa: E402
     FRONTMATTER_RE,
-    IGNORE_DIRS,
-    IGNORE_FILES,
     LONG_DASH_PATTERN,
     MAX_RAG_FILE_SIZE,
     REPO_ROOT,
     cprint,
-    extract_frontmatter,
     path_link,
     should_ignore_dir,
     should_ignore_file,

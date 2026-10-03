@@ -130,7 +130,7 @@ def run(args: argparse.Namespace) -> int:
         if not branch_exists(PUBLIC_BRANCH):
             if scope == "branch":
                 print(f"[FAIL] Public branch '{PUBLIC_BRANCH}' does not exist.")
-                print("       Run refresh_public_branch.py first.")
+                print("       Run publish_public.py --check first.")
                 return 2
             print(f"[warn] '{PUBLIC_BRANCH}' missing, skipping branch scope")
         else:
@@ -148,7 +148,7 @@ def run(args: argparse.Namespace) -> int:
     print("       These files must not reach the public remote.")
     print()
     if scope in {"branch", "both"}:
-        print("Branch violations -> run refresh_public_branch.py to regenerate the public branch with the correct filter.")
+        print("Branch violations -> run publish_public.py --check to regenerate the public branch with the correct filter.")
         print()
     if scope in {"tree", "both"}:
         print("Tree violations   -> update .gitignore or .git/info/exclude then `git rm --cached <path>` and recommit.")

@@ -38,7 +38,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from bs4 import BeautifulSoup, Tag
 from bs4.element import NavigableString
 
-from markdownify import markdownify as md
 
 from lib.user_config import env_or_config
 
@@ -539,7 +538,7 @@ def _render_book_readme(chapters: list[dict], book_meta: dict) -> str:
     lines.append("2. Re-run the converter: `python _Helpers/scripts/lib/book_html_to_md.py`")
     lines.append("3. Verify the diff in `odin-knowledge-base/docs/karl_zylinski/odin-book/`")
     lines.append("")
-    lines.append(f"## Metadata")
+    lines.append("## Metadata")
     lines.append("")
     lines.append(f"- **Title**: {book_meta['title']}")
     lines.append(f"- **Author**: {book_meta['author']}")
@@ -673,7 +672,7 @@ def main(argv: list[str] | None = None) -> int:
             return 1
         print(f"[CHECK OK] Source  : {src_path} ({src_path.stat().st_size:,} bytes)")
         print(f"[CHECK OK] Output  : {out_dir}")
-        print(f"[CHECK OK] Ready to convert.")
+        print("[CHECK OK] Ready to convert.")
         return 0
 
     src_path = Path(args.src)

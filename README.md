@@ -18,11 +18,7 @@ OdinRAG aggregates, formats, and indexes learning material about Odin game dev s
 - a human (via Obsidian, Grep, or `INDEX.md` files)
 - an AI agent (via the [`.kilo/skills/`](.kilo/skills) `kb-navigator` skill and the [`.kilo/agents/odin-gamedev.md`](.kilo/agents/odin-gamedev.md) subagent)
 
-The repo ships **only** the curation workflow (scrapers, agents, skills, indexes, doc metadata) on the **public `public` branch** (pushed to `github.com/LaurentOngaro/OdinRAG`).
-The paywalled scraped content (Skool courses, full Karl Zylinski book, full blog corpora) is **tracked** in the local `main` branch and pushed to the separate **private remote** `OdinRag-private`.
-It is excluded from the public `public` branch by the two-branch strategy, not by `.gitignore`.
-See [`_Helpers/docs/007_mixing_public_and_private_history.md`](_Helpers/docs/007_mixing_public_and_private_history.md) for the workflow.
-See [SOURCES.md](SOURCES.md) for how to obtain each source legally on your own.
+The repo ships **only** the curation workflow (scrapers, agents, skills, indexes, doc metadata) on the **public `public` branch** (pushed to `github.com/LaurentOngaro/OdinRAG`). The paywalled scraped content (Skool courses, full Karl Zylinski book, full blog corpora) is **tracked** in the local `main` branch and pushed to the separate **private remote** `OdinRag-private`. It is excluded from the public `public` branch by the two-branch strategy, not by `.gitignore`. See [`_Helpers/docs/007_mixing_public_and_private_history.md`](_Helpers/docs/007_mixing_public_and_private_history.md) for the workflow. See [SOURCES.md](SOURCES.md) for how to obtain each source legally on your own.
 
 ## Structure
 
@@ -73,13 +69,11 @@ cp _Helpers/templates/user_config.example.jsonc _Private/.config/user_config.jso
 # edit the copy with your actual paths
 ```
 
-The loader `_Helpers/scripts/lib/user_config.py` exposes them to the scrapers and `format_odin_in_files.py`. Override any value with an env var (e.g. `ODINFMT_EXE`, `BOOK_HTML_SRC`).
-Keep credentials out of the JSON - use env vars like `SKOOL_PASSWORD` for secrets.
+The loader `_Helpers/scripts/lib/user_config.py` exposes them to the scrapers and `format_odin_in_files.py`. Override any value with an env var (e.g. `ODINFMT_EXE`, `BOOK_HTML_SRC`). Keep credentials out of the JSON - use env vars like `SKOOL_PASSWORD` for secrets.
 
 ## Built with MiniMax-M3
 
-This whole project - the scraper architecture, the frontmatter schema, the agent prompts, the 9 Kilo skills, the subagent design, the lint configs - was designed and iterated with [MiniMax-M3](https://minimax.io), powered via [Kilo Code](https://kilo.ai) as the agentic IDE.
-M3 acts as the structural engineer; I act as the domain curator.
+This whole project - the scraper architecture, the frontmatter schema, the agent prompts, the 9 Kilo skills, the subagent design, the lint configs - was designed and iterated with [MiniMax-M3](https://minimax.io), powered via [Kilo Code](https://kilo.ai) as the agentic IDE. M3 acts as the structural engineer; I act as the domain curator.
 
 Every file in this repo is the result of a prompt + a code review between us. There is no `git blame` you can read to tell which line was M3's first draft and which was my edit - that's the point.
 
@@ -89,8 +83,7 @@ For the technical story of how M3 is used in this repo, see [`_Helpers/docs/002_
 
 This repository's code (scrapers, agents, skills, scripts, configs) is released under the **MIT License** - see [LICENSE](LICENSE).
 
-The third-party content referenced by the scrapers is **not** included in this repository and remains the property of its respective authors.
-See [SOURCES.md](SOURCES.md) for attribution and licensing.
+The third-party content referenced by the scrapers is **not** included in this repository and remains the property of its respective authors. See [SOURCES.md](SOURCES.md) for attribution and licensing.
 
 ## Support this project
 

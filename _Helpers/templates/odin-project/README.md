@@ -10,8 +10,7 @@
 
 ## KB inspirations (precise references)
 
-Fill in with the exact paths of the lessons/chapters that inspired this project.
-Examples:
+Fill in with the exact paths of the lessons/chapters that inspired this project. Examples:
 
 - `odin-knowledge-base/courses/programvideogames/vertical-slice-and-dice-v10/rpg/067-05-entity-system.md` (entity component pattern)
 - `odin-knowledge-base/docs/karl_zylinski/odin-book/13-making-manual-memory-management-easier.md` (arena allocator)

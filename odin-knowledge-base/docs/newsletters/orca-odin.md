@@ -41,7 +41,7 @@ In the following examples you can see how easy it is to create programs now!
 Additionally, you also need to specify the output, as shown below, which will then be used by Orca to bundle up the application. All examples can be built this way.
 
 ```odin
-odin build src -target:orca_wasm32 -out:module.wasm 
+odin build src -target:orca_wasm32 -out:module.wasm 
 orca bundle --name output module.wasm
 ```odin
 I’ve added comments on most lines to describe what is happening, the examples should be read top to bottom.
@@ -151,7 +151,7 @@ oc_on_frame_refresh :: proc "c" () {
 The next example uses a resource that needs to be specified:
 
 ```odin
-odin build src -target:orca_wasm32 -out:module.wasm 
+odin build src -target:orca_wasm32 -out:module.wasm 
 orca bundle --name output --resource-dir data module.wasm
 ```odin
 ```odin

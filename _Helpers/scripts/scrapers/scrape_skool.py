@@ -99,6 +99,16 @@ from fixes.odin_format import format_path_if_odin
 # get root directory
 ROOT_DIR = Path(__file__).resolve().parents[3]
 
+
+def _resolve_skool_exe() -> str:
+    for candidate in ("skool", "skool.cmd"):
+        if shutil.which(candidate):
+            return candidate
+    return "skool.cmd" if sys.platform == "win32" else "skool"
+
+
+SKOOL_EXE: str = _resolve_skool_exe()
+
 # ─── CREDENTIALS ────────────────────────────────────────────────────────────────
 SKOOL_EMAIL: str = ""
 SKOOL_PASSWORD: str = ""
@@ -338,7 +348,7 @@ def lesson_filename_from_title(title: str, idx: int | None = None, keep_duration
         title = _DURATION_RE.sub("", title)
 
     # 3. Nettoyer les séparateurs autour du titre restant
-    title = title.strip(" -–-")
+    title = re.sub(r"^[\s\-–]+|[\s\-–]+$", "", title)
 
     # 4. Sanitise for Windows (keep spaces, commas, `()`, apostrophes, etc.)
     safe = _WIN_FORBIDDEN.sub("_", title)
@@ -530,7 +540,7 @@ def _normalize_for_match(s: str) -> str:
 
 def run_skool(args: list[str], retries: int = 3) -> dict | list | None:
     """Run a skool-cli command and return the parsed JSON output."""
-    cmd = ["skool.cmd"] + args + ["--json"]
+    cmd = [SKOOL_EXE] + args + ["--json"]
     _log("DEBUG", f"run_skool: {' '.join(cmd)}")
     for attempt in range(retries):
         result = None
@@ -562,7 +572,7 @@ def login(force: bool = False) -> bool:
     auth_state = Path.home() / ".skool-cli" / "auth-state.json"
     if not force and auth_state.exists():
         try:
-            res = subprocess.run(["skool.cmd", "whoami", "-g", SKOOL_GROUP], capture_output=True, text=True, timeout=20, )
+            res = subprocess.run([SKOOL_EXE, "whoami", "-g", SKOOL_GROUP], capture_output=True, text=True, timeout=20, )
             if res.returncode == 0 and "active" in res.stdout.lower():
                 print(f"[*] Session active validée ({auth_state}).")
                 return True
@@ -579,7 +589,7 @@ def login(force: bool = False) -> bool:
     print(f"[*] Connexion en tant que {SKOOL_EMAIL}...")
     try:
         subprocess.run(
-            ["skool.cmd", "login", "--email", SKOOL_EMAIL, "--password", SKOOL_PASSWORD], check=True, capture_output=True, text=True, timeout=120,
+            [SKOOL_EXE, "login", "--email", SKOOL_EMAIL, "--password", SKOOL_PASSWORD], check=True, capture_output=True, text=True, timeout=120,
         )
         print("[+] Connecté.")
         return True
@@ -1386,7 +1396,7 @@ def export_course(
 
     lessons = get_lessons(course_name)
     if not lessons:
-        print(f"  [!] No lesson found (restricted access or empty course).")
+        print("  [!] No lesson found (restricted access or empty course).")
         _log("WARNING", f"Cours {course_name}: aucune leçon (accès restreint?)")
         # Early return: we have not yet incremented lesson_counter (the loop
         # hasn't started), so we return the value received as parameter
@@ -1408,7 +1418,7 @@ def export_course(
         _log("INFO", f"  Filtre '{lesson_filter}' (norm='{norm_pattern}'): "
              f"{len(matched)}/{len(lessons)} leçons retenues")
         if not matched:
-            print(f"  [!] No lesson matches the pattern.")
+            print("  [!] No lesson matches the pattern.")
             _log("WARNING", f"  Filtre '{lesson_filter}': 0 match")
             # Idem early return : lesson_counter pas encore incrémenté.
             return 0, lesson_counter
@@ -1574,7 +1584,7 @@ def export_course(
             if resources:
                 cookie_header = load_skool_cookies()
                 if not cookie_header:
-                    print(f"  [WARN] Skool cookies missing -> cannot download the support files")
+                    print("  [WARN] Skool cookies missing -> cannot download the support files")
                     _log("WARNING", f"  [support FAIL] cookies absents (course={course_slug})")
                 else:
                     # Support Files/<module?>/<lesson_name>/<file>.zip
@@ -1676,10 +1686,10 @@ def write_global_index(courses: list[dict], total: int):
 def check_prerequisites():
     """Verify that skool-cli is installed."""
     try:
-        subprocess.run(["skool.cmd", "--version"], capture_output=True, check=True)
+        subprocess.run([SKOOL_EXE, "--version"], capture_output=True, check=True)
         return True
     except (subprocess.CalledProcessError, FileNotFoundError):
-        print("[ERR] skool.cmd (de skool-cli) introuvable. Installez-le d'abord :")
+        print(f"[ERR] {SKOOL_EXE} (de skool-cli) introuvable. Installez-le d'abord :")
         print("  npm install -g skool-cli")
         print("  npx playwright install chromium")
         return False
@@ -1897,7 +1907,7 @@ def main():
 
     print("\n" + "=" * 60)
     print(f"  ✓ Export terminé : {total_lessons} leçons dans {OUTPUT_DIR}")
-    print(f"  → Indexe dans le RAG : Topic 'programvideogames'")
+    print("  → Indexe dans le RAG : Topic 'programvideogames'")
     print("=" * 60)
     _log("INFO", f"Terminé : {total_lessons} leçons exportées dans {OUTPUT_DIR}")
     _log("INFO", f"Log finalisé dans {LOG_FILE}")

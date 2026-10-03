@@ -48,7 +48,7 @@ Layered safety net (in order, before any leak escapes the workstation):
 
 1. **Local hook** - `.git/hooks/pre-push` refuses any push of `main` to the `public` remote.
 2. **Audit script** - `_Helpers/scripts/diagnostic/audit_public_safety.py` verifies the `public` branch is free of forbidden paths before you push.
-3. **Refresh helper** - `_Helpers/scripts/diagnostic/refresh_public_branch.py` regenerates the sanitised `public` branch in one command (idempotent, refuses a dirty working tree).
+3. **Publish / refresh helper** - `_Helpers/scripts/diagnostic/publish_public.py` regenerates the sanitised `public` branch in one command (idempotent, refuses a dirty working tree).
 4. **GitHub Action** - `.github/workflows/public_safety.yml` re-runs the audit on every push and pull request targeting `main`, blocking leaks even if the local hook is bypassed.
 5. **CI auto-cleanup** - the GitHub Action also prunes the filter-branch backup ref so no orphan state survives in CI.
 
@@ -120,7 +120,7 @@ And put the precise personal patterns in `.git/info/exclude`:
 /odin-knowledge-base/docs/karl_zylinski/odin-book/
 ```
 
-Adapt the patterns to your own private folders. Keep them in sync with `FORBIDDEN_PATTERNS` in `audit_public_safety.py` and `STRIP_RULES` in `refresh_public_branch.py` - three places to update when the set of personal paths changes.
+Adapt the patterns to your own private folders. Keep them in sync with `FORBIDDEN_PATTERNS` in `audit_public_safety.py` and `STRIP_RULES` in `publish_public.py` - three places to update when the set of personal paths changes.
 
 ## Step 3 - import personal content under the override
 
@@ -176,17 +176,14 @@ git ls-tree -r public-orphan | wc -l   # -> 0
 
 ### Step 4b - regenerate `public` from `main` via the helper script
 
-The wrapper at `_Helpers/scripts/diagnostic/refresh_public_branch.py` is the durable entry point. It is **idempotent** (no-op when the `public` branch is already in sync) and **refuses to run on a dirty working tree** (filter-branch limitation - stash first, then `git stash pop`).
+The wrapper at `_Helpers/scripts/diagnostic/publish_public.py` is the durable entry point. It is **idempotent** (no-op when the `public` branch is already in sync) and **refuses to run on a dirty working tree** (filter-branch limitation - stash first, then `git stash pop`).
 
 ```bash
 # Dry-run: show what would happen, do nothing
-python _Helpers/scripts/diagnostic/refresh_public_branch.py --check
+python _Helpers/scripts/diagnostic/publish_public.py --check
 
-# Refresh if needed (the first run after Step 3 always does something)
-python _Helpers/scripts/diagnostic/refresh_public_branch.py
-
-# Refresh + run the audit in one go
-python _Helpers/scripts/diagnostic/refresh_public_branch.py --verify
+# Refresh and publish (pushes private, regenerates public, audits, pushes public)
+python _Helpers/scripts/diagnostic/publish_public.py
 ```
 
 Under the hood the script runs:
@@ -248,7 +245,7 @@ if [ "$remote" != "public" ]; then
   exit 0
 fi
 
-# Personal patterns anchored at repo root. MUST stay in sync with refresh_public_branch.py STRIP_RULES and audit_public_safety.py FORBIDDEN_PATTERNS.
+# Personal patterns anchored at repo root. MUST stay in sync with publish_public.py STRIP_RULES and audit_public_safety.py FORBIDDEN_PATTERNS.
 personal_pattern='^(code/projects/PVG03_RPG/|_Private/|odin-knowledge-base/courses/|odin-knowledge-base/docs/karl_zylinski/odin-book/)'
 
 while read -r local_ref _remote_ref; do
@@ -301,10 +298,10 @@ python _Helpers/scripts/diagnostic/audit_public_safety.py --verbose
 Exit codes:
 
 - `0` - clean.
-- `1` - forbidden paths found. Re-run `refresh_public_branch.py` if it's a branch issue, or update `.gitignore` / `.git/info/exclude` if it's a tree issue.
+- `1` - forbidden paths found. Re-run `publish_public.py --check` if it's a branch issue, or update `.gitignore` / `.git/info/exclude` if it's a tree issue.
 - `2` - git missing, branch absent, etc.
 
-The script's `FORBIDDEN_PATTERNS` list drives both the audit scan and the inline display. Keep it in sync with the `personal_pattern` regex in the hook and the `STRIP_RULES` list in `refresh_public_branch.py`.
+The script's `FORBIDDEN_PATTERNS` list drives both the audit scan and the inline display. Keep it in sync with the `personal_pattern` regex in the hook and the `STRIP_RULES` list in `publish_public.py`.
 
 ## Step 7 - CI: GitHub Action for paranoid double-check
 
@@ -329,7 +326,7 @@ git commit -m "..."
 
 # 2. When ready to publish:
 git stash push -u -m "wip-publish"        # only if working tree is dirty
-python _Helpers/scripts/diagnostic/refresh_public_branch.py --verify
+python _Helpers/scripts/diagnostic/publish_public.py
 git stash pop                              # only if you stashed
 
 # 3. Push the sanitised branch (the hook refuses main!).
@@ -354,14 +351,14 @@ git push private main
 ### Accidentally pushed a personal path to the public remote
 
 1. Push the same ref to the private remote immediately (`git push private main` if you have one). The local copy is the source of truth.
-2. Rewrite `public` to a clean state with `python _Helpers/scripts/diagnostic/refresh_public_branch.py --verify`.
+2. Rewrite `public` to a clean state with `python _Helpers/scripts/diagnostic/publish_public.py --check`.
 3. `git push --force-with-lease public public`.
 4. On the public remote, history rewriting depends on the host. Personal repos on commercial forges support `git push --force` after a cooldown. Shared repos and forks are out of reach: the leak is permanent in third-party mirrors.
 5. Treat the leaked content as compromised: rotate every secret that lives (or lived) in the leaked paths, request cache scrubs where possible (Google cache, GitHub search), and document the incident in your private notes.
 
 ### Pre-push hook blocks a legitimate push
 
-Inspect the diff the hook printed. If the paths are genuinely public, amend `.gitignore` and `.git/info/exclude`, recommit on `main`, run `refresh_public_branch.py --verify`, retry. If the paths are personal, you caught a mistake - do not bypass the hook.
+Inspect the diff the hook printed. If the paths are genuinely public, amend `.gitignore` and `.git/info/exclude`, recommit on `main`, run `publish_public.py --check`, retry. If the paths are personal, you caught a mistake - do not bypass the hook.
 
 ### `_Private/.config/` (credentials) ever gets committed
 
@@ -374,7 +371,7 @@ mv _Private/.config/* ../credentials-backup/
 chmod 600 ../credentials-backup/*
 
 # Re-scrub history (filter-branch will rewrite every commit to drop them).
-python _Helpers/scripts/diagnostic/refresh_public_branch.py --verify
+python _Helpers/scripts/diagnostic/publish_public.py --check
 
 # Wipe local main and rebuild from public + personal-content import commits.
 # (Detailed recipe depends on your history shape - see Karl Zylinski's book chapter on manual memory management for the general pattern.)
@@ -387,7 +384,7 @@ For repos that have already been pushed to a public remote with secrets inside, 
 - **One local repo, two responsibilities.** Mental cost: every push goes through a "which remote?" decision. The hook enforces it; you still have to think.
 - **`filter-branch` rewrites history.** The public branch's history is a rewriting of main's. `git blame` on a public file will not see commits that only touched personal files, which is what you want. The downside is older commits that produced identical content on `public` may vanish via `--prune-empty`.
 - **Public branch can drift.** If you forget to refresh `public` before push, the public remote ships an outdated subset. The pre-push hook does not detect stale `public`; it only checks for forbidden paths.
-- **`filter-branch` is deprecated.** Upstream recommends `git filter-repo`. Migration is mechanical when this repo gains a Python dependency on filter-repo: replace the `git filter-branch` calls in `refresh_public_branch.py` and the GitHub Action with the equivalent `git filter-repo --path ... --invert-paths` invocations.
+- **`filter-branch` is deprecated.** Upstream recommends `git filter-repo`. Migration is mechanical when this repo gains a Python dependency on filter-repo: replace the `git filter-branch` calls in `publish_public.py` and the GitHub Action with the equivalent `git filter-repo --path ... --invert-paths` invocations.
 - **Filter-branch leaves a backup ref.** `refs/original/refs/heads/public` is created on every run. The helper script and the GitHub Action both delete it after success. A stale backup is harmless but consumes space.
 - **Forks on the public remote.** A leaked secret in a public remote lives forever in forks and clones. No git machinery can erase it from third-party mirrors. The hook is your only prevention; the audit is your only verification.
 - **The pre-push hook only checks paths.** It does not inspect commit messages, author identities, or dates. A commit message that says "fix \_Private/planning/daily typo" reaches the public remote if no path on its content side is personal (because filter-branch already rewrote the trees). If that matters, add a stricter CI check.
@@ -396,17 +393,17 @@ For repos that have already been pushed to a public remote with secrets inside, 
 
 After completing all steps you will have touched these files (paths are repo-root-relative):
 
-| Path                                                   | Purpose                                             | Tracked?   |
-| ------------------------------------------------------ | --------------------------------------------------- | ---------- |
-| `.gitignore`                                           | secrets + build/IDE ignores only                    | yes        |
-| `.git/info/exclude`                                    | per-clone personal ignores                          | NO (local) |
-| `refs/heads/main`                                      | full history, the local source of truth             | yes        |
-| `refs/heads/public-orphan`                             | empty anchor for `public-orphan..<ref>` diff checks | yes        |
-| `refs/heads/public`                                    | filter-branch output, pushed to the public remote   | yes        |
-| `.git/hooks/pre-push`                                  | refuses main -> public pushes                       | NO (local) |
-| `_Helpers/scripts/diagnostic/audit_public_safety.py`   | `--scope tree/branch/both`, lint-clean              | yes        |
-| `_Helpers/scripts/diagnostic/refresh_public_branch.py` | idempotent wrapper, lint-clean                      | yes        |
-| `.github/workflows/public_safety.yml`                  | CI re-runs audit on push + PR                       | yes        |
+| Path                                                 | Purpose                                             | Tracked?   |
+| ---------------------------------------------------- | --------------------------------------------------- | ---------- |
+| `.gitignore`                                         | secrets + build/IDE ignores only                    | yes        |
+| `.git/info/exclude`                                  | per-clone personal ignores                          | NO (local) |
+| `refs/heads/main`                                    | full history, the local source of truth             | yes        |
+| `refs/heads/public-orphan`                           | empty anchor for `public-orphan..<ref>` diff checks | yes        |
+| `refs/heads/public`                                  | filter-branch output, pushed to the public remote   | yes        |
+| `.git/hooks/pre-push`                                | refuses main -> public pushes                       | NO (local) |
+| `_Helpers/scripts/diagnostic/audit_public_safety.py` | `--scope tree/branch/both`, lint-clean              | yes        |
+| `_Helpers/scripts/diagnostic/publish_public.py`      | idempotent wrapper, lint-clean                      | yes        |
+| `.github/workflows/public_safety.yml`                | CI re-runs audit on push + PR                       | yes        |
 
 ## References
 
@@ -414,4 +411,4 @@ After completing all steps you will have touched these files (paths are repo-roo
 - `_Helpers/scripts/diagnostic/README - diagnostic.md` - the audit + refresh + coherence scripts.
 - `.github/workflows/public_safety.yml` - the CI guard-rail.
 - `AGENTS.md` at the repo root - global conventions, including markdown style and frontmatter.
-- `SOURCES.md` - if you add a new paid source, update `audit_public_safety.py FORBIDDEN_PATTERNS` and `refresh_public_branch.py STRIP_RULES` so the two scripts stay in sync.
+- `SOURCES.md` - if you add a new paid source, update `audit_public_safety.py FORBIDDEN_PATTERNS` and `publish_public.py STRIP_RULES` so the two scripts stay in sync.

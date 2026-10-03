@@ -1,17 +1,26 @@
-# gitattributes
-#
-# Note: as of 2026-07-03 (commit 0ad618f / filter-repo run), no file in this
-# repo is LFS-tracked. The .blend and .zip under Support Files/ have been
-# removed from history by filter-repo --invert-paths. The rules below are
-# kept for safety in case a contributor accidentally re-adds a large
-# binary file: gitattributes still marks them as binary (no line-ending
-# mangling, no diff), but the LFS filter is OFF so the blob is stored
-# directly in git.
-#
-# If you re-introduce LFS for a new path, add a line like:
-#   <glob> filter=lfs diff=lfs merge=lfs -text
-# and ensure the remote (OdinRAG-private) has LFS storage configured
-# (it does not, as of 2026-07-03).
+# gitattributes - OdinRAG line endings and binary rules
+# Set default behavior to automatically normalize line endings to LF on commit.
+* text=auto eol=lf
 
+# Explicit text file types (enforce LF)
+*.odin text eol=lf
+*.md text eol=lf
+*.py text eol=lf
+*.json text eol=lf
+*.jsonc text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.sh text eol=lf
+
+# Windows scripts (preserve CRLF)
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Binary files
 *.blend binary
 *.zip binary
+*.png binary
+*.wav binary
+*.ogg binary
+*.ico binary
+*.pdf binary

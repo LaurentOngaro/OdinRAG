@@ -17,8 +17,10 @@
 
       _tools/ (mutualised):
         - build_and_run.bat
+        - build_and_run.sh      (POSIX equivalent of the .bat above)
         - check_and_format.bat
         - create_junctions.ps1
+        - create_junctions.sh   (POSIX equivalent of the .ps1 above)
 
   - **Templates (copied ONLY if missing by default)**: files that have a sensible
     default but should be customised per-user/per-project. With -Force, they
@@ -45,7 +47,8 @@
     )
 
 .PARAMETER Targets
-  List of project root paths. Defaults to the 3 known projects.
+  List of project root paths. Defaults to paths configured in user_config.jsonc
+  or ODIN_SYNC_TARGETS env var.
 
 .PARAMETER Source
   The canonical shared tooling directory. Defaults to the script's folder.
@@ -64,17 +67,39 @@
 #>
 [CmdletBinding(SupportsShouldProcess=$true)]
 param(
-    [string[]]$Targets = @(
-        "D:\Projets\Odin\Falconerd\PVG02_Metroidvania",
-        "D:\Projets_Perso\00a_Skeletons\Odin_Skel\Odin_Skeleton",
-        "D:\Projets_Perso\03_Code\Odin\OdinRAG\code\projects\PVG03_RPG"
-    ),
+    [string[]]$Targets = @(),
     [string]$Source = $PSScriptRoot,
     [switch]$SkipTemplates,
     [switch]$Force
 )
 
 $ErrorActionPreference = "Stop"
+
+# Auto-resolve targets if not specified:
+# 1. Environment variable ODIN_SYNC_TARGETS (semicolon or comma separated)
+# 2. _Private/.config/user_config.jsonc (paths.sync_targets or tooling.sync_targets)
+if (-not $Targets -or $Targets.Count -eq 0) {
+    if ($env:ODIN_SYNC_TARGETS) {
+        $Targets = $env:ODIN_SYNC_TARGETS -split '[;,]' | ForEach-Object { $_.Trim() } | Where-Object { $_ }
+    } else {
+        try {
+            $repoRoot = (Get-Item $Source).Parent.Parent.FullName
+            $configFile = Join-Path $repoRoot "_Private\.config\user_config.jsonc"
+            if (Test-Path $configFile) {
+                $raw = Get-Content $configFile -Raw -Encoding UTF8
+                $clean = $raw -replace '(?m)^\s*//.*$', ''
+                $cfg = $clean | ConvertFrom-Json
+                if ($cfg.paths -and $cfg.paths.sync_targets) {
+                    $Targets = [string[]]$cfg.paths.sync_targets
+                } elseif ($cfg.tooling -and $cfg.tooling.sync_targets) {
+                    $Targets = [string[]]$cfg.tooling.sync_targets
+                }
+            }
+        } catch {
+            Write-Verbose "Could not load targets from user_config.jsonc: $_"
+        }
+    }
+}
 
 # =============================================================================
 # Canonical files (always copied, overwriting any local copy).
@@ -84,8 +109,10 @@ $canonical = @{
     "odinfmt.json"                       = Join-Path $Source "odinfmt.json"
     "ols.json"                           = Join-Path $Source "ols.json"
     "_tools\build_and_run.bat"           = Join-Path $Source "_tools\build_and_run.bat"
+    "_tools\build_and_run.sh"            = Join-Path $Source "_tools\build_and_run.sh"
     "_tools\check_and_format.bat"        = Join-Path $Source "_tools\check_and_format.bat"
     "_tools\create_junctions.ps1"        = Join-Path $Source "_tools\create_junctions.ps1"
+    "_tools\create_junctions.sh"         = Join-Path $Source "_tools\create_junctions.sh"
 }
 
 # =============================================================================
@@ -128,6 +155,15 @@ if ($missing.Count -gt 0) {
     foreach ($m in $missing) { Write-Warning "  ! $m" }
     Write-Warning "These will be skipped."
 }
+
+if (-not $Targets -or $Targets.Count -eq 0) {
+    Write-Warning "No sync targets specified."
+    Write-Host "Specify targets with: pwsh -File .\sync-tooling.ps1 -Targets @('path/to/project1', ...)"
+    Write-Host "Or configure 'paths.sync_targets' in _Private/.config/user_config.jsonc"
+    Write-Host "Or set the environment variable ODIN_SYNC_TARGETS"
+    return
+}
+
 Write-Host "Targets:" -ForegroundColor Cyan
 foreach ($t in $Targets) { Write-Host "  - $t" }
 Write-Host ""

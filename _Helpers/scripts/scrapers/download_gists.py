@@ -177,7 +177,7 @@ def update_readme(downloaded: list[tuple[str, str, str]], gists_dir: Path) -> No
 
     existing_text = readme_path.read_text(encoding="utf-8")
     new_entries: list[str] = []
-    for full_url, owner, gist_id in downloaded:
+    for full_url, _owner, gist_id in downloaded:
         existing = existing_gist_mapping(GISTS_DIR)
         if gist_id in existing:
             local_file = f"`{existing[gist_id].name}`"

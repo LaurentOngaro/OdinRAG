@@ -103,7 +103,6 @@ SKIP_DIRS = {
     ".zed",  # Zed editor config
     "_TEMPLATE_",  # project template (not real content)
     "out",  # scrapers output
-    "__pycache__",  # python bytecode cache (duplicate safety)
 }
 
 # Regex patterns

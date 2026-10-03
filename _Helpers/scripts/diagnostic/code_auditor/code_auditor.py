@@ -25,7 +25,6 @@ Stdlib only (plus `jsonschema` and the package's sibling modules). Cross-platfor
 from __future__ import annotations
 
 import argparse
-import datetime as _dt
 import sys
 import textwrap
 from pathlib import Path
@@ -50,7 +49,7 @@ from rule_loader import (
 )
 from scanner import Finding, scan_file
 from reporter import ReportTarget, build_report
-from kb_index import KBIndex, build_default_index
+from kb_index import KBIndex
 from context_builder import ContextBuilder
 
 

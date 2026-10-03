@@ -1,0 +1,83 @@
+#!/usr/bin/env bash
+# Pre-push hook: refuses pushes to the `public` remote that contain personal paths.
+# Personal paths live ONLY on local main; the `public` branch (filter-branch rewrite)
+# contains only the public subset.
+#
+# See _Helpers/docs/007_mixing_public_and_private_history.md for the full workflow.
+#
+# Personal content (must NEVER reach the public remote):
+#   - code/projects/PVG03_RPG/        (personal Odin project)
+#   - _Private/                       (planning, raw, config, docs)
+#   - odin-knowledge-base/courses/    (paywalled Skool content)
+#   - odin-knowledge-base/docs/karl_zylinski/odin-book/ (paywalled book)
+#
+# Paths above are anchored at repo root. `_Private/.config/` is also kept in
+# `.gitignore` (defense in depth) so credentials never reach any remote.
+
+set -euo pipefail
+
+remote="$1"
+
+# Read all push references from stdin once so multiple loops can inspect them.
+input_lines="$(cat)"
+if [ -z "$input_lines" ]; then
+  exit 0
+fi
+
+# --- Step 1: enforce git fetch before push (applies to all remotes) ---
+# If the remote tracking ref is ahead of local, refuse and ask the user to
+# fetch (and rebase/merge) before retrying the push. Skipped when the remote
+# has no tracking ref for this branch yet (new branch / first push to remote).
+while read -r local_ref _remote_ref; do
+  if [ -z "$local_ref" ]; then
+    continue
+  fi
+
+  branch="${local_ref#refs/heads/}"
+  remote_tracking_ref="refs/remotes/$remote/$branch"
+
+  if ! git rev-parse --verify --quiet "$remote_tracking_ref" >/dev/null 2>&1; then
+    continue
+  fi
+
+  behind_count="$(git rev-list --count "$local_ref".."$remote_tracking_ref" 2>/dev/null || echo 0)"
+
+  if [ "${behind_count:-0}" -gt 0 ]; then
+    echo "Refusing push to $remote: local '$branch' is $behind_count commit(s) behind $remote/$branch." >&2
+    echo "Run one of the following, then retry the push:" >&2
+    echo "  git fetch $remote" >&2
+    echo "  git pull --rebase $remote $branch   (recommended for linear history)" >&2
+    exit 1
+  fi
+done <<< "$input_lines"
+
+# --- Step 2: refuse pushes to the `public` remote that contain personal paths ---
+# Only enforce on the public remote.
+if [ "$remote" != "public" ]; then
+  exit 0
+fi
+
+# Personal patterns anchored at repo root.
+personal_pattern='^(code/projects/PVG03_RPG/|_Private/|odin-knowledge-base/courses/|odin-knowledge-base/docs/karl_zylinski/odin-book/)'
+
+# Iterate over each local_ref being pushed.
+while read -r local_ref _remote_ref; do
+  if [ -z "$local_ref" ]; then
+    continue
+  fi
+
+  # Compare against the empty anchor; for a `public`-remote push, EVERY file
+  # in local_ref that matches a personal pattern is a leak.
+  diff_output="$(git diff --name-only "public-orphan..$local_ref" 2>/dev/null || true)"
+
+  if echo "$diff_output" | grep -qE "$personal_pattern"; then
+    echo "Refusing push to public remote: personal paths detected in $local_ref." >&2
+    echo "Push that branch to the 'private' remote, not 'public'." >&2
+    echo "" >&2
+    echo "Offending paths:" >&2
+    echo "$diff_output" | grep -E "$personal_pattern" >&2
+    exit 1
+  fi
+done <<< "$input_lines"
+
+exit 0

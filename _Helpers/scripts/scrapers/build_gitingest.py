@@ -298,7 +298,7 @@ def process_entry(entry: RepoEntry, *, force: bool, check_only: bool, gitingest_
     try:
         result = subprocess.run(cmd, capture_output=True, text=True, check=False)
     except FileNotFoundError:
-        print(f"  [ERR] gitingest binary not found on PATH")
+        print("  [ERR] gitingest binary not found on PATH")
         return "failed"
     if result.returncode != 0:
         print(f"  [ERR] gitingest exited with code {result.returncode}")

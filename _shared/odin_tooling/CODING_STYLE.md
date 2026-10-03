@@ -118,8 +118,7 @@ Three tiers (per the OdinRAG AGENTS.md):
 | 2    | `arena` (per-scene)  | Scene-stable data (entities, tilemaps) | One scene    |
 | 3    | `heap` (default)     | Save/load + permanent state            | Program-wide |
 
-See `odin-knowledge-base/courses/programvideogames/vertical-slice-and-dice-v10/rpg/088-26.
-Tracking Allocator.md` for the canonical reference (when present in the KB).
+See `odin-knowledge-base/courses/programvideogames/vertical-slice-and-dice-v10/rpg/088-26. Tracking Allocator.md` for the canonical reference (when present in the KB).
 
 ## 9. Linting rules
 
@@ -184,5 +183,4 @@ For each rule, the enforcement level is documented above. Summary:
 | §11 Banned patterns           | Mixed (some -vet-\*, rest reviewer) |
 | §12 File headers              | Convention only                     |
 
-If you want to add a **tool-enforced** rule (e.g. blank lines between procs), propose it upstream to `odin-lang/Odin` first.
-The canonical list of Odin-supported flags is in `README - Odin Tooling.md` (§ Supported Odin flags).
+If you want to add a **tool-enforced** rule (e.g. blank lines between procs), propose it upstream to `odin-lang/Odin` first. The canonical list of Odin-supported flags is in `README - Odin Tooling.md` (§ Supported Odin flags).

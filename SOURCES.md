@@ -57,8 +57,7 @@ If you own the ebook:
 4. Output: `odin-knowledge-base/docs/karl_zylinski/odin-book/01-...33-about-the-author.md` (33 MD files).
 
 **Where the output lives**: the 33 chapters are **tracked in the local `main` branch** and pushed to the private remote `OdinRag-private`.
-They are **absent from the public `public` branch** (so a fresh `git clone` of `github.com/LaurentOngaro/OdinRAG` won't see them).
-The exclusion is done via the two-branch strategy, not `.gitignore`. Local `git status` keeps them hidden via `.git/info/exclude` (LOCAL only).
+They are **absent from the public `public` branch** (so a fresh `git clone` of `github.com/LaurentOngaro/OdinRAG` won't see them). The exclusion is done via the two-branch strategy, not `.gitignore`. Local `git status` keeps them hidden via `.git/info/exclude` (LOCAL only).
 
 **What ships in the public branch of this repo**: an `odin-book/README.md` index of the 33 chapters (the only file in the public branch).
 

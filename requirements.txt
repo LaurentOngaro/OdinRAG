@@ -1,0 +1,16 @@
+# Core scraper, diagnostic and indexing dependencies
+requests>=2.28.0
+beautifulsoup4>=4.11.0
+markdownify>=0.11.0
+lxml>=4.9.0
+pyyaml>=6.0
+jsonschema>=4.20.0
+colorama>=0.4.6
+
+# Tooling and quality checks
+pyright>=1.1.300
+pytest>=8.0.0
+ruff>=0.4.0
+
+# Optional: Skool scraping automation
+playwright>=1.40.0

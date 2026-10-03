@@ -32,7 +32,6 @@ from __future__ import annotations
 import argparse
 import sys
 from pathlib import Path
-from typing import Any
 
 try:
     sys.stdout.reconfigure(encoding="utf-8")  # type: ignore[attr-defined]
@@ -44,7 +43,6 @@ sys.path.insert(0, str(_DIAGNOSTIC_DIR))
 
 from vaultConfigOdinRAG import (  # noqa: E402
     ALLOWED_TYPES,
-    COLORS,
     IGNORE_DIRS,
     IGNORE_FILES,
     LONG_DASH_PATTERN,

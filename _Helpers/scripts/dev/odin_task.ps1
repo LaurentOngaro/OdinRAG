@@ -103,16 +103,35 @@ The script needs either:
   }
 }
 
-# If a sub-project's _tools/build_and_run.bat exists, prefer it over the
+# If a sub-project's _tools/build_and_run.{bat,sh} exists, prefer it over the
 # generic `odin build` invocation. Triggered when the current working directory
 # is inside code/projects/<project>/ (e.g. when the launch config hardcodes
 # `cwd` to that project). Mirrors the convention used by the standalone
 # project workspace.
-function Resolve-SubprojectBat {
+#
+# The .bat is the canonical pipeline on Windows; the .sh is its POSIX twin,
+# created by create_junctions.sh-style tooling alongside it. On a POSIX host we
+# must pick the .sh, otherwise PowerShell would try to exec a .bat and fail with
+# "Exec format error" (there is no cmd.exe to interpret it).
+function Resolve-SubprojectBuildScript {
   param([string] $ProjectRoot)
-  $bat = Join-Path $ProjectRoot '_tools\build_and_run.bat'
-  if (Test-Path -LiteralPath $bat -PathType Leaf) {
-    return $bat
+
+  # $IsWindows is a read-only automatic variable in PowerShell Core, so it must
+  # not be assigned. Reading it is enough on Core; on Windows PowerShell 5.1 the
+  # variable does not exist, and that host is Windows by definition.
+  $onWindows = if (Test-Path variable:IsWindows) { $IsWindows } else { $true }
+
+  $candidates = if ($onWindows) {
+    @('_tools\build_and_run.bat')
+  } else {
+    @('_tools/build_and_run.sh')
+  }
+
+  foreach ($rel in $candidates) {
+    $script = Join-Path $ProjectRoot $rel
+    if (Test-Path -LiteralPath $script -PathType Leaf) {
+      return $script
+    }
   }
   return $null
 }
@@ -122,15 +141,15 @@ Write-Host "[odin_task] project: $($ctx.ProjectName)"
 Write-Host "[odin_task] src    : $($ctx.Src) (mode=$Mode, exec=$Exec)"
 
 # Detect subproject mode from the current working directory: if cwd is inside
-# the project, route through the project's _tools\build_and_run.bat for
-# build/run modes. The .bat is the canonical pipeline used by the standalone
+# the project, route through the project's _tools\build_and_run.{bat,sh} for
+# build/run modes. That script is the canonical pipeline used by the standalone
 # workspace, so this keeps the root workspace behavior identical when the
 # user opens it from anywhere.
-$subprojectBat = $null
+$subprojectBuildScript = $null
 if ($Mode -in @('build-debug', 'build-release', 'run-debug', 'run-release')) {
-  $subprojectBat = Resolve-SubprojectBat -ProjectRoot $ctx.ProjectRoot
-  if ($subprojectBat) {
-    Write-Host "[odin_task] routing via sub-project bat: $subprojectBat"
+  $subprojectBuildScript = Resolve-SubprojectBuildScript -ProjectRoot $ctx.ProjectRoot
+  if ($subprojectBuildScript) {
+    Write-Host "[odin_task] routing via sub-project script: $subprojectBuildScript"
   }
 }
 
@@ -145,25 +164,35 @@ foreach ($d in @($ctx.DebugDir, $ctx.ReleaseDir, $ctx.DllDir)) {
 # No more _debug / _release suffixes on the binary names - the sub-folder
 # disambiguates them. Matches the KB convention (karl_zylinski hot-reload
 # template: OUT_DIR=build/debug, OUT_DIR=build/release).
-$exeBaseName = "$($ctx.ProjectName).exe"
-$dllBaseName = "$($ctx.ProjectName).dll"
+#
+# The extension is .exe on Windows and extension-less on Linux/macOS, where a
+# stray ".exe" would produce a binary the shell cannot exec and that the launch
+# config's `program` field cannot resolve.
+$onWindows = if (Test-Path variable:IsWindows) { $IsWindows } else { $true }  # 5.1 = Windows
+$exeExt = if ($onWindows) { '.exe' } else { '' }
+$dllExt = if ($onWindows) { '.dll' } else { '.so' }
+
+$exeBaseName = "$($ctx.ProjectName)$exeExt"
+$dllBaseName = "$($ctx.ProjectName)$dllExt"
 $debugExe = Join-Path $ctx.DebugDir   $exeBaseName
 $releaseExe = Join-Path $ctx.ReleaseDir $exeBaseName
 $dllOut = Join-Path $ctx.DllDir     $dllBaseName
 
-# Helper: invoke the sub-project's build_and_run.bat with consistent flags.
-# Calls the .bat directly (no cmd /c shim) so quoting is consistent. Always
-# passes --no-pause so the .bat does not block waiting for keyboard input
-# when invoked from VS Code (the build is run inside a task panel).
+# Helper: invoke the sub-project's build_and_run script with consistent flags.
+# On Windows the script is build_and_run.bat and is called directly (no cmd /c
+# shim) so quoting is consistent. On Linux/macOS it is build_and_run.sh and must
+# be run through bash, because the file is not marked executable on every
+# checkout and exec'ing it directly relies on the shebang. Always passes
+# --no-pause so the script does not block on keyboard input when invoked from a
+# VS Code task panel.
 function Invoke-SubprojectBuild {
-  param([string] $Bat, [string] $Src, [string] $Out, [bool] $IsDebug, [bool] $DoExec)
+  param([string] $Script, [string] $Src, [string] $Out, [bool] $IsDebug, [bool] $DoExec)
 
-  # GUARD: if any path is empty or the .bat doesn't exist, refuse to invoke.
-  # Calling a non-existent .bat would either fail silently or, worse, trigger
-  # cmd.exe to fall back to its own PATH search and pollute the workspace root
-  # with stray files via copy /y side-effects inside the .bat.
-  if (-not (Test-Path -LiteralPath $Bat -PathType Leaf)) {
-    Write-Host "[odin_task] ERROR: sub-project .bat not found at '$Bat' - skipping build" -ForegroundColor Red
+  # GUARD: if any path is empty or the script doesn't exist, refuse to invoke.
+  # Calling a missing script would fail silently or, worse, let a stale .bat
+  # linger on a POSIX host where there is no cmd.exe to interpret it.
+  if (-not (Test-Path -LiteralPath $Script -PathType Leaf)) {
+    Write-Host "[odin_task] ERROR: sub-project build script not found at '$Script' - skipping build" -ForegroundColor Red
     return 1
   }
   if ([string]::IsNullOrWhiteSpace($Src) -or [string]::IsNullOrWhiteSpace($Out)) {
@@ -178,15 +207,21 @@ function Invoke-SubprojectBuild {
   if ($DoExec) {
     $cmdargs += '--exec'
   }
-  Write-Host "[odin_task] & `"$Bat`" $($cmdargs -join ' ')"
-  & $Bat @cmdargs
+
+  if ($onWindows) {
+    Write-Host "[odin_task] & `"$Script`" $($cmdargs -join ' ')"
+    & $Script @cmdargs
+  } else {
+    Write-Host "[odin_task] bash `"$Script`" $($cmdargs -join ' ')"
+    & bash $Script @cmdargs
+  }
   return $LASTEXITCODE
 }
 
 switch ($Mode) {
   'build-debug' {
-    if ($subprojectBat) {
-      $code = Invoke-SubprojectBuild -Bat $subprojectBat -Src $ctx.Src -Out $debugExe -IsDebug $true -DoExec $Exec
+    if ($subprojectBuildScript) {
+      $code = Invoke-SubprojectBuild -Script $subprojectBuildScript -Src $ctx.Src -Out $debugExe -IsDebug $true -DoExec $Exec
       if ($code -ne 0) {
         exit $code
       }
@@ -201,8 +236,8 @@ switch ($Mode) {
     }
   }
   'build-release' {
-    if ($subprojectBat) {
-      $code = Invoke-SubprojectBuild -Bat $subprojectBat -Src $ctx.Src -Out $releaseExe -IsDebug $false -DoExec $Exec
+    if ($subprojectBuildScript) {
+      $code = Invoke-SubprojectBuild -Script $subprojectBuildScript -Src $ctx.Src -Out $releaseExe -IsDebug $false -DoExec $Exec
       if ($code -ne 0) {
         exit $code
       }
@@ -223,8 +258,8 @@ switch ($Mode) {
   'run-debug' {
     # Kept for back-compat with [BUILD+RUN] odin_task (debug). Equivalent to
     # build-debug + Exec, but routed through the .bat if available for parity.
-    if ($subprojectBat) {
-      $code = Invoke-SubprojectBuild -Bat $subprojectBat -Src $ctx.Src -Out $debugExe -IsDebug $true -DoExec $true
+    if ($subprojectBuildScript) {
+      $code = Invoke-SubprojectBuild -Script $subprojectBuildScript -Src $ctx.Src -Out $debugExe -IsDebug $true -DoExec $true
       if ($code -ne 0 -and $code -ne -2147483645) {
         exit $code
       }
@@ -237,8 +272,8 @@ switch ($Mode) {
     }
   }
   'run-release' {
-    if ($subprojectBat) {
-      $code = Invoke-SubprojectBuild -Bat $subprojectBat -Src $ctx.Src -Out $releaseExe -IsDebug $false -DoExec $true
+    if ($subprojectBuildScript) {
+      $code = Invoke-SubprojectBuild -Script $subprojectBuildScript -Src $ctx.Src -Out $releaseExe -IsDebug $false -DoExec $true
       if ($code -ne 0) {
         exit $code
       }
