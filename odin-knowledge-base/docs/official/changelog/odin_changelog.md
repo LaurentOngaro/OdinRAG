@@ -2,27 +2,214 @@
 source: github-releases
 repo: odin-lang/Odin
 tag: consolidated
-date: 2026-08-25
+date: 2026-10-03
 type: changelog
 status: active
 version: 1.0.0
-lastUpdated: "2026-08-25T10:35:50Z"
+lastUpdated: "2026-10-03T16:16:25Z"
 updatedBy: "MiniMax-M3 (Kilo Code)"
 tags: [OdinRAG, kb, source/official, changelog, odin]
 ---
 # Odin Changelog (consolidated, 20 releases)
 
-> Generated from the [odin-lang/Odin releases](https://github.com/odin-lang/Odin/releases) feed on 2026-08-25.
+> Generated from the [odin-lang/Odin releases](https://github.com/odin-lang/Odin/releases) feed on 2026-10-03.
 > Re-run `python _Helpers/scripts/scrapers/scrape_odin_changelog.py` to refresh.
+
+## dev-2026-09 - 2026-09-01
+
+**dev-2026-09** by Kelimion - <https://github.com/odin-lang/Odin/releases/tag/dev-2026-09>
+
+## New Language Features
+
+* Experimental: Inline `asm` templates for x86/x64, ARM and RISC-V in #7271, #7406 and #7465
+* Documentation: https://odin-lang.org/docs/inline-asm/
+* \`\`\` and """ strings to declare multi-line string literals that normalize indentation up to the closing quotation marks.
+
+## New Compiler Improvements
+
+* Use `posix_spawnp` instead of `system()` when invoking the linker in #7485
+* Fix default linker timing label on non-Windows platforms in #7240
+* Fix `odin doc -doc-format` aborting on any package that imports another package in #7242
+* Fix bigint negative printing in #7243
+* Fix constant `transmute` from unsigned to signed wrapping one value too many in #7244
+* Handle `#soa` fixed compound literals for vars in #7239
+* Validate floating-point array counts as integers in #7251
+* Fix typo in enumerated array in #7252
+* Make redeclaration diagnostics stable under threading in #7253
+* Improve procedure group overload scoring in #7227
+* Fix #7012 - a type isn't its own specialization in #7257
+* Fixes swizzles on array elements in soa containers in #7259
+* Fix Name Canonicalization Rotate Left typo in #7267
+* Fix constant `string16` carrying UTF-8, and inverted slice indices reaching `substring` in #7268
+* Fixes chain indexing for array elements in `#soa` containers in #7270
+* Fixes range loop over array elements in `#soa` containers in #7277
+* Fix riscv64 ABI classification for padded, over-aligned, and pointer-bearing structs in #7282
+* i386: Pass aggregate arguments by value on the stack in #7283
+* i386: Return aggregates through the hidden pointer on System V targets in #7284
+* Use enum value init expression instead of numeric value in doc format in #7289
+* Remove dead `simd_rem` in #7269
+* Fix duplicated name for temporary `.ll` files in #7291
+* Don't clear the operand value on the simd success path in #7315
+* Fix #7281, apply `#max_field_align` in #7314
+* Add diagnostic for missing field name to `type_field_bit_offset` + `type_field_bit_size` in #7293
+* Fix byte swap on untyped int-like untyped types in #7294
+* Bound constant arguments before range-checking them in #7295
+* `type_is_comparable`: false for an unspecialized polymorphic record in #7296
+* Fix guards combining two required conditions with `&&` in #7297
+* Correct the endianness guard messages in #7301
+* Make the three endianness predicates partition in #7307
+* `simd_extract_lsbs`/`simd_extract_msbs` Reject a lane count that exceeds the `bit_set` limit in #7308
+* Clarify `type_has_shared_fields` behavior in code doc in #7309
+* Matrix: enforce the element limit on multiplication and on overflowing dimensions in #7310
+* Hoist `if` stmt in enumerated_array in #7311
+* Check enumerated array length in #7312
+* `check_matrix_type_hint`: Require the element type and layout to match in #7313
+* Fixes `f32` to 64-bit `int`/`uint` conversion in #7319
+* Fixes `float` to 128-bit `int`/`uint` conversion in #7321
+* Classify amd64/arm64 aggregates from the source type in #7292
+* Fix `long` -> `int64_t` for win64 in #7324
+* Fix `bit_field` intrinsic by @kalsprite in https://github.com/odin-lang/Odin/pull/7325
+* Fix out of bounds for zero arg `#load_directory` in #7329
+* Fix compilation error when using the fixed-point write procedure and `-vet-unused` in #7330
+* Fix backend support for `#unroll` on `[dynamic]T` in #7337
+* Fix `bit_set` upper endpoint representability check in #7340
+* fix `bit_set` subset/superset constant folding in #7346
+* Fix three faults in `&~` constant folding in #7345
+* Enforce the `#simd` construction rules and stop two crashes in #7344
+* `intrinsics.type_integer_to_unsigned(rune)` returns `f16` in #7343
+* `quaternion` and `complex` nan cmp & accessors in #7342
+* Improved stable sort, from `insertion_sort` to `merge_rotate` in #7349
+* Set console codepage to utf-8 (on Windows), and restore old one on exit in #7351
+* Reenables `LLVMSetUnnamedAddress` for global constants merging in #7333
+* Range-check a constant passed to an `#any_int` parameter in #7360
+* Add the missing `break` in `add_min_dep_type_info` in #7359
+* riscv64: Read a flattened aggregate's members from their real offsets in #7334
+* Fix eol diagnostic in #7358
+* Fixes the `%%` operator in #7353
+* Fix SIGBUS/segfault when compiling recursive `#soa` slice/dynamic array types in #7361
+* ABI Conformance harness + fixes in #7327
+* Fix `c_va_start` guard and `c_va_arg` format mismatch in #7367
+* riscv64: use a slice for the coerce offsets + missed arm in riscv ABI in #7368
+* Reject a built-in procedure assigned to in #7369
+* Do not register map runtime dependencies under bedrock in #7371
+* Range-check the constant `abs` folds in #7372
+* Fix #7377 in #7378
+* Let FreeBSD use default `gb_copy_file` path in #7381
+* Add AVX-512 VNNI VPDPWSSD support to inline assembly in #7380
+* A base prefix with only digit separators has no digits in #7370
+* A `bit_fìeld` constant is range-checked only while it is untyped in #7385
+* A self-referential `bit_field` hangs the compiler in #7390
+* Codegen worker must not exit process with running siblings in #7391
+* Multi-instruction asm template computed with one operand twice in #7393
+* `extend` family emits mnemonic that doesn't exist in #7392
+* Let compiler check error() fmt strings + fixes in #7395
+* Peel union constant to its variant in #7396
+* `complex` and `quaternion` take their type from their arguments in #7399
+* A union constant in a ternary or builds an ill-typed phi #7397
+* Implement fixes for constant unions in #7087
+* Only reuse a compound literal's storage for a variable of its type in #7400
+* Fix `or_else` diverging with single return value in #7394
+* Remove the `os.Error == 0` compatibility hack in #7403
+* Restore the `Did you want 'nil'?` diagnostic everywhere in #7405
+* Address `printf` format warning in #7404
+* Better hints when assigning or comparing to `0` when it is not allowed in #7407
+* Fix reordered compound literal comparison in #7409
+* Fix compiler panic on a selector into `#branch_location` in #7415
+* Fix compiler segfault on `distinct` of a type alias that cycles back in #7416
+* Fix segfault comparing two foreign declarations of the same symbol in #7417
+* Fix compiler segfault on a bare `..` in a type position call in #7418
+* Asm cast guard in #7437
+* Reject asm operands in slots only a named hardware register can fill in #7431
+* Diagnose in an asm template instead of aborting with SIGILL in #7434
+* Fix `-no-crt` on Windows in #7426
+* Fixes `-o:size` in #7440
+* `string_split_iterator` fix in #7445
+* Big endian bool cmp in #7448
+* Fix `min(T) % -1` kills the process with SIGFPE, at every hardware width in #7450
+* Fix canonical names for types in procedure literals in #7439
+* Inline `asm` templates - CFG based analysis in #7444
+* Normalize bool cmp in #7449
+* Reject a non-constant argument to an asm template's immediate in #7432
+* Add missing `i128le`, `i128be` to endian switch in #7459
+* Convert constants before narrowing to `i64` in the remaining checker sites in #7460
+* Delete dead code that crashed the checker on an `asm` template group with no parameters in #7435
+* Fix a swizzle target in a multi-assignment reading an already-written source in #7458
+* Broadcast a constant into every array level in #7457
+* Give asm templates a documentation category instead of a blank header and a null `%s` in #7438
+* Do not deduplicate cases in tagless switches in #7468
+
+## New Packages
+
+*
+
+## Package Improvements
+
+* [core:unicode/utf8] Fix truncated text for grapheme clusters in #7003
+* [core:thread] Clarify completed task handling in thread pools in #7247
+* [core:simd] Fix grammar in #7203
+* [core:bytes] Optimize `index_any` with a byte bitset in #7255
+* [core:simd/arm] Implement simd arm neon table lookup in #7256
+* [core:odin/tokenizer] Fix broken double-checked lock in `init` in #7258
+* [core:sys/windows] Add `UnregisterHotKey` in #7264
+* [core:odin/parser] Fix unparenthesized attributes missing end position in its AST node in #7265
+* [vendor:box3d] Add Box3D support for WebAssembly in #7266
+* [core:simd/arm] Fix simd arm neon table lookup on big endian in #7273
+* [core:unicode/utf8] + [core:text/edit] Add `text` field to `utf8.Grapheme`, fix caret translation by grapheme in #7274
+* [base:runtime] Fixes `non_zero_append_elem_fixed_capacity_string` in #7317
+* [base:runtime] Adds the `pop` family of procedures for `#soa` arrays in #7290
+* [core:simd/arm] Implement simd arm neon extended table lookup in #7275
+* [core:simd/arm] Implement simd arm neon logical in #7332
+* [core:encoding/hex] Add non-allocating `decode_into_buffer` in #7347
+* [base:runtime] Fix #7262. Do not free the original block on a failed heap resize in #7328
+* [core:os] Fix #7350 in #7352
+* [core:mem] Keep `Dynamic_Arena` allocations aligned after reset in #7355
+* [core:slice] Fix `slice.get` doing unnecessary bounds check in #7363
+* [core:slice] Fix `slice.simple_equal` misbehaviour on empty slice with non-nil data in #7364
+* [core:image/tga] Fix `.alpha_add_if_missing` for TGA in #7366
+* [core:sys/windows] Fix `FILE_NOTIFY_INFORMATION` struct member casing in #7374
+* [core:odin] Remove `inline` and `no_inline` keywords in #7375
+* [core:sys/wasm/js] Support shared WebAssembly memory in browser APIs in #7272
+* [core:container/handle_map] Nicer organization, fix broken test, add test in #7383
+* [core:rexcode/x86] Merge tables in #7384
+* [core:thread] An exiting worker must not leave published in #7388
+* [core:rexcode] Improvements in #7362
+* [core:image/jpeg] Fixed negative read bug in #7410
+* [core:hash] Add murmur3 implementation in #7419
+* [core:nbio] Fix use-after-free, spurious poll readiness, and double completion on Windows in #7401
+* [vendor:raylib] Fixed typo in `raylib.odin` in #7451
+* [core:os] Fix simple typo in `process.odin` in #7454
+* [core:fmt] Fill left-justified field with spaces in #7461
+* [core:sys/darwin/Foundation] Skip Cocoa import on iOS in #7424
+* [vendor:libc-shim] Fix typo in `sched.odin` in #7456
+* [core:fmt] Fix justified printing of `0` producing all spaces in #7463
+* [core:unicode/utf8] Fix #5939 grapheme cluster width in #7462
+* [core:debug/trace] Remove `os`, `fmt`, `slice`, and `strconv` imports in #7408
+* [core:os] add `device` to `File_Info` by @laytan in https://github.com/odin-lang/Odin/pull/7466
+* [core:odin/parser] Improve parsing field docs and comments in #7481
+* [core:net] Use explicitly passed allocators in #7480
+* [core:encoding/json] Fix leak of key and value of a malformed object in #7487
+
+## Miscellaneous
+
+* Explicitly specify all required LLVM components on Linux build in #7338
+* Remove faulty tests in #7446
+* Remove `-microarch:native` from 3 Windows tests and tweak Win test runner in #7455
+* Add regression test for #7336 in #7428
+
+**Full Changelog**: https://github.com/odin-lang/Odin/compare/dev-2026-08...dev-2026-09
+
+---
 
 ## dev-2026-08 - 2026-08-06
 
 **dev-2026-08** by Kelimion - <https://github.com/odin-lang/Odin/releases/tag/dev-2026-08>
 
 ## New Language Features
+
 * Allow custom `-collection`s to be used for `foreign import`s in #6999
 
 ## New Compiler Improvements
+
 * Disallow proc group assignment to blank identifier in #6996
 * Increase stack size for threads in #6997
 * Reject chained deferred procedures in #7013
@@ -68,6 +255,7 @@ tags: [OdinRAG, kb, source/official, changelog, odin]
 * Polymorphic procedures resolving to `nil` (#6753 and #) in #7208
 
 ## New Packages
+
 * `[core:crypto/rsa]` Add RSA support in #6857
 * `[core:encoding/asn1]` Add strict DER + `[core:crypto/x509]` (X.509 v3) in #6838
 * `[core:crypto/turboshake]` Add TurboSHAKE in #7043
@@ -75,6 +263,7 @@ tags: [OdinRAG, kb, source/official, changelog, odin]
 * `[core:debug/trace]` Replaced with a much improved implementation in #7141
 
 ## Package Improvements
+
 * `[core:container/rbtree]` Match `find_or_insert` semantics with AVL in #6988
 * `[core:container/rbtree]` Add `upsert` in #7002
 * `[vendor:box3d]` Fix missing return value of `*_GetUserData` functions in #7006
@@ -123,6 +312,7 @@ tags: [OdinRAG, kb, source/official, changelog, odin]
 * Various typo fixes across the packages
 
 ## Miscellaneous
+
 * `[vendor:*]` Replace makefiles in with shell scripts in #7034
 * CI: Update NetBSD to `10_2026Q1` in #7085
 * Improve build scripts portabability and make them `pwd` independent in #7084
@@ -139,6 +329,7 @@ tags: [OdinRAG, kb, source/official, changelog, odin]
 **dev-2026-07a** by Kelimion - <https://github.com/odin-lang/Odin/releases/tag/dev-2026-07a>
 
 ## What's Changed
+
 * Add pull request policy to `vendor/README.md`
 * Fix `vendor:raylib` 6.0 bindings
 * Update `vendor:box3d` to latest commit in #6986
@@ -161,11 +352,13 @@ tags: [OdinRAG, kb, source/official, changelog, odin]
 **dev-2026-07** by Kelimion - <https://github.com/odin-lang/Odin/releases/tag/dev-2026-07>
 
 ## New Language Features
+
 * Add restricted Odin subset mode `-bedrock` in #6654
 * Add [Playdate](https://play.date) support as a `-subtarget` of `-target:freestanding_arm32` in #6900
 * Support `q.xyz` on quaternion*
 
 ## New Compiler Improvements
+
 * New Feature: Stack canaries #6830
 * Change default settings to enable pie and full relro on Linux in #6790
 * Make the type hash 63-bit to not crash OMG JIT in WebKit under WASM in #6829
@@ -201,12 +394,13 @@ tags: [OdinRAG, kb, source/official, changelog, odin]
 * Disallow types in `#any_int` params in  #6950
 * Convert poly const int to `f64` when needed in #6948
 
-
 ## New Packages
+
 * [core:raylib] Raylib 6.0 in #6940
 * [vendor:box3d] Box3D bindings in #6933
 
 ## Package Improvements
+
 * [core:terminal/ansi] Add Alternate Screen Buffer in #6813
 * [core:nbio] Fix UAF op `op.l` in cross-thread exec in #6819
 * [core:slice] Fix wrong variable name in `slice.rotate` in * fixed wrong variable name in #6828
@@ -234,6 +428,7 @@ tags: [OdinRAG, kb, source/official, changelog, odin]
 * [core:container/xar] Forward caller location to make in `array_push_back_*` in #6958
 
 ## Miscellaneous
+
 * Fix nightly static Linux build in #6808
 * Added missing `LDFLAGS` for `OpenBSD` in #6728
 * Deduplicate macOS and Linux nightly builds in #6812
@@ -250,10 +445,12 @@ tags: [OdinRAG, kb, source/official, changelog, odin]
 **dev-2026-06** by Kelimion - <https://github.com/odin-lang/Odin/releases/tag/dev-2026-06>
 
 ## New Language Features
+
 * Add `@(fast_math)` attribute (PR #6676)
 * Support `**` as `expand_values` operator: `**x` == `expand_values(x)` (PR #6731)
 
 ## New Compiler Improvements
+
 * Better error reporting for unary `++`/`--` (PR #6649)
 * Removed Haiku from supported targets (PR #6631)
 * Better SIMD generation for square matrix multiplication and `intrinsics.transpose` (PR #6676)
@@ -274,11 +471,13 @@ tags: [OdinRAG, kb, source/official, changelog, odin]
 * Fix error message "`do` not on the same line as `for`" (PR #6794)
 
 ## New Packages
+
 * Add ML-KEM (FIPS 203) post-quantum key encapsulation support (PR #6635)
 * Add ML-DSA (FIPS 204) post-quantum digital signature support (PR #6695)
 * Add intial PEM support (PR #6755)
 
 ## Package Improvements
+
 * Improve consistency between platforms for `os.copy_directory_all` (PR #6651)
 * Use `context.assertion_failure_proc` in tracking allocator bad free callback (PR #6659)
 * Add `DefSubclassProc` binding (PR #6664)
@@ -305,10 +504,12 @@ tags: [OdinRAG, kb, source/official, changelog, odin]
 * `core:mem` / `core:testing`: Fix buffer overflow when running a test which shrinks a dynamic array (PR #6791)
 
 ## Miscellaneous
+
 * Add `/src` as safe directory for nightly linux arm workflow (PR #6658)
 * Link against `libstdc++exp` for backtrace support (PR #6732)
 
 ## Full Change Log
+
 **Full Changelog**: https://github.com/odin-lang/Odin/compare/dev-2026-05...dev-2026-06
 
 ---
@@ -318,10 +519,12 @@ tags: [OdinRAG, kb, source/official, changelog, odin]
 **dev-2026-05** by Kelimion - <https://github.com/odin-lang/Odin/releases/tag/dev-2026-05>
 
 ## New Language Features
+
 * Native Array Casting Semantics, e.g. `cast([4]f32)4x_u32` (PR #6605)
 * Increase `matrix` limit from 16 to 64 elements, allowing for up to `matrix[8, 8]T`
 
 ## New Compiler Improvements
+
 * Add -debug default behavior usage docs (PR #6511)
 * Fix output of filename when outputting docs with the `-in-source-order` option (PR #6536)
 * Fix `#no_bounds_check` regression (PR #6541)
@@ -342,9 +545,11 @@ tags: [OdinRAG, kb, source/official, changelog, odin]
 * Fix compiler warning on Linux (PR #6638)
 
 ## New Packages
+
 * [core:crypto/noise] Add Noise implementation (PR #6573)
 
 ## Package Improvements
+
 * [core:os] Add `dir` procedure (PR #6517, PR #6528)
 * [base:runtime] Native simd width (PR #6545)
 * [core:os] Fix `_volume_name_len` to handle paths of purely path separators (PR #6547)
@@ -375,6 +580,7 @@ tags: [OdinRAG, kb, source/official, changelog, odin]
 * [core:sys/linux] Emulate `dup2` better on arm64 and riscv (PR #6632)
 
 ## Full Change Log
+
 **Full Changelog**: https://github.com/odin-lang/Odin/compare/dev-2026-04...dev-2026-05
 
 ---
@@ -384,9 +590,11 @@ tags: [OdinRAG, kb, source/official, changelog, odin]
 **dev-2026-04** by Kelimion - <https://github.com/odin-lang/Odin/releases/tag/dev-2026-04>
 
 ## New Language Features
+
 * [Fixed Capacity Dynamic Arrays](https://github.com/odin-lang/Odin/pull/6406), adds `[dynamic; N]T`
 
 ## New Compiler Improvements
+
 * Limit maximum exponent of integer literals to avoid unnecessary work
 * Add `-in-source-order` option to `odin doc` to show docs in source order within each file
 * Support clang-style `+`/`-` prefixes in target features
@@ -411,11 +619,13 @@ tags: [OdinRAG, kb, source/official, changelog, odin]
 * Fix declaration order bugs #5572 and #5961: Incorrectly rejecting valid in-progress/forward union references
 
 ## New Packages
+
 * `core:crypto/argon2id` initial import
 * `vendor:windows/wasapi`
 * `vendor:sdl3/mixer`
 
 ## Package Improvements
+
 * Add more JS to `examples/all`
 * Update Unicode database to newer version
 * Fix modular exponentiation in `core:math/big`
@@ -462,6 +672,7 @@ tags: [OdinRAG, kb, source/official, changelog, odin]
 * `for init; x in y {}` style loops
 
 ## New Compiler Improvements
+
 * Stop silently ignoring unknown directives on an inline `asm` expression
 * Do not allow duplicated `#partial` directives on switch statements
 * Add broadcasting to strings (Fix #1837)
@@ -474,9 +685,11 @@ tags: [OdinRAG, kb, source/official, changelog, odin]
 * Fix #6270
 
 ## New Packages
+
 * `core:crypto/ecdsa`: Add ECDSA support
 
 ## Package Improvements
+
 * [BREAKING] `core:os/os2` -> `core:os` integration
 * [BREAKING] `core:sys/info`: Change API from globals to calls. Do as little work in `@(init)` as practical.
 * Allow test names to be specified as a command line option for tests executable
@@ -546,7 +759,7 @@ tags: [OdinRAG, kb, source/official, changelog, odin]
 ## New Compiler Improvements
 
 * Link-Time Optimization Support
-  *  `-lto:thin` and `-lto:thin-files`
+  * `-lto:thin` and `-lto:thin-files`
 * `#must_tail` directive and `preserve/none`/`preserve/most`/`preserve/all`  calling conventions
   * Enables the ability to state how optimize for tail calls
 * `-disable-unwind`
@@ -559,7 +772,7 @@ tags: [OdinRAG, kb, source/official, changelog, odin]
 * `-target:freestanding_amd64_mingw`
   * Allowing for linking to MinGW on Windows but for freestanding purposes (not general)
 * Fix `string16` issues on Mac and Linux
-* Fix `in`/`not_in` on constant `bit_set`s 
+* Fix `in`/`not_in` on constant `bit_set`s
 * Allow `#+vet` tags always work in addition to command line flag
 * General fixes to `-vet`
 * Type assertions now use the same `context.assertion_failure_proc` as `assert` and `panic`  where possible
@@ -597,7 +810,7 @@ tags: [OdinRAG, kb, source/official, changelog, odin]
   * Correct how comment handling and entities
 * `core:strings`
   * Add `loc := #caller_location` to allocating procedures that would benefit for it
-* `core:sys/windows` 
+* `core:sys/windows`
   * add a few procedure bindings
   * sync barriers
   * procedure-based "macros" for RawInput
@@ -605,7 +818,7 @@ tags: [OdinRAG, kb, source/official, changelog, odin]
   * Pass given allocator on in `create_iterator`
 * `vendor:x11/xlib`
   * Binding fixes, correcting incorrect signatures
-* `vendor:directx` 
+* `vendor:directx`
   * Improve string type uses in DirectX bindings
 * `vendor:compress/lz4`
   * Fix linking on non-Windows platforms
@@ -619,10 +832,9 @@ tags: [OdinRAG, kb, source/official, changelog, odin]
 * Move `vendor:libc` to `vendor:libc-shim`
   * This is to clarify that it exists as a "shim" rather than a proper replacement
 * Update Orca bindings
-* General additions and improvements to `core:sys/linux` 
+* General additions and improvements to `core:sys/linux`
 * Bulk-write to a slice in xoshiro/pcg_random_generator_proc
 * Fixes to darwin/Foundation bindings
-
 
 ## Full Change Log
 
@@ -636,7 +848,7 @@ tags: [OdinRAG, kb, source/official, changelog, odin]
 
 ## New Language Features
 
-* 
+*
 
 ## New Compiler Improvements
 
@@ -707,7 +919,7 @@ tags: [OdinRAG, kb, source/official, changelog, odin]
 
 ## New Language Features
 
-* 
+*
 
 ## New Compiler Improvements
 
@@ -715,7 +927,7 @@ tags: [OdinRAG, kb, source/official, changelog, odin]
 
 ## New Packages
 
-* 
+*
 
 ## Package Improvements
 
@@ -812,20 +1024,19 @@ The old default generator is available under `core:math/rand` in `rand_pcg.odin`
   * Concatentation of constant slices, strings, and some arrays at compile time
 * `intrinsics.objc_super` & `@(objc_superclass=<type>)`
 
-
 ## New Compiler Improvements
 
 * Objective-C interface improvements
   * `intrinsics.objc_super` and automatically emit `objc_msgSend` calls where necessary for `@(objc_superclass)` attribute
   * Fix block symbols naming conflict across modules
-* LLVM backend fixes 
+* LLVM backend fixes
   * `#simd` vector only uses bit cast when elements are not pointers
   * Fix bitcasting `context` pointer to prevent compilation errors on LLVM-14
   * Numerous constant union improvements
   * Prefer the `Type *` ver `LLVMTypeRef` when looking up `struct_field_remapping` due to lack of uniqueness
 * Default parameter exclusion counting improvement for procedure groups
 * Improved `-target-features` flag by allow the user to disable a target feature
-  *  `-target-features:-sse,-sse2,-avx`
+  * `-target-features:-sse,-sse2,-avx`
 * `-export-linked-libs-file:<string>` flag to export the linked libraries to a file
 * Fix a few compiler hangs on macOS.
 * LLVM 21 support for non-Windows platforms
@@ -862,10 +1073,10 @@ The old default generator is available under `core:math/rand` in `rand_pcg.odin`
 * `vendor/egl`
   * add a few more procedures and constants
   * Fix `GetPlatformDisplay` and `CreatePlatformWindowSurface` to use `int` instead of `i32`
-* `vendor:box2d` 
+* `vendor:box2d`
   * fixes to bindings mismatches
   * Add `targetAngle` to `RevoluteJoint` struct/procs
-* `core:odin/parser`  
+* `core:odin/parser`
   * fixes for `end_pos`
   * parse empty identifiers after selector as a selector expression with an empty field
 * `core:hash`: add CCITT CRC-16
@@ -942,10 +1153,10 @@ The old default generator is available under `core:math/rand` in `rand_pcg.odin`
 
 * `@(init)`  and `@(fini)` must be `proc "contextless" ()`
 * Implement `intrinsics.objc_block` @harold-b in https://github.com/odin-lang/Odin/pull/5547
-  *  Implements the Apple block ABI.2010.3.16 natively
+  * Implements the Apple block ABI.2010.3.16 natively
 * Improve deference missing suggestion message
 * Do not check for explicit allocators when determining proc in proc group by @janga-perlind in https://github.com/odin-lang/Odin/pull/5564
-* Skip errors on polymorphic procs when in a proc group with other options 
+* Skip errors on polymorphic procs when in a proc group with other options
 * Fix compiler segfault when trying to use proc at type level or trying to use `()` as a type
 
 ## New Packages
@@ -960,24 +1171,24 @@ The old default generator is available under `core:math/rand` in `rand_pcg.odin`
 * Fixes to `vendor:wasm/WebGL` bindings
 * Cleanup in `math/rand` and `runtime/random_generator`
 * Add missing xlib functions for getting and setting text properties
-* `vendor:OpenGL` fix misnamed parameter by 
-* Make D3D12_FEATURE_DATA_D3D12_OPTIONS.MinPrecisionSupport a bitset 
-* Fix buddy allocator assert 
+* `vendor:OpenGL` fix misnamed parameter by
+* Make D3D12_FEATURE_DATA_D3D12_OPTIONS.MinPrecisionSupport a bitset
+* Fix buddy allocator assert
 * Check for EOF when scanning file tags
 * Fix stride in `memory_equal/compare_zero` giving false positves
 * Split SDL_ttf bindings to group with and without require_results
 * Propogate `#caller_location` to core:container/queue procs
-* Support using allocator resize in `_reserve_soa` 
+* Support using allocator resize in `_reserve_soa`
 * Zero existing memory when using `resize_soa`
-* Add `add/remove_document_event_listener()` to `core:sys/wasm/js` 
+* Add `add/remove_document_event_listener()` to `core:sys/wasm/js`
 * Fixed and added obj-c methods for `NSWindow`
-* fix typo in `CLSIDFromProgIDEx` signature 
-* Fix broken `wglUseFontBitmaps` binding 
+* fix typo in `CLSIDFromProgIDEx` signature
+* Fix broken `wglUseFontBitmaps` binding
 * Add `LPFN_GETACCEPTEXSOCKADDRS` to ws2_32.odin
-* Specify `%m` and `%M `as verbs for integer formatting in `core:fmt`
-* Add `@(require_results)` attribute to procs returning an allocator 
+* Specify `%m` and `%M`as verbs for integer formatting in `core:fmt`
+* Add `@(require_results)` attribute to procs returning an allocator
 * Handle allocator error when appending in `read_entire_file_from_file`
-* `vendor:box2d` fix `CreateMotorJoint` procedure signature 
+* `vendor:box2d` fix `CreateMotorJoint` procedure signature
 * Add build tags to `posix/spawn.odin`
 
 **Full Changelog**: https://github.com/odin-lang/Odin/compare/dev-2025-08...dev-2025-09
@@ -989,9 +1200,11 @@ The old default generator is available under `core:math/rand` in `rand_pcg.odin`
 **dev-2025-08** by gingerBill - <https://github.com/odin-lang/Odin/releases/tag/dev-2025-08>
 
 ## New Language Features
+
 *
 
 ## New Compiler Improvements
+
 * General compiler bug fixes
 * `intrinsics.type_enum_is_contiguous`
 * `intrinsics.simd_runtime_swizzle`
@@ -1004,25 +1217,26 @@ The old default generator is available under `core:math/rand` in `rand_pcg.odin`
 * Fix macos amd64 builds
 * amd64 ABI fixes regarding certain types of SIMD vectors
 
-
 ## New Packages
+
 *
 
 ## Package Improvements
+
 * Update `core:prof/spall` to version 3
   * Adds @(no_instrumentation) to spall buffer and SCOPED operations
-* `core:hash/xxhash`: Static SIMD Support for XXH3 
+* `core:hash/xxhash`: Static SIMD Support for XXH3
 * Minor fixes to `core:mem/virtual` edge cases
 * Unix build script for `kb_text_shape`
 * Add `IUnknown` UUID for win32 related code
 * `crypto/hash`: hash_bytes_to_buffer slice result to digest size
 * Minor fix to `-default-to-nil-allocator`
-* Disable filepath/match.odin and filepath/walk.odin compilation on js targets 
+* Disable filepath/match.odin and filepath/walk.odin compilation on js targets
 * Minor fixes to `SDL_image` save procedure that should return a boolean
 * Mach Process Control
-* Fix amd64 no-crt entry assembly 
-* Add cgltf filter type and wrap mode enums 
-* SDL2 - AudioAllowChangeFlags bit_set 
+* Fix amd64 no-crt entry assembly
+* Add cgltf filter type and wrap mode enums
+* SDL2 - AudioAllowChangeFlags bit_set
 * `core:thread` - set stack size to rlimit for \*nix platforms
 
 **Full Changelog**: https://github.com/odin-lang/Odin/compare/dev-2025-07...dev-2025-08
@@ -1034,10 +1248,12 @@ The old default generator is available under `core:math/rand` in `rand_pcg.odin`
 **dev-2025-07** by Kelimion - <https://github.com/odin-lang/Odin/releases/tag/dev-2025-07>
 
 ## New Language Features
+
 * Add `intrinsics.type_is_bit_field`
 * Add `@(no_sanitize_memory)` with additions to `base:sanitizer`
 
 ## New Compiler Improvements
+
 * Correct spelling in `odin doc -help` output
 * Let `-test-all-packages` work with `-build-mode:test`
 * Fix package docs
@@ -1063,9 +1279,11 @@ The old default generator is available under `core:math/rand` in `rand_pcg.odin`
 * Various fixes
 
 ## New Packages
+
 * `vendor/kb_text_shape`
 
 ## Package Improvements
+
 * Add examples/all/sdl3 for all sdl3 dependant packages
 * Rewrite `Atomic_RW_Mutex`
 * Add overlapped I/O bindings for Windows
@@ -1114,9 +1332,11 @@ The old default generator is available under `core:math/rand` in `rand_pcg.odin`
 **dev-2025-06** by gingerBill - <https://github.com/odin-lang/Odin/releases/tag/dev-2025-06>
 
 ## New Language Features
-* -
+
+* *
 
 ## New Compiler Improvements
+
 * Improvements to building with Android
 * Add more asan support to the odin runtime and sanitizing for various allocators
 * Fix to compile-time and variable NaN comparisons
@@ -1140,15 +1360,16 @@ The old default generator is available under `core:math/rand` in `rand_pcg.odin`
 * Add error with a suggestion when trying to extract an element from a `#simd` array, and prefer `simd.extract`
 * Only trim `.odin` from build filename
 * Keep shared libraries from calling main program's startup/cleanup procs on Linux
-* Add `-build-only`, `-keep-test-executable`, delete test executable after running 
+* Add `-build-only`, `-keep-test-executable`, delete test executable after running
 * Enable all sanitizers on FreeBSD
 * RAD Debugger support through custom `.raddbg` section
   * Default views for slices and matrices
 * Error on unterminated multi-line comment
 * Fix output of object names (https://github.com/odin-lang/Odin/pull/5241)
-* Add suggestions for `quaternionN` or `complexN` conversions 
+* Add suggestions for `quaternionN` or `complexN` conversions
 
 ## New Packages
+
 * `base:sanitizer`
 * `vendor:windows/XAudio2`
 * `vendor:sdl3/ttf`
@@ -1156,26 +1377,27 @@ The old default generator is available under `core:math/rand` in `rand_pcg.odin`
 * `core:encoding/ansi` -> `core:terminal/ansi`
 
 ## Package Improvements
+
 * Vectorize `base:runtime.memory_*`
-* `core:net` 
+* `core:net`
   * Rework errors to be cross-platform
   * Replace `default_tcp_options` with a constant
-* `core:container/small_array`: Improve documentation for 
+* `core:container/small_array`: Improve documentation for
 * `core:sync/chan`: Improve documentation
 * `core:mem/tlsf`: refactor, add `free_all` support, add automatic new pools
 * `core:fmt`: Fix printing for `bit_set[Enum]` when `min(Enum) != 0`
-* `vendor/glfw` 
+* `vendor/glfw`
   * fix `SetMonitorCallback` and `MonitorProc` type definition
   * use `b32` where appropriate
 * `core:text/regex`: Add iterator
 * `core:math`: Fix `math.nextafter` skipping from 0 to 1
-* `vendor:wgpu`: 
+* `vendor:wgpu`:
   * Update to 25.0.2.1
   * Fix function name for wgpu.js `genericGetAdapterInfo`
   * Correct `mipmpaFilter` field name in wgpu.js
 * `core:time/timezone`: preserve nanoseconds on calls
 * `vendor:box2d`:
-  *  Update to 3.1.0
+  * Update to 3.1.0
   * Add missing field in `box2d.BodyDef`
   * Make `build_box2d.sh` more flexible
 * `core:container/priority_queue`
@@ -1183,7 +1405,7 @@ The old default generator is available under `core:math/rand` in `rand_pcg.odin`
   * Fix off-by-one error in `remove`
 * `core:sys/darwin/Foundation` : Loads of additions and related stuff
 * `vendor:sdl2`: correct RWwrite signature
-* `vendor:sdl3`: 
+* `vendor:sdl3`:
   * Fix `count` output parameter of `GetFullscreenDisplayModes`
   * Add `Semaphore` API
 * `core:encoding/*`, fix parsing of CDATA tags
@@ -1196,8 +1418,8 @@ The old default generator is available under `core:math/rand` in `rand_pcg.odin`
 * `base:intrinsics`: alternate `reduce_add`/`reduce_mul` intrinsics
 * `core:strconv`, add support for hex-floats (`0h`)
 * `vendor:raylib/rlgl` add some missing functions
-* `vendor:directx/d3d12` 
-  * add more FEATURE_DATA_OPTIONs 
+* `vendor:directx/d3d12`
+  * add more FEATURE_DATA_OPTIONs
   * Fix RESOURCE_STATE_ALL_SHADER_RESOURCE flags and add new HEAP_TYPE
 * `core:encoding/json`: when unmarshalling, only match on struct tags if present
 * `vendor/miniaudio`: update to 0.11.22
@@ -1224,7 +1446,7 @@ The old default generator is available under `core:math/rand` in `rand_pcg.odin`
 * Support LLVM 20.1
 * Fix Objective-C Selector and Class linking problems caused by a race condition
 * VERY Rudimentary support for Android:
-    * `-subtarget:android` for `-target:linux_arm64`
+  * `-subtarget:android` for `-target:linux_arm64`
 * Numerous `js_wasm32` improvements
 * Add `~{memory}` clobber to syscalls intrinsics
 * Improve `or_else` type inference logic
@@ -1252,7 +1474,7 @@ The old default generator is available under `core:math/rand` in `rand_pcg.odin`
 
 ## New Language Features
 
--
+*
 
 ## New Compiler Improvements
 
@@ -1269,7 +1491,6 @@ The old default generator is available under `core:math/rand` in `rand_pcg.odin`
 * `for x in bit_set` will use a count leading zeros intrinsics internally rather than checking each bit manually
 * General bug fixes for LLVM backend
 
-
 ## New Packages
 
 * `vendor:sdl3/image`
@@ -1280,7 +1501,7 @@ The old default generator is available under `core:math/rand` in `rand_pcg.odin`
 * Improved documentation for `core:simd`
 * Minor fixes to SDL3 bindings
 * Support use of `*` in format strings without an index
-* `NS.SavePanel_URL` fix 
+* `NS.SavePanel_URL` fix
 * Support `%b` for `rune`
 * `os2` fixes
   * Recursive directory walker
@@ -1288,42 +1509,3 @@ The old default generator is available under `core:math/rand` in `rand_pcg.odin`
   * `os2.random_string` to use `context.random_generator`
 
 ---
-
-## dev-2025-02 - 2025-02-11
-
-**dev-2025-02** by gingerBill - <https://github.com/odin-lang/Odin/releases/tag/dev-2025-02>
-
-## New Language Features
-
-* Support `#unroll(N) for` with arrays
-
-## Compiler Improvements
-
-* Enable `-use-separate-module` as default for all platforms (except wasm based ones)
-* General Bug Fixes
-* Remove erroneous warnings regarding stack overflow in range loops "by reference"
-* Allow broadcasting of untyped values to `#simd` arrays
-* Improvements to `-obfuscate-source-code-locations`
-* Remove duplicates of .framework/.dynlib/.so in linker
-* Darwin: Sort frameworks to link first
-
-
-## New Packages
-
-* `vendor:sdl3` (3.2.2)
-* `vendor:windows/GameInput`
-
-## Package Improvements
-
-* Improvements to D3D12 package
-* Improvements for Haiku
-* Add missing procedures to GLFW
-* `runtime.map_entry`
-* XInput bindings for `core:sys/windows`
-* More work on `core:os/os2` development
-* More Objective-C bindings
-* Additional bindings and constants for `core:sys/windows`
-* `mem.Tracking_Allocator` defaults to panicking on bad frees
-
----
-

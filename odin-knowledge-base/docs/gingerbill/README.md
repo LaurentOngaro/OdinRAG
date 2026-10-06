@@ -29,6 +29,7 @@ If you want the full articles on your machine:
 
 Articles that the scraper can pull (specific count depends on your local run):
 
+- **CTTI is Exponential, RTTI is Linear** (2026-09-02) - https://www.gingerbill.org/article/2026/09/02/ctti-is-exponential-rtti-is-linear
 - **Everyone Says Assembly Is Untyped—Everyone Is Wrong** (2026-08-20) - https://www.gingerbill.org/article/2026/08/20/designing-odins-inline-asm
 - **Good Tools Are Invisible** (2026-07-10) - https://www.gingerbill.org/article/2026/07/10/good-tools-are-invisible
 - **The Aesthetic Problem of Namespacing** (2026-05-13) - https://www.gingerbill.org/article/2026/05/13/aesthetic-namespacing

@@ -16,17 +16,9 @@ Fix Your Timestep! | Gaffer On Games
 
 Jun 10, 2004
 
-10 min read
+9 min read
 
 [Game Physics](/categories/game-physics/)
-
----
-
-Hello readers, I'm no longer posting new content on gafferongames.com
-
-### Please check out my new blog at [mas-bandwidth.com](https://mas-bandwidth.com/xdp-for-game-programmers)
-
----
 
 ## Introduction
 
@@ -40,7 +32,7 @@ But how to choose this delta time value? This may seem like a trivial subject bu
 
 The simplest way to step forward is with fixed delta time, like 1/60th of a second:
 
-```c
+```odin
     double t = 0.0;
     double dt = 1.0 / 60.0;
 
@@ -62,8 +54,7 @@ In these cases your simulation will run faster or slower than you intended.
 
 Fixing this *seems* simple. Just measure how long the previous frame takes, then feed that value back in as the delta time for the next frame. This makes sense because of course, because if the computer is too slow to update at 60HZ and has to drop down to 30fps, you'll automatically pass in 1/30 as delta time. Same thing for a display refresh rate of 75HZ instead of 60HZ or even the case where VSYNC is turned off on a fast computer:
 
-```c
-
+```odin
     double t = 0.0;
 
     double currentTime = hires_time_in_seconds();
@@ -91,8 +82,7 @@ It's much more realistic to say that your simulation is well behaved only if del
 
 With this knowledge at hand, here's a simple trick to ensure that you never pass in a delta time greater than the maximum value, while still running at the correct speed on different machines:
 
-```c
-
+```odin
     double t = 0.0;
     double dt = 1 / 60.0;
 
@@ -140,7 +130,7 @@ If you head just exploded don't worry, all that is needed to solve this is to ch
 
 For example:
 
-```c
+```odin
     double t = 0.0;
     const double dt = 0.01;
 
@@ -178,7 +168,7 @@ Now consider that the majority of render frames will have some small remainder o
 
 One solution to this problem is to interpolate between the previous and current physics state based on how much time is left in the accumulator:
 
-```c
+```odin
     double t = 0.0;
     double dt = 0.01;
 
@@ -221,13 +211,8 @@ We can use this remainder value to get a blending factor between the previous an
 
 **NEXT ARTICLE:** [Physics in 3D](/post/physics_in_3d/)
 
----
-
-Hello readers, I'm no longer posting new content on gafferongames.com
-
-### Please check out my new blog at [mas-bandwidth.com](https://mas-bandwidth.com/xdp-for-game-programmers)
-
----
+Enjoying my articles and open source code?
+[Support my work!](https://www.patreon.com/MasBandwidth/membership)
 
 [physics](/tags/physics/)
 

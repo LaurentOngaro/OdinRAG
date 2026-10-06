@@ -2,17 +2,17 @@
 source: github-releases
 repo: raysan5/raylib
 tag: consolidated
-date: 2026-08-25
+date: 2026-10-03
 type: changelog
 status: active
 version: 1.0.0
-lastUpdated: "2026-08-25T10:35:56Z"
+lastUpdated: "2026-10-03T16:16:29Z"
 updatedBy: "MiniMax-M3 (Kilo Code)"
 tags: [OdinRAG, kb, source/raylib, changelog, raylib]
 ---
 # Raylib Changelog (consolidated, 10 releases)
 
-> Generated from the [raysan5/raylib releases](https://github.com/raysan5/raylib/releases) feed on 2026-08-25.
+> Generated from the [raysan5/raylib releases](https://github.com/raysan5/raylib/releases) feed on 2026-10-03.
 > Re-run `python _Helpers/scripts/scrapers/scrape_raylib_changelog.py` to refresh.
 
 ## 6.0 - 2026-04-23
