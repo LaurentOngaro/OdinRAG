@@ -10,7 +10,7 @@
 To keep this repo small and the licensing clear, the **public branch** of this repository ships a **curated subset** of each source:
 
 - **Fully shipped** (Odin team content under MIT-style): `odin-knowledge-base/docs/official/`, `odin-knowledge-base/docs/newsletters/`, `odin-knowledge-base/docs/showcase/`.
-- **5 sample articles shipped** (© authors, public-readable): `odin-knowledge-base/docs/karl_zylinski/`, `odin-knowledge-base/docs/gingerbill/`, `odin-knowledge-base/docs/jakubtomsu/`.
+- **5 sample articles shipped** (© authors, public-readable): `odin-knowledge-base/docs/karl_zylinski/`, `odin-knowledge-base/docs/gingerbill/`, `odin-knowledge-base/docs/jakubtomsu/`, `odin-knowledge-base/docs/marianpekar/`.
 - **NOT in the public `public` branch** (paid / paywall), but **tracked in the local `main` branch** and pushed to the private remote `OdinRag-private`: `odin-knowledge-base/docs/karl_zylinski/odin-book/`, `odin-knowledge-base/courses/`.
 
 The exclusion mechanism for the last category is the **two-branch strategy** (local `main` ↔ private remote / local `public` ↔ public remote), NOT `.gitignore`. See [`_Helpers/docs/007_mixing_public_and_private_history.md`](../_Helpers/docs/007_mixing_public_and_private_history.md).
@@ -91,7 +91,21 @@ They are **absent from the public `public` branch** (so a fresh `git clone` of `
 
 **Scraper**: `_Helpers/scripts/scrapers/scrape_jakubtomsu.py` (RSS).
 
-## 7. Odin Showcase
+## 7. Marian Pekar's blog (marianpekar.com)
+
+| Source                               | Licence                                   | How to obtain                            |
+| ------------------------------------ | ----------------------------------------- | ---------------------------------------- |
+| Articles on `marianpekar.com/blog/`  | © Marian Pekar (publicly readable, free)  | Free to read: <https://marianpekar.com>  |
+
+**Why this source**: the blog is now focused on building things from scratch in Odin, including two long multi-part series that are directly relevant to this knowledge base (software rendering and physics, both with raylib).
+
+**What ships in this repo**: the 21 Odin posts in `odin-knowledge-base/docs/marianpekar/` (Software Renderer in Odin from Scratch, parts I-XIV; Physics Engine in Odin from Scratch, parts I-VI; 2D Cloth Simulation in Odin with raylib). The 16 older posts about Unreal Engine, Unity and tooling are **not** shipped; they are listed in the folder README.
+
+**Scraper**: `_Helpers/scripts/scrapers/scrape_marianpekar.py` (RSS at `/rss`). It filters on the `odin` keyword in the slug or the title; pass `--all` to also pull the Unity/Unreal posts.
+
+**Note on the author**: the site is supported by donations and explicitly states that all content stays free (no ads, no paywall). If you find these articles useful, consider [supporting the author](https://buymeacoffee.com/marianpekar) and always link back to the original post.
+
+## 8. Odin Showcase
 
 | Source                                      | Licence                                   | How to obtain                           |
 | ------------------------------------------- | ----------------------------------------- | --------------------------------------- |
@@ -101,7 +115,7 @@ They are **absent from the public `public` branch** (so a fresh `git clone` of `
 
 **Scraper**: `_Helpers/scripts/scrapers/scrape_showcase.py` (crawl).
 
-## 8. Skool "programvideogames" group (Vertical Slice and Dice + Metroidvania courses)
+## 9. Skool "programvideogames" group (Vertical Slice and Dice + Metroidvania courses)
 
 | Source                                                          | Licence                                       | How to obtain                                              |
 | --------------------------------------------------------------- | --------------------------------------------- | ---------------------------------------------------------- |
@@ -120,7 +134,7 @@ They are **absent from the public `public` branch** (so a fresh `git clone` of `
 - Authenticate with your paid Skool account in the browser session
 - Run `python _Helpers/scripts/scrapers/scrape_skool.py`
 
-## 9. Odin & Raylib changelogs (GitHub Releases API)
+## 10. Odin & Raylib changelogs (GitHub Releases API)
 
 | Source                               | Licence                                   | How to obtain                                      |
 | ------------------------------------ | ----------------------------------------- | -------------------------------------------------- |
@@ -139,7 +153,7 @@ They are **absent from the public `public` branch** (so a fresh `git clone` of `
 
 Both are idempotent (frontmatter `tag:` check), support `--check` dry-run and an optional `GITHUB_TOKEN` env var for the 5000 req/hour rate limit.
 
-## 10. GitIngest snapshots (Perplexity Space fallback layer)
+## 11. GitIngest snapshots (Perplexity Space fallback layer)
 
 | Source                              | Licence                          | How to obtain                                                           |
 | ----------------------------------- | -------------------------------- | ----------------------------------------------------------------------- |
@@ -157,7 +171,7 @@ Both are idempotent (frontmatter `tag:` check), support `--check` dry-run and an
 - Snapshots are **fallback context, not primary source of truth**. The curated KB under `odin-knowledge-base/docs/` is always preferred over a raw gitIngest dump when available.
 - The Perplexity Space should only ingest the small curated files (changelogs, INDEX, charte) - NOT the bulk snapshots. See the backlog doc for the precise keep/drop list.
 
-## 11. Code references (always-public)
+## 12. Code references (always-public)
 
 | Source                                          | Licence               | How to obtain                                                                                                 |
 | ----------------------------------------------- | --------------------- | ------------------------------------------------------------------------------------------------------------- |

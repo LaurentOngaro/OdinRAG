@@ -56,6 +56,7 @@ odin-knowledge-base/
 │   ├── newsletters/         <- odin-lang.org/news/ (Odin team, public branch)
 │   ├── gingerbill/          <- gingerbill.org (5 sample articles in public, full corpus in main)
 │   ├── jakubtomsu/          <- jakubtomsu.github.io (sample in public, full corpus in main)
+│   ├── marianpekar/         <- marianpekar.com Odin posts (21 posts in public, Unity/Unreal excluded)
 │   └── showcase/            <- odin-lang.org/showcase/ (Odin team, public branch)
 ├── gitIngest/               <- gitingest snapshots of local Odin repo clones (public branch, regenerable)
 ├── references/             <- curated cross-language style/design references (public branch, hand-maintained)

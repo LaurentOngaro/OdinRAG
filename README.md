@@ -33,7 +33,7 @@ The repo ships **only** the curation workflow (scrapers, agents, skills, indexes
 > Paywalled scraped content (`odin-knowledge-base/courses/`, `odin-knowledge-base/docs/karl_zylinski/odin-book/`) is **absent from the public `public` branch** by the two-branch strategy.
 > That strategy is: local `main` ↔ private remote / local `public` ↔ public remote.
 > The exclusion mechanism is **not** `.gitignore`.
-> The repo ships sample articles in `odin-knowledge-base/docs/{karl_zylinski,gingerbill,jakubtomsu}/` on the `public` branch.
+> The repo ships sample articles in `odin-knowledge-base/docs/{karl_zylinski,gingerbill,jakubtomsu,marianpekar}/` on the `public` branch.
 > Run the corresponding scrapers (or sync from the private remote if you have access) to populate the full corpus on your own machine.
 
 ## Quick start

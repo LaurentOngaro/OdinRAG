@@ -2,7 +2,7 @@
 
 ## Contents
 
-- `docs/` - scraped Markdown sources (official, karl_zylinski, newsletters, gingerbill, jakubtomsu, showcase)
+- `docs/` - scraped Markdown sources (official, karl_zylinski, newsletters, gingerbill, jakubtomsu, marianpekar, showcase)
 - `INDEX.md` - central index by topic (auto + manual zones)
 - `gitIngest/` - gitingest snapshots of local Odin repo clones (regenerable)
 - `references/` - curated cross-language style/design references (TigerStyle, design philosophy); hand-maintained in both branches, see its README

@@ -11,7 +11,7 @@ updatedBy: "MiniMax-M3 (Kilo Code)"
 
 # Prompt: refresh the "Index by topic" section of `odin-knowledge-base/INDEX.md`
 
-> Use this prompt when the KB has grown significantly (new Skool lessons, new Karl book chapters, new gingerbill/jakubtomsu articles) and the hardcoded "Index by topic" section in `odin-knowledge-base/INDEX.md` is stale.
+> Use this prompt when the KB has grown significantly (new Skool lessons, new Karl book chapters, new gingerbill/jakubtomsu/marianpekar articles) and the hardcoded "Index by topic" section in `odin-knowledge-base/INDEX.md` is stale.
 
 ## When to invoke
 

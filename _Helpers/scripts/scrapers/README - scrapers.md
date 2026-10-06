@@ -10,6 +10,7 @@ One scraper per source. Each one is re-entrant (skips already scraped files by d
 - `scrape_zylinski.py` - Karl Zylinski blog articles → `odin-knowledge-base/docs/karl_zylinski/`.
 - `scrape_gingerbill.py` - gingerbill.org blog articles via RSS → `odin-knowledge-base/docs/gingerbill/`.
 - `scrape_jakubtomsu.py` - Jakub Tomsu blog articles → `odin-knowledge-base/docs/jakubtomsu/`.
+- `scrape_marianpekar.py` - Marian Pekar blog articles (Odin posts only by default, `--all` to include the Unity/Unreal ones) → `odin-knowledge-base/docs/marianpekar/`.
 - `scrape_newsletters.py` - odin-lang.org/news/ newsletters → `odin-knowledge-base/docs/newsletters/`.
 - `scrape_showcase.py` - odin-lang.org/showcase/ pages → `odin-knowledge-base/docs/showcase/`.
 - `scrape_skool.py` - Skool `programvideogames` group, paywalled, tracks in `main`, absent from `public` → `odin-knowledge-base/courses/programvideogames/`.

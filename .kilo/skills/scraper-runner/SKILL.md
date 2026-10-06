@@ -1,6 +1,6 @@
 ---
 name: scraper-runner
-description: "Run a scraper (_Helpers/scripts/scrapers/scrape_*.py) with the right flags. Covers scrape_skool (Skool programvideogames), scrape_official (odin-lang.org), scrape_zylinski (zylinski.se), scrape_gingerbill.py, scrape_newsletters.py, scrape_jakubtomsu.py, scrape_showcase.py, download_gists.py, download_odin_examples.py. All re-entrant."
+description: "Run a scraper (_Helpers/scripts/scrapers/scrape_*.py) with the right flags. Covers scrape_skool (Skool programvideogames), scrape_official (odin-lang.org), scrape_zylinski (zylinski.se), scrape_gingerbill.py, scrape_newsletters.py, scrape_jakubtomsu.py, scrape_marianpekar.py, scrape_showcase.py, download_gists.py, download_odin_examples.py. All re-entrant."
 ---
 
 # Run a scraper
@@ -17,6 +17,7 @@ Skill for re-running one of the project's scrapers. All scrapers are **re-entran
 | `scrape-gingerbill.py`       | gingerbill.org RSS                 | `odin-knowledge-base/docs/gingerbill/`           | requests + BeautifulSoup |
 | `scrape-newsletters.py`      | odin-lang.org/news/                | `odin-knowledge-base/docs/newsletters/`          | requests + BeautifulSoup |
 | `scrape-jakubtomsu.py`       | jakubtomsu.github.io RSS           | `odin-knowledge-base/docs/jakubtomsu/`           | requests + BeautifulSoup |
+| `scrape-marianpekar.py`      | marianpekar.com RSS (Odin posts)   | `odin-knowledge-base/docs/marianpekar/`          | requests + BeautifulSoup |
 | `scrape-showcase.py`         | odin-lang.org/showcase/            | `odin-knowledge-base/docs/showcase/`             | requests + BeautifulSoup |
 | `scrape_odin_changelog.py`   | github.com/odin-lang/Odin releases | `odin-knowledge-base/docs/official/changelog/`   | requests                 |
 | `scrape_raylib_changelog.py` | github.com/raysan5/raylib releases | `odin-knowledge-base/docs/raylib/changelog/`     | requests                 |
@@ -48,6 +49,8 @@ python _Helpers/scripts/scrapers/scrape_skool.py --overwrite-existing-lessons
 
 ### scrape_skool - useful options
 
+> **Stale-lesson prune (default ON, full runs only)**: a lesson whose Skool title carries no lesson number is named with the positional prefix `{idx+1:03d}-`. Inserting or reordering a lesson upstream shifts that prefix, but an already-exported lesson is reused as-is and never renamed, so the old file survives as a byte-identical duplicate whose number collides with another lesson. On a **complete** run the scraper therefore deletes every `.md` under the course folder that is not one of the target filenames computed during that run. `README.md` and `Support Files/` are never touched, and the step is automatically skipped when `--lesson`, `--skip-until` or `--number` makes the target set partial. Use `--prune-dry-run` to preview, `--no-prune` to disable.
+
 ```bash
 # A single lesson (fuzzy title filter)
 python _Helpers/scripts/scrapers/scrape_skool.py --lesson "entities state physics"
@@ -60,6 +63,12 @@ python _Helpers/scripts/scrapers/scrape_skool.py --download-video
 
 # Also download the ZIPs attached to lessons
 python _Helpers/scripts/scrapers/scrape_skool.py --download-support-files
+
+# List the stale lesson files that would be deleted, without deleting them
+python _Helpers/scripts/scrapers/scrape_skool.py --prune-dry-run
+
+# Keep the stale lesson files (disable the automatic cleanup)
+python _Helpers/scripts/scrapers/scrape_skool.py --no-prune
 
 # Test connection / session validity only (fast check)
 python _Helpers/scripts/scrapers/scrape_skool.py --login

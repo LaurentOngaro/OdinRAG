@@ -13,13 +13,16 @@ Skill for querying the OdinRAG knowledge base. The KB is composed of three corpo
 | `odin-knowledge-base/docs/official/`                | TBD pages    | odin-lang.org/docs/              | Free, public               |
 | `odin-knowledge-base/docs/karl_zylinski/`           | TBD articles | zylinski.se                      | Free, public               |
 | `odin-knowledge-base/docs/karl_zylinski/odin-book/` | TBD chapters | Book "Understanding Odin" (Karl) | Optional (paid ebook)      |
+| `odin-knowledge-base/docs/gingerbill/`              | TBD articles | gingerbill.org                   | Free, public               |
+| `odin-knowledge-base/docs/jakubtomsu/`              | TBD articles | jakubtomsu.github.io             | Free, public               |
+| `odin-knowledge-base/docs/marianpekar/`             | 21 articles  | marianpekar.com                  | Free, public               |
 
 > `TBD` means "regenerate after each scrape via `python _Helpers/scripts/indexing/build_kb_index.py`".
 > See [`../../odin-knowledge-base/INDEX.md`](../../odin-knowledge-base/INDEX.md) for the live counts in your local checkout.
-
+>
 > **YAML convention**: see [`_Helpers/docs/003_yaml_frontmatter_conventions.md`](../../_Helpers/docs/003_yaml_frontmatter_conventions.md) for the full nomenclature (hierarchical tags `topic/*`, `source/*`, `phase/*`).
 > The filters below rely on these conventions.
-
+>
 > **REFERENCE BOOK** (once split via `_Helpers/scripts/fixes/book_html_to_md.py`):
 > [`odin-knowledge-base/docs/karl_zylinski/odin-book/`](../../odin-knowledge-base/docs/karl_zylinski/odin-book/README.md)
 > contains the full book "Understanding the Odin Programming Language" split into per-chapter MD files (numbered chapters + appendices + about-the-author).
@@ -51,13 +54,14 @@ If the requested topic is in the INDEX -> load the listed files directly. If the
 
 Skool lessons can be filtered by Obsidian **hierarchical tag**:
 
-| Filter                           | Command                                                              |
-| -------------------------------- | -------------------------------------------------------------------- |
-| All allocator lessons            | `grep -lr "topic/allocator" odin-knowledge-base/`                    |
-| Skool lessons on FSM             | `grep -lr "topic/state-machine" odin-knowledge-base/`                |
-| Official Odin lessons (language) | `grep -lr "source/official" odin-knowledge-base/docs/official/`     |
-| Karl Zylinski articles           | `grep -lr "source/zylinski" odin-knowledge-base/docs/karl_zylinski/` |
-| Whole KB for one topic           | `grep -rli "topic/raylib" odin-knowledge-base/`                      |
+| Filter                           | Command                                                               |
+| -------------------------------- | --------------------------------------------------------------------- |
+| All allocator lessons            | `grep -lr "topic/allocator" odin-knowledge-base/`                     |
+| Skool lessons on FSM             | `grep -lr "topic/state-machine" odin-knowledge-base/`                 |
+| Official Odin lessons (language) | `grep -lr "source/official" odin-knowledge-base/docs/official/`       |
+| Karl Zylinski articles           | `grep -lr "source/zylinski" odin-knowledge-base/docs/karl_zylinski/`  |
+| Marian Pekar from-scratch series | `ls odin-knowledge-base/docs/marianpekar/` (renderer, physics, cloth) |
+| Whole KB for one topic           | `grep -rli "topic/raylib" odin-knowledge-base/`                       |
 
 ## Search strategy
 
@@ -67,6 +71,7 @@ Skool lessons can be filtered by Obsidian **hierarchical tag**:
 Question on Odin itself (syntax, types)        ->  odin-knowledge-base/docs/official/
 Question on gamedev / specific patterns         ->  odin-knowledge-base/
 Question on allocators / hot reload / DOD       ->  odin-knowledge-base/docs/karl_zylinski/
+Question on rendering / physics from scratch    ->  odin-knowledge-base/docs/marianpekar/
 Question on Raylib/Sokol (template setup)       ->  code/vendored templates/ + KB
 ```
 
