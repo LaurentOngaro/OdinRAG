@@ -20,7 +20,7 @@
       "explanation": "tracking_allocator instruments every alloc/free; in release it costs 2-3x and reports false leaks from initialization-time allocations. Reserve it for Debug builds only.",
       "kb_sources": [
         "odin-knowledge-base/docs/karl_zylinski/odin-book/13-making-manual-memory-management-easier.md",
-        "odin-knowledge-base/courses/programvideogames/vertical-slice-and-dice-v10/rpg/088-26. Tracking Allocator.md"
+        "odin-knowledge-base/courses/programvideogames/the-course-is-here/rpg/088-26. Tracking Allocator.md"
       ],
       "lesson_refs": ["088"],
       "fix_suggestion": "Wrap the instantiation in `when ODIN_DEBUG { ... }`"
@@ -37,7 +37,7 @@
       "kb_sources": [
         "odin-knowledge-base/docs/karl_zylinski/odin-book/09-introduction-to-manual-memory-management.md",
         "odin-knowledge-base/docs/karl_zylinski/temporary-allocator-your-first-arena.md",
-        "odin-knowledge-base/courses/programvideogames/vertical-slice-and-dice-v10/rpg/087-25. Scenes, Transitions, Allocations.md"
+        "odin-knowledge-base/courses/programvideogames/the-course-is-here/rpg/087-25. Scenes, Transitions, Allocations.md"
       ],
       "lesson_refs": ["087"],
       "fix_suggestion": "Move the allocation outside the loop, or use a per-frame arena."

@@ -359,33 +359,36 @@ When looking for a specific pattern (e.g. 'how to do a tracking allocator'), loo
 - `odin-knowledge-base/docs/karl_zylinski/odin-book/13-making-manual-memory-management-easier.md` - tracking + arena (essential)
 - `odin-knowledge-base/docs/karl_zylinski/odin-book/10-more-container-types.md` - slices, maps, custom iterators
 - `odin-knowledge-base/docs/karl_zylinski/temporary-allocator-your-first-arena.md` - dedicated arena article
-- `odin-knowledge-base/courses/programvideogames/vertical-slice-and-dice-v10/rpg/088-26-tracking-allocator.md` - tracking in practice
+- `odin-knowledge-base/courses/programvideogames/the-course-is-here/rpg/088-26. Tracking Allocator.md` - tracking in practice
 
 ### State machines (FSM)
-- `odin-knowledge-base/courses/programvideogames/vertical-slice-and-dice-v10/metroidvania/020-211-finite-state-machine-movement-0624.md` - FSM for movement
-- `odin-knowledge-base/courses/programvideogames/vertical-slice-and-dice-v10/metroidvania/021-212-attacking-1232.md` - FSM for combat
+- `odin-knowledge-base/courses/programvideogames/the-course-is-here/metroidvania/211-Finite State Machine - Movement.md` - FSM for movement
+- `odin-knowledge-base/courses/programvideogames/the-course-is-here/metroidvania/212-Attacking.md` - FSM for combat
 - `odin-knowledge-base/docs/karl_zylinski/odin-book/05-making-new-types.md` - `Using unions for state machines` (section 5.3.6)
-- `odin-knowledge-base/.../metroidvania/017-208-enemy-behaviors-0826.md` - state applied to enemies
+- `odin-knowledge-base/.../metroidvania/208-Enemy Behaviors.md` - state applied to enemies
 
 ### Entity system / component
-- `odin-knowledge-base/courses/programvideogames/vertical-slice-and-dice-v10/rpg/067-05-entity-system.md` - full implementation
-- `odin-knowledge-base/courses/programvideogames/vertical-slice-and-dice-v10/metroidvania/014-205-entities-state-physics-update-1504.md` - entity update loop
-- `odin-knowledge-base/.../rpg/093-31-party-system-battle-resolution.md` - entity applied to combat
+- `odin-knowledge-base/courses/programvideogames/the-course-is-here/rpg/067-05. Entity System.md` - full implementation
+- `odin-knowledge-base/courses/programvideogames/the-course-is-here/metroidvania/205-Entities, State, Physics Update.md` - entity update loop
+- `odin-knowledge-base/.../rpg/093-31. Party System & Battle Resolution.md` - entity applied to combat
 
 ### Hot reload
 - `odin-knowledge-base/docs/karl_zylinski/hot-reload-gameplay-code.md` - concept and Karl's demo
-- `odin-knowledge-base/.../rpg/084-22-hot-reloading.md` - practical application
+- `odin-knowledge-base/.../rpg/084-22. Hot Reloading.md` - practical application
 - `odin-knowledge-base/docs/karl_zylinski/odin-book/24-a-tour-of-the-core-collection.md` - `core:dynlib`
 
 ### Collision / physics
-- `odin-knowledge-base/.../introduction/006-simple-collision-detection-and-resolution-10-min.md` - basics
-- `odin-knowledge-base/.../rpg/077-15-detecting-3d-collisions.md` - 3D
-- `odin-knowledge-base/.../rpg/080-18-3d-collision-response.md` - 3D response
+- `odin-knowledge-base/.../introduction/006-Simple Collision Detection and Resolution.md` - basics
+- `odin-knowledge-base/.../rpg/077-15. Detecting 3D Collisions.md` - 3D
+- `odin-knowledge-base/.../rpg/080-18. 3D Collision Response.md` - 3D response
+- `odin-knowledge-base/docs/marianpekar/physics-engine-in-odin-from-scratch-part-i.md` (through `part-vi`) - from-scratch rigid body engine: SAT, impulse, friction, bounciness, raycasting
 
 ### Rendering / Raylib
-- `odin-knowledge-base/.../introduction/004-drawing-shapes-and-sprites-7min.md` - basics
-- `odin-knowledge-base/.../introduction/001-introduction-to-odin-and-raylib-3min.md` - setup
+- `odin-knowledge-base/.../introduction/004-Drawing Shapes and Sprites.md` - basics
+- `odin-knowledge-base/.../introduction/001-Introduction to Odin and Raylib.md` - setup
 - `odin-knowledge-base/docs/karl_zylinski/odin-book/25-libraries-for-creating-video-games.md` - Raylib/Sokol overview
+- `odin-knowledge-base/docs/marianpekar/software-renderer-in-odin-from-scratch-part-i.md` (through `part-xiv`) - from-scratch 3D software renderer: matrices, depth buffer, rasterization, Phong shading, multiple lights
+- `odin-knowledge-base/docs/marianpekar/2d-cloth-simulation-in-odin-with-raylib.md` - Verlet integration, fixed-timestep loop, `defer` + heap cleanup
 
 ### Data-oriented / perf
 - `odin-knowledge-base/docs/karl_zylinski/odin-book/20-data-oriented-design.md` - SoA vs AoS
@@ -397,7 +400,7 @@ When looking for a specific pattern (e.g. 'how to do a tracking allocator'), loo
 - `odin-knowledge-base/docs/karl_zylinski/handle-based-arrays.md` - handle-based pattern (Karl)
 - `odin-knowledge-base/docs/karl_zylinski/handle-based-maps-three-implementations.md` - handle maps
 
-### C bindings / vendor:
+### C bindings / vendor
 - `odin-knowledge-base/docs/karl_zylinski/generate-odin-bindings-for-c-libraries.md` - c-bindgen for C libs
 - `odin-knowledge-base/docs/karl_zylinski/odin-book/21-making-c-library-bindings-foreign-function-interface.md` - FFI manual
 

@@ -107,32 +107,32 @@ grep -ri "tracking_allocator\|Tracking_Allocator" odin-knowledge-base/
 Always return the **relative path** + the **module** in the response:
 
 ```text
--> odin-knowledge-base/courses/programvideogames/vertical-slice-and-dice-v10/metroidvania/020-211-finite-state-machine-movement.md
+-> odin-knowledge-base/courses/programvideogames/the-course-is-here/metroidvania/211-Finite State Machine - Movement.md
   Module: Metroidvania, Durée: 6.24 min
 ```
 
 ## Frequent Odin patterns (where to look)
 
-| Pattern               | Key files (relative paths)                                                                                                                                                                                 |
-| --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Allocators            | `odin-knowledge-base/docs/karl_zylinski/temporary-allocator-your-first-arena.md`,`odin-knowledge-base/.../introduction/007-text-rendering-and-memory-allocators.md`,`.../rpg/088-26-tracking-allocator.md` |
-| State machine (FSM)   | `odin-knowledge-base/.../metroidvania/020-211-finite-state-machine-movement.md`,`odin-knowledge-base/.../metroidvania/021-212-attacking.md`                                                                |
-| Entity system         | `odin-knowledge-base/.../metroidvania/014-205-entities-state-physics-update.md`,`odin-knowledge-base/.../metroidvania/017-208-enemy-behaviors.md`,`.../rpg/067-05-entity-system.md`                        |
-| Hot reload (DLL)      | `odin-knowledge-base/docs/karl_zylinski/hot-reload-gameplay-code.md`,`odin-knowledge-base/.../rpg/084-22-hot-reloading.md`,`odin-knowledge-base/.../rpg/085-23-hot-reloading-integration.md`               |
-| DOD / SoA             | `odin-knowledge-base/docs/karl_zylinski/odin-dod-benchmarks.md`,`odin-knowledge-base/docs/karl_zylinski/data-oriented-ideas-for-small-gamedev-teams.md`                                                    |
-| c-bindgen             | `odin-knowledge-base/docs/karl_zylinski/generate-odin-bindings-for-c-libraries.md`                                                                                                                         |
-| Raylib intro          | `odin-knowledge-base/.../introduction/001-introduction-to-odin-and-raylib.md`                                                                                                                              |
-| WASM / sokol-web      | `odin-knowledge-base/docs/karl_zylinski/odin-sokol-web.md`                                                                                                                                                 |
-| Collision 2D          | `odin-knowledge-base/.../introduction/006-simple-collision-detection-and-resolution.md`,`odin-knowledge-base/.../metroidvania/016-207-command-buffers-better-debug-draw.md` (debug draw collision)         |
-| Collision 3D          | `odin-knowledge-base/.../rpg/077-15-detecting-3d-collisions.md`,`odin-knowledge-base/.../rpg/080-18-3d-collision-response.md`                                                                              |
-| Inventory             | `odin-knowledge-base/.../metroidvania/038-228-inventory-system.md`                                                                                                                                         |
-| Save/Load             | `odin-knowledge-base/.../metroidvania/036-226-saving-and-loading.md`,`odin-knowledge-base/.../rpg/099-37-saving-loading-main-menu.md`                                                                      |
-| Dialogue / Quest      | `odin-knowledge-base/.../rpg/101-39-dialogue-part-1.md`,`odin-knowledge-base/.../rpg/102-40-dialogue-part-2-choices-events-quests.md`                                                                      |
-| Pathfinding (A\*)     | `odin-knowledge-base/.../rpg/090-28-navigation-system.md`                                                                                                                                                  |
-| Procedural generation | `odin-knowledge-base/.../rpg/105-43-edit-mode-first-pass.md`                                                                                                                                               |
-| Battle system         | `odin-knowledge-base/.../rpg/093-31-party-system-battle-resolution.md`,`odin-knowledge-base/.../rpg/094-32-variable-turn-order.md`                                                                         |
-| Procedural dungeon    | `odin-knowledge-base/.../rpg/091-29-npc-movement-optimisation.md`                                                                                                                                          |
-| Level editor          | `odin-knowledge-base/.../metroidvania/041-231-level-editor-introduction.md`,`.../metroidvania/045-235-zoom-pan-level-mode.md`                                                                              |
+| Pattern               | Key files (relative paths)                                                                                                                                                                                  |
+| --------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Allocators            | `odin-knowledge-base/docs/karl_zylinski/temporary-allocator-your-first-arena.md`,`odin-knowledge-base/.../introduction/007-Text Rendering and Memory Allocators.md`,`.../rpg/088-26. Tracking Allocator.md` |
+| State machine (FSM)   | `odin-knowledge-base/.../metroidvania/211-Finite State Machine - Movement.md`,`odin-knowledge-base/.../metroidvania/212-Attacking.md`                                                                       |
+| Entity system         | `odin-knowledge-base/.../metroidvania/205-Entities, State, Physics Update.md`,`odin-knowledge-base/.../metroidvania/208-Enemy Behaviors.md`,`.../rpg/067-05. Entity System.md`                              |
+| Hot reload (DLL)      | `odin-knowledge-base/docs/karl_zylinski/hot-reload-gameplay-code.md`,`odin-knowledge-base/.../rpg/084-22. Hot Reloading.md`,`odin-knowledge-base/.../rpg/085-23. Hot Reloading Integration.md`              |
+| DOD / SoA             | `odin-knowledge-base/docs/karl_zylinski/odin-dod-benchmarks.md`,`odin-knowledge-base/docs/karl_zylinski/data-oriented-ideas-for-small-gamedev-teams.md`                                                     |
+| c-bindgen             | `odin-knowledge-base/docs/karl_zylinski/generate-odin-bindings-for-c-libraries.md`                                                                                                                          |
+| Raylib intro          | `odin-knowledge-base/.../introduction/001-Introduction to Odin and Raylib.md`                                                                                                                               |
+| WASM / sokol-web      | `odin-knowledge-base/docs/karl_zylinski/odin-sokol-web.md`                                                                                                                                                  |
+| Collision 2D          | `odin-knowledge-base/.../introduction/006-Simple Collision Detection and Resolution.md`,`odin-knowledge-base/.../metroidvania/207-Command Buffers - Better Debug Draw.md` (debug draw collision)            |
+| Collision 3D          | `odin-knowledge-base/.../rpg/077-15. Detecting 3D Collisions.md`,`odin-knowledge-base/.../rpg/080-18. 3D Collision Response.md`                                                                             |
+| Inventory             | `odin-knowledge-base/.../metroidvania/228-Inventory System.md`                                                                                                                                              |
+| Save/Load             | `odin-knowledge-base/.../metroidvania/226-Saving and Loading.md`,`odin-knowledge-base/.../rpg/099-37. Saving, Loading, Main Menu.md`                                                                        |
+| Dialogue / Quest      | `odin-knowledge-base/.../rpg/101-39. Dialogue Part 1.md`,`odin-knowledge-base/.../rpg/102-40. Dialogue Part 2 - Choices, Events, Quests.md`                                                                 |
+| Pathfinding (A\*)     | `odin-knowledge-base/.../rpg/090-28. Navigation System.md`                                                                                                                                                  |
+| Procedural generation | `odin-knowledge-base/.../rpg/105-43. Edit Mode First Pass.md`                                                                                                                                               |
+| Battle system         | `odin-knowledge-base/.../rpg/093-31. Party System & Battle Resolution.md`,`odin-knowledge-base/.../rpg/094-32. Variable Turn Order.md`                                                                      |
+| Procedural dungeon    | `odin-knowledge-base/.../rpg/091-29. NPC Movement Optimisation.md`                                                                                                                                          |
+| Level editor          | `odin-knowledge-base/.../metroidvania/231-Level Editor Introduction.md`,`.../metroidvania/235-Zoom, Pan, Level Mode.md`                                                                                     |
 
 ## Citation conventions
 
@@ -146,7 +146,7 @@ Always include:
 Example of a good response:
 
 ```text
--> odin-knowledge-base/.../metroidvania/020-211-finite-state-machine-movement.md
+-> odin-knowledge-base/.../metroidvania/211-Finite State Machine - Movement.md
   Module: Metroidvania
   Section: "The state machine"
   Shows how to define `Entity_State` enum + `switch` in `entity_update`.

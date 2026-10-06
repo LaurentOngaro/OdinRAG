@@ -50,6 +50,15 @@ Options:
                                 when --lesson is used (the index changes with the filtered list). Markdown lessons always keep their index prefix for reading order.
 --add-duration, -d             Keep the duration suffix (MM:SS or H:MM:SS) of the Skool title in the filename -> the slug ends with the duration digits (ex: ...editor-side-panel-imgui-1053).
                                 By default (False), this suffix is removed -> shorter name (ex: ...editor-side-panel-imgui). The duration stays visible in the Markdown frontmatter.
+--no-prune                      Do NOT delete the .md of stale lessons (default: enabled on full runs).
+                                Prune deletes every .md under the course folder that is not one of the target
+                                filenames computed during the run. This is what removes the duplicate left behind
+                                when a lesson is inserted or reordered upstream: the positional {idx+1:03d}- prefix
+                                of a number-less title shifts, the lesson is rewritten under its new name, and the
+                                frozen old file is deleted. Never touches README.md or Support Files/.
+                                Automatically skipped on partial runs (--lesson / --skip-until / --number), where
+                                the set of target filenames would be incomplete.
+--prune-dry-run                 List the stale .md files that would be deleted, without deleting them (check mode).
 --log-reset                    Reset the log file on run start instead of appending.
 
 Prerequisites:
@@ -527,6 +536,47 @@ def _build_course_readme_from_disk(course_dir: Path, course_name: str) -> tuple[
         lines.append("")
 
     return "\n".join(lines).rstrip() + "\n", len(md_files)
+
+
+def prune_stale_lessons(course_dir: Path, expected: set[Path], dry_run: bool = False) -> list[Path]:
+    """Supprime les `.md` de leçons devenues obsolètes dans `course_dir`.
+
+    Pourquoi c'est nécessaire : quand le titre Skool ne porte pas de numéro
+    de leçon (ex: "Intro to Scenes"), `lesson_filename_from_title` utilise le
+    préfixe positionnel `{idx+1:03d}-`. Insérer une leçon en tête de module
+    décale donc toutes les suivantes. Or une leçon déjà présente sur disque
+    est réutilisée (idempotence) et jamais renommée : son nom reste figé à sa
+    position d'origine. Résultat : l'ancien fichier de la leçon déplacée
+    survit (doublon au contenu identique) et son numéro entre en collision
+    avec une autre leçon.
+
+    Le correctif est de supprimer tout `.md` sous `course_dir` qui ne fait
+    pas partie de `expected` (les noms cibles calculés pendant le run). Sur
+    un run complet, la leçon déplacée est donc réécrite sous son nouveau nom
+    puis son ancien fichier est effacé.
+
+    Garde-fous :
+      - `README.md` et tout le dossier `Support Files/` ne sont jamais touchés.
+      - `expected` doit venir d'un run COMPLET (pas de --lesson / --skip-until
+        / --number), sinon l'appelant ne doit pas invoquer cette fonction :
+        le set serait partiel et des leçons valides seraient supprimées.
+    """
+    stale: list[Path] = []
+    for md in sorted(course_dir.rglob("*.md")):
+        if md.name == "README.md":
+            continue
+        if "Support Files" in md.parts:
+            continue
+        if md in expected:
+            continue
+        stale.append(md)
+        rel = md.relative_to(OUTPUT_DIR) if OUTPUT_DIR in md.parents else md
+        action = "obsolète (dry-run)" if dry_run else "supprimé"
+        print(f"  [-] Obsolète {action} : {rel}")
+        _log("INFO", f"  [prune] {action}: {rel}")
+        if not dry_run:
+            md.unlink(missing_ok=True)
+    return stale
 
 
 def _normalize_for_match(s: str) -> str:
@@ -1333,7 +1383,9 @@ def export_course(
     skip_until: int | None = None,
     max_lesson: int | None = None,
     lesson_counter: int = 0,
-    total_lessons_run: int = 0
+    total_lessons_run: int = 0,
+    prune: bool = True,
+    prune_dry_run: bool = False
 ) -> tuple[int, int]:
     """Exporte toutes les leçons d'un cours vers des fichiers Markdown.
 
@@ -1377,6 +1429,11 @@ def export_course(
     Les vidéos sont placées dans `<course_video_dir>/<module?>/<name>.mp4`
     où `<module>` est le dossier Skool de la leçon (slugifié) - réplique
     la structure des markdown (`metroidvania/`, `rpg/`, etc.).
+
+    Si `prune` est True (défaut) ET que le run est complet (ni
+    `lesson_filter`, ni `skip_until`, ni `max_lesson`), les `.md` du course
+    folder qui ne font pas partie des noms cibles de ce run sont supprimés
+    (voir `prune_stale_lessons`). `prune_dry_run` liste au lieu de supprimer.
     """
     course_name = course.get("title", course.get("name", "unknown"))
     course_slug = slugify(course_name)
@@ -1428,6 +1485,10 @@ def export_course(
         _log("INFO", f"  {len(lessons)} leçons trouvées")
 
     index_lines = [f"# Index - {course_name}", f"\nExporté le {datetime.now().strftime('%Y-%m-%d %H:%M')}", "", ]
+
+    # Noms de fichiers cibles calculés pendant ce run. Sert au prune de fin
+    # de cours (tout .md absent de ce set est un fichier obsolète).
+    expected_paths: set[Path] = set()
 
     current_folder = None
     lesson_count = 0
@@ -1481,6 +1542,7 @@ def export_course(
         base_dir.mkdir(exist_ok=True)
         filename = f"{lesson_name}.md"
         filepath = base_dir / filename
+        expected_paths.add(filepath)
 
         rel_path = filepath.relative_to(OUTPUT_DIR)
         index_lines.append(f"- [{title}]({rel_path})")
@@ -1639,6 +1701,24 @@ def export_course(
             _log("WARNING", f"HLSUrlExtractor close: {e}")
         hls_extractor = None
 
+    # ─── Prune des leçons obsolètes (run COMPLET uniquement) ───────────────
+    # `expected_paths` n'est complet que si aucune leçon n'a été skippée ni
+    # filtrée : sinon le set est partiel et le prune supprimerait des leçons
+    # valides. On se garde donc sur les 3 flags de sélection.
+    full_run = not lesson_filter and skip_until is None and max_lesson is None
+    if not prune:
+        print("  [-] Prune désactivé (--no-prune).")
+        _log("INFO", "  [prune] désactivé par --no-prune")
+    elif not full_run:
+        print("  [-] Prune ignoré : run partiel (--lesson / --skip-until / --number).")
+        _log("INFO", "  [prune] ignoré: run partiel, expected_paths incomplet")
+    else:
+        stale = prune_stale_lessons(course_dir, expected_paths, dry_run=prune_dry_run)
+        if stale:
+            mode = "détectés" if prune_dry_run else "supprimés"
+            print(f"  [-] {len(stale)} fichier(s) obsolète(s) {mode}.")
+            _log("INFO", f"  [prune] {len(stale)} obsolète(s) {mode}")
+
     # Rebuild the course README from EVERY .md present on disk, not just the
     # lessons processed this run. This keeps entries for lessons skipped via
     # --lesson / --number / --skip-until or already-present-on-disk (idempotent).
@@ -1757,6 +1837,16 @@ def main():
     parser.add_argument(
         "--log-reset", action="store_true", help="Réinitialiser (écraser) le fichier de log au démarrage au lieu d'ajouter à la suite.",
     )
+    parser.add_argument(
+        "--no-prune",
+        action="store_true",
+        help="Ne PAS supprimer les .md de leçons obsolètes (par défaut : activé sur les runs complets).",
+    )
+    parser.add_argument(
+        "--prune-dry-run",
+        action="store_true",
+        help="Liste les .md de leçons obsolètes sans les supprimer (mode --check).",
+    )
     args = parser.parse_args()
     _init_log(reset=args.log_reset)
     _log("INFO", "Démarrage du scrape")
@@ -1787,6 +1877,14 @@ def main():
     if args.add_duration:
         print("[*] --add-duration → suffixe de durée conservé dans le slug")
         _log("INFO", "--add-duration activé")
+
+    if args.no_prune:
+        print("[*] --no-prune → les .md de leçons obsolètes sont conservés")
+        _log("INFO", "--no-prune activé (prune désactivé)")
+
+    if args.prune_dry_run:
+        print("[*] --prune-dry-run → liste les obsolètes sans les supprimer")
+        _log("INFO", "--prune-dry-run activé (mode check)")
 
     _log("DEBUG", f"args={vars(args)}")
 
@@ -1888,6 +1986,8 @@ def main():
             max_lesson=max_lesson,
             lesson_counter=lesson_counter,
             total_lessons_run=total_lessons_run,
+            prune=not args.no_prune,
+            prune_dry_run=args.prune_dry_run,
         )
         total_lessons += n
 

@@ -13,7 +13,7 @@
 > These 3-5 files are what Kilo will consult when helping you on this project.
 > Format: `relative/path.md` - relevant section.
 
-- `odin-knowledge-base/courses/programvideogames/vertical-slice-and-dice-v10/<MODULE>/<lesson>.md`
+- `odin-knowledge-base/courses/programvideogames/the-course-is-here/<MODULE>/<lesson>.md`
 - `odin-knowledge-base/docs/karl_zylinski/odin-book/<NN>-<chapter>.md`
 - `odin-knowledge-base/docs/official/<page>.md`
 
