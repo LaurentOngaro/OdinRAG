@@ -16,6 +16,7 @@ Scripts that depend on the user config:
     - _Helpers/scripts/fixes/odin_format.py       (ODINFMT_EXE)
     - _Helpers/scripts/scrapers/scrape_skool.py      (yt-dlp path, Skool credentials)
     - _Helpers/scripts/fixes/book_html_to_md.py   (path to Karl book HTML)
+    - _Helpers/scripts/dev/sync_links.py           (per-OS link targets)
 """
 
 from __future__ import annotations
@@ -55,6 +56,9 @@ DEFAULTS: dict[str, Any] = {
         "expected_articles_zylinski": 0,
         "expected_official_docs": 0,
     },
+    # Per-OS absolute targets for the workspace links declared in
+    # `_Helpers/links.jsonc`. Structure: key -> { "windows": "...", "linux": "...", "default": "..." }.
+    "links": {},
 }
 
 
@@ -106,6 +110,24 @@ def _strip_jsonc_comments(text: str) -> str:
     return "".join(out)
 
 
+def load_jsonc_file(path: Path) -> dict:
+    """Load a JSONC file (JSON with comments) and return it as a dict.
+
+    Returns an empty dict when the file is missing or malformed, so callers can
+    degrade gracefully instead of crashing on a user typo.
+    """
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            raw = f.read()
+    except (OSError, UnicodeDecodeError):
+        return {}
+    try:
+        data = json.loads(_strip_jsonc_comments(raw))
+    except json.JSONDecodeError:
+        return {}
+    return data if isinstance(data, dict) else {}
+
+
 def load_config() -> dict:
     """Load the user config from the JSONC file, merging with DEFAULTS."""
     if not CONFIG_PATH.is_file():
@@ -130,6 +152,7 @@ PATHS = _config.get("paths", {})
 SKOOL = _config.get("skool", {})
 SCRAPER = _config.get("scraper", {})
 KB = _config.get("kb", {})
+LINKS = _config.get("links", {})
 
 
 def get(key_path: str, default: Any = "") -> Any:
@@ -157,4 +180,4 @@ def where_to_create() -> str:
     return str(CONFIG_PATH)
 
 
-__all__ = ["CONFIG_PATH", "EXAMPLE_PATH", "DEFAULTS", "load_config", "get", "env_or_config", "PATHS", "SKOOL", "SCRAPER", "KB", "where_to_create", ]
+__all__ = ["CONFIG_PATH", "EXAMPLE_PATH", "DEFAULTS", "load_config", "load_jsonc_file", "get", "env_or_config", "PATHS", "SKOOL", "SCRAPER", "KB", "LINKS", "where_to_create", ]

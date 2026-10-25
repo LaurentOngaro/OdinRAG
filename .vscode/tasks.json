@@ -796,6 +796,46 @@
     }
 ,
     {
+      "label": "[LINKS] Sync workspace links (current OS)",
+      "detail": "Regenerate the workspace links declared in _Helpers/links.jsonc for the CURRENT host: NTFS junction on Windows, symbolic link on Linux. A link created for the other OS is replaced (wrong primitive or wrong target). Idempotent: nothing changes when everything is already in place. Run this after switching machine (Windows <-> WSL/Linux).",
+      "type": "process",
+      "group": "none",
+      "command": "python",
+      "args": [
+        "_Helpers/scripts/dev/sync_links.py",
+        "--apply"
+      ],
+      "options": {
+          "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+          "reveal": "always",
+          "panel": "shared"
+      },
+      "problemMatcher": []
+    }
+,
+    {
+      "label": "[LINKS] Check workspace links (dry-run)",
+      "detail": "Report the state of every workspace link (ok / missing / drift / broken / conflict / unresolved) without touching anything. Exit code 1 when a link must be regenerated with the [LINKS] Sync task.",
+      "type": "process",
+      "group": "none",
+      "command": "python",
+      "args": [
+        "_Helpers/scripts/dev/sync_links.py",
+        "--check"
+      ],
+      "options": {
+          "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+          "reveal": "always",
+          "panel": "shared"
+      },
+      "problemMatcher": []
+    }
+,
+    {
       "label": "[PUBLISH] publish_public --check (dry-run)",
       "group": "none",
       "type": "process",

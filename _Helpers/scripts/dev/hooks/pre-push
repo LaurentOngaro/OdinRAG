@@ -6,7 +6,7 @@
 # See _Helpers/docs/007_mixing_public_and_private_history.md for the full workflow.
 #
 # Personal content (must NEVER reach the public remote):
-#   - code/projects/PVG03_RPG/        (personal Odin project)
+#   - code/projects/<project>/       (personal Odin projects, exposed as links)
 #   - _Private/                       (planning, raw, config, docs)
 #   - odin-knowledge-base/courses/    (paywalled Skool content)
 #   - odin-knowledge-base/docs/karl_zylinski/odin-book/ (paywalled book)
@@ -58,7 +58,10 @@ if [ "$remote" != "public" ]; then
 fi
 
 # Personal patterns anchored at repo root.
-personal_pattern='^(code/projects/PVG03_RPG/|_Private/|odin-knowledge-base/courses/|odin-knowledge-base/docs/karl_zylinski/odin-book/)'
+# `code/projects/[^/]+/` matches every personal project folder (whatever its
+# name) but NOT the README that legitimately lives in code/projects/.
+# The project list is declared in _Helpers/links.jsonc.
+personal_pattern='^(code/projects/[^/]+/|_Private/|odin-knowledge-base/courses/|odin-knowledge-base/docs/karl_zylinski/odin-book/)'
 
 # Iterate over each local_ref being pushed.
 while read -r local_ref _remote_ref; do

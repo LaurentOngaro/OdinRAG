@@ -17,6 +17,8 @@ OdinRAG is a **RAG knowledge base** for Odin (a systems language by Ginger Bill)
 
 The scraped content of paywalled or copyrighted sources is **never redistributed in this public repo** - see [`SOURCES.md`](SOURCES.md) for how to obtain each source legally on your own.
 
+> **Session bootstrap (one command, ~100 ms).** Before any file work, run `python _Helpers/scripts/dev/sync_links.py --check`. Exit 0 means the workspace links match the current OS (junction on Windows, symlink on Linux). Exit 1 means a link is missing, points elsewhere or uses the wrong primitive: run `python _Helpers/scripts/dev/sync_links.py --apply` to regenerate it for this host, then continue. The check never modifies anything; the apply is idempotent and never touches content.
+
 ## Repository structure
 
 > **The full tree lives in [`_Helpers/docs/001_folder_structure.md`](_Helpers/docs/001_folder_structure.md).**
@@ -69,6 +71,23 @@ Scripts that need personal info read from this config (with env var override):
 | `_Helpers/scripts/fixes/book_html_to_md.py` | `paths.karl_book_out`  | `BOOK_HTML_OUT`                         |
 
 Chain of resolution per value: **env var > user_config.jsonc > empty string**.
+
+### Workspace links (Windows + Linux)
+
+The folders that live outside this repository (the personal Odin projects under `code/projects/`, the `.agents` mirror of `.kilo`) are exposed as **links**: an NTFS junction on Windows, a symbolic link on Linux. They are NEVER created by hand and NEVER tracked by git.
+
+- Topology (tracked): `_Helpers/links.jsonc`
+- Absolute paths per OS (gitignored): `_Private/.config/user_config.jsonc` -> `links` section
+- Generator: `_Helpers/scripts/dev/sync_links.py` (`--check` dry-run, `--apply` create/repair, `--list`, `--prune`)
+
+```bash
+python _Helpers/scripts/dev/sync_links.py --check
+python _Helpers/scripts/dev/sync_links.py --apply
+```
+
+VS Code tasks: `[LINKS] Sync workspace links (current OS)` (regenerate for this host, replaces the links made for the other OS) and `[LINKS] Check workspace links (dry-run)`.
+
+Full rationale: [`_Helpers/docs/009_cross_platform_links.md`](_Helpers/docs/009_cross_platform_links.md).
 
 ## Conventions
 

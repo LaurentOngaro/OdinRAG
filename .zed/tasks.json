@@ -12,6 +12,8 @@
 //   - Recreate only the tasks tied to the Odin daily flow.
 //   - Diagnostics ([DIAG] * tasks) stay in the terminal for now - they are
 //     one-shot CLI calls with no muscle-memory shortcut.
+//   - The link sync task IS mirrored here: it is the "switch to this OS"
+//     step of the cross-platform workflow (see 009_cross_platform_links.md).
 //   - Format on save is wired through `languages.Odin.format_on_save: "on"`
 //     (see .zed/settings.json), so no explicit "format" task is needed.
 [
@@ -106,6 +108,19 @@
     "args": [
       "$ZED_WORKTREE_ROOT/_Helpers/scripts/fixes/format_odin_in_files.py",
       "--file", "$ZED_FILE"
+    ],
+    "cwd": "$ZED_WORKTREE_ROOT",
+    "reveal": "always",
+    "hide": "never",
+    "show_summary": true,
+    "use_new_terminal": false
+  },
+  {
+    "label": "Links: Sync workspace links (current OS)",
+    "command": "python",
+    "args": [
+      "$ZED_WORKTREE_ROOT/_Helpers/scripts/dev/sync_links.py",
+      "--apply"
     ],
     "cwd": "$ZED_WORKTREE_ROOT",
     "reveal": "always",

@@ -68,5 +68,18 @@
     "expected_files_karl_book": 0,
     "expected_articles_zylinski": 0,
     "expected_official_docs": 0
+  },
+
+  // Per-OS absolute targets for the workspace links.
+  // The topology is declared in `_Helpers/links.jsonc` (tracked).
+  // The absolute paths are machine-specific, hence local-only.
+  // Key format: <key used by links.jsonc> -> { "windows": "...", "linux": "...", "default": "..." }
+  // "default" is used when the current OS has no specific entry.
+  // Env var override: ODINRAG_LINK_<KEY_UPPERCASE> (e.g. ODINRAG_LINK_PROJECT_PVG03_RPG).
+  "links": {
+    // "project.MyGame": {
+    //   "windows": "D:/Projects/Odin/MyGame",
+    //   "linux": "/mnt/d/Projects/Odin/MyGame"
+    // }
   }
 }

@@ -1,0 +1,67 @@
+// Link topology for the OdinRAG workspace.
+//
+// This file is the SINGLE SOURCE OF TRUTH for every "shortcut" that points to a
+// folder living outside the repo (or to a mirrored folder inside it).
+// It is tracked in git (it contains no personal path) and is consumed by
+// `_Helpers/scripts/dev/sync_links.py`.
+//
+// The manifest declares the TOPOLOGY (which links exist, where they point in
+// logical terms). The machine-specific ABSOLUTE PATHS live in the gitignored
+// `_Private/.config/user_config.jsonc` -> "links" section (one entry per OS).
+//
+// Target forms:
+//   - { "repo": "<path relative to the repo root>" }  -> portable, no config needed
+//   - { "config": "<key in user_config.links>" }      -> per-OS absolute paths
+//   - "<path relative to the repo root>"              -> shorthand for { "repo": ... }
+//
+// Link modes (optional "mode" field):
+//   - "auto"     (default) junction on Windows for directories, symlink everywhere else
+//   - "junction" NTFS junction on Windows, symlink on POSIX
+//   - "symlink"  symbolic link on every OS
+//
+// Scopes:
+//   - "private"   points to personal content, must NEVER reach the public branch
+//   - "workspace" points inside the repo, safe to recreate on any machine
+
+{
+  "version": 1,
+
+  "links": [
+    {
+      "id": "project.PVG03_RPG",
+      "link": "code/projects/PVG03_RPG",
+      "target": { "config": "project.PVG03_RPG" },
+      "scope": "private",
+      "description": "Personal Odin RPG project (external repository)."
+    },
+    {
+      "id": "project.PVG02_Metroidvania",
+      "link": "code/projects/PVG02_Metroidvania",
+      "target": { "config": "project.PVG02_Metroidvania" },
+      "scope": "private",
+      "description": "Personal Odin Metroidvania project (external repository)."
+    },
+    {
+      "id": "project.Odin_Skeleton",
+      "link": "code/projects/Odin_Skeleton",
+      "target": { "config": "project.Odin_Skeleton" },
+      "scope": "private",
+      "description": "Personal Odin project skeleton (external repository)."
+    },
+    {
+      "id": "workspace.agents",
+      "link": ".agents",
+      "target": { "repo": ".kilo" },
+      "scope": "workspace",
+      "description": "Mirror of .kilo so GitHub Copilot discovers the same skills as Kilo Code."
+    },
+    {
+      "id": "workspace.obsidian",
+      "link": ".obsidian",
+      "target": { "config": "workspace.obsidian" },
+      "scope": "workspace",
+      "optional": true,
+      "description": "Obsidian vault settings (Windows-only shared profile, skipped elsewhere)."
+    }
+  ]
+}

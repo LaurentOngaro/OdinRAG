@@ -42,6 +42,8 @@ PUBLIC_BRANCH = "refs/heads/public"
 FORBIDDEN_PATTERNS: list[tuple[str, str]] = [
     ("_Private/", "All _Private/ content is local-only (never push)"),
     ("code/projects/PVG03_RPG/", "Personal Odin project (not part of the RAG)"),
+    ("code/projects/PVG02_Metroidvania/", "Personal Odin project (not part of the RAG)"),
+    ("code/projects/Odin_Skeleton/", "Personal Odin project (not part of the RAG)"),
     ("odin-knowledge-base/courses/", "Skool courses (paywall)"),
     ("odin-knowledge-base/docs/karl_zylinski/odin-book/", "Karl Zylinski ebook (paid)"),
 ]

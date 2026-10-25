@@ -45,6 +45,7 @@ _None for now._
   python _Helpers/scripts/scrapers/build_gitingest.py --check
   python _Helpers/scripts/scrapers/scrape_odin_changelog.py --check
   python _Helpers/scripts/scrapers/scrape_raylib_changelog.py --check
+  python _Helpers/scripts/dev/sync_links.py --check
   python _Helpers/scripts/diagnostic/audit_public_safety.py
   ```
 

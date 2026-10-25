@@ -120,7 +120,7 @@ And put the precise personal patterns in `.git/info/exclude`:
 /odin-knowledge-base/docs/karl_zylinski/odin-book/
 ```
 
-Adapt the patterns to your own private folders. Keep them in sync with `FORBIDDEN_PATTERNS` in `audit_public_safety.py` and `STRIP_RULES` in `publish_public.py` - three places to update when the set of personal paths changes.
+Adapt the patterns to your own private folders. Keep them in sync with `FORBIDDEN_PATTERNS` in `audit_public_safety.py` and `STRIP_RULES` in `publish_public.py` - three places to update when the set of personal paths changes. The personal projects exposed under `code/projects/` are declared once in [`_Helpers/links.jsonc`](links.jsonc) and never tracked by git: see [`009_cross_platform_links.md`](009_cross_platform_links.md).
 
 ## Step 3 - import personal content under the override
 
@@ -246,7 +246,8 @@ if [ "$remote" != "public" ]; then
 fi
 
 # Personal patterns anchored at repo root. MUST stay in sync with publish_public.py STRIP_RULES and audit_public_safety.py FORBIDDEN_PATTERNS.
-personal_pattern='^(code/projects/PVG03_RPG/|_Private/|odin-knowledge-base/courses/|odin-knowledge-base/docs/karl_zylinski/odin-book/)'
+# `code/projects/[^/]+/` covers every personal project folder without matching the README that lives in code/projects/.
+personal_pattern='^(code/projects/[^/]+/|_Private/|odin-knowledge-base/courses/|odin-knowledge-base/docs/karl_zylinski/odin-book/)'
 
 while read -r local_ref _remote_ref; do
   if [ -z "$local_ref" ]; then

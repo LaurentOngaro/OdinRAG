@@ -11,6 +11,7 @@ Meta documentation about this repository:
 - `005_public_release_checklist.md` - pre-push checklist
 - `007_mixing_public_and_private_history.md` - workflow for splitting public/private content
 - `008_tasks_and_launch_wiring.md` - VS Code / Zed task and launch wiring specification
+- `009_cross_platform_links.md` - Windows junctions / Linux symlinks: manifest + generator
 
 ## Conventions
 

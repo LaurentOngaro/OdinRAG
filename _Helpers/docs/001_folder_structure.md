@@ -86,9 +86,10 @@ code/
 ```text
 _Helpers/
 ├── README - helpers.md
+├── links.jsonc                <- link topology (workspace junctions / symlinks), consumed by scripts/dev/sync_links.py
 ├── scripts/                 <- thematic sub-folders
 │   ├── README - scripts.md
-│   ├── dev/                 <- editor integration scripts (odin_task.ps1)
+│   ├── dev/                 <- editor integration scripts (odin_task.ps1) + workspace link manager (sync_links.py)
 │   ├── diagnostic/          <- audit_public_safety.py, auditReadmeCoherence.py, publish_public.py, vaultConfigOdinRAG.py + vaultDiagnostic.py + validateFrontmatter.py (R2 TerraBloom port)
 │   │   └── code_auditor/    <- code_auditor.py + odin_rules.{jsonc,schema.json} + rule_loader.py + scanner.py + kb_index.py + context_builder.py + reporter.py + README - code_auditor.md (self-contained package, Phase 1+2+3)
 │   ├── fixes/               <- format_odin_in_files, fix_mojibake, reflow_md, odin_format, book_html_to_md, lint_pylance
@@ -104,6 +105,7 @@ _Helpers/
 │   ├── 005_public_release_checklist.md
 │   ├── 007_mixing_public_and_private_history.md
 │   ├── 008_tasks_and_launch_wiring.md
+│   ├── 009_cross_platform_links.md
 │   └── ...
 ├── templates/               <- INTERNAL OdinRAG templates (clone these, never edit in place)
 │   ├── README - templates.md

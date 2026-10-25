@@ -12,6 +12,7 @@ They are NOT gitignored - see [`_Helpers/docs/007_mixing_public_and_private_hist
 
 - See [`../INTEGRATION.md`](../INTEGRATION.md) for the full convention.
 - New projects are scaffolded from [`_Helpers/templates/odin-project/`](../../_Helpers/templates/odin-project/).
+- A project that lives OUTSIDE this repository is exposed here as a **link** (NTFS junction on Windows, symbolic link on Linux). The links are declared in [`_Helpers/links.jsonc`](../../_Helpers/links.jsonc) and created by `_Helpers/scripts/dev/sync_links.py` - never by hand. See [`_Helpers/docs/009_cross_platform_links.md`](../../_Helpers/docs/009_cross_platform_links.md).
 
 ## Cross-references
 

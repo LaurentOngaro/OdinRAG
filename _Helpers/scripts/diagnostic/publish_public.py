@@ -46,8 +46,13 @@ PUBLIC_REMOTE = "public"
 # - audit_public_safety.py FORBIDDEN_PATTERNS
 # - the pre-push hook pattern
 # - _Helpers/docs/007_mixing_public_and_private_history.md
+# The `code/projects/*` entries are the personal projects exposed as links
+# (see _Helpers/links.jsonc): they are untracked on disk, but they must never
+# appear in the history rewritten for the public branch.
 STRIP_RULES: list[str] = [
     "code/projects/PVG03_RPG",
+    "code/projects/PVG02_Metroidvania",
+    "code/projects/Odin_Skeleton",
     "_Private",
     "odin-knowledge-base/courses",
     "odin-knowledge-base/docs/karl_zylinski/odin-book",
