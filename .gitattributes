@@ -1,5 +1,24 @@
 # gitattributes - OdinRAG line endings and binary rules
-# Set default behavior to automatically normalize line endings to LF on commit.
+#
+# Objectif : un fichier doit avoir les memes octets sur les deux OS.
+#   - Index (dépôt) : toujours LF.
+#   - Copie de travail : toujours LF, sur Windows comme sur Linux.
+# Un fichier dont seuls les fins de ligne changent n'est donc JAMAIS
+# signale comme modifie par Git, quel que soit l'OS qui l'ait edite.
+#
+# Seul le contenu binaire est declare comme tel pour empecher toute
+# tentative de conversion.
+#
+# Regle : `* text=auto eol=lf` s'applique a tout. Les types texte sont
+# ensuite reaffirmes explicitement (documentation) et les scripts Windows
+# (.bat, .cmd, .ps1) conservent CRLF, car cmd.exe et PowerShell les
+# executent avec des fins de ligne CRLF.
+#
+# Rappel : `core.autocrlf` doit rester a false sur chaque clone local
+# (`git config core.autocrlf false`). Les attributs ci-dessus primeront
+# dans tous les cas, mais un autocrlf actif rend le diagnostic trompeur.
+
+# Default: normalize to LF in the index, checkout as LF on every OS.
 * text=auto eol=lf
 
 # Explicit text file types (enforce LF)
@@ -11,16 +30,32 @@
 *.yml text eol=lf
 *.yaml text eol=lf
 *.sh text eol=lf
+*.txt text eol=lf
+*.excalidraw text eol=lf
+*.cfg text eol=lf
+*.toml text eol=lf
 
 # Windows scripts (preserve CRLF)
 *.bat text eol=crlf
 *.cmd text eol=crlf
+*.ps1 text eol=crlf
 
 # Binary files
 *.blend binary
 *.zip binary
 *.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.gif binary
 *.wav binary
 *.ogg binary
+*.mp3 binary
 *.ico binary
 *.pdf binary
+*.exe binary
+*.dll binary
+*.pdb binary
+*.lib binary
+*.exp binary
+*.obj binary

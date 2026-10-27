@@ -18,6 +18,13 @@ indent_size = 2
 [*.{json,yaml,yml,toml}]
 indent_size = 2
 
+# Scripts Windows : CRLF pour rester compatibles avec cmd.exe et PowerShell
+# (coherent avec les entrees `eol=crlf` du .gitattributes).
+[*.{bat,cmd,ps1}]
+end_of_line = crlf
+insert_final_newline = false
+trim_trailing_whitespace = false
+
 [*.py]
 indent_size = 4
 max_line_length = 150

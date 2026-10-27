@@ -89,6 +89,22 @@ VS Code tasks: `[LINKS] Sync workspace links (current OS)` (regenerate for this 
 
 Full rationale: [`_Helpers/docs/009_cross_platform_links.md`](_Helpers/docs/009_cross_platform_links.md).
 
+### Line endings (LF everywhere, both OS)
+
+The repository is used from Windows and from Linux. Line endings must be identical on both, so that a file edited on one OS is never reported as modified on the other.
+
+- `.gitattributes` is the source of truth: `* text=auto eol=lf` (index and working tree are LF), with CRLF reserved for the Windows scripts (`.bat`, `.cmd`, `.ps1`).
+- `.editorconfig` enforces `end_of_line = lf` for the editors that support it.
+- On **each clone**, run once: `git config core.autocrlf false` (local setting, never versioned).
+- After a scraper or an external tool rewrites files, normalize them: `python _Helpers/scripts/dev/normalize_eol.py --check` (report) then `--stage` (rewrite in LF and stage).
+
+```bash
+git config core.autocrlf false
+python _Helpers/scripts/dev/normalize_eol.py --check
+```
+
+> `git add --renormalize .` is **not** enough: git refuses to normalize a file whose indexed version already contains CRLF. The working tree must be rewritten first, then `git add`.
+
 ## Conventions
 
 ### File naming (`NNN_` prefix)
