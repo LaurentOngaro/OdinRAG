@@ -1,0 +1,19 @@
+{
+  "editor.formatOnSave": true,
+  "files.eol": "\n",
+  "[odin]": {
+    "editor.defaultFormatter": "DanielGavin.ols",
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true
+  },
+  "[powershell]": {
+    "files.eol": "\r\n"
+  },
+  "[bat]": {
+    "files.eol": "\r\n"
+  },
+  "search.exclude": {
+    "build/**": true,
+    "**/node_modules": true
+  }
+}

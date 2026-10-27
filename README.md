@@ -36,14 +36,24 @@ The repo ships **only** the curation workflow (scrapers, agents, skills, indexes
 > The repo ships sample articles in `odin-knowledge-base/docs/{karl_zylinski,gingerbill,jakubtomsu,marianpekar}/` on the `public` branch.
 > Run the corresponding scrapers (or sync from the private remote if you have access) to populate the full corpus on your own machine.
 
+## Where to pick up the work
+
+- [`TODO.md`](TODO.md) - short, actionable tasks (one line each).
+- [`ACTION_PLAN.md`](ACTION_PLAN.md) - the remaining multi-step work (cross-OS setup, publishing, migrations).
+
+Both are updated by the coding agents at the end of every session: the AI session is not shared between machines or between repositories, so anything not written down is lost.
+
 ## Quick start
 
-````bash
+```bash
 git clone https://github.com/LaurentOngaro/OdinRAG.git
 cd OdinRAG
 
 # Audit before any push (idempotent, exit 0 = clean)
 python _Helpers/scripts/diagnostic/audit_public_safety.py
+
+# Generate the workspace links for this OS (junction on Windows, symlink on Linux)
+python _Helpers/scripts/dev/sync_links.py --apply
 
 # Scrape the public sources (no paywall, no auth)
 python _Helpers/scripts/scrapers/scrape_official.py

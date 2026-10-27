@@ -8,48 +8,78 @@ _Define your top priorities here, in execution order. Leave blank if undecided._
 
 ## Project Improvements
 
-### Bugs (last: BUG01)
+### Bugs (next: BUG01)
 
 _None for now._
 
-### Documentation (last: DOC01)
+### Documentation (next: DOC03)
 
 _None for now._
 
-### Display (last: DISP01)
+### Display (next: DISP01)
 
 _None for now._
 
-### Features (last: FEAT01)
+### Features (next: FEAT01)
 
 _None for now._
 
-### Publish (last: PUB01)
+### Publish (next: PUB01)
 
 _None for now._
 
-### Refactoring (last: REF02)
+### Refactoring (next: REF03)
 
-- [ ] REF02 - `_tools/jetbrains_configurations/` is currently NOT synced (per-project IDE files).
-  - If we want to mutualise them, add a recursive copy step in `sync-tooling.ps1` and a `_tools/jetbrains_configurations/TPL_/` directory.
+#### REF02 - jetbrains configurations
 
-### Security (last: SEC01)
+`_tools/jetbrains_configurations/` is currently NOT synced (per-project IDE files).
+
+- If we want to mutualise them, add a recursive copy step in `sync-tooling.ps1` and a `_tools/jetbrains_configurations/TPL_/` directory.
+
+### Security (next: SEC01)
 
 _None for now._
 
-## Recurring tasks (last: REC01)
+## Recurring tasks (next: REC03)
 
-- [ ] REC01: **Quarterly check KB + Space** - run the following scripts to ensure the knowledge base and Space are up-to-date and consistent.
+### REC01 : Quarterly check KB + Space
 
-  ```bash
-  python _Helpers/scripts/scrapers/build_gitingest.py --check
-  python _Helpers/scripts/scrapers/scrape_odin_changelog.py --check
-  python _Helpers/scripts/scrapers/scrape_raylib_changelog.py --check
-  python _Helpers/scripts/dev/sync_links.py --check
-  python _Helpers/scripts/diagnostic/audit_public_safety.py
-  ```
+run the following scripts to ensure the knowledge base and Space are up-to-date and consistent.
 
-## Roadmap / Ideas to Investigate (last: IDEA01)
+```bash
+python _Helpers/scripts/scrapers/build_gitingest.py --check
+python _Helpers/scripts/scrapers/scrape_odin_changelog.py --check
+python _Helpers/scripts/scrapers/scrape_raylib_changelog.py --check
+python _Helpers/scripts/dev/sync_links.py --check
+python _Helpers/scripts/diagnostic/audit_public_safety.py
+```
+
+### REC02 : After each scrape or external rewrite
+
+Some scrapers and external tools write CRLF. The working tree must stay LF on both OS, and the workspace links must match the current OS.
+
+```bash
+python _Helpers/scripts/dev/normalize_eol.py --check
+python _Helpers/scripts/dev/sync_links.py --check
+```
+
+### REC03 : On every new clone (Windows 11 or Fedora Linux)
+
+Local setup, run once per clone. Details in [`ACTION_PLAN.md`](ACTION_PLAN.md).
+
+```bash
+git config core.autocrlf false
+python _Helpers/scripts/dev/normalize_eol.py --apply
+python _Helpers/scripts/dev/sync_links.py --apply
+```
+
+## Cross-repo (OdinRAG <-> GodotRAG)
+
+- [ ] Push the pending commits of both repositories (OdinRAG: 3 commits, GodotRAG: 2 commits) to their remotes.
+- [ ] Decide what to do with the TerraBloom design docs, now that the project is a link and its content is not duplicated in the repositories (tracked in GodotRAG's `ACTION_PLAN.md`).
+- [ ] Apply the same cross-OS setup (REC03) to the GodotRAG clone on the Fedora machine.
+
+## Roadmap / Ideas to Investigate (next: IDEA01)
 
 Next up:
 

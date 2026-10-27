@@ -53,6 +53,10 @@ Thumbs.db
 # but user tasks.json is tracked for the benefit of collaborators, so we don't ignore it:
 !.vscode/tasks.json
 !.vscode/launch.json
+# Editor settings are shared too (line endings, formatters, keymap). They must
+# NEVER contain secrets (tokens, MCP keys, personal paths): keep them in the
+# user-level settings if they do.
+!.vscode/settings.json
 
 # === Zed project config ===
 # Mirror of the .vscode/* pattern above: the .zed/ folder is versioned so that

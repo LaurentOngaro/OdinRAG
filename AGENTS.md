@@ -105,6 +105,16 @@ python _Helpers/scripts/dev/normalize_eol.py --check
 
 > `git add --renormalize .` is **not** enough: git refuses to normalize a file whose indexed version already contains CRLF. The working tree must be rewritten first, then `git add`.
 
+### Task traceability (never lose a pending task)
+
+The AI session is **not** shared between machines, between repositories, or between sessions: a task mentioned in a chat is lost as soon as the session ends. Every remaining task must therefore be written down before the session ends.
+
+- **Short task** (one line, no context needed) -> `TODO.md`, in the section matching its topic.
+- **Long task** (several steps, a decision, a migration, a risk) -> detailed in [`ACTION_PLAN.md`](ACTION_PLAN.md).
+- **Task that concerns both repositories** -> written in both `TODO.md` files, with a cross-reference to the sibling repository.
+
+Rule of thumb: if the task does not fit in one line of `TODO.md`, it goes to `ACTION_PLAN.md`. Never leave a pending task in the conversation only.
+
 ## Conventions
 
 ### File naming (`NNN_` prefix)
