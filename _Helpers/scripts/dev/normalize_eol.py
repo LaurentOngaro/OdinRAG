@@ -140,6 +140,21 @@ def normalize_file(path: Path) -> bool:
     return True
 
 
+def find_eol_only_changes() -> list[str]:
+    """Liste les fichiers signales modifies alors que seul le style de fin de ligne change.
+
+    Git compare la copie de travail a l'index en passant par le filtre clean :
+    un fichier sauvegarde en CRLF par un editeur peut donc etre signale modifie
+    alors que le diff est vide. `git update-index --refresh` leve le faux
+    positif (le cache de stat est simplement perime).
+    """
+    modified = set(_git("diff", "--name-only").splitlines())
+    if not modified:
+        return []
+    real = set(_git("diff", "--ignore-cr-at-eol", "--name-only").splitlines())
+    return sorted(modified - real)
+
+
 def main(argv: list[str] | None = None) -> int:
     """Point d'entree. Retourne le code de sortie du processus."""
     parser = argparse.ArgumentParser(description="Normalise les fins de ligne de la copie de travail en LF.")
@@ -177,9 +192,22 @@ def main(argv: list[str] | None = None) -> int:
     if not candidates:
         _log("+", "toutes les fins de ligne sont conformes (LF)")
         _log("i", "%d script(s) Windows laissés en CRLF" % skipped_crlf)
-        return 0
+    else:
+        _log("i", "%d fichier(s) à normaliser, %d script(s) Windows laissés en CRLF" % (len(candidates), skipped_crlf))
 
-    _log("i", "%d fichier(s) à normaliser, %d script(s) Windows laissés en CRLF" % (len(candidates), skipped_crlf))
+    # Faux positifs : modifies pour cause de fin de ligne uniquement.
+    try:
+        eol_only = find_eol_only_changes()
+    except RuntimeError:
+        eol_only = []
+    if eol_only:
+        _log("!", "%d fichier(s) signalé(s) modifiés alors que seul le style de fin de ligne change" % len(eol_only))
+        for path in eol_only:
+            _log("i", "faux positif : %s" % path)
+        _log("i", "lever avec : git update-index --refresh")
+
+    if not candidates:
+        return 0
 
     if args.check:
         for path in candidates:
