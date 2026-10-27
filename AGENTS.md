@@ -107,11 +107,13 @@ python _Helpers/scripts/dev/normalize_eol.py --check
 
 ### Task traceability (never lose a pending task)
 
-The AI session is **not** shared between machines, between repositories, or between sessions: a task mentioned in a chat is lost as soon as the session ends. Every remaining task must therefore be written down before the session ends.
+The AI session is **not** shared between operating systems (Windows / Linux), between machines, between repositories, or between sessions: a task mentioned in a chat is lost as soon as the session ends.
 
-- **Short task** (one line, no context needed) -> `TODO.md`, in the section matching its topic.
-- **Long task** (several steps, a decision, a migration, a risk) -> detailed in [`ACTION_PLAN.md`](ACTION_PLAN.md).
-- **Task that concerns both repositories** -> written in both `TODO.md` files, with a cross-reference to the sibling repository.
+**Mandatory end-of-conversation rule**: whenever one or more tasks remain to be done at the end of a conversation, the AI agent must **systematically** write them down before closing the session:
+
+- **Short task** (one line, no complex context needed) -> add it to [`TODO.md`](TODO.md), in the section matching its topic.
+- **Long task** (several steps, a decision, a migration, a risk) -> detail it in [`ACTION_PLAN.md`](ACTION_PLAN.md).
+- **Cross-repository task** (`OdinRAG`, `GodotRAG`, `Personal RAG`, `Godot_Roguelite`) -> write it in the tracking files of each concerned repository with a cross-reference.
 
 Rule of thumb: if the task does not fit in one line of `TODO.md`, it goes to `ACTION_PLAN.md`. Never leave a pending task in the conversation only.
 
@@ -289,6 +291,7 @@ See [`.kilo/agents/odin-gamedev.md`](.kilo/agents/odin-gamedev.md) for the speci
 
 ## Git workflow - always require user validation
 
+- **Track `.vscode/settings.json` in Git**: `.vscode/settings.json` (along with `tasks.json`, `launch.json`, `extensions.json`, and `.zed/settings.json`) must be committed to the repository so editor rules, LF line endings, and formatters are shared across Windows and Linux, **unless** it contains sensitive data (tokens, API keys, private personal paths), which must stay in user-level settings or `_Private/.config/user_config.jsonc`.
 - **NEVER** run `git commit` or `git push` without an explicit user request.
 - After any modification (code, docs, configs, structure), stage the changes with `git add` and present a clear summary of what changed, then **WAIT** for the user to say "commit", "push", "OK to commit", or equivalent.
 - If the user only asks for a fix / edit / dry-run, stop after the local edit. Do not interpret silence as approval.
