@@ -45,7 +45,7 @@ Both are updated by the coding agents at the end of every session: the AI sessio
 
 ## Quick start
 
-```bash
+````bash
 git clone https://github.com/LaurentOngaro/OdinRAG.git
 cd OdinRAG
 

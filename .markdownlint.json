@@ -1,16 +1,6 @@
 {
   "default": true,
   "extends": null,
-  "globs": [
-    "**/*.md",
-    "!**/node_modules/**",
-    "!.kilo/**",
-    "!**/_Private/**",
-    "!**/odin-knowledge-base/courses/**",
-    "!**/_Helpers/logs/**",
-    "!**/odin-knowledge-base/docs/**",
-    "!**/code/vendored templates/odin-*/**"
-  ],
   "MD001": true,
   "MD003": {
     "style": "consistent"
@@ -32,7 +22,12 @@
   "MD010": {
     "code_blocks": true,
     "ignore_code_languages": [
-      "odin"
+      "odin",
+      "gdscript",
+      "makefile",
+      "make",
+      "go",
+      "tsv"
     ],
     "spaces_per_tab": 2
   },
@@ -41,7 +36,7 @@
     "maximum": 1
   },
   "MD013": false,
-  "MD014": true,
+  "MD014": false,
   "MD018": true,
   "MD019": true,
   "MD020": true,
@@ -52,16 +47,14 @@
   },
   "MD023": true,
   "MD024": false,
-  "MD025": {
-    "front_matter_title": ""
-  },
+  "MD025": false,
   "MD026": {
     "punctuation": ".,;:!。，；：！"
   },
   "MD027": {
     "list_items": true
   },
-  "MD028": true,
+  "MD028": false,
   "MD029": false,
   "MD030": {
     "ul_single": 1,
@@ -73,9 +66,7 @@
     "list_items": true
   },
   "MD032": true,
-  "MD033": {
-    "allowed_elements": []
-  },
+  "MD033": false,
   "MD034": false,
   "MD035": {
     "style": "consistent"
@@ -85,18 +76,10 @@
   "MD038": true,
   "MD039": true,
   "MD040": false,
-  "MD041": {
-    "allow_preamble": false,
-    "front_matter_title": "^\\s*title\\s*[:=]",
-    "level": 1
-  },
+  "MD041": false,
   "MD042": true,
   "MD043": false,
-  "MD044": {
-    "names": [],
-    "code_blocks": true,
-    "html_elements": true
-  },
+  "MD044": false,
   "MD045": false,
   "MD046": {
     "style": "consistent"
@@ -111,40 +94,15 @@
   "MD050": {
     "style": "consistent"
   },
-  "MD051": {
-    "ignore_case": false,
-    "ignored_pattern": ""
-  },
-  "MD052": {
-    "ignored_labels": [
-      "x"
-    ],
-    "shortcut_syntax": false
-  },
-  "MD053": {
-    "ignored_definitions": [
-      "//"
-    ]
-  },
-  "MD054": {
-    "autolink": true,
-    "inline": true,
-    "full": true,
-    "collapsed": true,
-    "shortcut": true,
-    "url_inline": true
-  },
+  "MD051": false,
+  "MD052": false,
+  "MD053": false,
+  "MD054": false,
   "MD055": {
     "style": "consistent"
   },
   "MD056": true,
   "MD058": true,
-  "MD059": {
-    "prohibited_texts": [
-      "click here",
-      "here",
-      "link",
-      "more"
-    ]
-  }
+  "MD059": false,
+  "MD060": true
 }

@@ -34,10 +34,10 @@ python _Helpers/scripts/dev/sync_links.py --list
 
 ### VS Code tasks
 
-| Task | Effect |
-| --- | --- |
+| Task                                        | Effect                                                                                                                      |
+| ------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
 | `[LINKS] Sync workspace links (current OS)` | Runs `--apply`: regenerates every link with the primitive of the current host and replaces the links made for the other OS. |
-| `[LINKS] Check workspace links (dry-run)` | Runs `--check`: reports the state of every link, changes nothing. |
+| `[LINKS] Check workspace links (dry-run)`   | Runs `--check`: reports the state of every link, changes nothing.                                                           |
 
 Zed mirrors the sync task as `Links: Sync workspace links (current OS)` (`.zed/tasks.json`).
 
@@ -51,11 +51,11 @@ Run the sync task after moving from one machine to the other (Windows <-> WSL/Li
 
 A link that works on one OS is usually broken on the other:
 
-| OS | Primitive | Command | Notes |
-| --- | --- | --- | --- |
+| OS      | Primitive     | Command                     | Notes                                                                    |
+| ------- | ------------- | --------------------------- | ------------------------------------------------------------------------ |
 | Windows | NTFS junction | `mklink /J <link> <target>` | No administrator rights, no Developer Mode, local absolute targets only. |
-| Windows | Symbolic link | `mklink /D` / `os.symlink` | Needs Developer Mode or an elevated shell. |
-| Linux | Symbolic link | `ln -s <target> <link>` | Relative or absolute target. |
+| Windows | Symbolic link | `mklink /D` / `os.symlink`  | Needs Developer Mode or an elevated shell.                               |
+| Linux   | Symbolic link | `ln -s <target> <link>`     | Relative or absolute target.                                             |
 
 The failure mode is silent and confusing. A symlink created from WSL keeps its POSIX target (`/mnt/d/...`) inside the NTFS reparse point, so it resolves fine in WSL and is broken in Windows (`D:\mnt\d\...` does not exist). The reverse happens with a junction: WSL follows it, but the link is meaningless as soon as the folder is checked out on a machine without `mklink`.
 
@@ -85,18 +85,18 @@ The rule that replaces it: **one logical link, one path, one generator. The prim
   "link": "code/projects/PVG03_RPG",
   "target": { "config": "project.PVG03_RPG" },
   "scope": "private",
-  "description": "Personal Odin RPG project (external repository)."
+  "description": "Personal Odin RPG project (external repository).",
 }
 ```
 
-| Field | Meaning |
-| --- | --- |
-| `id` | Logical identifier. Also drives the env var override `ODINRAG_LINK_<ID>`. |
-| `link` | Where the link lives, relative to the repo root. |
-| `target` | `{ "repo": "<relative path>" }` for a portable internal target, `{ "config": "<key>" }` for a machine-specific external target. |
-| `scope` | `private` (personal content, must never reach the public branch) or `workspace` (points inside the repo). |
-| `mode` | Optional: `auto` (default), `junction` or `symlink`. |
-| `optional` | Optional: when true, a link that cannot be resolved on this OS is skipped instead of reported as an error. |
+| Field      | Meaning                                                                                                                         |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `id`       | Logical identifier. Also drives the env var override `ODINRAG_LINK_<ID>`.                                                       |
+| `link`     | Where the link lives, relative to the repo root.                                                                                |
+| `target`   | `{ "repo": "<relative path>" }` for a portable internal target, `{ "config": "<key>" }` for a machine-specific external target. |
+| `scope`    | `private` (personal content, must never reach the public branch) or `workspace` (points inside the repo).                       |
+| `mode`     | Optional: `auto` (default), `junction` or `symlink`.                                                                            |
+| `optional` | Optional: when true, a link that cannot be resolved on this OS is skipped instead of reported as an error.                      |
 
 ### 2. The machine paths (local, gitignored)
 
@@ -117,12 +117,12 @@ The generator picks the entry matching the current OS (`windows`, `linux`, then 
 
 [`_Helpers/scripts/dev/sync_links.py`](../scripts/dev/sync_links.py) is the only component that knows about junctions.
 
-| Action | Behaviour |
-| --- | --- |
-| `--check` (default) | Read-only. Reports the state of every link and exits 1 if something must change. |
-| `--apply` | Creates the missing links, replaces the links that point elsewhere, recreates the broken ones. Idempotent. |
-| `--prune` | Removes the links that live next to the declared ones but are not declared (only inside the `code/projects/` container). |
-| `--list` | Prints the topology, the resolved target and the state of every link. |
+| Action              | Behaviour                                                                                                                |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `--check` (default) | Read-only. Reports the state of every link and exits 1 if something must change.                                         |
+| `--apply`           | Creates the missing links, replaces the links that point elsewhere, recreates the broken ones. Idempotent.               |
+| `--prune`           | Removes the links that live next to the declared ones but are not declared (only inside the `code/projects/` container). |
+| `--list`            | Prints the topology, the resolved target and the state of every link.                                                    |
 
 Per-OS behaviour:
 
@@ -150,7 +150,7 @@ Statuses reported by `--check`: `ok`, `missing`, `drift` (wrong target or wrong 
      "link": "code/projects/PVG04_MyGame",
      "target": { "config": "project.PVG04_MyGame" },
      "scope": "private",
-     "description": "Personal Odin project (external repository)."
+     "description": "Personal Odin project (external repository).",
    }
    ```
 
@@ -179,15 +179,15 @@ Statuses reported by `--check`: `ok`, `missing`, `drift` (wrong target or wrong 
 
 ## Troubleshooting
 
-| Symptom | Cause | Fix |
-| --- | --- | --- |
-| `unresolved` for a project link | The key is missing from the `links` section of `_Private/.config/user_config.jsonc`, or it has no entry for the current OS. | Add the `windows` / `linux` / `default` entry. |
-| `drift` after a move | The link points to the old location. | `--apply` (it replaces the link, never the content). |
-| `drift` mentioning "this host expects a junction" | The link was created on the other OS (symlink on Windows, or the reverse). | `--apply` (or the `[LINKS] Sync` task) rebuilds it with the right primitive. |
-| `conflict` | A real folder sits where the link should be. | Move or rename the folder, then `--apply`. |
-| `broken` | The target folder was deleted or moved. | Fix the path in the config, then `--apply`. |
-| The link exists but Windows cannot open it | The link was created with a POSIX target (`/mnt/d/...`) by an older manual setup. | `--apply` replaces it with a native junction. |
-| `mklink` fails on a network target | Junctions only support local paths. | The generator falls back to a symbolic link; enable Developer Mode if the fallback also fails. |
+| Symptom                                           | Cause                                                                                                                       | Fix                                                                                            |
+| ------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `unresolved` for a project link                   | The key is missing from the `links` section of `_Private/.config/user_config.jsonc`, or it has no entry for the current OS. | Add the `windows` / `linux` / `default` entry.                                                 |
+| `drift` after a move                              | The link points to the old location.                                                                                        | `--apply` (it replaces the link, never the content).                                           |
+| `drift` mentioning "this host expects a junction" | The link was created on the other OS (symlink on Windows, or the reverse).                                                  | `--apply` (or the `[LINKS] Sync` task) rebuilds it with the right primitive.                   |
+| `conflict`                                        | A real folder sits where the link should be.                                                                                | Move or rename the folder, then `--apply`.                                                     |
+| `broken`                                          | The target folder was deleted or moved.                                                                                     | Fix the path in the config, then `--apply`.                                                    |
+| The link exists but Windows cannot open it        | The link was created with a POSIX target (`/mnt/d/...`) by an older manual setup.                                           | `--apply` replaces it with a native junction.                                                  |
+| `mklink` fails on a network target                | Junctions only support local paths.                                                                                         | The generator falls back to a symbolic link; enable Developer Mode if the fallback also fails. |
 
 ## Cross-references
 

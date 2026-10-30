@@ -1,0 +1,15 @@
+.git/**
+.github/**
+.vscode/**
+.obsidian/**
+.kilo/**
+.agents/**
+node_modules/**
+**/node_modules/**
+_Private/**
+_Raw/**
+_Helpers/logs/**
+odin-knowledge-base/courses/**
+odin-knowledge-base/docs/**
+code/vendored templates/**
+code/projects/**

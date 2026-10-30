@@ -93,9 +93,9 @@ Full rationale: [`_Helpers/docs/009_cross_platform_links.md`](_Helpers/docs/009_
 
 The repository is used from Windows and from Linux. Line endings must be identical on both, so that a file edited on one OS is never reported as modified on the other.
 
-- `.gitattributes` is the source of truth: `* text=auto eol=lf` (index and working tree are LF), with CRLF reserved for the Windows scripts (`.bat`, `.cmd`, `.ps1`).
-- `.editorconfig` enforces `end_of_line = lf` for the editors that support it.
-- On **each clone**, run once: `git config core.autocrlf false` (local setting, never versioned).
+- `.gitattributes` is the source of truth: `* text=auto eol=lf` (index and working tree are LF), with CRLF reserved exclusively for native Windows scripts (`*.bat`, `*.cmd`, `*.ps1`, `*.reg`).
+- `.editorconfig` enforces `end_of_line = lf` and `max_line_length = 180` for code/scripts (`max_line_length = off` for Markdown) for the editors that support it.
+- On **each clone**, run once: `git config --local core.autocrlf false` (local setting, never versioned). Never create a commit that only modifies line endings (EOL).
 - After a scraper or an external tool rewrites files, normalize them: `python _Helpers/scripts/dev/normalize_eol.py --check` (report) then `--stage` (rewrite in LF and stage).
 
 ```bash
@@ -221,21 +221,33 @@ These scripts must:
 
 ## Style rules (project-wide)
 
-These rules apply to every tracked `.md` file in this repo unless the file is explicitly excluded (see notes below).
+These rules apply to every tracked file in this repo unless the file is explicitly excluded (see notes below).
 
-### Punctuation: no AI-typical characters
+### Code & script line length (180 characters)
 
-- **Never use em-dash (U+2014) or en-dash (U+2013).** Use plain ASCII hyphen-minus (`-`, U+002D). Reason: these characters are almost exclusively used by AI assistants in French/English prose, not by humans in their daily writing. Their presence in a tracked file is a strong signal of AI-generated content.
+- **Line length limit is fixed at 180 characters** (`max_line_length = 180` in `.editorconfig`, `character_width = 180` in `odinfmt.json`, `printWidth: 180` in `.prettierrc.json`) for all code, scripts, and configuration files (`.py`, `.odin`, `.ps1`, `.sh`, `.json`, `.yaml`, `.toml`).
+- **Never artificially wrap** code or strings at 80, 100, or 150 characters.
+
+### Punctuation: no AI-typical characters & strict preservation of French accents
+
+- **Never use em-dash (U+2014) or en-dash (U+2013).** Use plain ASCII hyphen-minus (`-`, U+002D) or ASCII arrow (`->`). Reason: these characters are almost exclusively used by AI assistants in French/English prose, not by humans in their daily writing. Their presence in a tracked file is a strong signal of AI-generated content.
 - Same rule for smart quotes / ellipsis: ASCII `'` `"` `...` instead of curly variants. Mostly enforced automatically by `MD026` in `markdownlint`.
-- **Accented letters are NOT in scope** of this rule: French typography (e, e, e, a, a, c, o, u, u, i, i, e, y) and other European diacritics are normal human text. Keep them as-is.
-- Box-drawing characters and arrow symbols (-> , =>, <-) are OK for diagrams and table separators.
+- **Accented letters MUST be strictly preserved**: whenever writing or editing French text (in `_Private/`, raw notes, comments, or French strings), **all French accented characters and diacritics must be kept in UTF-8** (`é`, `è`, `ê`, `ë`, `à`, `â`, `ù`, `û`, `ç`, `œ`, `î`, `ï`, `ô`, `ÿ`, `É`, `È`, `À`, `Ç`...). **Never strip or degrade French text into unaccented ASCII.**
+- Box-drawing characters and arrow symbols (`->`, `=>`, `<-`) are OK for diagrams and table separators.
 - Full rationale + edge cases: load the [`markdown-style`](.kilo/skills/markdown-style/SKILL.md) skill before any `.md` edit.
 
-### Markdown prose
+### Markdown prose & automatic formatting (0 markdownlint warning)
 
-- **One paragraph = one physical line.** No line break inside a sentence, no matter the line length. Tables, code blocks, and frontmatter are exempt.
+- **One paragraph = one physical line.** No line break inside a sentence, no matter the line length (`MD013: false`, `proseWrap: preserve`). Tables, code blocks, and frontmatter are exempt.
 - **Before** writing or editing any `.md` file, load the [`markdown-style`](.kilo/skills/markdown-style/SKILL.md) skill (pre/post checklists in one place).
-- **After** writing or editing any `.md` file, run `python _Helpers/scripts/fixes/reflow_md.py --quiet --check --path <file>` -> exit `0` = clean. `--apply` is MANUAL recovery only (explicit user GO).
+- **After** writing or editing any `.md` file, align tables and format with Prettier, run `markdownlint-cli2 --fix`, and verify the reflow invariant so that **0 `markdownlint` warning** remains:
+
+```bash
+npx --yes prettier --prose-wrap preserve --end-of-line lf --write <file>
+npx --yes markdownlint-cli2 --fix <file>
+python _Helpers/scripts/fixes/reflow_md.py --quiet --check --path <file>
+```
+
 - Detailed rule + examples: [`_Helpers/docs/004_markdown_style.md`](_Helpers/docs/004_markdown_style.md) (loaded on demand, not in first-context).
 
 ### Markdown structure: READMEs must reflect their directory

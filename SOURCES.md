@@ -93,9 +93,9 @@ They are **absent from the public `public` branch** (so a fresh `git clone` of `
 
 ## 7. Marian Pekar's blog (marianpekar.com)
 
-| Source                               | Licence                                   | How to obtain                            |
-| ------------------------------------ | ----------------------------------------- | ---------------------------------------- |
-| Articles on `marianpekar.com/blog/`  | © Marian Pekar (publicly readable, free)  | Free to read: <https://marianpekar.com>  |
+| Source                              | Licence                                  | How to obtain                           |
+| ----------------------------------- | ---------------------------------------- | --------------------------------------- |
+| Articles on `marianpekar.com/blog/` | © Marian Pekar (publicly readable, free) | Free to read: <https://marianpekar.com> |
 
 **Why this source**: the blog is now focused on building things from scratch in Odin, including two long multi-part series that are directly relevant to this knowledge base (software rendering and physics, both with raylib).
 

@@ -31,4 +31,4 @@ The canonical host (https://spinroot.com/gerard/pdf/P10.pdf) sits behind a Cloud
 
 The Power of Ten was published in the **IEEE Computer** column "Robustness" in 2006. It is public, no paywall, and explicitly intended to be redistributed by teams building safety-critical software. The PDF is the canonical artifact; this Markdown file exists only to make the asset discoverable by Kilo's KB index.
 
->Source: https://spinroot.com/gerard/pdf/P10.pdf
+> Source: https://spinroot.com/gerard/pdf/P10.pdf

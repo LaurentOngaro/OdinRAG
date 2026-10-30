@@ -18,20 +18,20 @@ This folder collects hand-picked external references that inform OdinRAG project
 
 ## Distinction from `docs/` and `courses/`
 
-| Folder        | Scope                                | Source                                                                  | Frontmatter                    | Public branch                |
-| ------------- | ------------------------------------ | ----------------------------------------------------------------------- | ------------------------------ | ---------------------------- |
-| `docs/`       | Odin-specific (scraped)              | odin-lang.org, zylinski.se, gingerbill.org, jakubtomsu, marianpekar.com | minimal                        | yes                          |
-| `courses/`    | Odin-specific (paid Skool content)   | skool.com/programvideogames                                             | scraping-style (`Cours:` etc.) | absent (two-branch strategy) |
-| `references/` | Cross-language, general design       | curated by hand (TigerBeetle, Sean Barrett, NASA, etc.)                 | full (matches AGENTS.md)       | yes                          |
+| Folder        | Scope                              | Source                                                                  | Frontmatter                    | Public branch                |
+| ------------- | ---------------------------------- | ----------------------------------------------------------------------- | ------------------------------ | ---------------------------- |
+| `docs/`       | Odin-specific (scraped)            | odin-lang.org, zylinski.se, gingerbill.org, jakubtomsu, marianpekar.com | minimal                        | yes                          |
+| `courses/`    | Odin-specific (paid Skool content) | skool.com/programvideogames                                             | scraping-style (`Cours:` etc.) | absent (two-branch strategy) |
+| `references/` | Cross-language, general design     | curated by hand (TigerBeetle, Sean Barrett, NASA, etc.)                 | full (matches AGENTS.md)       | yes                          |
 
 The boundary rule: if a document is **about Odin** (its language, ecosystem, idioms), it goes in `docs/` or `courses/`. If it is **outside Odin** but **informs how we code Odin**, it goes in `references/`.
 
 ## Contents
 
-| File                | Topic                                                      | Why it's here                                                                                                       |
-| ------------------- | ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| `tiger_style.md`    | TigerBeetle coding style guide for safety-critical code    | Safety-critical mindset (assertions density, no recursion, fixed-size types, in-place init) carries to Odin         |
-| `tiger_style-fr.md` | French translation of TigerStyle                           | Personal reading aid. Annotated with `exception:` in frontmatter per AGENTS.md ("all public docs in English" rule)  |
+| File                | Topic                                                   | Why it's here                                                                                                      |
+| ------------------- | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `tiger_style.md`    | TigerBeetle coding style guide for safety-critical code | Safety-critical mindset (assertions density, no recursion, fixed-size types, in-place init) carries to Odin        |
+| `tiger_style-fr.md` | French translation of TigerStyle                        | Personal reading aid. Annotated with `exception:` in frontmatter per AGENTS.md ("all public docs in English" rule) |
 
 More candidates are listed in the inline chat decisions; not yet committed to disk.
 

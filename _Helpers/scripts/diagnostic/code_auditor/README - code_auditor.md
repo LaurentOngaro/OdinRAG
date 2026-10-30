@@ -168,9 +168,9 @@ Add a project override block:
 {
   "project_overrides": {
     "MY_PROJECT": {
-      "extra_rules": ["MY-001", "MY-002"]
-    }
-  }
+      "extra_rules": ["MY-001", "MY-002"],
+    },
+  },
 }
 ```
 

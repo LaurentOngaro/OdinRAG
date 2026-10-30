@@ -52,7 +52,7 @@ In these cases your simulation will run faster or slower than you intended.
 
 ## Variable delta time
 
-Fixing this *seems* simple. Just measure how long the previous frame takes, then feed that value back in as the delta time for the next frame. This makes sense because of course, because if the computer is too slow to update at 60HZ and has to drop down to 30fps, you'll automatically pass in 1/30 as delta time. Same thing for a display refresh rate of 75HZ instead of 60HZ or even the case where VSYNC is turned off on a fast computer:
+Fixing this _seems_ simple. Just measure how long the previous frame takes, then feed that value back in as the delta time for the next frame. This makes sense because of course, because if the computer is too slow to update at 60HZ and has to drop down to 30fps, you'll automatically pass in 1/30 as delta time. Same thing for a display refresh rate of 75HZ instead of 60HZ or even the case where VSYNC is turned off on a fast computer:
 
 ```odin
     double t = 0.0;
@@ -74,7 +74,7 @@ Fixing this *seems* simple. Just measure how long the previous frame takes, then
 
 But there is a huge problem with this approach which I will now explain. The problem is that the behavior of your physics simulation depends on the delta time you pass in. The effect could be subtle as your game having a slightly different "feel" depending on framerate or it could be as extreme as your spring simulation exploding to infinity, fast moving objects tunneling through walls and players falling through the floor!
 
-One thing is for certain though and that is that it's utterly unrealistic to expect your simulation to correctly handle *any* delta time passed into it. To understand why, consider what would happen if you passed in 1/10th of a second as delta time? How about one second? 10 seconds? 100? Eventually you'll find a breaking point.
+One thing is for certain though and that is that it's utterly unrealistic to expect your simulation to correctly handle _any_ delta time passed into it. To understand why, consider what would happen if you passed in 1/10th of a second as delta time? How about one second? 10 seconds? 100? Eventually you'll find a breaking point.
 
 ## Semi-fixed timestep
 
@@ -110,13 +110,13 @@ The benefit of this approach is that we now have an upper bound on delta time. I
 
 What is the spiral of death? It's what happens when your physics simulation can't keep up with the steps it's asked to take. For example, if your simulation is told: "OK, please simulate X seconds worth of physics" and if it takes Y seconds of real time to do so where Y > X, then it doesn't take Einstein to realize that over time your simulation falls behind. It's called the spiral of death because being behind causes your update to simulate more steps to catch up, which causes you to fall further behind, which causes you to simulate more steps...
 
-So how do we avoid this? In order to ensure a stable update I recommend leaving some headroom. You really need to ensure that it takes *significantly less* than X seconds of real time to update X seconds worth of physics simulation. If you can do this then your physics engine can "catch up" from any temporary spike by simulating more frames. Alternatively you can clamp at a maximum # of steps per-frame and the simulation will appear to slow down under heavy load. Arguably this is better than spiraling to death, especially if the heavy load is just a temporary spike.
+So how do we avoid this? In order to ensure a stable update I recommend leaving some headroom. You really need to ensure that it takes _significantly less_ than X seconds of real time to update X seconds worth of physics simulation. If you can do this then your physics engine can "catch up" from any temporary spike by simulating more frames. Alternatively you can clamp at a maximum # of steps per-frame and the simulation will appear to slow down under heavy load. Arguably this is better than spiraling to death, especially if the heavy load is just a temporary spike.
 
 ## Free the physics
 
 Now let's take it one step further. What if you want exact reproducibility from one run to the next given the same inputs? This comes in handy when trying to network your physics simulation using deterministic lockstep, but it's also generally a nice thing to know that your simulation behaves exactly the same from one run to the next without any potential for different behavior depending on the render framerate.
 
-But you ask why is it necessary to have fully fixed delta time to do this? Surely the semi-fixed delta time with the small remainder step is "good enough"? And yes, you are right. It is *good enough* in most cases but it is not *exactly the same* due to to the limited precision of floating point arithmetic.
+But you ask why is it necessary to have fully fixed delta time to do this? Surely the semi-fixed delta time with the small remainder step is "good enough"? And yes, you are right. It is _good enough_ in most cases but it is not _exactly the same_ due to to the limited precision of floating point arithmetic.
 
 What we want then is the best of both worlds: a fixed delta time value for the simulation plus the ability to render at different framerates. These two things seem completely at odds, and they are - unless we can find a way to decouple the simulation and rendering framerates.
 
@@ -205,7 +205,7 @@ One solution to this problem is to interpolate between the previous and current 
     }
 ```
 
-This *looks* complicated but here is a simple way to think about it. Any remainder in the accumulator is effectively a measure of just how much more time is required before another whole physics step can be taken. For example, a remainder of dt/2 means that we are currently halfway between the current physics step and the next. A remainder of dt\*0.1 means that the update is 1/10th of the way between the current and the next state.
+This _looks_ complicated but here is a simple way to think about it. Any remainder in the accumulator is effectively a measure of just how much more time is required before another whole physics step can be taken. For example, a remainder of dt/2 means that we are currently halfway between the current physics step and the next. A remainder of dt\*0.1 means that the update is 1/10th of the way between the current and the next state.
 
 We can use this remainder value to get a blending factor between the previous and current physics state simply by dividing by dt. This gives an alpha value in the range [0,1] which is used to perform a linear interpolation between the two physics states to get the current state to render. This interpolation is easy to do for single values and for vector state values. You can even use it with full 3D rigid body dynamics if you store your orientation as a quaternion and use a spherical linear interpolation (slerp) to blend between the previous and current orientations.
 
@@ -216,17 +216,8 @@ Enjoying my articles and open source code?
 
 [physics](/tags/physics/)
 
-#####
-
 ### Related
 
 - [Integration Basics](/post/integration_basics/)
 
-##### Cite
-
-×
-
-[Copy](#)
-[Download](#)
-
->Source: https://gafferongames.com/post/fix_your_timestep/
+> Source: https://gafferongames.com/post/fix_your_timestep/
