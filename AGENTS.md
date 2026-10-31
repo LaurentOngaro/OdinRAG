@@ -28,6 +28,7 @@ The scraped content of paywalled or copyrighted sources is **never redistributed
 - `code/` - public code references (examples, gists, vendored templates, personal projects)
 - `_Helpers/` - **Bucket 2** (public) - scripts, meta docs, internal templates, prompts, logs
 - `_Private/` - **Bucket 3** (gitignored, never pushed) - config, planning, raw notes
+- `_Archives/` - **Bucket 4** (tracked on `main`) - mirror tree for historical versions, completed notes, and closed strata
 
 > Note: paywalled scraped content (`odin-knowledge-base/courses/`, `odin-knowledge-base/docs/karl_zylinski/odin-book/`) is **tracked** in the local `main` branch and pushed to the private remote `OdinRag-private`.
 > It is **absent from the public `public` branch** (and therefore from `github.com/LaurentOngaro/OdinRAG`).
@@ -137,7 +138,7 @@ Rule of thumb: if the task does not fit in one line of `TODO.md`, it goes to `AC
   - `**/social/**` (one-off social posts, no chronological order)
   - `**/daily/**` (dailies use `J_YYYY-MM-DD.md` - the `J_` prefix is the date tag)
   - `**/raw/**` (raw notes kept as-is, no frontmatter, no `NNN_`)
-  - `**/decisions/**` (ADR files use `YYYY-MM-DD_ADR-NNN_<slug>.md` - see ADR section)
+  - `**/decisions/**` (ADR files use stable naming `ADR-NNN_<slug>.md` - see ADR section)
   - `code/**` (no `NNN_` - code files keep their original names)
   - `odin-knowledge-base/**` (no `NNN_` - scraped files keep their original slugs)
 - **Dailies live in `_Private/planning/daily/`** (tracked in `main` only, absent from `public`): their filename is purely personal and never reaches the public repo.
@@ -147,21 +148,33 @@ Rule of thumb: if the task does not fit in one line of `TODO.md`, it goes to `AC
 
 ADRs live in `_Private/docs/decisions/` (private, main-only).
 
-- Naming: `YYYY-MM-DD_ADR-NNN_<slug>.md` (NNN = global sequential counter, restarts nowhere)
+- Naming: `ADR-NNN_<slug>.md` (stable naming without date prefix, NNN = global sequential 3-digit counter, restarts nowhere; date is tracked in YAML frontmatter and Git history)
 - Status values: `Proposee`, `Acceptee`, `Rejetee`, `Obsolete`
 - Minimal structure: Context / Decision / Consequences / References
 - Source drafts transit through `_Private/raw/Perplexity decisions/` before promotion
 - See `_Private/docs/decisions/README.md` for the full index
 
+### Document lifecycle, stable naming and archives (`_Archives/`)
+
+Per the repository lifecycle and archiving doctrine (ADR-0002):
+
+1. **Stable naming for active documents**: living documents (ADRs, design notes, roadmaps) use stable names without changing date prefixes (e.g. `ADR-001_<slug>.md`). Update dates are tracked in YAML frontmatter (`updated: YYYY-MM-DD`) and Git history.
+2. **Mirror tree structure under `_Archives/`**: `_Archives/` faithfully mirrors the active documentation tree (`_Archives/_Private/docs/decisions/`, `_Archives/_Private/planning/daily/`, `_Archives/_Private/raw/`, `_Archives/_Helpers/docs/`, etc.) to host superseded documents, closed strata, and retrospective milestones.
+3. **Archive suffix and metadata convention**:
+   - Every archived document carries the suffix `_archived_<YYYY-MM-DD>.md`.
+   - YAML metadata: `status: archived`, `archived_date: YYYY-MM-DD`.
+   - A traceability callout at the top points back to the corresponding active living document when applicable.
+4. **Linter and tool exclusion**: `_Archives/` is excluded from active linter scopes in `.markdownlint-cli2.jsonc` and `.prettierignore` to preserve historical integrity without raising spurious warnings.
+
 ### Perplexity workflow
 
 Perplexity AI (Space: Odin Assistant Projet jeu) uses GitHub MCP to read and write directly into `OdinRAG-private/main`.
 
-| Output type                          | Destination                          | Naming                       |
-| ------------------------------------ | ------------------------------------ | ---------------------------- |
-| Session notes, Q&A, syntheses        | `_Private/raw/Perplexity backlog/`   | `<DATE>_<NNN>_<slug>.md`     |
-| Decision drafts (pending validation) | `_Private/raw/Perplexity decisions/` | `<DATE>_<NNN>_<slug>.md`     |
-| Validated ADRs                       | `_Private/docs/decisions/`           | `<DATE>_ADR-<NNN>_<slug>.md` |
+| Output type                          | Destination                          | Naming                   |
+| ------------------------------------ | ------------------------------------ | ------------------------ |
+| Session notes, Q&A, syntheses        | `_Private/raw/Perplexity backlog/`   | `<DATE>_<NNN>_<slug>.md` |
+| Decision drafts (pending validation) | `_Private/raw/Perplexity decisions/` | `<DATE>_<NNN>_<slug>.md` |
+| Validated ADRs                       | `_Private/docs/decisions/`           | `ADR-<NNN>_<slug>.md`    |
 
 Do NOT upload repo-bound content to the Perplexity Space if it is already accessible via MCP (see `ADR-001`).
 
