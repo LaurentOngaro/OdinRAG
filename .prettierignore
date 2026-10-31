@@ -6,6 +6,8 @@
 .agents/**
 node_modules/**
 **/node_modules/**
+_Archives/**
+**/_Archives/**
 _Private/**
 _Raw/**
 _Helpers/logs/**

@@ -4,6 +4,8 @@
 .obsidian/**/*
 node_modules/**
 **/node_modules/**
+_Archives/**
+**/_Archives/**
 .kilo/node_modules/**
 _Private/**
 _Raw/**
