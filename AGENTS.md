@@ -27,8 +27,8 @@ The scraped content of paywalled or copyrighted sources is **never redistributed
 - `odin-knowledge-base/` - **Bucket 1** (public sanitized on `public` branch, full content tracked locally on `main` branch) - scraped KB + Skool courses
 - `code/` - public code references (examples, gists, vendored templates, personal projects)
 - `_Helpers/` - **Bucket 2** (public) - scripts, meta docs, internal templates, prompts, logs
-- `_Private/` - **Bucket 3** (gitignored, never pushed) - config, planning, raw notes
-- `_Archives/` - **Bucket 4** (tracked on `main`) - mirror tree for historical versions, completed notes, and closed strata
+- `_Private/` - **Bucket 3** (tracked on `main` only, absent from `public`) - config, planning, raw notes
+- `_Archives/` - **Bucket 4** (tracked on `main` only, absent from `public`) - mirror tree for historical versions, completed notes, and closed strata
 
 > Note: paywalled scraped content (`odin-knowledge-base/courses/`, `odin-knowledge-base/docs/karl_zylinski/odin-book/`) is **tracked** in the local `main` branch and pushed to the private remote `OdinRag-private`.
 > It is **absent from the public `public` branch** (and therefore from `github.com/LaurentOngaro/OdinRAG`).
@@ -96,7 +96,7 @@ The repository is used from Windows and from Linux. Line endings must be identic
 
 - `.gitattributes` is the source of truth: `* text=auto eol=lf` (index and working tree are LF), with CRLF reserved exclusively for native Windows scripts (`*.bat`, `*.cmd`, `*.ps1`, `*.reg`).
 - `.editorconfig` enforces `end_of_line = lf` and `max_line_length = 180` for code/scripts (`max_line_length = off` for Markdown) for the editors that support it.
-- On **each clone**, run once: `git config --local core.autocrlf false` (local setting, never versioned). Never create a commit that only modifies line endings (EOL).
+- On **each clone**, run once: `git config --local core.autocrlf false` and `git config --local core.hooksPath _Helpers/scripts/dev/hooks` (local settings, never versioned). Never create a commit that only modifies line endings (EOL).
 - After a scraper or an external tool rewrites files, normalize them: `python _Helpers/scripts/dev/normalize_eol.py --check` (report) then `--stage` (rewrite in LF and stage).
 
 ```bash
@@ -156,15 +156,16 @@ ADRs live in `_Private/docs/decisions/` (private, main-only).
 
 ### Document lifecycle, stable naming and archives (`_Archives/`)
 
-Per the repository lifecycle and archiving doctrine (ADR-0002):
+Per the repository lifecycle and archiving doctrine (`ADR-003`):
 
-1. **Stable naming for active documents**: living documents (ADRs, design notes, roadmaps) use stable names without changing date prefixes (e.g. `ADR-001_<slug>.md`). Update dates are tracked in YAML frontmatter (`updated: YYYY-MM-DD`) and Git history.
-2. **Mirror tree structure under `_Archives/`**: `_Archives/` faithfully mirrors the active documentation tree (`_Archives/_Private/docs/decisions/`, `_Archives/_Private/planning/daily/`, `_Archives/_Private/raw/`, `_Archives/_Helpers/docs/`, etc.) to host superseded documents, closed strata, and retrospective milestones.
-3. **Archive suffix and metadata convention**:
+1. **Private status (`main`-only)**: `_Archives/` is entirely private (`main`-only, stripped from `public` via `_Helpers/config/private_paths.jsonc`, and rejected at any depth by the audit and pre-push hook).
+2. **Stable naming for active documents**: living documents (ADRs, design notes, roadmaps) use stable names without changing date prefixes (e.g. `ADR-001_<slug>.md`). Update dates are tracked in YAML frontmatter (`updated: YYYY-MM-DD`) and Git history.
+3. **Mirror tree structure under `_Archives/`**: `_Archives/` faithfully mirrors the active documentation tree (`_Archives/_Private/docs/decisions/`, `_Archives/_Private/docs/audits/`, `_Archives/_Private/planning/daily/`, `_Archives/_Private/raw/`, `_Archives/_Helpers/docs/`, etc.) to host superseded documents, closed strata, and retrospective milestones.
+4. **Archive suffix and metadata convention**:
    - Every archived document carries the suffix `_archived_<YYYY-MM-DD>.md`.
    - YAML metadata: `status: archived`, `archived_date: YYYY-MM-DD`.
    - A traceability callout at the top points back to the corresponding active living document when applicable.
-4. **Linter and tool exclusion**: `_Archives/` is excluded from active linter scopes in `.markdownlint-cli2.jsonc` and `.prettierignore` to preserve historical integrity without raising spurious warnings.
+5. **Linter and tool exclusion**: `_Archives/` is excluded from active linter scopes in `.markdownlint-cli2.jsonc`, `.prettierignore`, and `reflow_md.py` (`SKIP_DIRS`) to preserve historical integrity without raising spurious warnings.
 
 ### Perplexity workflow
 
@@ -201,7 +202,7 @@ Do NOT upload repo-bound content to the Perplexity Space if it is already access
 - Style: `snake_case`, type hints, docstrings on public functions.
 - Encoding: UTF-8 everywhere. `sys.stdout.reconfigure(encoding="utf-8")` at the top of every CLI script (with `# type: ignore[attr-defined]`).
 - Lint: Pylance-compatible (no flake8/black enforced).
-- No `print()` for debug - use `_log(level, msg)` and a structured logger.
+- CLI output: use structured prefixes (`[+]`, `[i]`, `[warn]`, `[FAIL]`) via `print()` (or `_ok`/`_warn`/`_fail` helpers) for interactive CLI scripts; use `_log(level, msg)` for long-running scrapers that write persistent log files. Avoid bare `print()` debug leftovers.
 - **After any edit to a `.py` file, run `python _Helpers/scripts/fixes/lint_pylance.py <file>` and fix every reported warning before considering the task done.** The script wraps `pyright` (CLI engine behind Pylance) and exits non-zero on remaining warnings. Common diagnostics + workflow: load the [`pylance-check`](.kilo/skills/pylance-check/SKILL.md) skill.
 - **Backticks in docstrings: use single** (`foo`), not double. The double form is RST markup; pyright rejects it.
 - Reserve double backticks for Markdown files. Bulk-fix legacy Python: `_Helpers/scripts/fixes/single_backtick_md.py --apply`.
@@ -278,7 +279,8 @@ Verify with `python _Helpers/scripts/diagnostic/auditReadmeCoherence.py` (non-ze
 - **Rule**: all **PUBLIC** tracked `.md` files must be in English. This includes top-level files (README.md, AGENTS.md, SOURCES.md, etc.), anything under `_Helpers/`, `odin-knowledge-base/`, `code/`, and any other path that ends up in the `public` branch. The same applies to frontmatter (`title`, `summary`) of public docs.
 - **Why**: the `public` branch is what gets pushed to github.com. That repo is public and international. The rule exists for search consistency, AI tooling (the subagent prompt expects English keywords), and international contributors.
 - **Exempted from this rule** (any language is fine):
-  - Everything under `_Private/` (Bucket 3, gitignored) - never reaches the `public` branch.
+  - Everything under `_Private/` (Bucket 3, `main`-only) - never reaches the `public` branch.
+  - Everything under `_Archives/` (Bucket 4, `main`-only) - never reaches the `public` branch.
   - Files under any `**/raw/**` folder - raw notes are kept as-is by convention (no frontmatter, no `NNN_` prefix).
   - Personal logs, planning notes, daily entries - always private.
 - **Rare public non-English doc**: annotate in frontmatter with `exception: <reason>` so the convention violation is explicit.

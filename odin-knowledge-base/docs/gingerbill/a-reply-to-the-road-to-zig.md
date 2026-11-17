@@ -1,4 +1,13 @@
-# A Reply to *The Road to Zig 1.0*
+---
+title: "A Reply to The Road to Zig 1.0"
+date: 2019-05-13
+source: "https://www.gingerbill.org/article/2019/05/13/a-reply-to-the-road-to-zig"
+tags: [OdinRAG, kb, source/gingerbill]
+type: reference
+status: active
+---
+
+# A Reply to _The Road to Zig 1.0_
 
 2019-05-13
 
@@ -7,12 +16,13 @@ It is lovely to see many new programming languages being produced to solve diffe
 - [Odin](https://www.gingerbill.org/odin/)
 
   For those who do not know, I am the creator of the [Odin programming language](https://www.gingerbill.org/odin/).
+
 - [Scopes](http://scopes.rocks)
 - [Zig](https://ziglang.org/)
 
 They are all very good languages but with entirely different philosophies behind them. See if one suits your personal philosophy better!
 
-Which brings to me to the latest talk by [Andrew Kelley](https://twitter.com/andy_kelley) about his programming language, [Zig](https://ziglang.org/), titled *[The Road to Zig 1.0](https://chariotsolutions.com/screencast/philly-ete-2019-andrew-kelley-the-road-to-zig-1-0/)*. In this talk, Andrew presents the Zig programming language as a programming language for maintaining robust reusable software with a tour of the unique features of that Zig has. I recommend watching the talk before reading this article to make your own decision about it.
+Which brings to me to the latest talk by [Andrew Kelley](https://twitter.com/andy_kelley) about his programming language, [Zig](https://ziglang.org/), titled _[The Road to Zig 1.0](https://chariotsolutions.com/screencast/philly-ete-2019-andrew-kelley-the-road-to-zig-1-0/)_. In this talk, Andrew presents the Zig programming language as a programming language for maintaining robust reusable software with a tour of the unique features of that Zig has. I recommend watching the talk before reading this article to make your own decision about it.
 
 ## Opening
 
@@ -37,16 +47,18 @@ Andrew then precedes to talk about many of the things which will prevent softwar
 - A lack of C ABI will mean it is not usable by most languages
 - Complicated build systems from source
 
-These points are only mildly related to producing *quality software* and closer to concerns about performance, ease of use, safety, and compatibility. I appreciate the caveats do not fit on the slide but many of these points do seem to be a completely different issue to the what question of *quality software*.
+These points are only mildly related to producing _quality software_ and closer to concerns about performance, ease of use, safety, and compatibility. I appreciate the caveats do not fit on the slide but many of these points do seem to be a completely different issue to the what question of _quality software_.
 
 - Garbage collection (and automatic memory management in general) has its uses in certain problem domains and in those domains, it does not reduce the quality of that software.
 - Automatic heap allocation is more of a problem with the language (and third party code) doing things behind the back of the developer which may have performance implications. I have never had a program cause a system to run out of memory in real software (other than artificial stress tests). If you are working in a low-memory environment, you should be extremely aware of its limitations and plan accordingly
 
   I have discussed this issue before with Andrew and I really do not see this as much of an issue as he does. If you are a desktop machine and run out of memory, don’t try to recover from the panic, quit the program or even shut-down the computer. As for other machinery, plan accordingly!.
+
 - A piece of software doesn’t need to be as fast as C to be quality software. If the performance is within a certain margin and/or the performance of your code has little overhead for the problem-at-hand (e.g. a one-off task), then the clarity of the code is much more important than its performance. This is why Python is so popular in the scientific community as prototyping/glue language, with the actual heavy-lifting done by C/FORTRAN bindings to the highly optimized code.
 - A lack of C ABI is an issue if you need your software to interface with other software but as I said, this has nothing to do with quality software itself rather compatibility with other software
 
   And aiding your programming language with interfacing with foreign code and help it get more widely adopted..
+
 - Complicated build systems is mostly a cultural issue where people are either told to use a certain approach or learn about “best practices”.
 
 ## Condition Compilation
@@ -64,7 +76,8 @@ if (builtin.os == .windows) {
 } else {
 	@compileError("unknown how to get the time");
 }
-```odin
+```
+
 A huge issue with this approach is that it is not clear that these clauses will be evaluated at compile-time nor that they will actually produce a scope or not. Odin solves this issue by using a separate keyword, `when`, to denote a compile-time branching statement:
 
 ```odin
@@ -75,22 +88,23 @@ when ODIN_OS == "windows" {
 } else {
 	// ...
 }
-```odin
+```
+
 This `when` statement is clearer to read and because it is denoted different, it is clear that it has different semantics to an `if` statement. A `when` statement in Odin does not produce a new scope for each clause, and only the clause that is true at compile-time will be semantically checked (all clauses are syntactically checked, unlike an `#if 0` block in C), whilst in an `if` statement, all clauses are semantically checked.
 
 ## Error Handling
 
-My biggest issue with the design of the Zig language, which is demonstrated in this talk, is that “error values” are built into the language itself. In a [previous article](/article/2018/09/05/exceptions-and-why-odin-will-never-have-them/), I discuss the issues with exceptions, error handling, and error propagation. Zig’s *error* types have a similar syntax to exceptions but they do not share the same internals as exceptions in that they are handled as part of the return values rather than through unwinding the stack (or some similar mechanism). Andrew comments that people are lazy (which they are) and will do whatever the default way is, so why not at least get them to handle things “correctly?” and “make handling errors fun”.
+My biggest issue with the design of the Zig language, which is demonstrated in this talk, is that “error values” are built into the language itself. In a [previous article](/article/2018/09/05/exceptions-and-why-odin-will-never-have-them/), I discuss the issues with exceptions, error handling, and error propagation. Zig’s _error_ types have a similar syntax to exceptions but they do not share the same internals as exceptions in that they are handled as part of the return values rather than through unwinding the stack (or some similar mechanism). Andrew comments that people are lazy (which they are) and will do whatever the default way is, so why not at least get them to handle things “correctly?” and “make handling errors fun”.
 
-Firstly, error handling should not be fun-it should be painless. It’s akin to saying paying taxes should be fun. It will never be fun, but you can remove a lot of the drudge work from it. Secondly, as I previously wrote, my issue with exception-based/exception-like errors is not the syntax but how they encourage error propagation. This encouragement promotes a culture of pass the error up the stack for “someone else” to handle the error. I hate this culture and I do not want to encourage it at the language level. Handle errors there and then and don’t pass them up the stack. *You make your mess; you clean it.*
+Firstly, error handling should not be fun-it should be painless. It’s akin to saying paying taxes should be fun. It will never be fun, but you can remove a lot of the drudge work from it. Secondly, as I previously wrote, my issue with exception-based/exception-like errors is not the syntax but how they encourage error propagation. This encouragement promotes a culture of pass the error up the stack for “someone else” to handle the error. I hate this culture and I do not want to encourage it at the language level. Handle errors there and then and don’t pass them up the stack. _You make your mess; you clean it._
 
-Error propagation is fine within a library/package/module but you ought not to be encouraging propagation *across* library boundaries. There are so many issues I have seen in real life, which lead to *crappy software*, where errors are just left for “someone else” to handle. Error propagation also has the the tendency to remove information about the type of error as it is reduced to a “simpler” error type up the stack. If you are designing a language to aid in producing *quality software*, don’t add a core feature to the language which encourages sloppy habits.
+Error propagation is fine within a library/package/module but you ought not to be encouraging propagation _across_ library boundaries. There are so many issues I have seen in real life, which lead to _crappy software_, where errors are just left for “someone else” to handle. Error propagation also has the the tendency to remove information about the type of error as it is reduced to a “simpler” error type up the stack. If you are designing a language to aid in producing _quality software_, don’t add a core feature to the language which encourages sloppy habits.
 
-Odin’s approach to error handling is to treat errors as nothing special. Error cases are handled like any other piece of code. In conjunction with Odin’s multiple return values, enumerations, unions, and many other features, this means the user can return extra information, including *error values*, alongside the normal return values if wanted and handle them accordingly.
+Odin’s approach to error handling is to treat errors as nothing special. Error cases are handled like any other piece of code. In conjunction with Odin’s multiple return values, enumerations, unions, and many other features, this means the user can return extra information, including _error values_, alongside the normal return values if wanted and handle them accordingly.
 
 ## Clean-up Code
 
-One feature that both Odin and Zig share is `defer`. A `defer` statement *defers* a statement until the end of scope. I think this concept is much more powerful and versatile than C++‘s RAII concept as it conceptually links the creation with the destruction without hiding it nor tying it to a type 
+One feature that both Odin and Zig share is `defer`. A `defer` statement _defers_ a statement until the end of scope. I think this concept is much more powerful and versatile than C++‘s RAII concept as it conceptually links the creation with the destruction without hiding it nor tying it to a type 
 
 I talk about the `defer` statement in a previous [article](/article/2015/08/19/defer-in-cpp/).. Zig extends the `defer` to work with the error system with `errdefer`, which is a nice and natural extension of this system and is coherent with the rest of the language’s design.
 
@@ -104,7 +118,7 @@ It might be incorrect to call it a set as they can only be one of the values in 
 
 The Zig build system is the language itself. ~~It extends the compile-time execution system to call a “build” function to set up the build requirements. Having the same language be the build-language is very useful and a natural extension of the compile-time execution system. The compile-time execution system itself is already a huge requirement for the language which does complicate things but if that is accepted and desired, this feature is less of an issue.~~
 
-Update: It appears that the build system is not part of the compile-time system whatsoever. It appears to be apart of the core library rather than a feature of the language itself. This could be easily replicate this in any language however having it part of the core library itself, this means that there is a *standard* approach to use which nudges it towards being the *default* approach.
+Update: It appears that the build system is not part of the compile-time system whatsoever. It appears to be apart of the core library rather than a feature of the language itself. This could be easily replicate this in any language however having it part of the core library itself, this means that there is a _standard_ approach to use which nudges it towards being the _default_ approach.
 
 In Odin, “foreign” code is handled by the `foreign` system. Foreign code that is imported is associated with its dependencies, this means that only the dependencies that are used are built against. Coupled with Odin’s package system, it helps encapsulate the foreign code along with the Odin code. Odin does not directly import C header file, like Zig, but I found that in practice, you rarely want to use the raw bindings to the C code. From what I know of, how Zig is currently designed, its build system does not allow for this minimal dependency tracking that Odin offers.
 
@@ -116,7 +130,7 @@ I will not talk about LLVM any more as it requires another entirely separate art
 
 ## Summary
 
-Andrew sets out by striving to aid in the production of *quality software* but does not really address why *crappy software* is produced in the first place. Many of the features in Zig itself encourage what I see to be poor and lazy practice, especially the error system. Zig is a well designed language but I disagree with many of the design decisions and the fundamental philosophy behind it. I hope Andrew is successful and is continually able to make a living off from Zig as this is a wonderful project.
+Andrew sets out by striving to aid in the production of _quality software_ but does not really address why _crappy software_ is produced in the first place. Many of the features in Zig itself encourage what I see to be poor and lazy practice, especially the error system. Zig is a well designed language but I disagree with many of the design decisions and the fundamental philosophy behind it. I hope Andrew is successful and is continually able to make a living off from Zig as this is a wonderful project.
 
 If you like the sound of it and want to find out more, please check it out at <https://ziglang.org/>.
 
@@ -124,14 +138,14 @@ If you like the sound of it and want to find out more, please check it out at <h
 
 Throughout this article, I have been discussing Zig and its issues. Why do I recommend Odin over Zig?
 
-Odin is not trying to solve the problem of *quality software* as that is fundamentally a cultural problem. The Odin programming language is fast, concise, readable, pragmatic, and open sourced. It is designed with the intent of being an alternative to C with the following goals:
+Odin is not trying to solve the problem of _quality software_ as that is fundamentally a cultural problem. The Odin programming language is fast, concise, readable, pragmatic, and open sourced. It is designed with the intent of being an alternative to C with the following goals:
 
 - simplicity
 - high performance
 - built for modern systems
 - joy of programming
 
-I wanted a language that solved many of the issues I had with programming. I wanted the specification of the language to be 100% knowable by a mere mortal. There are probably less than a dozen people in the world that know all of the C++ specification *and* understand it. Rust is starting to approach that complexity even though it is a new language. Swift already has a lot of baggage as its evolved past from Objective-C and the NeXTstep ecosystem.
+I wanted a language that solved many of the issues I had with programming. I wanted the specification of the language to be 100% knowable by a mere mortal. There are probably less than a dozen people in the world that know all of the C++ specification _and_ understand it. Rust is starting to approach that complexity even though it is a new language. Swift already has a lot of baggage as its evolved past from Objective-C and the NeXTstep ecosystem.
 
 At the turn of 2016, I gave myself a New Year’s Resolution to start any new personal programming project in pure C to see what I really needed from a language. It turned out that I needed very little to be very productive. The friction from having to remember many of the features in C++ and other languages reduced my productivity a lot more than I realised. From using pure C for a few months, I noticed that there were features that I wanted to add to C to increase my productivity and reducing errors. These features included `defer` and tagged-unions. I started creating a metaprogramming tool to augment my C code so I could add these new features. I quickly began to realise that what I wanted was a new language as this endeavour was a dead-end.
 
@@ -145,4 +159,4 @@ At the end of the day, I am a pragmatic man and I do not see the need for type-t
 
 If you like the sound of it and want to find out more, please check it out at <https://www.odin-lang.org/> and <https://github.com/odin-lang/Odin>.
 
->Source: https://www.gingerbill.org/article/2019/05/13/a-reply-to-the-road-to-zig
+> Source: https://www.gingerbill.org/article/2019/05/13/a-reply-to-the-road-to-zig

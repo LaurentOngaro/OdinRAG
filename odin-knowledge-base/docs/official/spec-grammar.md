@@ -1,3 +1,11 @@
+---
+title: "Lexical Grammar"
+source: "https://odin-lang.org/spec/grammar"
+tags: [OdinRAG, kb, source/official]
+type: reference
+status: active
+---
+
 The Odin Programming Language expressed in EBNF.
 
 The EBNF grammar used (represented itself in EBNF):
@@ -499,4 +507,4 @@ AttrElemList     = AttrElem { "," AttrElem } [ "," ] ;
 AttrElem         = IDENT [ "=" Expr ] ;
 ```
 
->Source: https://odin-lang.org/spec/grammar
+> Source: https://odin-lang.org/spec/grammar

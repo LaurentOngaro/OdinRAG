@@ -1,3 +1,12 @@
+---
+title: "Make games using Odin and Raylib #1: Setup + First Program"
+date: 2024-02-09
+source: "https://zylinski.se/posts/gamedev-for-beginners-using-odin-and-raylib-1"
+tags: [OdinRAG, kb, source/zylinski, topic/raylib, topic/dod]
+type: reference
+status: active
+---
+
 # Make games using Odin and Raylib #1: Setup + First Program
 
 February 9, 2024
@@ -37,7 +46,7 @@ I will provide instructions for Windows, Mac and Linux.
 
 [Odin](https://www.odin-lang.org), sometimes referred to as Odinlang, is a programming language that tries to be a modern alternative to the language C. It is a fairly simple language, making it beginner friendly. Odin is a so-called ’low level’ language, meaning that you have a great deal of control, making it suitable for creating video games. Why do video games need so much control? Because they often need to do a lot of things very quickly, so there are no hitches and no lag in the game, so there is benefit in being able to tell the computer what to do in great detail.
 
-The term *low level* refers to the programming language being “close to the hardware”, which in essence means that there are few layers of automatic stuff between the code and the computer’s processor. The opposite term *high level* is often used to describe languages that does a great deal for you automatically, at the cost of having less control.
+The term _low level_ refers to the programming language being “close to the hardware”, which in essence means that there are few layers of automatic stuff between the code and the computer’s processor. The opposite term _high level_ is often used to describe languages that does a great deal for you automatically, at the cost of having less control.
 
 If you come from a high level language such as Javascript, C# or Python, then please don’t be discouraged by all this low levelness and control. Because Odin is, as I usually say, “low level with a high level feeling”. You have lots of control, but there are also many comfortable modern features to help you write expressive code. All this, while still keeping the language very simple.
 
@@ -65,7 +74,7 @@ Trailer for my game CAT & ONION. The game is made completely using Odin and Rayl
 
 Before we get started with the code we’ll have to download and setup some software. I urge you to push on through these perhaps boring setup steps, as things will get much more fun once we start writing code.
 
-In order to turn the Odin code we are about to write into a program you can run, you need to download the Odin *compiler*. Compilation is the process by which the computer takes code and outputs a program you can run.
+In order to turn the Odin code we are about to write into a program you can run, you need to download the Odin _compiler_. Compilation is the process by which the computer takes code and outputs a program you can run.
 
 Here are my recommended ways for setting up the Odin compiler:
 
@@ -75,7 +84,7 @@ Here are my recommended ways for setting up the Odin compiler:
 
 ### Simple Odin compiler setup for Windows[#](#simple-odin-compiler-setup-for-windows)
 
-*The official Odin Windows install instructions will have you install the massive Visual Studio code editor, which is not necessary, therefore I provide these simplified instructions for Windows.*
+_The official Odin Windows install instructions will have you install the massive Visual Studio code editor, which is not necessary, therefore I provide these simplified instructions for Windows._
 
 **Step 1:** Download compiler from here <https://github.com/odin-lang/Odin/releases/latest>. Scroll to the bottom and download the file called `odin-windows-amd64-dev-<year>-<month>.zip`. When the download has finished, extract the contents to the folder `c:\odin`. You should end up with something that looks like this:
 
@@ -93,7 +102,7 @@ When you run it you’ll see this:
 
 Install the additional software the Odin compiler needs by clicking 1, 2 and then 3
 
-Click the *(1) Add to Environment* checkbox, so that the Odin compiler can find the installed software. Thereafter you need to *(2) accept a license agreement* and then click *(3) Install*. When it’s all done the installer might tell you to log out and in again, in which case you should do that.
+Click the _(1) Add to Environment_ checkbox, so that the Odin compiler can find the installed software. Thereafter you need to _(2) accept a license agreement_ and then click _(3) Install_. When it’s all done the installer might tell you to log out and in again, in which case you should do that.
 
 You now have a working Odin compiler.
 
@@ -117,17 +126,18 @@ package game
 import rl "vendor:raylib"
 
 main :: proc() {
-    rl.InitWindow(1280, 720, "My First Game")
+  rl.InitWindow(1280, 720, "My First Game")
 
-    for !rl.WindowShouldClose() {
-        rl.BeginDrawing()
-        rl.ClearBackground(rl.BLUE)
-        rl.EndDrawing()
-    }
+  for !rl.WindowShouldClose() {
+    rl.BeginDrawing()
+    rl.ClearBackground(rl.BLUE)
+    rl.EndDrawing()
+  }
 
-    rl.CloseWindow()
+  rl.CloseWindow()
 }
-```odin
+```
+
 When you’ve typed it all in, go ahead and save it to `c:\code\my_first_game\my_first_game.odin`. You’ll have to create those `code` and `my_first_game` directories.
 
 > **MAC / LINUX** Save the code to a folder such as `~/code/my_first_game`, where `~` denotes your home directory.
@@ -144,7 +154,7 @@ Running Odin compiler from the Command Prompt on Windows
 
 > **WINDOWS** Open start menu and type “Command Prompt”. Launch that app. In it, write this:
 >
-> ```odin
+> ````odin
 > cd \code\my_first_game
 > c:\odin\odin run .
 > ```odin
@@ -154,6 +164,8 @@ Running Odin compiler from the Command Prompt on Windows
 > cd code/my_first_game
 > odin run .
 > ```odin
+> ````
+
 Note that the period `.` is part of the run command!
 
 When you hit enter on that second command, then the Odin compiler should compile and run your game. You should see this window appear:
@@ -174,7 +186,7 @@ If your program did not compile, chances are you mistyped something in the code.
 
 If you mistyped anything in the code, then the Odin compiler will try to be helpful.
 
-In this case, I had accidentally typed `BegunDrawing` instead of `BeginDrawing`. The error message is in this case helpful and suggests what I might have meant instead. The compiler won’t always be able to be *that* helpful, sometimes you’ll have to do some detective work yourself to figure out why your program didn’t compile.
+In this case, I had accidentally typed `BegunDrawing` instead of `BeginDrawing`. The error message is in this case helpful and suggests what I might have meant instead. The compiler won’t always be able to be _that_ helpful, sometimes you’ll have to do some detective work yourself to figure out why your program didn’t compile.
 
 ## So what does that code we typed in really do?[#](#so-what-does-that-code-we-typed-in-really-do)
 
@@ -184,18 +196,19 @@ package game
 import rl "vendor:raylib"
 
 main :: proc() {
-    rl.InitWindow(1280, 720, "My First Game")
+  rl.InitWindow(1280, 720, "My First Game")
 
-    for !rl.WindowShouldClose() {
-        rl.BeginDrawing()
-        rl.ClearBackground(rl.BLUE)
-        rl.EndDrawing()
-    }
+  for !rl.WindowShouldClose() {
+    rl.BeginDrawing()
+    rl.ClearBackground(rl.BLUE)
+    rl.EndDrawing()
+  }
 
-    rl.CloseWindow()
+  rl.CloseWindow()
 }
-```odin
-Let’s start by looking at the line `main :: proc() {`. This line defines a new *procedure*. A procedure, or proc as I will call it, is a block of code with a name attached. The code inside the proc can be run if you know the proc’s name. In this case we are creating a proc called `main`. When an Odin program starts, it looks for a proc called `main` and starts the program from the top of that proc. The proc runs from the opening curly brace `{`, to the matching closing curly brace `}`, as shown below:
+```
+
+Let’s start by looking at the line `main :: proc() {`. This line defines a new _procedure_. A procedure, or proc as I will call it, is a block of code with a name attached. The code inside the proc can be run if you know the proc’s name. In this case we are creating a proc called `main`. When an Odin program starts, it looks for a proc called `main` and starts the program from the top of that proc. The proc runs from the opening curly brace `{`, to the matching closing curly brace `}`, as shown below:
 
 ![Main Proc with arrows of where it starts and ends](/odinraylib1/main.png)
 
@@ -205,9 +218,9 @@ When the closing curly brace `}` of the main proc is reached, then the game has 
 
 > **PROCEDURES? FUNCTIONS?** Those who have programmed before might recognize procedures by the word function. Those two words mostly mean the same thing, but the word procedure has a bit of a wider defintion.
 
-Looking inside the `main` proc we see a bunch of lines that all start with `rl`. All those lines are *calls* to procs within Raylib, i.e. code that is instructing Raylib to do stuff. By *proc call* I mean that you use the name of a proc in order to run the code inside that proc. As mentioned before, Raylib can draw graphics, create windows and much more. The line `rl.InitWindow(1280, 720, "My First Game")` creates a window of size 1280x720 pixels and gives the window the title “My First Game”.
+Looking inside the `main` proc we see a bunch of lines that all start with `rl`. All those lines are _calls_ to procs within Raylib, i.e. code that is instructing Raylib to do stuff. By _proc call_ I mean that you use the name of a proc in order to run the code inside that proc. As mentioned before, Raylib can draw graphics, create windows and much more. The line `rl.InitWindow(1280, 720, "My First Game")` creates a window of size 1280x720 pixels and gives the window the title “My First Game”.
 
-The line `for !rl.WindowShouldClose() {` makes a loop that runs for as long as the window created by Raylib wants to stay open. `rl.WindowShouldClose()` is a proc in Raylib that essentially tells us if the user pressed the close button of the window. But we want to know if the user *didn’t* press it, which is why we put the `!` in front to negate the answer from Raylib. The stuff between the two curly braces `{}` is the code that the loop will run, over and over again, until the user tries to close the window.
+The line `for !rl.WindowShouldClose() {` makes a loop that runs for as long as the window created by Raylib wants to stay open. `rl.WindowShouldClose()` is a proc in Raylib that essentially tells us if the user pressed the close button of the window. But we want to know if the user _didn’t_ press it, which is why we put the `!` in front to negate the answer from Raylib. The stuff between the two curly braces `{}` is the code that the loop will run, over and over again, until the user tries to close the window.
 
 ![Image saying that the code inbetween the two curly braces of the for loop will run over and over as long as the window isn&rsquo;t closed](/odinraylib1/main_loop.png)
 
@@ -224,7 +237,7 @@ The line `rl.BeginDrawing()` instructs Raylib to start a new frame and `rl.EndDr
 Our loop will terminate if the user presses the close button on the window, in which case it will leave the loop and then run the final line of `main`: `rl.CloseWindow()`, after that our game shuts down because the `main` proc is done.
 
 Finally, I’ll just say something about the first two lines of our program:
-`import rl "vendor:raylib"` tells the Odin compiler that we want to use Raylib in our program. The Odin compiler comes with built in support for Raylib, as part of the “vendor” collection of libraries. We say that we are importing the Raylib *package*. All those things in Raylib will end up under the `rl` prefix, which is why those procs we used in our program all started with `rl`
+`import rl "vendor:raylib"` tells the Odin compiler that we want to use Raylib in our program. The Odin compiler comes with built in support for Raylib, as part of the “vendor” collection of libraries. We say that we are importing the Raylib _package_. All those things in Raylib will end up under the `rl` prefix, which is why those procs we used in our program all started with `rl`
 
 > **MORE VENDOR PACKAGES** There are numerous other vendor packages, you can see them all by looking into `c:\odin\vendor` (or similar path if you’re on Mac / Linux). You’ll find stuff like DirectX, OpenGL and SDL in there.
 
@@ -244,7 +257,7 @@ Sublime will pop up a new build system file, copy these lines into that file:
 
 > **WINDOWS:**
 >
-> ```odin
+> ````odin
 > {
 >     "working_dir": "c:/code/my_first_game",
 >     "shell_cmd": "c:/odin/odin run .",
@@ -260,6 +273,8 @@ Sublime will pop up a new build system file, copy these lines into that file:
 >     "file_regex": "^(.+)\\(([0-9]+):([0-9]+)\\) (.+)$"
 > }
 > ```odin
+> ````
+
 and then save it. Name it something like `my_first_game.sublime-build`. Make sure to save it in the folder Sublime suggests (the folder’s path is probably something like `Sublime Text 3/Packages/User`). Make sure you use the `.sublime-build` filename ending, otherwise Sublime will not find it.
 
 This file tells Sublime to compile our game using the command `odin run .`. The `working_dir` part tells sublime to run the command from within the directory where we saved our code. You do not need to tell the Odin compiler exactly which files we wish to compile, the period `.` at the end of the command denotes the ‘current directory’, which means that it takes all the files in the `working_dir` and compiles them into a package. However, we only have one file (`main.odin`), but if we add more odin files later then they will get picked up as well.
@@ -282,4 +297,4 @@ Have a fantastic day!
 
 /Karl
 
->Source: https://zylinski.se/posts/gamedev-for-beginners-using-odin-and-raylib-1
+> Source: https://zylinski.se/posts/gamedev-for-beginners-using-odin-and-raylib-1

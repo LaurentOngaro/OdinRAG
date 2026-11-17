@@ -108,7 +108,7 @@ SKIP_DIRS = {
 # Regex patterns
 WIKILINK_PATTERN = re.compile(r"\[\[([^\]\|#]+)(?:#[^\]|]+)?(?:\|[^\]]+)?\]\]")
 # Matches inline filenames - requires underscore between prefix and rest, ends with .md, no space in middle
-FILENAME_PATTERN = re.compile(r"(?<![`\w/\d])(\d{3}_[A-Za-z0-9_-]+\.md)(?!\S*\d)")
+FILENAME_PATTERN = re.compile(r"(?<![`\w/\d-])(\d{3}_[A-Za-z0-9_-]+\.md)(?!\S*\d)")
 # Matches directory references like "851_Curated_AssetsList/" or "301_IA_Tools/"
 DIRNAME_PATTERN = re.compile(r"(?:^|[\s`(])(?:[*+-]\s+)?(\d{3}_[A-Za-z0-9_]+)/")
 # Matches folder wikilinks [[Folder/]] (with trailing slash, no extension)

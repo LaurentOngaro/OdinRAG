@@ -1,3 +1,11 @@
+---
+title: "Odin Changes in Detail"
+source: "https://odin-lang.org/news/newsletter-2026-q1"
+tags: [OdinRAG, kb, source/newsletters]
+type: reference
+status: active
+---
+
 ## Odin Changes in Detail [#](#odin-changes-in-detail)
 
 ### New and Improved `core:os` [#](#new-and-improved-coreos)
@@ -8,7 +16,7 @@ If you require the old functionality of `core:os`, it is still available under `
 
 ### `#+feature using-stmt` [#](#feature-using-stmt)
 
-`using` as a statement has been a controversial feature of Odin for a long time. `using` on struct fields has been shown to be an extremely useful construct with very few issues in practice but the use of `using` as a statement has caused problems in general. We are *not* removing the feature but instead making `using` as a statement and procedure parameter modifier an opt-in feature on a per-file basis rather than having it on by default. This can be enabled by placing `#+feature using-stmt` at the top of the file that requires it.
+`using` as a statement has been a controversial feature of Odin for a long time. `using` on struct fields has been shown to be an extremely useful construct with very few issues in practice but the use of `using` as a statement has caused problems in general. We are _not_ removing the feature but instead making `using` as a statement and procedure parameter modifier an opt-in feature on a per-file basis rather than having it on by default. This can be enabled by placing `#+feature using-stmt` at the top of the file that requires it.
 
 `using` on struct fields still works as expected and will continue to do so.
 
@@ -91,7 +99,8 @@ exec :: proc "preserve/none" (vm: ^VM, instrs: [^]Instr) -> i32 {
 
     return #must_tail LUT[instrs[0].opc](vm, instrs)
 }
-```odin
+```
+
 ### Licensing Changes to zlib from BSD 3-clause [#](#licensing-changes-to-zlib-from-bsd-3-clause)
 
 Odin has recently changed its licence for the source code from BSD 3-clause to zlib. This decision was driven by a desire for greater simplicity, legal clarity, and to remove many potentially restrictive clauses.
@@ -211,7 +220,8 @@ Entity :: struct {
         e.pos += {1, 2}
     }
 }
-```odin
+```
+
 ### `core:crypto/ecdh` [#](#corecryptoecdh)
 
 Package `core:crypto/ecdh` is a unification of `X25519` and `X448`, and adds support for `secp256r1` and `secp384r1`.
@@ -228,4 +238,4 @@ Odin now bundles with libCURL as part of its `vendor` package; the free and open
 
 1. For instance you could give control of the entire loop to the user, but that comes with all the problems with that. [↩︎](#fnref:1)
 
->Source: https://odin-lang.org/news/newsletter-2026-q1
+> Source: https://odin-lang.org/news/newsletter-2026-q1

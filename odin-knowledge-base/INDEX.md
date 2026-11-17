@@ -1,6 +1,6 @@
 ---
 title: "OdinKB - Semantic index"
-date: 2026-10-06
+date: 2026-11-17
 tags: [OdinRAG, kb, doc/index, reference]
 type: reference
 status: active
@@ -17,23 +17,27 @@ summary: "Compact index (~5 KB) to navigate the ~180 files of the Odin KB withou
 
 ## Overview (by source)
 
-| Source                                              | Files | Format                                                                                      | Why                                                   |
-| --------------------------------------------------- | ----- | ------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
-| `odin-knowledge-base/courses/`                      | 127   | Skool 'programvideogames' lessons (Markdown with frontmatter)                               | Concrete implementation, complete code, game patterns |
-| `odin-knowledge-base/docs/karl_zylinski/odin-book/` | 34    | Karl's book **'Understanding the Odin Programming Language'** split into 1 file per chapter | Language reference, pure concept, minimal example     |
-| `odin-knowledge-base/docs/karl_zylinski/*.md`       | 21    | Karl Zylinski blog articles                                                                 | Game dev patterns, opinions, hot take                 |
-| `odin-knowledge-base/docs/official/`                | 39    | Official odin-lang.org docs + awesome-odin                                                  | Official language reference                           |
-| `odin-knowledge-base/gitIngest/`                    | 21    | gitingest snapshots of local Odin repo clones (karl_zylinski, falconerd, odin-lang)         | Fallback context layer when MCP GitHub is unavailable |
-| `code/examples/demo.odin`                           | 1     | Official language demo                                                                      | Exhaustive feature reference                          |
+| Source                                              | Files | Format                                                                                      | Why                                                          |
+| --------------------------------------------------- | ----- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| `odin-knowledge-base/courses/`                      | 117   | Skool 'programvideogames' lessons (Markdown with frontmatter)                               | Concrete implementation, complete code, game patterns        |
+| `odin-knowledge-base/docs/karl_zylinski/odin-book/` | 34    | Karl's book **'Understanding the Odin Programming Language'** split into 1 file per chapter | Language reference, pure concept, minimal example            |
+| `odin-knowledge-base/docs/karl_zylinski/*.md`       | 22    | Karl Zylinski blog articles                                                                 | Game dev patterns, opinions, hot take                        |
+| `odin-knowledge-base/docs/official/`                | 44    | Official odin-lang.org docs, spec, changelogs + awesome-odin                                | Official language reference                                  |
+| `odin-knowledge-base/docs/newsletters/`             | 38    | Official Odin newsletters (odin-lang.org/news/)                                             | Language evolution, ecosystem highlights                     |
+| `odin-knowledge-base/docs/gingerbill/`              | 48    | Ginger Bill blog articles (gingerbill.org)                                                  | Language design philosophy, allocators, C/Zig comparisons    |
+| `odin-knowledge-base/docs/jakubtomsu/`              | 12    | Jakub Tomsu blog articles (jakubtomsu.github.io)                                            | Data structures, compile speed, practical gamedev            |
+| `odin-knowledge-base/docs/marianpekar/`             | 23    | Marian Pekar blog series (marianpekar.com)                                                  | From-scratch software renderer, physics engine, Raylib cloth |
+| `odin-knowledge-base/docs/showcase/`                | 8     | Odin showcase entries (odin-lang.org/showcase/)                                             | Real-world Odin projects and architecture notes              |
+| `odin-knowledge-base/references/`                   | 5     | Curated cross-language engineering references                                               | Safety-critical style (TigerStyle) applicable to Odin        |
+| `odin-knowledge-base/gitIngest/`                    | 21    | gitingest snapshots of local Odin repo clones (karl_zylinski, falconerd, odin-lang)         | Fallback context layer when MCP GitHub is unavailable        |
+| `code/examples/demo.odin`                           | 1     | Official language demo                                                                      | Exhaustive feature reference                                 |
 
-**Total**: ~243 files, ~8 MB of MD.
+**Total**: ~373 files, ~10 MB of MD.
 
 ## Skool courses (programvideogames)
 
 See the detail in [`courses/programvideogames/README.md`](courses/programvideogames/README.md).
 
-- **metroidvania-10-testing-ignore** (9 lessons) - [`courses/programvideogames/metroidvania-10-testing-ignore/README.md`](courses/programvideogames/metroidvania-10-testing-ignore/README.md)
-  - `introduction/`: 9 lessons
 - **the-course-is-here** (115 lessons) - [`courses/programvideogames/the-course-is-here/README.md`](courses/programvideogames/the-course-is-here/README.md)
   - `introduction/`: 9 lessons
   - `metroidvania/`: 53 lessons
@@ -80,10 +84,14 @@ See the detail in [`courses/programvideogames/README.md`](courses/programvideoga
 
 ## Statistics
 
-- **127** Skool files (Vertical Slice and Dice v1.0 + Metroidvania 1.0)
+- **117** Skool files (`the-course-is-here`: Introduction, Metroidvania, RPG)
 - **34** Karl book files (28 chapters + 4 appendices + about-author)
-- **21** Zylinski articles
-- **39** official odin-lang.org docs
+- **22** Zylinski articles
+- **44** official odin-lang.org docs & changelogs
+- **38** Odin newsletters
+- **48** Ginger Bill articles
+- **12** Jakub Tomsu articles
+- **23** Marian Pekar articles
 - **1** official demo (`code/examples/demo.odin`)
 
 ## Skill to navigate
@@ -217,5 +225,4 @@ If the INDEX becomes too big (> 10 KB), consider splitting into:
 
 - `odin-knowledge-base/INDEX.md` (this file, overview)
 - `odin-knowledge-base/TOPICS.md` (detailed topics)
-
 <!-- END MANUAL -->

@@ -1,3 +1,12 @@
+---
+title: "Memory Allocation Strategies - Part 2"
+date: 2019-02-08
+source: "https://www.gingerbill.org/article/2019/02/08/memory-allocation-strategies-002"
+tags: [OdinRAG, kb, source/gingerbill, topic/allocator]
+type: reference
+status: active
+---
+
 # Memory Allocation Strategies - Part 2
 
 ## Linear/Arena Allocators
@@ -8,7 +17,7 @@ Series: [Memory Allocation Strategies](/series/memory-allocation-strategies)
 
 # Linear Allocation
 
-The first memory allocation strategy that I will cover is also one of the simplest ones: linear allocation. As the name suggests, memory is allocated linearly. Throughout this series, I will be using the concept of an *allocator* as a means to allocate this memory. A linear allocator, is also known by other names such as an Arena or Region-based allocator. In this article, I will refer to this allocator an a *Arena*.
+The first memory allocation strategy that I will cover is also one of the simplest ones: linear allocation. As the name suggests, memory is allocated linearly. Throughout this series, I will be using the concept of an _allocator_ as a means to allocate this memory. A linear allocator, is also known by other names such as an Arena or Region-based allocator. In this article, I will refer to this allocator an a _Arena_.
 
 ## Basic Logic
 
@@ -18,7 +27,7 @@ Other data may stored such as the offset of the beginning of the previous alloca
 
 ![Linear Allocator Layout](/images/memory-allocation-strategies/linear_allocator.svg#center)
 
-To allocate some memory from the arena, it is as simple as moving the offset (or pointer) forward. In [Big-O notation](https://wikipedia.org/wiki/Big_O_notation), the allocation has complexity of ***O(1)*** (constant).
+To allocate some memory from the arena, it is as simple as moving the offset (or pointer) forward. In [Big-O notation](https://wikipedia.org/wiki/Big_O_notation), the allocation has complexity of _**O(1)**_ (constant).
 
 ![Linear Allocator Alloc](/images/memory-allocation-strategies/linear_allocator_alloc.svg#center)
 
@@ -28,7 +37,7 @@ Due to being the simplest allocator possible, the arena allocator does not allow
 
 **Note:** The following code examples will be in written in C.
 
-The simplest arena allocator *could* look like this:
+The simplest arena allocator _could_ look like this:
 
 ```odin
 static unsigned char *arena_buffer;
@@ -47,17 +56,18 @@ void *arena_alloc(size_t size) {
 	// Return NULL if the arena is out of memory
 	return NULL;
 }
-```odin
+```
+
 As you may be able to tell, this is as simple as it gets. There are two issues with this basic approach:
 
 - You cannot reuse this procedure for different arenas
 - The pointer returned may not be aligned correctly for the data you need
 
-The first issue can be easily solved by coupling that global data into a structure and passing that to the procedure `arena_alloc`. As for the second issue, this requires understanding about the basic issues of *unaligned memory*.
+The first issue can be easily solved by coupling that global data into a structure and passing that to the procedure `arena_alloc`. As for the second issue, this requires understanding about the basic issues of _unaligned memory_.
 
 # Memory Alignment
 
-Modern computer architectures will always read memory at its “word size” (4 bytes on a 32 bit machine, 8 bytes on a 64 bit machine). If you have an unaligned memory access (on a processor that allows for that), the processor will have to read multiple “words”. This means that an unaligned memory access *may* be much slower than an aligned memory access.
+Modern computer architectures will always read memory at its “word size” (4 bytes on a 32 bit machine, 8 bytes on a 64 bit machine). If you have an unaligned memory access (on a processor that allows for that), the processor will have to read multiple “words”. This means that an unaligned memory access _may_ be much slower than an aligned memory access.
 I will not write too much about memory alignment in this series. If you would like to learn more, I recommend the following articles:
 
 - [IBM - Data alignment: Straighten up and fly right](https://developer.ibm.com/technologies/systems/articles/pa-dalign/)
@@ -72,7 +82,8 @@ On virtually all architectures, the amount of bytes that something must be align
 bool is_power_of_two(uintptr_t x) {
 	return (x & (x-1)) == 0;
 }
-```odin
+```
+
 To align a memory address to the specified alignment is simple modulo arithmetic. You are looking to find how many bytes forward you need to go in order for the memory address is a multiple of the specified alignment.
 
 ```odin
@@ -93,7 +104,8 @@ uintptr_t align_forward(uintptr_t ptr, size_t align) {
 	}
 	return p;
 }
-```odin
+```
+
 Now that we know how to align memory, that means we can update our original `arena_alloc` to support alignment properly and store the arena data within a structure.
 
 ```odin
@@ -133,7 +145,8 @@ void *arena_alloc_align(Arena *a, size_t size, size_t align) {
 void *arena_alloc(Arena *a, size_t size) {
 	return arena_alloc_align(a, size, DEFAULT_ALIGNMENT);
 }
-```odin
+```
+
 # Implementing the Rest
 
 The arena allocator is usable for basic things now but it is missing a few features that would make it practical for everyday use. The complete arena allocator will have the following procedures:
@@ -155,7 +168,8 @@ void arena_init(Arena *a, void *backing_buffer, size_t backing_buffer_length) {
 	a->curr_offset = 0;
 	a->prev_offset = 0;
 }
-```odin
+```
+
 ## Free
 
 As I previously stated, `arena_free` does absolutely nothing. It exists purely for completeness.
@@ -164,7 +178,8 @@ As I previously stated, `arena_free` does absolutely nothing. It exists purely f
 void arena_free(Arena *a, void *ptr) {
 	// Do nothing
 }
-```odin
+```
+
 ## Resize
 
 Resizing an allocation is sometimes useful in an arena. To reduce waste of memory, it is useful to track the `prev_offset` and if the `old_memory` passed in equals the offset provided, just resize that memory block.
@@ -204,7 +219,8 @@ void *arena_resize_align(Arena *a, void *old_memory, size_t old_size, size_t new
 void *arena_resize(Arena *a, void *old_memory, size_t old_size, size_t new_size) {
 	return arena_resize_align(a, old_memory, old_size, new_size, DEFAULT_ALIGNMENT);
 }
-```odin
+```
+
 ## Free All
 
 Finally, `arena_free_all` is used to free all the memory within the allocator by setting the buffer offsets to zero. This is very useful for when you want to reset on a per cycle/frame basis.
@@ -214,7 +230,8 @@ void arena_free_all(Arena *a) {
 	a->curr_offset = 0;
 	a->prev_offset = 0;
 }
-```odin
+```
+
 # Using the Allocator
 
 To use the allocator, you need to provide some backing memory. A simple approach is to provide an array:
@@ -223,23 +240,25 @@ To use the allocator, you need to provide some backing memory. A simple approach
 unsigned char backing_buffer[256];
 Arena a = {0};
 arena_init(&a, backing_buffer, 256);
-```odin
+```
+
 Another approach is to use `malloc`:
 
 ```odin
 void *backing_buffer = malloc(256);
 Arena a = {0};
 arena_init(&a, backing_buffer, 256);
-```odin
+```
+
 # Conclusion
 
 You have now implemented your very first custom allocator! The full source code is [available here](/code/memory-allocation-strategies/part002.c).
 
-In the next article, I will be talking about the basic evolution of the *arena allocator* in to a [*stack allocator*](/article/2019/02/15/memory-allocation-strategies-003/).
+In the next article, I will be talking about the basic evolution of the _arena allocator_ in to a [_stack allocator_](/article/2019/02/15/memory-allocation-strategies-003/).
 
 # Extra Features
 
-One extra feature you could add is a temporary arena memory *savepoint*. This is extremely useful for when you just want to use some memory in an arena for a very short period and then reset to the previously saved point.
+One extra feature you could add is a temporary arena memory _savepoint_. This is extremely useful for when you just want to use some memory in an arena for a very short period and then reset to the previously saved point.
 
 ```odin
 typedef struct Temp_Arena_Memory Temp_Arena_Memory;
@@ -263,4 +282,4 @@ void temp_arena_memory_end(Temp_Arena_Memory temp) {
 }
 ```
 
->Source: https://www.gingerbill.org/article/2019/02/08/memory-allocation-strategies-002
+> Source: https://www.gingerbill.org/article/2019/02/08/memory-allocation-strategies-002

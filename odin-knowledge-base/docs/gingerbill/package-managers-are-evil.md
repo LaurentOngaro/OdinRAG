@@ -1,3 +1,12 @@
+---
+title: "Package Managers are Evil"
+date: 2025-09-08
+source: "https://www.gingerbill.org/article/2025/09/08/package-managers-are-evil"
+tags: [OdinRAG, kb, source/gingerbill]
+type: reference
+status: active
+---
+
 # Package Managers are Evil
 
 2025-09-08
@@ -17,7 +26,7 @@ To start, I need to make a few distinctions between concepts a lot of programmer
 
 These are all separate and can have no relation to one another. I have nothing wrong with packages, in fact Odin has packages built into the language. I have nothing wrong with repositories, as that’s how a lot of people discover new packages-a search engine, something I think everyone uses on a daily basis
 
-I primarily use [DuckDuckGo](http://duckduckgo.com/), but I also use Google and many others because they are pretty much all bad.. Build systems are usually language dependent/specific, and for Odin I have tried minimize the need for a build system entirely (at least as a separate thing) where most projects will build with `odin build .`, which works due to the linking information being defined in the source code itself with the `foreign` system. This leaves *package managers*; what do they do?
+I primarily use [DuckDuckGo](http://duckduckgo.com/), but I also use Google and many others because they are pretty much all bad.. Build systems are usually language dependent/specific, and for Odin I have tried minimize the need for a build system entirely (at least as a separate thing) where most projects will build with `odin build .`, which works due to the linking information being defined in the source code itself with the `foreign` system. This leaves _package managers_; what do they do?
 
 ## What do package managers do?
 
@@ -33,7 +42,7 @@ That’s my general criticism: the unnecessary automation.
 
 Most package managers usually have to define what a package is, because the language itself does not have a well defined concept of a package in the language. JavaScript is great example of this as there are multiple different package managers for the language (`npm` being one of the most popular), but because each package manager defines the concept of a package differently, it results in the need for a **package manager manager**. Yes… this is a real thing.
 
-This is why I am saying it is *evil*, as it will send you to hell quicker.
+This is why I am saying it is _evil_, as it will send you to hell quicker.
 
 ## Mitigations in some languages
 
@@ -47,9 +56,9 @@ ThePrimeagen mentioned the “Klingon Approach” as a joke. This refers to Klin
 
 In real life, when you have a dependency, you are responsible for it
 
-This comment was from José Valim (the creator of the [Elixir](https://en.wikipedia.org/wiki/Elixir_(programming_language)) programming language) and this was a very good point which I wanted to add to this article.. If the thing that is dependent on you does something wrong, like a child or business, you might end up in jail, as you are responsible for that. Package dependencies are not that far different but people trust them with little-to-no verification. And when something goes wrong, you are on the hook to maintain it. It is a thing you should worry about and take care of.
+This comment was from José Valim (the creator of the [Elixir](<https://en.wikipedia.org/wiki/Elixir_(programming_language)>) programming language) and this was a very good point which I wanted to add to this article.. If the thing that is dependent on you does something wrong, like a child or business, you might end up in jail, as you are responsible for that. Package dependencies are not that far different but people trust them with little-to-no verification. And when something goes wrong, you are on the hook to maintain it. It is a thing you should worry about and take care of.
 
-A common thing that people bring up about package managers are security risks. There are indeed serious problems, especially when you blindly trust things you have just randomly started depending from off the internet. However for my needs, those are not even the biggest worries for what I work on, but they might be for you! For me at work, we use currently use [SDL2](https://www.libsdl.org/) for our windowing stuff at work, and we have found a huge amount of bugs and we hate it to the point that I/we will probably write our own window and input handling system from scratch for each Operating System we target. At least it is our code and we can depend on it and correct it when things go wrong; we are not having an extra dependency. I know SDL2 is used by millions of people, but we keep hitting all of the bugs. “But it’s great though!”. [SDL3]((https://www.libsdl.org/)) might fix it all but the time to integrate SDL3 would be the same time I could write it from scratch.
+A common thing that people bring up about package managers are security risks. There are indeed serious problems, especially when you blindly trust things you have just randomly started depending from off the internet. However for my needs, those are not even the biggest worries for what I work on, but they might be for you! For me at work, we use currently use [SDL2](https://www.libsdl.org/) for our windowing stuff at work, and we have found a huge amount of bugs and we hate it to the point that I/we will probably write our own window and input handling system from scratch for each Operating System we target. At least it is our code and we can depend on it and correct it when things go wrong; we are not having an extra dependency. I know SDL2 is used by millions of people, but we keep hitting all of the bugs. “But it’s great though!”. [SDL3](<(https://www.libsdl.org/)>) might fix it all but the time to integrate SDL3 would be the same time I could write it from scratch.
 
 I am **not** advocating to write things from scratch. I wish there were libraries I could say that they “Just Work™”, but I still have to depend on them, and they are a liability; not just security liabilities but just bug liabilities.
 
@@ -57,7 +66,7 @@ Each dependency is a potential liability.
 
 ## Unbacked high trust
 
-People rarely, if ever, vet their code, especially third-party code. Most people assume random code off the internet *works*. This is a societal issue where programmers are very high trusting in a place where you should have the least amount of trust possible. To put it bluntly, a lot of programmers come from a highly developed countries which are in general high trust societies, and then they apply that to the rest of their online world. This means you only need one person to do something malicious to something millions depend on to screw everything up. It doesn’t even have to be malicious but a funny bug, where if you clicked one pixel on the screen, it is [Rick Rolling](https://www.youtube.com/watch?v=dQw4w9WgXcQ) you.
+People rarely, if ever, vet their code, especially third-party code. Most people assume random code off the internet _works_. This is a societal issue where programmers are very high trusting in a place where you should have the least amount of trust possible. To put it bluntly, a lot of programmers come from a highly developed countries which are in general high trust societies, and then they apply that to the rest of their online world. This means you only need one person to do something malicious to something millions depend on to screw everything up. It doesn’t even have to be malicious but a funny bug, where if you clicked one pixel on the screen, it is [Rick Rolling](https://www.youtube.com/watch?v=dQw4w9WgXcQ) you.
 
 ## Gell-Mann amnesia effect
 
@@ -69,9 +78,9 @@ You’ll find engineers who will go “some of my coworkers are so horrible, hey
 
 ## Evolutionary selection pressure
 
-Most people assume programming is like every other industry, like actual engineering which has been around for thousands of years, or modern science which has been around for about half a millenium. People trust who they perceive to be the “experts”, as you see all of these articles, books, conference videos, etc, and they all tell you stuff but for the most part which does not necessarily *seem* true.
+Most people assume programming is like every other industry, like actual engineering which has been around for thousands of years, or modern science which has been around for about half a millenium. People trust who they perceive to be the “experts”, as you see all of these articles, books, conference videos, etc, and they all tell you stuff but for the most part which does not necessarily _seem_ true.
 
-I remember trusting those who were perceived to be “experts” which were espousing “wisdom”. However, as I have programmed more over the years, I realized there is very *very* little wisdom in this industry. This industry is 70-75 years old at best, and that is not old enough to have any good evolutionary selection pressure. It is not old enough to get rid of the bad things-it hasn’t evolved quick enough. We will find out in a few HUNDRED years, and I mean *hundreds*, what is actual good wisdom is in programming.
+I remember trusting those who were perceived to be “experts” which were espousing “wisdom”. However, as I have programmed more over the years, I realized there is very _very_ little wisdom in this industry. This industry is 70-75 years old at best, and that is not old enough to have any good evolutionary selection pressure. It is not old enough to get rid of the bad things-it hasn’t evolved quick enough. We will find out in a few HUNDRED years, and I mean _hundreds_, what is actual good wisdom is in programming.
 
 There are some laws we know like [Conway’s Law](https://en.wikipedia.org/wiki/Conway's_law), where “organizations which design systems (in the broad sense used here) are constrained to produce designs which are copies of the communication structures of these organizations”. Or to rephrase it in programming terms, the structure of the code will reflect the company that programs it. But that is one of the only laws that we know to exist.
 
@@ -91,4 +100,4 @@ Not everything that can be automated ought to be automated. The automation of de
 
 Another issue is that for other languages, the concept of a package is ill-defined in the language itself. And as such, the package manager itself is usually trying to define the concept of what a package is, which leads to many issues. Sometimes, if there are multiple competing package managers with different definitions of what a package is, the monstrosity of a package-manager-manager arises and the hell that brings with it.
 
->Source: https://www.gingerbill.org/article/2025/09/08/package-managers-are-evil
+> Source: https://www.gingerbill.org/article/2025/09/08/package-managers-are-evil

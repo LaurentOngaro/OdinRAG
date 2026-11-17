@@ -1,3 +1,12 @@
+---
+title: "Solodevs and the trap of the game engine"
+date: 2024-05-23
+source: "https://zylinski.se/posts/solodevs-and-the-trap-of-the-game-engine"
+tags: [OdinRAG, kb, source/zylinski, topic/raylib]
+type: reference
+status: active
+---
+
 # Solodevs and the trap of the game engine
 
 May 23, 2024
@@ -40,7 +49,7 @@ Naturally I adopted lots of the mindsets of how to make games from this job. I.e
 
 It is very easy to look at a general purpose game engine such as Unity or Godot and think that you should use such engines with such tools to create games. Now, using such engines is perfectly fine. But the problem is when you want to create your own games from scratch, then you might get the idea that you also need to build a general purpose game engine before you get started with the gameplay code.
 
-I still wanted to create my own games, as in solo developing them. So in my spare time I was tinkering away. But I got way too inspired by my day job, where I was developing a general purpose game engine! I was creating renderers, abstract level editing tools, file formats, data compilers. But I didn’t write any gameplay code *at all*! That, I thought, came when the engine code was mature enough.
+I still wanted to create my own games, as in solo developing them. So in my spare time I was tinkering away. But I got way too inspired by my day job, where I was developing a general purpose game engine! I was creating renderers, abstract level editing tools, file formats, data compilers. But I didn’t write any gameplay code _at all_! That, I thought, came when the engine code was mature enough.
 
 ## Using third-party game engines[#](#using-third-party-game-engines)
 
@@ -64,7 +73,7 @@ If you work on a team you must make sure to provide tools to empower the team, b
 
 Again, comparing my 35 year old self to my 19 year old self, I found an advantage to using Odin over C++. My C++ projects usually didn’t leave the prototype stage. Perhaps it was due to inexperience. But also, there is a certain feeling of dread sometimes when you have a big C++ code base and want to implement a new mechanic, because C++ is a bit too chatty. There is just slightly too much friction in C++. In Odin the code is both more compact and simpler, making it possible for me to (just barely) clear the mental hill of having to add new features when I need to.
 
-Also Raylib is a bit simpler to use than SFML. All-in-all it just felt *fun* to write games again, and I felt like I could get to writing gameplay very quickly and also have an easier overview of the project than if I use a big engine like Unity.
+Also Raylib is a bit simpler to use than SFML. All-in-all it just felt _fun_ to write games again, and I felt like I could get to writing gameplay very quickly and also have an easier overview of the project than if I use a big engine like Unity.
 
 ## Was working with creating game engines a mistake?[#](#was-working-with-creating-game-engines-a-mistake)
 
@@ -78,4 +87,4 @@ If you want to see some game development streams and tutorials, then maybe you�
 
 /Karl Zylinski
 
->Source: https://zylinski.se/posts/solodevs-and-the-trap-of-the-game-engine
+> Source: https://zylinski.se/posts/solodevs-and-the-trap-of-the-game-engine

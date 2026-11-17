@@ -12,37 +12,38 @@ One file per Odin post, scraped from `https://marianpekar.com/rss`.
 
 ## Odin posts
 
-21 posts covering two long multi-part series plus one standalone article.
+22 posts covering two long multi-part series plus one standalone article.
 
-- [Physics Engine in Odin from Scratch, Part VI](./physics-engine-in-odin-from-scratch-part-vi.md) - 23 September 2026
-- [Physics Engine in Odin from Scratch, Part V](./physics-engine-in-odin-from-scratch-part-v.md) - 30 August 2026
-- [Physics Engine in Odin from Scratch, Part IV](./physics-engine-in-odin-from-scratch-part-iv.md) - 26 July 2026
-- [Physics Engine in Odin from Scratch, Part III](./physics-engine-in-odin-from-scratch-part-iii.md) - 20 June 2026
-- [Physics Engine in Odin from Scratch, Part II](./physics-engine-in-odin-from-scratch-part-ii.md) - 30 May 2026
-- [Physics Engine in Odin from Scratch, Part I](./physics-engine-in-odin-from-scratch-part-i.md) - 25 April 2026
-- [Software Renderer in Odin from Scratch, Part XIV](./software-renderer-in-odin-from-scratch-part-xiv.md) - 2 March 2026
-- [Software Renderer in Odin from Scratch, Part XIII](./software-renderer-in-odin-from-scratch-part-xiii.md) - 26 February 2026
-- [Software Renderer in Odin from Scratch, Part XII](./software-renderer-in-odin-from-scratch-part-xii.md) - 1 February 2026
-- [Software Renderer in Odin from Scratch, Part XI](./software-renderer-in-odin-from-scratch-part-xi.md) - 18 January 2026
-- [Software Renderer in Odin from Scratch, Part X](./software-renderer-in-odin-from-scratch-part-x.md) - 30 November 2025
-- [Software Renderer in Odin from Scratch, Part IX](./software-renderer-in-odin-from-scratch-part-ix.md) - 1 November 2025
-- [Software Renderer in Odin from Scratch, Part VIII](./software-renderer-in-odin-from-scratch-part-viii.md) - 16 October 2025
-- [Software Renderer in Odin from Scratch, Part VII](./software-renderer-in-odin-from-scratch-part-vii.md) - 4 October 2025
-- [Software Renderer in Odin from Scratch, Part VI](./software-renderer-in-odin-from-scratch-part-vi.md) - 13 September 2025
-- [Software Renderer in Odin from Scratch, Part V](./software-renderer-in-odin-from-scratch-part-v.md) - 30 July 2025
-- [Software Renderer in Odin from Scratch, Part IV](./software-renderer-in-odin-from-scratch-part-iv.md) - 4 July 2025
-- [Software Renderer in Odin from Scratch, Part III](./software-renderer-in-odin-from-scratch-part-iii.md) - 4 June 2025
-- [Software Renderer in Odin from Scratch, Part II](./software-renderer-in-odin-from-scratch-part-ii.md) - 5 April 2025
-- [Software Renderer in Odin from Scratch, Part I](./software-renderer-in-odin-from-scratch-part-i.md) - 2 March 2025
-- [2D Cloth Simulation in Odin with raylib](./2d-cloth-simulation-in-odin-with-raylib.md) - 26 January 2025
+- [Physics Engine in Odin from Scratch, Part VII](./physics-engine-in-odin-from-scratch-part-vii.md) - Sun, 15 Nov 2026 09:29:41 GMT
+- [Physics Engine in Odin from Scratch, Part VI](./physics-engine-in-odin-from-scratch-part-vi.md) - Wed, 23 Sep 2026 19:28:25 GMT
+- [Physics Engine in Odin from Scratch, Part V](./physics-engine-in-odin-from-scratch-part-v.md) - Sun, 30 Aug 2026 09:18:39 GMT
+- [Physics Engine in Odin from Scratch, Part IV](./physics-engine-in-odin-from-scratch-part-iv.md) - Sun, 26 Jul 2026 14:01:14 GMT
+- [Physics Engine in Odin from Scratch, Part III](./physics-engine-in-odin-from-scratch-part-iii.md) - Sat, 20 Jun 2026 18:30:21 GMT
+- [Physics Engine in Odin from Scratch, Part II](./physics-engine-in-odin-from-scratch-part-ii.md) - Sat, 30 May 2026 16:48:07 GMT
+- [Physics Engine in Odin from Scratch, Part I](./physics-engine-in-odin-from-scratch-part-i.md) - Sat, 25 Apr 2026 08:26:35 GMT
+- [Software Renderer in Odin from Scratch, Part XIV](./software-renderer-in-odin-from-scratch-part-xiv.md) - Mon, 02 Mar 2026 10:55:29 GMT
+- [Software Renderer in Odin from Scratch, Part XIII](./software-renderer-in-odin-from-scratch-part-xiii.md) - Thu, 26 Feb 2026 09:45:02 GMT
+- [Software Renderer in Odin from Scratch, Part XII](./software-renderer-in-odin-from-scratch-part-xii.md) - Sun, 01 Feb 2026 22:28:42 GMT
+- [Software Renderer in Odin from Scratch, Part XI](./software-renderer-in-odin-from-scratch-part-xi.md) - Sun, 18 Jan 2026 23:15:46 GMT
+- [Software Renderer in Odin from Scratch, Part X](./software-renderer-in-odin-from-scratch-part-x.md) - Sun, 30 Nov 2025 18:35:23 GMT
+- [Software Renderer in Odin from Scratch, Part IX](./software-renderer-in-odin-from-scratch-part-ix.md) - Sat, 01 Nov 2025 08:12:58 GMT
+- [Software Renderer in Odin from Scratch, Part VIII](./software-renderer-in-odin-from-scratch-part-viii.md) - Thu, 16 Oct 2025 11:30:16 GMT
+- [Software Renderer in Odin from Scratch, Part VII](./software-renderer-in-odin-from-scratch-part-vii.md) - Sat, 04 Oct 2025 11:49:52 GMT
+- [Software Renderer in Odin from Scratch, Part VI](./software-renderer-in-odin-from-scratch-part-vi.md) - Sat, 13 Sep 2025 17:25:38 GMT
+- [Software Renderer in Odin from Scratch, Part V](./software-renderer-in-odin-from-scratch-part-v.md) - Wed, 30 Jul 2025 19:44:40 GMT
+- [Software Renderer in Odin from Scratch, Part IV](./software-renderer-in-odin-from-scratch-part-iv.md) - Fri, 04 Jul 2025 15:42:21 GMT
+- [Software Renderer in Odin from Scratch, Part III](./software-renderer-in-odin-from-scratch-part-iii.md) - Wed, 04 Jun 2025 01:18:06 GMT
+- [Software Renderer in Odin from Scratch, Part II](./software-renderer-in-odin-from-scratch-part-ii.md) - Sat, 05 Apr 2025 12:39:29 GMT
+- [Software Renderer in Odin from Scratch, Part I](./software-renderer-in-odin-from-scratch-part-i.md) - Sun, 02 Mar 2025 00:06:00 GMT
+- [2D Cloth Simulation in Odin with raylib](./2d-cloth-simulation-in-odin-with-raylib.md) - Sun, 26 Jan 2025 02:11:43 GMT
 
 ## Series covered
 
-| Series | Parts | Slug pattern |
-| --- | --- | --- |
-| Software Renderer in Odin from Scratch | 14 | `software-renderer-in-odin-from-scratch-part-*` |
-| Physics Engine in Odin from Scratch | 6 | `physics-engine-in-odin-from-scratch-part-*` |
-| 2D Cloth Simulation in Odin with raylib | 1 | `2d-cloth-simulation-in-odin-with-raylib` |
+| Series                                  | Parts | Slug pattern                                    |
+| --------------------------------------- | ----- | ----------------------------------------------- |
+| Software Renderer in Odin from Scratch  | 14    | `software-renderer-in-odin-from-scratch-part-*` |
+| Physics Engine in Odin from Scratch     | 6     | `physics-engine-in-odin-from-scratch-part-*`    |
+| 2D Cloth Simulation in Odin with raylib | 1     | `2d-cloth-simulation-in-odin-with-raylib`       |
 
 ## Out of scope
 

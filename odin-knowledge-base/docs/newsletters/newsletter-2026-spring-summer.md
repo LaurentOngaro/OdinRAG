@@ -1,3 +1,11 @@
+---
+title: "A Message from our Ginger"
+source: "https://odin-lang.org/news/newsletter-2026-spring-summer"
+tags: [OdinRAG, kb, source/newsletters, topic/rendering, topic/raylib]
+type: reference
+status: active
+---
+
 ## A Message from our Ginger [#](#a-message-from-our-ginger)
 
 ## Made in Odin [#](#made-in-odin)
@@ -42,24 +50,24 @@ The entire game is synced to the music. Inspired by katamari damacy because I lo
 
 ## New Packages [#](#new-packages)
 
-| Package | Description |
-| --- | --- |
-| Cryptography |  |
-| [RSA](https://github.com/odin-lang/Odin/tree/master/core/crypto/rsa) | `RSA` (Rivest–Shamir–Adleman) cryptosystem |
-| [ASN1](https://github.com/odin-lang/Odin/tree/master/core/encoding/asn1) | Strict `DER` (Distinguished Encoding Rules) reader and writer for the `PKIX` subset of `ASN.1`, the substrate for `X.509` certificates and related structures |
-| [Turboshake](https://github.com/odin-lang/Odin/tree/master/core/crypto/turboshake) | [TurboSHAKE](https://keccak.team/turboshake.html) XOF algorithm family |
-| [ML-KEM](https://github.com/odin-lang/Odin/tree/master/core/crypto/mlkem) | Post-quantum Module-Lattice-Based Key-Encapsulation Mechanism ([FIPS 203](https://csrc.nist.gov/pubs/fips/203/final)) |
-| [ML-DSA](https://github.com/odin-lang/Odin/tree/master/core/crypto/mldsa) | Post-quantum digital signature support ([FIPS 204](https://csrc.nist.gov/pubs/fips/204/final)) |
-| [Noise](https://github.com/odin-lang/Odin/tree/master/core/crypto/noise) | [Noise Protocol Framework](https://noiseprotocol.org) implementation |
-| [Argon2Id](https://github.com/odin-lang/Odin/tree/master/core/crypto/argon2id) | Argon2Id Memory-Hard Function for Password Hashing and Proof-of-Work Applications ([RFC 9106](https://datatracker.ietf.org/doc/rfc9106/)) |
-| [ECDSA](https://github.com/odin-lang/Odin/tree/master/core/crypto/ecdsa) | Elliptic Curve Digital Signature Algorithm per [SEC](https://secg.org/) 2.0 section 4.1 |
-| Code Generation & Debugging |  |
-| [rexcode](https://github.com/odin-lang/Odin/tree/master/core/rexcode) | A high-performance multi-architecture instruction encoder/decoder/printer package |
-| [trace](https://github.com/odin-lang/Odin/tree/master/core/debug/trace) | `core:debug/trace` was replaced to offer much-improved backtrace functionality |
-| Vendor |  |
-| [raylib](https://github.com/odin-lang/Odin/tree/master/vendor/raylib) | [Raylib](https://www.raylib.com), major version 6 update |
-| [box3d](https://github.com/odin-lang/Odin/tree/master/vendor/box3d) | [Box3D](https://github.com/erincatto/box3d) physics engine |
-| [wasapi](https://github.com/odin-lang/Odin/tree/master/vendor/windows/wasapi) | [Windows Audio Sesssion API](https://learn.microsoft.com/en-us/windows/win32/coreaudio/wasapi) |
-| [SDL3 Mixer](https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/mixer) | [SDL3’s Mixer](https://github.com/libsdl-org/SDL_mixer) was released and bindings were added |
+| Package                                                                            | Description                                                                                                                                                   |
+| ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Cryptography                                                                       |                                                                                                                                                               |
+| [RSA](https://github.com/odin-lang/Odin/tree/master/core/crypto/rsa)               | `RSA` (Rivest–Shamir–Adleman) cryptosystem                                                                                                                    |
+| [ASN1](https://github.com/odin-lang/Odin/tree/master/core/encoding/asn1)           | Strict `DER` (Distinguished Encoding Rules) reader and writer for the `PKIX` subset of `ASN.1`, the substrate for `X.509` certificates and related structures |
+| [Turboshake](https://github.com/odin-lang/Odin/tree/master/core/crypto/turboshake) | [TurboSHAKE](https://keccak.team/turboshake.html) XOF algorithm family                                                                                        |
+| [ML-KEM](https://github.com/odin-lang/Odin/tree/master/core/crypto/mlkem)          | Post-quantum Module-Lattice-Based Key-Encapsulation Mechanism ([FIPS 203](https://csrc.nist.gov/pubs/fips/203/final))                                         |
+| [ML-DSA](https://github.com/odin-lang/Odin/tree/master/core/crypto/mldsa)          | Post-quantum digital signature support ([FIPS 204](https://csrc.nist.gov/pubs/fips/204/final))                                                                |
+| [Noise](https://github.com/odin-lang/Odin/tree/master/core/crypto/noise)           | [Noise Protocol Framework](https://noiseprotocol.org) implementation                                                                                          |
+| [Argon2Id](https://github.com/odin-lang/Odin/tree/master/core/crypto/argon2id)     | Argon2Id Memory-Hard Function for Password Hashing and Proof-of-Work Applications ([RFC 9106](https://datatracker.ietf.org/doc/rfc9106/))                     |
+| [ECDSA](https://github.com/odin-lang/Odin/tree/master/core/crypto/ecdsa)           | Elliptic Curve Digital Signature Algorithm per [SEC](https://secg.org/) 2.0 section 4.1                                                                       |
+| Code Generation & Debugging                                                        |                                                                                                                                                               |
+| [rexcode](https://github.com/odin-lang/Odin/tree/master/core/rexcode)              | A high-performance multi-architecture instruction encoder/decoder/printer package                                                                             |
+| [trace](https://github.com/odin-lang/Odin/tree/master/core/debug/trace)            | `core:debug/trace` was replaced to offer much-improved backtrace functionality                                                                                |
+| Vendor                                                                             |                                                                                                                                                               |
+| [raylib](https://github.com/odin-lang/Odin/tree/master/vendor/raylib)              | [Raylib](https://www.raylib.com), major version 6 update                                                                                                      |
+| [box3d](https://github.com/odin-lang/Odin/tree/master/vendor/box3d)                | [Box3D](https://github.com/erincatto/box3d) physics engine                                                                                                    |
+| [wasapi](https://github.com/odin-lang/Odin/tree/master/vendor/windows/wasapi)      | [Windows Audio Sesssion API](https://learn.microsoft.com/en-us/windows/win32/coreaudio/wasapi)                                                                |
+| [SDL3 Mixer](https://github.com/odin-lang/Odin/tree/master/vendor/sdl3/mixer)      | [SDL3’s Mixer](https://github.com/libsdl-org/SDL_mixer) was released and bindings were added                                                                  |
 
->Source: https://odin-lang.org/news/newsletter-2026-spring-summer
+> Source: https://odin-lang.org/news/newsletter-2026-spring-summer

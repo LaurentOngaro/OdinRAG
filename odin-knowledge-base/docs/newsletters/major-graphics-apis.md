@@ -1,12 +1,20 @@
+---
+title: "Metal"
+source: "https://odin-lang.org/news/major-graphics-apis"
+tags: [OdinRAG, kb, source/newsletters, topic/wasm]
+type: reference
+status: active
+---
+
 Odin now officially supports both the [Metal](https://developer.apple.com/metal/) API and [Direct3D](https://docs.microsoft.com/en-us/windows/win32/direct3d) 11 & 12 out-of-the box! This makes Odin currently the only language that officially supports all of the major graphics APIs: [OpenGL](https://pkg.odin-lang.org/vendor/OpenGL/), [Vulkan](https://pkg.odin-lang.org/vendor/vulkan/), [Direct3D11](https://pkg.odin-lang.org/vendor/directx/d3d11/), [Direct3D12](https://pkg.odin-lang.org/vendor/directx/d3d12/), [Metal](https://pkg.odin-lang.org/vendor/darwin/Metal/), [wgpu](https://pkg.odin-lang.org/vendor/wgpu) and [WebGL 1 & 2](https://github.com/odin-lang/Odin/tree/master/vendor/wasm/WebGL).
 
 ## Metal [#](#metal)
 
 ![Metal](/vendor/companies/Metal_2_Logo.png)
 
-Odin now has *NATIVE* Metal support, and it is even cleaner than writing it in Objective-C in numerous cases!
+Odin now has _NATIVE_ Metal support, and it is even cleaner than writing it in Objective-C in numerous cases!
 
-Native support means that Odin is *directly* caling the Objective-C runtime, and not through a wrapper of another language. This means that the Metal package in Odin will have virtually the same performance as Objective-C code. This means you can now write Metal code without being locked into using an Apple-specific language.
+Native support means that Odin is _directly_ caling the Objective-C runtime, and not through a wrapper of another language. This means that the Metal package in Odin will have virtually the same performance as Objective-C code. This means you can now write Metal code without being locked into using an Apple-specific language.
 
 ### Example and Documentation [#](#example-and-documentation)
 
@@ -42,7 +50,8 @@ id< MTLSamplerState > samplerState = [device newSamplerStateWithDescriptor:sampl
 // ...
 
 [samplerState release];
-```odin
+```
+
 ### Metal in Odin [#](#metal-in-odin)
 
 ```odin
@@ -63,7 +72,8 @@ samplerDescriptor->release()
 // ...
 
 samplerState->release()
-```odin
+```
+
 ## DirectX [#](#directx)
 
 ![DirectX](/vendor/companies/DirectX_logo.svg)
@@ -96,7 +106,8 @@ device->CreateTexture2D(&depth_buffer_desc, nil, &depth_buffer)
 
 depth_buffer_view: ^D3D11.IDepthStencilView
 device->CreateDepthStencilView(depth_buffer, nil, &depth_buffer_view)
-```odin
+```
+
 ```odin
 sampler_desc := D3D11.SAMPLER_DESC{
 	Filter         = .MIN_MAG_MIP_POINT,
@@ -109,4 +120,4 @@ sampler_state: ^D3D11.ISamplerState
 device->CreateSamplerState(&sampler_desc, &sampler_state)
 ```
 
->Source: https://odin-lang.org/news/major-graphics-apis
+> Source: https://odin-lang.org/news/major-graphics-apis

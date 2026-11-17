@@ -1,3 +1,12 @@
+---
+title: "Software Renderer in Odin from Scratch, Part XII"
+date: 2026-02-01
+source: "https://marianpekar.com/blog/software-renderer-in-odin-from-scratch-part-xii"
+tags: [OdinRAG, kb, source/marianpekar, topic/rendering]
+type: reference
+status: active
+---
+
 # Software Renderer in Odin from Scratch, Part XII
 
 1st February 2026 • 17 min read
@@ -63,10 +72,10 @@ As you can see, our default projection will still be the perspective, but we pre
 
 ```odin
 HandleInputs :: proc(
-    translation, rotation: ^Vector3, 
-    scale: ^f32, 
-    renderMode: ^i8, 
-    renderModesCount: i8, 
+    translation, rotation: ^Vector3,
+    scale: ^f32,
+    renderMode: ^i8,
+    renderModesCount: i8,
     projType: ^ProjectionType,
     deltaTime: f32
 ) {
@@ -103,7 +112,7 @@ ProjectToScreen :: proc(projType: ProjectionType, mat: Matrix4x4, p: Vector3) ->
         case .Orthographic: return Vector3{screenX, screenY, -clip.z}
     }
 
-    // The program never reaches this point, but we need to keep it 
+    // The program never reaches this point, but we need to keep it
     // to avoid a compilation error due to a missing return statement.
     return Vector3{}
 }
@@ -132,7 +141,7 @@ Now, let's fix all the broken procedure calls. The first is in the `DrawWirefram
 ```odin
 DrawWireframe :: proc(
     vertices: []Vector3,
-    triangles: []Triangle, 
+    triangles: []Triangle,
     projMat: Matrix4x4,
     projType: ProjectionType,
     color: rl.Color,
@@ -156,11 +165,11 @@ In the `DrawUnlit` procedure, we need to make similar changes:
 
 ```odin
 DrawUnlit :: proc(
-    vertices: []Vector3, 
+    vertices: []Vector3,
     triangles: []Triangle,
     projMat: Matrix4x4,
     projType: ProjectionType,
-    color: rl.Color, 
+    color: rl.Color,
     zBuffer: ^ZBuffer,
     image: ^rl.Image
 ) {
@@ -181,12 +190,12 @@ There are a few more changes needed in the `DrawFlatShaded` procedure, since we'
 
 ```odin
 DrawFlatShaded :: proc(
-    vertices: []Vector3, 
+    vertices: []Vector3,
     triangles: []Triangle,
     projMat: Matrix4x4,
     projType: ProjectionType,
-    light: Light, 
-    color: rl.Color, 
+    light: Light,
+    color: rl.Color,
     zBuffer: ^ZBuffer,
     image: ^rl.Image,
     ambient:f32 = 0.2
@@ -215,12 +224,12 @@ The same applies to the `DrawTexturedFlatShaded` procedure:
 
 ```odin
 DrawFlatShaded :: proc(
-    vertices: []Vector3, 
+    vertices: []Vector3,
     triangles: []Triangle,
     projMat: Matrix4x4,
     projType: ProjectionType,
-    light: Light, 
-    color: rl.Color, 
+    light: Light,
+    color: rl.Color,
     zBuffer: ^ZBuffer,
     image: ^rl.Image,
     ambient:f32 = 0.2
@@ -249,10 +258,10 @@ In the `DrawTexturedUnlit`, `DrawPhongShaded`, and `DrawTexturedPhongShaded` pro
 
 ```odin
 DrawTexturedUnlit :: proc(
-    vertices: []Vector3, 
-    triangles: []Triangle, 
-    uvs: []Vector2, 
-    texture: Texture, 
+    vertices: []Vector3,
+    triangles: []Triangle,
+    uvs: []Vector2,
+    texture: Texture,
     zBuffer: ^ZBuffer,
     projMat: Matrix4x4,
     projType: ProjectionType,
@@ -274,11 +283,11 @@ DrawTexturedUnlit :: proc(
 
 ```odin
 DrawPhongShaded :: proc(
-    vertices: []Vector3, 
-    triangles: []Triangle, 
-    normals: []Vector3, 
+    vertices: []Vector3,
+    triangles: []Triangle,
+    normals: []Vector3,
     light: Light,
-    color: rl.Color, 
+    color: rl.Color,
     zBuffer: ^ZBuffer,
     projMat: Matrix4x4,
     projType: ProjectionType,
@@ -301,12 +310,12 @@ DrawPhongShaded :: proc(
 
 ```odin
 DrawTexturedPhongShaded :: proc(
-    vertices: []Vector3, 
-    triangles: []Triangle, 
-    uvs: []Vector2, 
-    normals: []Vector3, 
+    vertices: []Vector3,
+    triangles: []Triangle,
+    uvs: []Vector2,
+    normals: []Vector3,
     light: Light,
-    texture: Texture, 
+    texture: Texture,
     zBuffer: ^ZBuffer,
     projMat: Matrix4x4,
     projType: ProjectionType,
@@ -368,4 +377,4 @@ If something doesn't work as expected, you can always compare your version with 
 > Author: Marian Pekar - <https://marianpekar.com>
 > (c) Marian Pekar. The posts stay freely readable on the author's site; this local copy is credited in `SOURCES.md` at the repo root. Please link back to the original article.
 
->Source: https://marianpekar.com/blog/software-renderer-in-odin-from-scratch-part-xii
+> Source: https://marianpekar.com/blog/software-renderer-in-odin-from-scratch-part-xii

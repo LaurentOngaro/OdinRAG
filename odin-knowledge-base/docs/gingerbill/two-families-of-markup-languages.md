@@ -1,10 +1,19 @@
+---
+title: "The Only Two Markup Languages"
+date: 2026-01-19
+source: "https://www.gingerbill.org/article/2026/01/19/two-families-of-markup-languages"
+tags: [OdinRAG, kb, source/gingerbill]
+type: reference
+status: active
+---
+
 # The Only Two Markup Languages
 
 2026-01-19
 
-There are only two families of *proper arbitrary* markup languages: [TeX](https://tug.org/) and [SGML](https://en.wikipedia.org/wiki/Standard_Generalized_Markup_Language)
+There are only two families of _proper arbitrary_ markup languages: [TeX](https://tug.org/) and [SGML](https://en.wikipedia.org/wiki/Standard_Generalized_Markup_Language)
 
-I would normally link to official thing as reference but it’s behind the “wonderful” ISO paywall: [ISO 8879:1986](https://www.iso.org/standard/16387.html).. By *arbitrary*, I mean the grammar specifically, and how it can be used to *mark* arbitrary plain text with information. And by *proper*, I mean the ability to have standalone nodes, user-definable nodes, nodes with attributes, and the wrapping of plain text. Everything else either lacks one of the these capabilities, or is a derivative or syntactic makeover of TeX or SGML.
+I would normally link to official thing as reference but it’s behind the “wonderful” ISO paywall: [ISO 8879:1986](https://www.iso.org/standard/16387.html).. By _arbitrary_, I mean the grammar specifically, and how it can be used to _mark_ arbitrary plain text with information. And by _proper_, I mean the ability to have standalone nodes, user-definable nodes, nodes with attributes, and the wrapping of plain text. Everything else either lacks one of the these capabilities, or is a derivative or syntactic makeover of TeX or SGML.
 
 ## The Two Families
 
@@ -15,7 +24,8 @@ The TeX family:
 \foo{wrapped text}
 \foo[attrib=value]{wrapped text}
 \foo[attrib=value]
-```odin
+```
+
 The SGML family:
 
 ```odin
@@ -23,14 +33,15 @@ The SGML family:
 <foo>wrapped text</foo>
 <foo attrib="value">wrapped text</foo>
 <foo attrib="value" />
-```odin
+```
+
 This does mean I am excluding things like [Markdown](https://daringfireball.net/projects/markdown/) 
 
-I use a variant of Markdown to write these articles. I use a custom extension of Commonmark which I’ve added the ability to write these margin-notes and some other things like trivial YouTube video embedded., [troff](https://troff.org/), [IBM’s GML](https://en.wikipedia.org/wiki/IBM_Generalized_Markup_Language), [Wiki](https://en.wikipedia.org/wiki/Wiki), [Emacs Org-Mode](https://orgmode.org/worg/org-syntax.html) etc. The reason for this exclusion is because they are neither *arbitrary* nor *proper*. They have procedural semantic meaning to their syntax and it cannot be arbitrarily extended.
+I use a variant of Markdown to write these articles. I use a custom extension of Commonmark which I’ve added the ability to write these margin-notes and some other things like trivial YouTube video embedded., [troff](https://troff.org/), [IBM’s GML](https://en.wikipedia.org/wiki/IBM_Generalized_Markup_Language), [Wiki](https://en.wikipedia.org/wiki/Wiki), [Emacs Org-Mode](https://orgmode.org/worg/org-syntax.html) etc. The reason for this exclusion is because they are neither _arbitrary_ nor _proper_. They have procedural semantic meaning to their syntax and it cannot be arbitrarily extended.
 
 For example in Markdown, `[text](link)` has a very specific intrinsic semantic meaning. Whilst in SGML/XML, `<foo>blah</foo>` has no intrinsic semantic meaning without some extra program to enforce that.
 
-For other similar markup languages, things like [BBCode](https://en.wikipedia.org/wiki/BBCode) I am classing as part of the the SGML family, and [Scribe](https://en.wikipedia.org/wiki/Scribe_(markup_language)) as part of the TeX family. BBCode is effectively a near-subset of XHTML but uses `[]` instead of `<>`.
+For other similar markup languages, things like [BBCode](https://en.wikipedia.org/wiki/BBCode) I am classing as part of the the SGML family, and [Scribe](<https://en.wikipedia.org/wiki/Scribe_(markup_language)>) as part of the TeX family. BBCode is effectively a near-subset of XHTML but uses `[]` instead of `<>`.
 
 Scribe’s syntax is effectively in the family of TeX but there is no need for the `{}` and either requires paired blocks (e.g. `@Begin(Quotation)` and `@End(Quotation)`) or adding the plain text as part of the attributes (e.g. `@Foo(tag=bar, title="The Title")`). This is why I think Scribe’s syntax is fundamentally flawed because of the lack of `{}`-like wrapping ability, compared to actual TeX.
 
@@ -39,17 +50,18 @@ Scribe’s syntax is effectively in the family of TeX but there is no need for t
 In the two languages, they both have means of using their specific symbols that are used for writing the mark-up. For SGML you do `&lt;` 
 
 For a minimal syntax to prevent escaping issues in an SGML-like language, you need 5 escaped entities:
- `& → &amp;`, `’ → &apos; or &#39;`, `< → &lt;`, `> → &gt;`, and `" → &quot; or &#34;`. However there are literally thousands of XML/HTML entities out there, and supporting them correctly has been “fun” for [packages](https://pkg.odin-lang.org/core/encoding/entity/) in Odin., and for TeX you do `\\`. The SGML approach differs to TeX as it is a different syntax than regular markup, whilst TeX unifies its syntax.
+`& → &amp;`, `’ → &apos; or &#39;`, `< → &lt;`, `> → &gt;`, and `" → &quot; or &#34;`. However there are literally thousands of XML/HTML entities out there, and supporting them correctly has been “fun” for [packages](https://pkg.odin-lang.org/core/encoding/entity/) in Odin., and for TeX you do `\\`. The SGML approach differs to TeX as it is a different syntax than regular markup, whilst TeX unifies its syntax.
 
-There is also the second aspect that the TeX family of syntaxes are much easier parse than the SGML family. I’ve written both before and the SGML syntax requires a bit more code to write, because of the named blocks for wrapping and the entity escaping (especially if you want to handle *all* of the XML/HTML entities, of which there are thousands of them).
+There is also the second aspect that the TeX family of syntaxes are much easier parse than the SGML family. I’ve written both before and the SGML syntax requires a bit more code to write, because of the named blocks for wrapping and the entity escaping (especially if you want to handle _all_ of the XML/HTML entities, of which there are thousands of them).
 
-To clarify, I am saying the “TeX Family” and not actual TeX itself. I know how insane TeX is and I did not want to get into how context-sensitive its grammar really is. I just wanted to focus on the *arbitrary proper markup syntax* of it in isolation rather than the semantics of a specific language in the “TeX Family”.
+To clarify, I am saying the “TeX Family” and not actual TeX itself. I know how insane TeX is and I did not want to get into how context-sensitive its grammar really is. I just wanted to focus on the _arbitrary proper markup syntax_ of it in isolation rather than the semantics of a specific language in the “TeX Family”.
 
 SGML wrapping syntax also has the flaw of allowing for overlapping hierarchies:
 
 ```odin
 <a><b>text</a></b>
-```odin
+```
+
 TeX syntax does not have this problem as it only uses generic brackets/braces. I cannot think of a case when overlapping hierarchies 
 
 By this, I mean purely the syntax, and not the concept of an overlapping hierarchy, which can exist in things like marking up [Bibles](https://en.wikipedia.org/wiki/Overlapping_markup). this is desired-in fact HTML parsers have to mitigate for this possible typo. A SGML derivative could remove the overlapping hierarchy syntax flaw by having `</>` be the delimiter.
@@ -74,13 +86,14 @@ Just say Norway to YAML.. Also fun fact, YAML is actually a superset of JSON whi
 
 Unfortunately, I do not class 
 
-This section was not here originally but I wanted to clarify why I don’t think they could be the third family in the class of *arbitrary proper markup languages*. Lisp/s-expression style stuff as being an *arbitrary proper markup language*, at least by default. The main reason is that you cannot just “markup” pre-existing plain text with it that easily, you effectively have to restructure the text completely for it work. At best you’d need to add a second syntax to make it clear what are the attributes vs what is the plain-text.
+This section was not here originally but I wanted to clarify why I don’t think they could be the third family in the class of _arbitrary proper markup languages_. Lisp/s-expression style stuff as being an _arbitrary proper markup language_, at least by default. The main reason is that you cannot just “markup” pre-existing plain text with it that easily, you effectively have to restructure the text completely for it work. At best you’d need to add a second syntax to make it clear what are the attributes vs what is the plain-text.
 
 [Hiccup](https://github.com/weavejester/hiccup) is a common syntax for generating HTML in the [Clojure](https://clojure.org/) ecosystem, which does “solve” the “proper” aspect by having attribute syntax:
 
 ```odin
 [:span {:attrib "value"} "wrapped text"]
-```odin
+```
+
 However it is still not an “arbitrary” markup language due not being able to wrap pre-existing plain text. I think the entire motivation behind the original markup languages too: marking up pre-existing plain text documents. Rather than starting from the “markup” language and adding text. This latter form is probably closer to just a structured text format rather than a markup language. Because of my clarification, S-expressions are a form of object notation, similar to JSON.
 
 A very minor but other obvious thing is the use of parentheses `()` is a bad choice since they are commonly used within plain text, but if you just swapped it for `[]` or `{}`, it would be fine, and most people would still recognize the s-expression nature. And the need for something like backticks `` ` `` to wrap the text might need to be there to remove the ambiguity.
@@ -109,14 +122,16 @@ Attributes can be applied to any declaration and have the following syntax:
 @(a=b, c=d)
 
 @key // as a minor shorthand
-```odin
+```
+
 The attributes can be applied arbitrarily too for different purposes. This means if some new functionality is needed in Odin, it can be added.
 
 The next syntax is struct field tags, which is just a string literal applied to the end of a struct field.
 
 ```odin
 Foo :: struct { x: T `extra information here` }
-```odin
+```
+
 This extra information is stored in RTTI and then used at runtime by the program/user to do whatever they need at runtime.
 
 The last is the directive syntax. It’s general syntax looks like this:
@@ -124,7 +139,8 @@ The last is the directive syntax. It’s general syntax looks like this:
 ```odin
 #key
 #key(args)
-```odin
+```
+
 And these can be either standalone, or applied to expressions, types, or statements. They are not applied to declarations to keep a distinct semantic meaning. These are all forms of a kind of semantic mark-up, but they exist as an escape hatch for future (or generally present) needs where the syntax might have been limiting. Attributes and directives are both TeX like whilst struct field tags are only a kind of “attribute syntax”.
 
 ## Conclusion
@@ -135,6 +151,6 @@ Coombs, James H.; Renear, Allen H.; DeRose, Steven J. (November 1987). [“Marku
 
 Bray, Tim (9 April 2003). [“On Semantics and Markup, Taxonomy of Markup”](https://www.tbray.org/ongoing/When/200x/2003/04/09/SemanticMarkup#p-1) I have read don’t seem to talk about the syntactical distinction in this article, but rather make only semantic distinctions such as presentational, procedural, or descriptive.
 
-I know this is probably a *very* nerdy syntax post, but I do find it interesting, and I don’t know if it has been talked about before by other people. If anyone knows of any other family of *proper* *arbitrary* markup syntaxes, please tell me as I’d love to know, but most of them seem to fall into one of these two categories. I personally prefer the TeX family because it removes the problems of overlapping hierarchies, minimizes clutter from redundant characters, and is a heck of a lot simple to parse.
+I know this is probably a _very_ nerdy syntax post, but I do find it interesting, and I don’t know if it has been talked about before by other people. If anyone knows of any other family of _proper_ _arbitrary_ markup syntaxes, please tell me as I’d love to know, but most of them seem to fall into one of these two categories. I personally prefer the TeX family because it removes the problems of overlapping hierarchies, minimizes clutter from redundant characters, and is a heck of a lot simple to parse.
 
->Source: https://www.gingerbill.org/article/2026/01/19/two-families-of-markup-languages
+> Source: https://www.gingerbill.org/article/2026/01/19/two-families-of-markup-languages

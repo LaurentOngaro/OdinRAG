@@ -1,3 +1,12 @@
+---
+title: "Was it really a Billion Dollar Mistake?"
+date: 2026-01-02
+source: "https://www.gingerbill.org/article/2026/01/02/was-it-really-a-billion-dollar-mistake"
+tags: [OdinRAG, kb, source/gingerbill]
+type: reference
+status: active
+---
+
 # Was it really a Billion Dollar Mistake?
 
 Series: [The Billion Dollar Mistake](/series/the-billion-dollar-mistake)
@@ -10,7 +19,7 @@ Series: [The Billion Dollar Mistake](/series/the-billion-dollar-mistake)
 
 ---
 
-Most people have probably heard of the *Billion Dollar Mistake* before, which was coined/invented by [Tony Hoare](https://en.wikipedia.org/wiki/Tony_Hoare): the inventor of null references/pointers.
+Most people have probably heard of the _Billion Dollar Mistake_ before, which was coined/invented by [Tony Hoare](https://en.wikipedia.org/wiki/Tony_Hoare): the inventor of null references/pointers.
 
 > I call it my billion-dollar mistake. It was the invention of the null reference in 1965. At that time, I was designing the first comprehensive type system for references in an object oriented language (ALGOL W). My goal was to ensure that all use of references should be absolutely safe, with checking performed automatically by the compiler. But I couldn’t resist the temptation to put in a null reference, simply because it was so easy to implement. This has led to innumerable errors, vulnerabilities, and system crashes, which have probably caused a billion dollars of pain and damage in the last forty years.
 
@@ -22,7 +31,7 @@ In many memory-managed garbaged collected languages, it will be the most common 
 
 This issue of null pointers is related to the [drunkard’s search principle](https://en.wikipedia.org/wiki/Streetlight_effect) (a drunk man looks for his lost keys at night under a lamppost because he can see in that area). I have found that null pointers are usually very easy to find and fix, especially since most are caused by trivial bugs (usually typos).
 
-In *theory*, null is still a perfectly valid memory address, but as a practical matter, we have decided on the convention that null being zero is useful for marking a pointer as unset. Modern platforms reserve the first few pages of (virtual) memory to check for these errors. Typically on all modern systems, that memory address is located at `0`  
+In _theory_, null is still a perfectly valid memory address, but as a practical matter, we have decided on the convention that null being zero is useful for marking a pointer as unset. Modern platforms reserve the first few pages of (virtual) memory to check for these errors. Typically on all modern systems, that memory address is located at `0`  
 
 `#define NULL ((void *)0)` in C99, or `nullptr` in C++11 and C23., but it didn’t always used to be on all platforms
 
@@ -40,11 +49,11 @@ Compile-time memory safety is not something I require for my kinds of systems le
 
 For Odin, I decided to not remove the existence of `nil` pointers. Why I have not tried to “solve” this “problem” is due to it being a trade-off in programming language design which is not immediately obvious.
 
-If you want to make pointers not have a `nil` state by default, this requires one of two possibilities: requiring the programmer to test every pointer on use, or assume pointers cannot be `nil`. The former is really annoying, and the latter requires something which I did not want to do (which you will most likely not agree with just because it doesn’t *seem* like a bad thing from the start): ***explicit initialization of every value everywhere***.
+If you want to make pointers not have a `nil` state by default, this requires one of two possibilities: requiring the programmer to test every pointer on use, or assume pointers cannot be `nil`. The former is really annoying, and the latter requires something which I did not want to do (which you will most likely not agree with just because it doesn’t _seem_ like a bad thing from the start): _**explicit initialization of every value everywhere**_.
 
 **Fundamentally the problem of `nil` pointers/references arising comes from the ability of not having to explicitly initialize individual-elements on creation, allowing them to be in a “nil” state by default.**
 
-The first option is solved in many languages (partially including [Odin](https://odin-lang.org/)) with having support for [maybe](https://pkg.odin-lang.org/base/builtin/#Maybe)/[option types](https://en.wikipedia.org/wiki/Option_type) or nullable types (monads), however I am still not a huge fan of them in practice as I rarely require them in systems-level programming. I know very well this is a *“controversial”* opinion, but systems-level programming languages deal with memory all the time and can easily get into “unsafe” states on purpose. Restricting this can actually make constructs (like custom allocators) very difficult to implement, along with other things.
+The first option is solved in many languages (partially including [Odin](https://odin-lang.org/)) with having support for [maybe](https://pkg.odin-lang.org/base/builtin/#Maybe)/[option types](https://en.wikipedia.org/wiki/Option_type) or nullable types (monads), however I am still not a huge fan of them in practice as I rarely require them in systems-level programming. I know very well this is a _“controversial”_ opinion, but systems-level programming languages deal with memory all the time and can easily get into “unsafe” states on purpose. Restricting this can actually make constructs (like custom allocators) very difficult to implement, along with other things.
 
 Odin does have `Maybe(^T)`, and that’s fine that it does exist, but it’s actually rare it is needed in practice. When it is needed, it’s either for documenting foreign code’s usage of pointers (i.e. non-Odin code), or it’s for things which are not pointers at all (in Odin code). And coupled with many of the other features of Odin (multiple return values, `or_return` et al, proper array types, etc), a lot of the need disappears in most cases.
 
@@ -54,7 +63,7 @@ The second option is a subtle one: it forces a specific style and architectural 
 
 You can do `x: T = -` to make it uninitialized stack memory, if that is necessary for certain optimizations..
 
-Fundamentally this idea of *explicit individual-element based initialization* everywhere is a viral concept which does lead to what I think are bad architectural decisions in the long run. Compilers are dumb-they cannot do everything for you, especially know the cost of the architectural decisions throughout your code, which requires knowing the (global) intent of your code. When people argue that a lot of the explicit initialization can be “optimized” out, this is only thinking from a *local* position of individual-elements, which does total up to being slower in some cases at a more *global* scale.
+Fundamentally this idea of _explicit individual-element based initialization_ everywhere is a viral concept which does lead to what I think are bad architectural decisions in the long run. Compilers are dumb-they cannot do everything for you, especially know the cost of the architectural decisions throughout your code, which requires knowing the (global) intent of your code. When people argue that a lot of the explicit initialization can be “optimized” out, this is only thinking from a _local_ position of individual-elements, which does total up to being slower in some cases at a more _global_ scale.
 
 To give an example of what I mean, take `make([]Some_Struct, N)`. In Odin, it just zeroes the memory because in some cases, it is literally free (i.e. `mmap` must zero). However, when you need to initialize each value of that slice, you are now turning a O(1) problem into a O(N) problem. And it can get worse if each field in the struct also needs its own form of construction.
 
@@ -70,9 +79,9 @@ If you didn’t guess, this is kind of tiresome when I am trying to explain Odin
 
 I find this “gotcha” that people bring up
 
-I find it mainly as a excuse to not try Odin, which is fine, I don’t care if you use Odin or not, but be honest that it’s just not a language for you rather than finding excuses. is probably one of the most common ones because it *seems* like an “obvious” and “simple” win, and I’d argue it’s the exact opposite of either “simple” and even a “win”. Language design is all about trade-offs and compromises as there is never going to be a perfect language for anyone’s problem. Even if you designed the Domain Specific Language (DSL) for your task, you’ll still have loads of issues, especially with specific semantics (not just syntax).
+I find it mainly as a excuse to not try Odin, which is fine, I don’t care if you use Odin or not, but be honest that it’s just not a language for you rather than finding excuses. is probably one of the most common ones because it _seems_ like an “obvious” and “simple” win, and I’d argue it’s the exact opposite of either “simple” and even a “win”. Language design is all about trade-offs and compromises as there is never going to be a perfect language for anyone’s problem. Even if you designed the Domain Specific Language (DSL) for your task, you’ll still have loads of issues, especially with specific semantics (not just syntax).
 
-Languages like Rust were designed from day zero around *explicit individual-element based initialization*, however when designing Odin, from day zero I wanted to still keep the feel of C (along without other design philosophies) so I explicitly wanted implicit zero based initialization (e.g. `x: T` has zeroed memory). This ever so minor choice might not seem like a big thing to you, but it leads to *MASSIVE* architectural decisions later on when developing a program.
+Languages like Rust were designed from day zero around _explicit individual-element based initialization_, however when designing Odin, from day zero I wanted to still keep the feel of C (along without other design philosophies) so I explicitly wanted implicit zero based initialization (e.g. `x: T` has zeroed memory). This ever so minor choice might not seem like a big thing to you, but it leads to _MASSIVE_ architectural decisions later on when developing a program.
 
 Odin could not “just add” non-nil pointers and it be “fine”. It would actually not be Odin any more, and the entire language would not even be a C alternative any more, and feel much more like C++, Rust, or OCaml. Rust and OCaml (which Rust is based off) are different kinds of languages to Odin and their approach does not translate well to what Odin (or C) is trying to do.
 
@@ -84,7 +93,7 @@ I believe this general local based thinking leads to poor architectural decision
 
 A good explanation of this general thinking is presented in this [video with Casey Muratori](https://www.youtube.com/watch?v=xt1KNDmOYqA):
 
-On this journey/life-cycle, no-one is born knowing how to program: you learn how to do it. And when it comes to programming, you think in stages (at least in my personal experience) that are usually quite consistent in their ordering amongst most people. At some point during this stage of thinking, people reach a point of what I’ll dub the *Individual-Element Mindset*. This mindset is when you think of each specific piece of data (element) as having its own *lifetime*. This leads to common approaches of thinking each element having to be constructed/`malloc`ed individually with its own unique lifetime, then it’s destructed/`free`d individually (or automatically by a garbage collector).
+On this journey/life-cycle, no-one is born knowing how to program: you learn how to do it. And when it comes to programming, you think in stages (at least in my personal experience) that are usually quite consistent in their ordering amongst most people. At some point during this stage of thinking, people reach a point of what I’ll dub the _Individual-Element Mindset_. This mindset is when you think of each specific piece of data (element) as having its own _lifetime_. This leads to common approaches of thinking each element having to be constructed/`malloc`ed individually with its own unique lifetime, then it’s destructed/`free`d individually (or automatically by a garbage collector).
 
 The architectures that arise from this mindset tends to be based around things like:
 
@@ -97,15 +106,15 @@ RAII and “smart” pointers
 
 I am placing quotes around “smart” to emphasize that they are not really “smart” in their construction nor “smart” in their usage. are both mitigations to get around many of the architectural issues of this mindset. RAII will handle the construction and destruction of elements automatically by the compiler. “Smart” pointers are there to help with the problems with forgetting to free allocations and to prevent use-after-frees, by tying the lifetime of the usage of the object with its allocation.
 
-This architectural mindset does lead to loads of problems as a project scales. Unfortunately, a lot of people never move past this point on their journey as a programmer. Sometimes they do not move past this point as they only program in a language with automatic memory management (e.g. garbage collection or automatic reference counting), and when you are in such a language, you pretty much never think about these aspects as much. And if you ever do think about these, it’s usually because you are trying to do something performance-oriented and you have to *pretend* you are managing your own memory. It is common for many games that have been written with garbage collected languages to try to get around the inadequacies of not being able to manage your own memory. But if you are never writing performance-critical code, it would be very unlikely that you would know that you have to get past this point.
+This architectural mindset does lead to loads of problems as a project scales. Unfortunately, a lot of people never move past this point on their journey as a programmer. Sometimes they do not move past this point as they only program in a language with automatic memory management (e.g. garbage collection or automatic reference counting), and when you are in such a language, you pretty much never think about these aspects as much. And if you ever do think about these, it’s usually because you are trying to do something performance-oriented and you have to _pretend_ you are managing your own memory. It is common for many games that have been written with garbage collected languages to try to get around the inadequacies of not being able to manage your own memory. But if you are never writing performance-critical code, it would be very unlikely that you would know that you have to get past this point.
 
-If you were having to manage these *millions* of individual allocations manually, it does make sense why people recommend things like RAII or “smart” pointers as the compiler will add the constructors and destructors automatically for you. You can see why a person at this stage of their programming journey can think it would be a good thing to do, since it removes a lot of the boilerplate and minimizes the possible errors due to forgetting to write things.
+If you were having to manage these _millions_ of individual allocations manually, it does make sense why people recommend things like RAII or “smart” pointers as the compiler will add the constructors and destructors automatically for you. You can see why a person at this stage of their programming journey can think it would be a good thing to do, since it removes a lot of the boilerplate and minimizes the possible errors due to forgetting to write things.
 
 I am not saying people who do this are stupid-far from it! I’ve had this mindset before in my journey as a programmer, as have most programmers. It’s something you either come to naturally or you are taught from the general programming culture on the internet. I cannot think of any one who has shipped software who has NOT been at this phase/stage at some point in their life.
 
 The problem with this mindset and the solutions it produces is that you are effectively patching over a flaw in your architecture. If two things are inextricably linked such that you have one thing getting automatically freed when the other thing gets freed (in all but the rarest of circumstances) this means that those things should have a combined lifetime. The better approach to this is to have one large “pool”/“arena” that all of those things got created in, so that things from that “pool” get freed together.
 
-The stage of the individual-element mindset is *stupid*, as in the code that you write whilst in this mindset will not be good, but **you are not** stupid. Especially since everyone will be at this stage at some point. The next stage to get to after this is the *grouped-element mindset*.
+The stage of the individual-element mindset is _stupid_, as in the code that you write whilst in this mindset will not be good, but **you are not** stupid. Especially since everyone will be at this stage at some point. The next stage to get to after this is the _grouped-element mindset_.
 
 n.b. I call myself an idiot/numpty/moron on a daily basis for things that I do, so don’t think I am saying I am “smart”. I am just as “stupid” as most. Stupid is as stupid does.
 
@@ -113,7 +122,7 @@ n.b. I call myself an idiot/numpty/moron on a daily basis for things that I do, 
 
 When you move from the Individual-Element Mindset to the Grouped-Element Mindset, things like smart-pointers and RAII
 
-Note I am *not* saying things like an explicit `defer` statement is not useful, but rather the need for the implicit RAII style of lifetime handling of individual-elements is bad. If I thought `defer` was bad, I would not have added it to Odin. become mostly irrelevant. This is because ownership and lifetime concerns are not as much of a problem any more, like the kind you had in the previous mindset. Ownership is a constant concern and mental overhead when thinking in an individual-element mindset. Whilst ownership is obvious (and usually trivial) in the vast majority (99+%) of cases when you are in the grouped-element mindset.
+Note I am _not_ saying things like an explicit `defer` statement is not useful, but rather the need for the implicit RAII style of lifetime handling of individual-elements is bad. If I thought `defer` was bad, I would not have added it to Odin. become mostly irrelevant. This is because ownership and lifetime concerns are not as much of a problem any more, like the kind you had in the previous mindset. Ownership is a constant concern and mental overhead when thinking in an individual-element mindset. Whilst ownership is obvious (and usually trivial) in the vast majority (99+%) of cases when you are in the grouped-element mindset.
 
 This grouped-element mindset tends to be based around things like:
 
@@ -122,7 +131,7 @@ This grouped-element mindset tends to be based around things like:
 - Heavy use of scratch space
 - Hashing and the reuse of elements
 
-Most of the advice (and criticisms) online that you will read are for/from the Individual-Element Mindset, and I’d argue the goal is to get to the Group-Element Mindset (and even pass it). It’s still a way of thinking for people who are not that good at programming as they could be *yet*. They are still in a stage of architecture which is very limited, and not appropriate for modern high-performance well-architected code. It is an old way thinking which is still very prevalent, and people need to get past it. I’d argue there is no “good code” that is written in the Individual-Element Mindset. It might do the job, but the code itself won’t be “good”, at best it will be adequate, but the mindset is inherently inefficient and bug-prone.
+Most of the advice (and criticisms) online that you will read are for/from the Individual-Element Mindset, and I’d argue the goal is to get to the Group-Element Mindset (and even pass it). It’s still a way of thinking for people who are not that good at programming as they could be _yet_. They are still in a stage of architecture which is very limited, and not appropriate for modern high-performance well-architected code. It is an old way thinking which is still very prevalent, and people need to get past it. I’d argue there is no “good code” that is written in the Individual-Element Mindset. It might do the job, but the code itself won’t be “good”, at best it will be adequate, but the mindset is inherently inefficient and bug-prone.
 
 n.b. In many ways, this individual-element mindset is a hell of a lot more costly than worrying about the “Billion Dollar Mistake” of this article. The performance losses alone are probably wasting BILLIONS PER DAY as an industry.
 
@@ -132,9 +141,9 @@ Use-after-free is usually another symptom of poor architectural decisions, and t
 
 It’d even argue the individual-element mindset is a reason why a lot of people still love the OOP approach to programming. You only have to think, and can only think, about a very small piece. OOP allows you to think very small and not how the whole program works. This was its initial goal too of both the Alan Kay style OOP (message passing) and the Java style OOP (inheritance-based encapsulation).
 
-As you get a little bit larger and start thinking about *systems* within your code, then you can see how things cohere and bind together much more easily. Once you are at this *systems* level of grouped-elements, you’re at this next phase of thinking.
+As you get a little bit larger and start thinking about _systems_ within your code, then you can see how things cohere and bind together much more easily. Once you are at this _systems_ level of grouped-elements, you’re at this next phase of thinking.
 
-However, I do not think you can skip past the individual-element mindset and jump straight to the group-element mindset, at least not the majority of people. I think it’s probably a necessary phase of thinking from understanding the fundamental *unit* of data within a problem, from the individual to the group
+However, I do not think you can skip past the individual-element mindset and jump straight to the group-element mindset, at least not the majority of people. I think it’s probably a necessary phase of thinking from understanding the fundamental _unit_ of data within a problem, from the individual to the group
 
 This should probably be its own article, not a footnote, but with a poor analogy, this grouped-element mindset is actually akin to “communism”, and that the individual-element mindset is closer to “capitalism”. Please note I think “communism” is evil, but the analogy of the politico-economics systems mirror quite well due to the thinking of element-based-lifetimes rather than system-based-lifetimes..
 
@@ -142,7 +151,7 @@ This should probably be its own article, not a footnote, but with a poor analogy
 
 When designing Odin, I had a lot of these distinctions of mindsets explicitly in mind. Most of my choices were conscious about what I wanted and did not want from a language. A lot of Odin’s design has been around this “nudging” to a certain style away from mindsets I do not feel are good in the long run.
 
-However these design decisions do come into conflict with the common *mindset* that a lot of programmers have. If you don’t agree with the design decisions of Odin, that’s fine, and Odin might not be the language for you, but don’t think you can trivially wedge an idea/feature/construct into another language and think it will just work as you expect.
+However these design decisions do come into conflict with the common _mindset_ that a lot of programmers have. If you don’t agree with the design decisions of Odin, that’s fine, and Odin might not be the language for you, but don’t think you can trivially wedge an idea/feature/construct into another language and think it will just work as you expect.
 
 A lot of language design is thinking about these local decisions and how they will affect the landscape of the global possibilities. We want to be able to think locally about something most of the time, but when it comes to architectural decisions, we need to think as global as we possibly can.
 
@@ -156,4 +165,4 @@ In statically typed compiled manual-memory managed languages, it’s not as much
 
 **Part Two** of this article clarifies a lot more: [Mitigating the Billion Dollar Mistake](/article/2026/01/11/mitigating-the-billion-dollar-mistake/)
 
->Source: https://www.gingerbill.org/article/2026/01/02/was-it-really-a-billion-dollar-mistake
+> Source: https://www.gingerbill.org/article/2026/01/02/was-it-really-a-billion-dollar-mistake

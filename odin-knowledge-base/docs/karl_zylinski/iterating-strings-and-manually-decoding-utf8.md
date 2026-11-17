@@ -1,18 +1,27 @@
+---
+title: "Iterating strings and manually decoding UTF-8"
+date: 2025-09-23
+source: "https://zylinski.se/posts/iterating-strings-and-manually-decoding-utf8"
+tags: [OdinRAG, kb, source/zylinski]
+type: reference
+status: active
+---
+
 # Iterating strings and manually decoding UTF-8
 
 September 23, 2025
 
 ![](https://zylinski.se/strings/cover.png)
 
-**This post is an adapted excerpt from *Understanding the Odin Programming Language* - the acclaimed eBook on learning Odin and understanding low-level concepts. Visit <https://odinbook.com> for more information.**
+**This post is an adapted excerpt from _Understanding the Odin Programming Language_ - the acclaimed eBook on learning Odin and understanding low-level concepts. Visit <https://odinbook.com> for more information.**
 
 Text strings in Odin use Unicode. Unicode is a standard that makes it possible to use characters from most languages. You can mix different languages within the same string, and even use exotic things such as emojis!
 
-Odin has two primary types for representing text: `string` and `cstring`. You’ll mainly use the `string` type in your Odin code. The `cstring` type is for working with libraries written in the C programming language. Both types use the *UTF-8* encoding, short for *Unicode Transformation Format - 8 bit*. UTF-8 is the most popular way of storing Unicode text in memory.
+Odin has two primary types for representing text: `string` and `cstring`. You’ll mainly use the `string` type in your Odin code. The `cstring` type is for working with libraries written in the C programming language. Both types use the _UTF-8_ encoding, short for _Unicode Transformation Format - 8 bit_. UTF-8 is the most popular way of storing Unicode text in memory.
 
-> There are two more string types called `string16` and `cstring16`. Those use the *UTF-16* encoding. They are only used in some specific cases (such as with the Windows API). They are covered in the full eBook.
+> There are two more string types called `string16` and `cstring16`. Those use the _UTF-16_ encoding. They are only used in some specific cases (such as with the Windows API). They are covered in the full eBook.
 
-This post is about understanding the interplay between UTF-8 and Unicode. We’ll talk about *runes* (Unicode code points) and how iterating a UTF-8 string automatically decodes it into runes. Thereafter we’ll look at how to manually decode a UTF-8 string by inspecting its memory.
+This post is about understanding the interplay between UTF-8 and Unicode. We’ll talk about _runes_ (Unicode code points) and how iterating a UTF-8 string automatically decodes it into runes. Thereafter we’ll look at how to manually decode a UTF-8 string by inspecting its memory.
 
 ## Iterating strings[#](#iterating-strings)
 
@@ -24,12 +33,13 @@ str: string = "Important Words"
 for r in str {
 	// r is of type `rune`
 }
-```odin
-The loop variable `r` is of type *rune*. A rune is just a 32 bit (4 byte) number. In many cases (but not all!), a rune represents a single character. For example the letter `K` is represented by a rune of value `75`. The name “rune” is specific to Odin. Outside of Odin, a rune is called a Unicode *code point*.
+```
+
+The loop variable `r` is of type _rune_. A rune is just a 32 bit (4 byte) number. In many cases (but not all!), a rune represents a single character. For example the letter `K` is represented by a rune of value `75`. The name “rune” is specific to Odin. Outside of Odin, a rune is called a Unicode _code point_.
 
 > The numeric values of code points are decided by the organization known as the Unicode consortium. They try to make a wide variety of characters, from many languages, possible to express using code points. For example, they’ve decided that the letter `Q` has the code point value `81` and that the Chinese character `猫` has the code point value `29483`.
 >
-> When we talk about *grapheme clusters (full eBook only)* you’ll understand why I wrote “In many cases (but not all!), a rune represents a single character”.
+> When we talk about _grapheme clusters (full eBook only)_ you’ll understand why I wrote “In many cases (but not all!), a rune represents a single character”.
 
 When our program stores a string in memory, such as in the variable `str`, then it doesn’t store it as a series of 4 byte rune values. Instead, it stores each rune using 1 to 4 bytes. That’s the UTF-8 encoding. As the loop in our example runs through the UTF-8-encoded string, it decodes sequences of 1-4 bytes into runes.
 
@@ -43,19 +53,21 @@ str := "小猫咪"
 for r in str {
 	fmt.println(r)
 }
-```odin
+```
+
 Which will print:
 
 ```odin
 小
 猫
 咪
-```odin
+```
+
 Within the memory of the UTF-8 string `str`, these Chinese characters use 3 bytes each. As the loop runs through the string, it decodes those groups of 3 bytes into proper 4 byte runes.
 
 > The UTF-8 decoder knows if it is processing a 1, 2, 3 or 4 byte rune. A few bits in each byte is dedicated to signaling if the rune continues, or if it is complete. In the next section, I’ll show how to manually decode UTF-8 by inspecting the value of each byte.
 >
-> *A note for Windows users*: You may see garbage in the command prompt when printing the Chinese characters. In that case, try running `chcp 65001` in the command prompt, before executing the program. Alternatively, add `windows.SetConsoleOutputCP(.UTF8)` at the top of the `main` proc (`import "core:sys/windows`). This works fine on Windows 11. If you are on Windows 10, then you might need a better command prompt program than `cmd`. I recommend [ConEmu](https://conemu.github.io/), which wraps `cmd` with some nice features. I don’t recommend PowerShell, it is buggy.
+> _A note for Windows users_: You may see garbage in the command prompt when printing the Chinese characters. In that case, try running `chcp 65001` in the command prompt, before executing the program. Alternatively, add `windows.SetConsoleOutputCP(.UTF8)` at the top of the `main` proc (`import "core:sys/windows`). This works fine on Windows 11. If you are on Windows 10, then you might need a better command prompt program than `cmd`. I recommend [ConEmu](https://conemu.github.io/), which wraps `cmd` with some nice features. I don’t recommend PowerShell, it is buggy.
 
 It’s important to understand that a rune, or Unicode code point, is independent of how the string is encoded. There are several different encodings, such as UTF-8 and UTF-16. Those encodings just decide how the string is stored in memory and how to turn that memory back into runes. The decoded value of the rune is the same, regardless of encoding.
 
@@ -72,7 +84,8 @@ for r in str {
 	// Prints the characters of `str` on separate lines.
 	fmt.println(r)
 }
-```odin
+```
+
 We want to investigate the bytes of the UTF-8 encoded string, without decoding them into runes. Therefore, we transmute the string to a slice of `u8` (byte). We can then loop through the bytes and print them in binary:
 
 ```odin
@@ -82,7 +95,8 @@ str_bytes := transmute([]u8)(str)
 for b in str_bytes {
 	fmt.printfln("%8b (%v)", b, b)
 }
-```odin
+```
+
 > `transmute([]u8)(str)` takes the memory of the string and “pretends” it to be of type `[]u8`. A slice of bytes and a string are more or less the same thing. But no automatic UTF-8 decoding will happen when we loop through the `[]u8` version. This makes it possible for us to inspect the encoded bytes.
 > The `%8b` format string tells `printfln` to print the number in binary. The `8` in `%8b` tells it to add zero padding on the left, so we always see 8 binary bits.
 
@@ -97,7 +111,8 @@ The output is:
 11100111 (231)
 10001100 (140)
 10101011 (171)
-```odin
+```
+
 Let’s manually go through the bytes, construct Unicode runes from them and print each one to verify that we did it correctly.
 
 **Rune C (byte `01000011`)**
@@ -160,7 +175,8 @@ str := "Cät=猫"
 for r in str {
 	fmt.printfln("%b", r)
 }
-```odin
+```
+
 It will print the same binary numbers that we found:
 
 ```odin
@@ -169,7 +185,8 @@ It will print the same binary numbers that we found:
 1110100 (t)
 111101 (=)
 111001100101011 (猫)
-```odin
+```
+
 > Any padding of zeroes on the left is not present here. Zero padding on the left of a binary number can often be thrown away, unless you want to keep the zeroes to hint at a specific bit width.
 
 A real UTF-8 decoder would do some additional error checks while decoding. But the knowledge in this section is sufficient to investigate the memory of most UTF-8 strings.
@@ -178,7 +195,7 @@ There’s a procedure in `core:unicode/utf8` called [`decode_rune`](https://pkg.
 
 ## Thanks for reading![#](#thanks-for-reading)
 
-If you enjoyed the contents and style of this blog post, then check out *Understanding the Odin Programming Language*. It is an eBook entirely written in this casual, friendly style: <https://odinbook.com>.
+If you enjoyed the contents and style of this blog post, then check out _Understanding the Odin Programming Language_. It is an eBook entirely written in this casual, friendly style: <https://odinbook.com>.
 
 > The book is roughly 47 times the size of this blog post.
 
@@ -188,4 +205,4 @@ Have a nice day!
 
 /Karl Zylinski
 
->Source: https://zylinski.se/posts/iterating-strings-and-manually-decoding-utf8
+> Source: https://zylinski.se/posts/iterating-strings-and-manually-decoding-utf8

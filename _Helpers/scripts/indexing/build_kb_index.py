@@ -52,6 +52,12 @@ KB_PATHS = {
     "karl": ROOT / "odin-knowledge-base" / "docs" / "karl_zylinski",
     "zylinski": ROOT / "odin-knowledge-base" / "docs" / "karl_zylinski",
     "official": ROOT / "odin-knowledge-base" / "docs" / "official",
+    "newsletters": ROOT / "odin-knowledge-base" / "docs" / "newsletters",
+    "gingerbill": ROOT / "odin-knowledge-base" / "docs" / "gingerbill",
+    "jakubtomsu": ROOT / "odin-knowledge-base" / "docs" / "jakubtomsu",
+    "marianpekar": ROOT / "odin-knowledge-base" / "docs" / "marianpekar",
+    "showcase": ROOT / "odin-knowledge-base" / "docs" / "showcase",
+    "references": ROOT / "odin-knowledge-base" / "references",
     "gitIngest": ROOT / "odin-knowledge-base" / "gitIngest",
     "examples": ROOT / "code" / "examples",
 }
@@ -173,6 +179,12 @@ def build_source_overview() -> str:
     zyl_count -= karl_count
     zyl_size -= karl_size
     off_count, off_size = count_md_files(KB_PATHS["official"])
+    news_count, news_size = count_md_files(KB_PATHS["newsletters"])
+    gb_count, gb_size = count_md_files(KB_PATHS["gingerbill"])
+    jt_count, jt_size = count_md_files(KB_PATHS["jakubtomsu"])
+    mp_count, mp_size = count_md_files(KB_PATHS["marianpekar"])
+    sc_count, sc_size = count_md_files(KB_PATHS["showcase"])
+    ref_count, ref_size = count_md_files(KB_PATHS["references"])
     gi_count, gi_size = count_snapshot_files(KB_PATHS["gitIngest"])
     ex_count, ex_size = count_md_files(KB_PATHS["examples"])
 
@@ -206,8 +218,44 @@ def build_source_overview() -> str:
         [
             "`odin-knowledge-base/docs/official/`",
             str(off_count),
-            "Official odin-lang.org docs + awesome-odin",
+            "Official odin-lang.org docs, spec, changelogs + awesome-odin",
             "Official language reference",
+        ],
+        [
+            "`odin-knowledge-base/docs/newsletters/`",
+            str(news_count),
+            "Official Odin newsletters (odin-lang.org/news/)",
+            "Language evolution, ecosystem highlights",
+        ],
+        [
+            "`odin-knowledge-base/docs/gingerbill/`",
+            str(gb_count),
+            "Ginger Bill blog articles (gingerbill.org)",
+            "Language design philosophy, allocators, C/Zig comparisons",
+        ],
+        [
+            "`odin-knowledge-base/docs/jakubtomsu/`",
+            str(jt_count),
+            "Jakub Tomsu blog articles (jakubtomsu.github.io)",
+            "Data structures, compile speed, practical gamedev",
+        ],
+        [
+            "`odin-knowledge-base/docs/marianpekar/`",
+            str(mp_count),
+            "Marian Pekar blog series (marianpekar.com)",
+            "From-scratch software renderer, physics engine, Raylib cloth",
+        ],
+        [
+            "`odin-knowledge-base/docs/showcase/`",
+            str(sc_count),
+            "Odin showcase entries (odin-lang.org/showcase/)",
+            "Real-world Odin projects and architecture notes",
+        ],
+        [
+            "`odin-knowledge-base/references/`",
+            str(ref_count),
+            "Curated cross-language engineering references",
+            "Safety-critical style (TigerStyle) applicable to Odin",
         ],
         [
             "`odin-knowledge-base/gitIngest/`",
@@ -223,6 +271,13 @@ def build_source_overview() -> str:
         ],
     ]
 
+    total_files = (
+        skool_count + karl_count + zyl_count + off_count + news_count + gb_count + jt_count + mp_count + sc_count + ref_count + gi_count + 1
+    )
+    total_bytes = (
+        skool_size + karl_size + zyl_size + off_size + news_size + gb_size + jt_size + mp_size + sc_size + ref_size + gi_size
+    )
+
     lines = [
         "## Overview (by source)",
         "",
@@ -230,7 +285,7 @@ def build_source_overview() -> str:
     lines.extend(format_markdown_table(headers, rows))
     lines.extend([
         "",
-        f"**Total**: ~{skool_count + karl_count + zyl_count + off_count + gi_count + 1} files, ~{fmt_size(skool_size + karl_size + zyl_size + off_size + gi_size)} of MD.",
+        f"**Total**: ~{total_files} files, ~{fmt_size(total_bytes)} of MD.",
         "",
     ])
     return "\n".join(lines)
@@ -308,14 +363,22 @@ def build_stats_section() -> str:
     zyl_count, _ = count_md_files(KB_PATHS["zylinski"])
     zyl_count -= karl_count
     off_count, _ = count_md_files(KB_PATHS["official"])
+    news_count, _ = count_md_files(KB_PATHS["newsletters"])
+    gb_count, _ = count_md_files(KB_PATHS["gingerbill"])
+    jt_count, _ = count_md_files(KB_PATHS["jakubtomsu"])
+    mp_count, _ = count_md_files(KB_PATHS["marianpekar"])
 
     lines = [
         "## Statistics",
         "",
-        f"- **{skool_count}** Skool files (Vertical Slice and Dice v1.0 + Metroidvania 1.0)",
+        f"- **{skool_count}** Skool files (`the-course-is-here`: Introduction, Metroidvania, RPG)",
         f"- **{karl_count}** Karl book files (28 chapters + 4 appendices + about-author)",
         f"- **{zyl_count}** Zylinski articles",
-        f"- **{off_count}** official odin-lang.org docs",
+        f"- **{off_count}** official odin-lang.org docs & changelogs",
+        f"- **{news_count}** Odin newsletters",
+        f"- **{gb_count}** Ginger Bill articles",
+        f"- **{jt_count}** Jakub Tomsu articles",
+        f"- **{mp_count}** Marian Pekar articles",
         "- **1** official demo (`code/examples/demo.odin`)",
         "",
     ]
@@ -440,14 +503,26 @@ If the INDEX becomes too big (> 10 KB), consider splitting into:
 - `odin-knowledge-base/TOPICS.md` (detailed topics)"""
 
 
+def _extract_frontmatter_date(text: str) -> str:
+    """Return existing `date:` from YAML frontmatter if present, else empty string."""
+    m = re.search(r"^date:\s*(\d{4}-\d{2}-\d{2})\s*$", text, re.MULTILINE)
+    return m.group(1) if m else ""
+
+
+def _strip_date_line(text: str) -> str:
+    """Remove the frontmatter `date:` line for day-invariant content comparison."""
+    return re.sub(r"^date:\s*\d{4}-\d{2}-\d{2}\n", "", text, count=1, flags=re.MULTILINE)
+
+
 # ─── FULL CONTENT BUILDER ────────────────────────────────────────────────────
-def build_index_content(existing_manual: str = "") -> str:
+def build_index_content(existing_manual: str = "", index_date: str | None = None) -> str:
     """Build the full INDEX.md content with AUTO + MANUAL sections.
 
     Args:
         existing_manual: content from a previous MANUAL block. If empty, the default manual content is used.
+        index_date: optional ISO date to place in frontmatter `date:`. Defaults to today.
     """
-    today = date.today().isoformat()
+    today = index_date or date.today().isoformat()
 
     frontmatter = (
         "---\n"
@@ -498,6 +573,10 @@ def main(argv: list[str] | None = None) -> int:
         existing_manual = extract_manual_section(existing_full)
 
     new_content = build_index_content(existing_manual)
+    if existing_full and _strip_date_line(existing_full) == _strip_date_line(new_content):
+        existing_date = _extract_frontmatter_date(existing_full)
+        if existing_date:
+            new_content = build_index_content(existing_manual, index_date=existing_date)
 
     if existing_full and existing_full == new_content:
         print(f"[OK] {out.relative_to(ROOT)} already up to date, no change needed.")
@@ -508,9 +587,9 @@ def main(argv: list[str] | None = None) -> int:
         print(f"[CHECK] {out.relative_to(ROOT)} differs from the generated content:")
         print(f"  existing : {len(existing_full):,} chars ({marker_status})")
         print(f"  generated: {len(new_content):,} chars")
-        return 0
+        return 1
 
-    out.write_text(new_content, encoding="utf-8")
+    out.write_text(new_content, encoding="utf-8", newline="\n")
     marker_status = "MANUAL preserved" if existing_manual else "MANUAL = default"
     print(f"[+] {out.relative_to(ROOT)} ({len(new_content):,} chars, {marker_status})")
     return 0

@@ -1,3 +1,12 @@
+---
+title: "Physics Engine in Odin from Scratch, Part I"
+date: 2026-04-25
+source: "https://marianpekar.com/blog/physics-engine-in-odin-from-scratch-part-i"
+tags: [OdinRAG, kb, source/marianpekar, topic/collision, topic/rendering]
+type: reference
+status: active
+---
+
 # Physics Engine in Odin from Scratch, Part I
 
 25th April 2026 • 22 min read
@@ -10,9 +19,9 @@ We're going to start with the software renderer project in the state where we le
 
 At the end of this series, we'll have a physics engine with raycasting. We'll be able to cast a ray from the position we click on the screen into the virtual world and retrieve the first object the ray hits, if it hits any. We'll use this to push and pull objects under the mouse cursor (LMB to push, RMB to pull).
 
-To ensure our physics engine wouldn't allow objects to penetrate each other, we're going to implement collision resolution (a common feature of physics engines) using two types of colliders: one for rectangular prisms and the other for spheres. For short, we'll call them a *box collider* and a *sphere collider*. Thus, we'll have to implement collision resolution between box and box, sphere and sphere, and box and sphere, and you're going to learn about the Separation Axis Theorem (SAT).
+To ensure our physics engine wouldn't allow objects to penetrate each other, we're going to implement collision resolution (a common feature of physics engines) using two types of colliders: one for rectangular prisms and the other for spheres. For short, we'll call them a _box collider_ and a _sphere collider_. Thus, we'll have to implement collision resolution between box and box, sphere and sphere, and box and sphere, and you're going to learn about the Separation Axis Theorem (SAT).
 
-We'll be able to "freeze" an object. One such static object will serve us as a floor, since our engine will simulate gravity. Boxes will tip over edges, and spheres will roll as expected. On surfaces tilted above a certain threshold, boxes will start to slide, and spheres will roll naturally. We'll also be able to control how much objects bounce off when they hit another object, and how slippery a surface of an object is by setting their *bounciness* and *friction* properties, respectively.
+We'll be able to "freeze" an object. One such static object will serve us as a floor, since our engine will simulate gravity. Boxes will tip over edges, and spheres will roll as expected. On surfaces tilted above a certain threshold, boxes will start to slide, and spheres will roll naturally. We'll also be able to control how much objects bounce off when they hit another object, and how slippery a surface of an object is by setting their _bounciness_ and _friction_ properties, respectively.
 
 Finally, we'll ensure that when a force is applied to an object that has other objects resting on top, those objects will move as well. (If you would like to use this physics engine to create a Jenga game, you'll have to disable this feature.)
 
@@ -86,7 +95,7 @@ Model --> Collider
 Collider <|-- BoxCollider
 Collider <|-- SphereCollider
 
-If we were building a game engine, I would suggest a different data structure, probably one where we'd have an `Entity` struct with ID and indices or pointers pointing into contiguous arrays of components (e.g., `Transform`, `Renderer`, `RigidBody`, `Collider`, etc.), and some *Entity Component System*. That might actually be a topic for another series of tutorials.
+If we were building a game engine, I would suggest a different data structure, probably one where we'd have an `Entity` struct with ID and indices or pointers pointing into contiguous arrays of components (e.g., `Transform`, `Renderer`, `RigidBody`, `Collider`, etc.), and some _Entity Component System_. That might actually be a topic for another series of tutorials.
 
 However, we're not building a game engine, and to keep things simple, we're going to treat an existing `Model` struct as a sort of entity or rather a "game object" (you might be familiar with `GameObject` from Unity or `Actor` from Unreal Engine) that, apart from properties related to rendering, will have new properties related to physics simulation.
 
@@ -106,7 +115,7 @@ But how do we set in the `HandleInputs` procedure the `force` and `torque`? This
 
 Watch the video above again and pay close attention to the position of the cursor. Notice how objects are being pulled as if they were grabbed at the position where the cursor points. Also, notice how the box slightly rotates to the left when it is pulled by the right side.
 
-That's because when a ray hits the object, which illustrates the following image, not just the object is acquired, but also the position where the ray touches the surface, which we're going to call the *contact point*.
+That's because when a ray hits the object, which illustrates the following image, not just the object is acquired, but also the position where the ray touches the surface, which we're going to call the _contact point_.
 
 ![Casting a ray from screen position into the world. This is a derivative work of <a href="https://commons.wikimedia.org/wiki/File:Perspective_projection_of_cube_above_plane.svg">"Perspective_projection_of_cube_above_plane.svg" by SharkD</a>, used under <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.en">CC BY-SA 4.0</a>. This file is licensed under the same license.](/uploads/phys_sim_i_raycast.png)
 
@@ -116,7 +125,7 @@ A force in the direction opposite to the ray (in the direction pointing from the
 
 Another common responsibility of a physics engine is collision resolution, or to be precise, collision detection and resolution. We don't want to allow two rigid bodies to intersect; when that happens, we push both objects in opposite directions, assuming neither is static, in which case we push only the dynamic one. In the video above, the static object is the biggest cube underneath all the other objects that serves as a floor.
 
-To achieve this, we first need to determine, for each pair of objects, whether they intersect. A naïve approach checks all pairs, which results in quadratic time complexity *(O(n²))*. There are optimization techniques to address this. We'll return to this later.
+To achieve this, we first need to determine, for each pair of objects, whether they intersect. A naïve approach checks all pairs, which results in quadratic time complexity _(O(n²))_. There are optimization techniques to address this. We'll return to this later.
 
 There are various techniques for collision detection, each with its own pros and cons. For example, the Gilbert-Johnson-Keerthi (GJK) algorithm can be used to detect collisions between arbitrary convex shapes, but it's a bit more difficult to understand and implement than the Separating Axis Theorem (SAT), especially in 3D.
 
@@ -225,7 +234,7 @@ And the last one, even simpler, for extracting just the Y-axis.
 ```odin
 GetUpAxisFromRotationMatrix :: proc(mat: Matrix4x4) -> Vector3 {
     return {
-        mat[0][1], mat[1][1], mat[2][1]                   
+        mat[0][1], mat[1][1], mat[2][1]
     }
 }
 ```
@@ -343,4 +352,4 @@ If your scene looks different or you have trouble compiling the project, you can
 > Author: Marian Pekar - <https://marianpekar.com>
 > (c) Marian Pekar. The posts stay freely readable on the author's site; this local copy is credited in `SOURCES.md` at the repo root. Please link back to the original article.
 
->Source: https://marianpekar.com/blog/physics-engine-in-odin-from-scratch-part-i
+> Source: https://marianpekar.com/blog/physics-engine-in-odin-from-scratch-part-i

@@ -1,10 +1,19 @@
+---
+title: "Odin’s Fiasco with Wikipedia"
+date: 2026-04-20
+source: "https://www.gingerbill.org/article/2026/04/20/odin-wikipedia-fiasco"
+tags: [OdinRAG, kb, source/gingerbill]
+type: reference
+status: active
+---
+
 # Odin’s Fiasco with Wikipedia
 
 2026-04-20
 
-Recently, [Brodie Robertson](https://www.youtube.com/@BrodieRobertson) produced a video on the *Bizarre World of Wikipedia Deleting Programming Pages*. I highly recommend watching the video.
+Recently, [Brodie Robertson](https://www.youtube.com/@BrodieRobertson) produced a video on the _Bizarre World of Wikipedia Deleting Programming Pages_. I highly recommend watching the video.
 
-I thank Brodie for covering the [Wikipedia fiasco for Odin](https://en.wikipedia.org/wiki/Wikipedia:Articles_for_deletion/Odin_(programming_language)). We don’t particularly care if Odin is on Wikipedia or not; especially when Wikipedia itself is rarely reliable, but we’ve been dealing with Wikipedia mods for years. Our best hypothesis
+I thank Brodie for covering the [Wikipedia fiasco for Odin](<https://en.wikipedia.org/wiki/Wikipedia:Articles_for_deletion/Odin_(programming_language)>). We don’t particularly care if Odin is on Wikipedia or not; especially when Wikipedia itself is rarely reliable, but we’ve been dealing with Wikipedia mods for years. Our best hypothesis
 
 Which could very well be wrong too, and I’d love to be proven wrong. is quite simple: some of the mods just don’t like Odin as a language and don’t want it on Wikipedia as any form of “advertisement”.
 
@@ -20,9 +29,9 @@ If they honestly believe making a production-grade programming language is that 
 
 ## Ideological Playground
 
-Wikipedia *in general* is an ideological
+Wikipedia _in general_ is an ideological
 
-By ideological, I do not necessarily “political”, rather they follow an ideology, a set of doctrines/beliefs, for better or for worse. playground, and the inclusion of articles are gatekept by activists. *Some* Wikipedia Mods
+By ideological, I do not necessarily “political”, rather they follow an ideology, a set of doctrines/beliefs, for better or for worse. playground, and the inclusion of articles are gatekept by activists. _Some_ Wikipedia Mods
 
 Just like Reddit mods, or even Digg mods back in the day view themselves as “journalists” and trying to do the “morally ideological” thing by only allowing certain posts on there; programming languages are just one example of that. For many people programming languages are a religion to them
 
@@ -39,7 +48,7 @@ I’m not concerned about the deletion itself, even as the creator of the progra
 
 “Reliable sources” in programming are scarce. The examples cited in the comments of that deletion discussion are either sparsely read or not even general-programming-related. The field simply lacks well-respected journals or forums for serious discussion: it’s the Wild Wild West. Peer-reviewed papers on programming topics specifically are not necessarily reputable or reliable
 
-I am not talking about peer reviewed papers in general in other fields which do not act the same as programming. But “Peer Review”, something that didn’t exist until the 1960s, isn’t the be all and end all of reputability or fountain of wisdom. However, I’ll leave that discussion for another day.. Most of the old “reputable sources” are exactly that: *old*. Few people read them anymore, and many have devolved into product advertising or chasing the latest hype-cycle. Who decides which websites are more authoritative than others, especially when no one is regularly reading them?
+I am not talking about peer reviewed papers in general in other fields which do not act the same as programming. But “Peer Review”, something that didn’t exist until the 1960s, isn’t the be all and end all of reputability or fountain of wisdom. However, I’ll leave that discussion for another day.. Most of the old “reputable sources” are exactly that: _old_. Few people read them anymore, and many have devolved into product advertising or chasing the latest hype-cycle. Who decides which websites are more authoritative than others, especially when no one is regularly reading them?
 
 A lot that exists today just has tenured inertia of being there, uncontested for so long that that the uncontestation is the only thing notable about them to begin with. Applied consistently, these criteria would warrant removing over 90% of programming-related articles from Wikipedia. I don’t want that, but it would be the logical outcome.
 
@@ -67,4 +76,4 @@ We believe in the coming months with the introduction of things like the native 
 
 Odin will be an overnight success-a decade in the making.
 
->Source: https://www.gingerbill.org/article/2026/04/20/odin-wikipedia-fiasco
+> Source: https://www.gingerbill.org/article/2026/04/20/odin-wikipedia-fiasco

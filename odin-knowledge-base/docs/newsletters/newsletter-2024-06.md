@@ -1,29 +1,37 @@
+---
+title: "Projects shared this month"
+source: "https://odin-lang.org/news/newsletter-2024-06"
+tags: [OdinRAG, kb, source/newsletters, topic/wasm]
+type: reference
+status: active
+---
+
 Read up on the compiler changes in the [monthly release](https://github.com/odin-lang/Odin/releases/tag/dev-2024-06) notes.
 
-This month we’ve got a new podcast from ***Allen***, including ***Andrew Kelley*** and ***Ginger Bill***. They talk about language design and a bit about textual programming. This fits nicely with the blog entries for this month.
+This month we’ve got a new podcast from _**Allen**_, including _**Andrew Kelley**_ and _**Ginger Bill**_. They talk about language design and a bit about textual programming. This fits nicely with the blog entries for this month.
 
 ---
 
-***Karl Zylinski*** can’t stop with dishing out high quality odin videos. From tutorials to basic games everything get’s covered.
+_**Karl Zylinski**_ can’t stop with dishing out high quality odin videos. From tutorials to basic games everything get’s covered.
 
 Indiedevs Talk Shop is his podcast, featuring fellow gamedevs and talking about… well anything gamedev related.
 
-Here is one of my favorites so far with the game developer ***Dennis Gustafsson***, one of the creators of [Teardown](https://www.teardowngame.com/). As a big fan of the game it was nice to hear how the game got started and what was most challenging about development.
+Here is one of my favorites so far with the game developer _**Dennis Gustafsson**_, one of the creators of [Teardown](https://www.teardowngame.com/). As a big fan of the game it was nice to hear how the game got started and what was most challenging about development.
 
 ## Projects shared this month [#](#projects-shared-this-month)
 
-| Project Name | Description |
-| --- | --- |
-| [odin-aseprite](https://github.com/blob1807/odin-aseprite) | Aseprite File Handler updated |
-| [opencv-odin-demo](https://github.com/yevhen-k/opencv-odin-demo/) | OpenCV bindings |
-| [locale](https://codeberg.org/mgavioli/locale) | Manage locales |
-| [odin-wasm](https://github.com/thetarnav/odin-wasm/tree/main/wasm/ctx2d) | Wasm Canvas Context |
-| [onnx-odin](https://github.com/yevhen-k/onnx-odin-bindings) | onnx Bindings |
-| [podin](https://codeberg.org/mgavioli/podin) | collect translatable messages in Odin source to be managed |
-| [gameinput](https://github.com/cstrachan88/odin-gameinput) | Microsoft GameInput Bindings |
-| [vulkan-triangle](https://github.com/10aded/Odin-Vulkan-GLFW-Rainbow-Triangle) | Vulkan GLFW Triangle |
-| [NML Odin](https://github.com/joaocarvalhoopen/Neat_Matrix_Library_in_Odin) | Neat Matrix Library Port to odin |
-| [Dusk](https://github.com/JerMakesStuff/Dusk) | Game Framework |
+| Project Name                                                                   | Description                                                |
+| ------------------------------------------------------------------------------ | ---------------------------------------------------------- |
+| [odin-aseprite](https://github.com/blob1807/odin-aseprite)                     | Aseprite File Handler updated                              |
+| [opencv-odin-demo](https://github.com/yevhen-k/opencv-odin-demo/)              | OpenCV bindings                                            |
+| [locale](https://codeberg.org/mgavioli/locale)                                 | Manage locales                                             |
+| [odin-wasm](https://github.com/thetarnav/odin-wasm/tree/main/wasm/ctx2d)       | Wasm Canvas Context                                        |
+| [onnx-odin](https://github.com/yevhen-k/onnx-odin-bindings)                    | onnx Bindings                                              |
+| [podin](https://codeberg.org/mgavioli/podin)                                   | collect translatable messages in Odin source to be managed |
+| [gameinput](https://github.com/cstrachan88/odin-gameinput)                     | Microsoft GameInput Bindings                               |
+| [vulkan-triangle](https://github.com/10aded/Odin-Vulkan-GLFW-Rainbow-Triangle) | Vulkan GLFW Triangle                                       |
+| [NML Odin](https://github.com/joaocarvalhoopen/Neat_Matrix_Library_in_Odin)    | Neat Matrix Library Port to odin                           |
+| [Dusk](https://github.com/JerMakesStuff/Dusk)                                  | Game Framework                                             |
 
 ---
 
@@ -39,7 +47,7 @@ Last month I showed off my text editor with a bit of a twist in terms of buffer 
 
 ### Dion [#](#dion)
 
-***Dion*** was a demo project showed off at around the handmade circles about having an AST (Abstract Syntax Tree) level editor. Sadly the project has been discontinued and the website is now down, but luckily I have saved some of the showcase material. I’ll show one of them as long as the creators are okay with it.
+_**Dion**_ was a demo project showed off at around the handmade circles about having an AST (Abstract Syntax Tree) level editor. Sadly the project has been discontinued and the website is now down, but luckily I have saved some of the showcase material. I’ll show one of them as long as the creators are okay with it.
 
 ![](/images/news/2024-06-skytrias1.gif)
 
@@ -49,7 +57,7 @@ An AST can be presented in different syntax outputs. The tree still remains edit
 
 Lovely feature that mostly IDE's have - Renaming locals or globals.
 
-I’m not certain why the project has been dropped. I think it’s sad that nobody is actively developing something like ***Dion*** anymore. If you know anybody who still does, let me know!
+I’m not certain why the project has been dropped. I think it’s sad that nobody is actively developing something like _**Dion**_ anymore. If you know anybody who still does, let me know!
 
 ### Getting Started [#](#getting-started)
 
@@ -65,7 +73,7 @@ As we already have a nice `core:odin/ast` / `core:odin/parser` package, it was e
 
 ### AST Structure & Examples [#](#ast-structure--examples)
 
-I won’t go into too much detail but basically odin’s AST is split up into *Statements* and *Expressions*. There are also *Declarations* and *Types* but which can be thought of subtypes.
+I won’t go into too much detail but basically odin’s AST is split up into _Statements_ and _Expressions_. There are also _Declarations_ and _Types_ but which can be thought of subtypes.
 
 So a generic node for odin would look something like this:
 
@@ -99,12 +107,14 @@ Node :: struct {
 Node_Type :: enum {
   // ...
 }
-```odin
+```
+
 Let’s try out a simple example first
 
 ```odin
 some_value: int
-```odin
+```
+
 Equals
 
 ```odin
@@ -115,12 +125,14 @@ Declaration_Value ":"
   - Expression_Identifier "int"
 - VALUES
   - empty
-```odin
+```
+
 But it could also get more complex
 
 ```odin
 value1, value2, value3: int = 1, 2, 3
-```odin
+```
+
 Equals
 
 ```odin
@@ -135,21 +147,23 @@ Declaration_Value ":"
   - Expression_Basic_Literal (integer) "1"
   - Expression_Basic_Literal (integer) "2"
   - Expression_Basic_Literal (integer) "3"
-```odin
+```
+
 Let’s try an odin procedure, can you guess how it’s built up?
 
 ```odin
 some_procedure :: proc() {
 
 }
-```odin
+```
+
 Would turn out to be
 
 ```odin
 Declaration_Value "::"
 - NAMES
   - Expression_Identifier "some_procedure"
-- VALUES 
+- VALUES
   - Expression_Procedure_Literal "proc"
     - BODY
       - Statement_Block "{...}"
@@ -159,7 +173,8 @@ Declaration_Value "::"
           - ...
           - ...
           - ...
-```odin
+```
+
 Quite complex just for a procedure, don’t you think?
 
 ### AST Creation [#](#ast-creation)
@@ -204,7 +219,7 @@ node_ui :: proc(using draw: ^Draw_State, node: ^tree.Node)
         line += 1
       }
 
-      indentation -= 1    
+      indentation -= 1
       draw_text_basic_inc(draw, &sub, "}")
       column += 1
 
@@ -216,7 +231,8 @@ node_ui :: proc(using draw: ^Draw_State, node: ^tree.Node)
     // ...
   }
 }
-```odin
+```
+
 ### Wrapping Up [#](#wrapping-up)
 
 Since the short blog is getting quite long already we’ll take a break here and dive into editor navigation, editing and the other painful things that the AST editing ends up becoming.
@@ -233,9 +249,9 @@ A few years ago I decided that I was going to figure out how to write cross-plat
 
 My apps were going to be graphical by nature - as a graphics artist most of what I wanted to do involved them in some capacity. I found Dear Imgui early on and used that during my first serious odin project. I quickly ran into some frustrating limitations, and decided I wanted to write my own UI. My design is based heavily on the [fantastic series of blog posts](https://www.rfleury.com/p/ui-series-table-of-contents) by Ryan Fleury, so reading and digesting some of that is highly recommended.
 
-All of my UI development has been at the service of other projects, and I keep a few “example” projects in the repository to help test a variety of conditions that my library needs to be able to handle. One of these projects is a code editor. Dubbed *codin* (for obvious reasons), there are several parts of the project that were both fun and interesting for me to figure out. For this post I decided to focus on the way the UI builder code works. When it comes down to it, core of the editor is based on a single widget of my UI library, `edit_multiline`.
+All of my UI development has been at the service of other projects, and I keep a few “example” projects in the repository to help test a variety of conditions that my library needs to be able to handle. One of these projects is a code editor. Dubbed _codin_ (for obvious reasons), there are several parts of the project that were both fun and interesting for me to figure out. For this post I decided to focus on the way the UI builder code works. When it comes down to it, core of the editor is based on a single widget of my UI library, `edit_multiline`.
 
-As an *imgui*, the builder code in my library looks something like this:
+As an _imgui_, the builder code in my library looks something like this:
 
 ```odin
 {
@@ -244,8 +260,9 @@ As an *imgui*, the builder code in my library looks something like this:
   if button(buffer.name).clicked do fmt.println("You clicked a button!")
   panel_end()
 }
-```odin
-Everything in the UI is composed of a hierarchy of *boxes* that compose everything displayed in the UI. A *widget* is a chunk of code the creates and manipulates the *boxes*. For example, the `button()` function in the above example looks like this:
+```
+
+Everything in the UI is composed of a hierarchy of _boxes_ that compose everything displayed in the UI. A _widget_ is a chunk of code the creates and manipulates the _boxes_. For example, the `button()` function in the above example looks like this:
 
 ```odin
 button :: proc(name:..any) -> Box_Ops {
@@ -254,7 +271,8 @@ button :: proc(name:..any) -> Box_Ops {
   process_ops(box)
   return box.ops
 }
-```odin
+```
+
 For codin, I created a widget for editing a single line of text:
 
 ```odin
@@ -270,7 +288,8 @@ edit_text :: proc(name: []any, text:^string) -> Box_Ops {
   }
   ...
 }
-```odin
+```
+
 [](/images/news/2024-06-codin_edit_text.mp4)
 
 But in codin we need to edit multiple lines of text, so why don’t we just put that widget into another one:
@@ -281,7 +300,8 @@ edit_multiline :: proc(name: []any, lines:^[dynamic]string) -> Box_Ops {
     edit_text(name, line)
   }
 }
-```odin
+```
+
 That, as the name suggests, lets you edit a chunk of text that is composed of multiple lines. But what we have more lines than fill the screen? My library has a `scrollbox()` widget that scales to fit it’s children and adds bars you can grab to slide it up and down:
 
 [](/images/news/2024-06-codin_scrollbox.mp4)
@@ -290,7 +310,7 @@ The problem with this approach is that if you have a large text file, there are 
 
 [](/images/news/2024-06-codin_too-many-boxes.mp4)
 
-My solution to this problem was to only create boxes for visible lines of text. However, this breaks the scrollbox - the scrollbox needs a full set of children to determine the proper height for it’s own box. What I needed to do was create a spacer box before the visible boxes to account for the offscreen boxes that are no longer created, and *also* manually calculate the height of the scrollbox, since we don’t have the children boxes that appear *after* the last visible line:
+My solution to this problem was to only create boxes for visible lines of text. However, this breaks the scrollbox - the scrollbox needs a full set of children to determine the proper height for it’s own box. What I needed to do was create a spacer box before the visible boxes to account for the offscreen boxes that are no longer created, and _also_ manually calculate the height of the scrollbox, since we don’t have the children boxes that appear _after_ the last visible line:
 
 - First calculate the number of visible rows
 - Then calculate what the height of the scrollbox would be if I created boxes for all the rows
@@ -303,7 +323,7 @@ edit_multiline :: proc(...) {
   visible_rows      := get_panel_height() / get_line_space()
   row_count         := len(lines)
   scrollbox_height  := f32(row_count) * get_line_space()
-  
+
   size(.PARENT, 1, .PIXELS, scrollbox_height)
   sbox := scrollbox({"text buffer"})
 
@@ -320,7 +340,8 @@ edit_multiline :: proc(...) {
     }
   pop()
 }
-```odin
+```
+
 And now we only create and calculate the number of boxes that would be visible:
 
 [](/images/news/2024-06-codin_good-boxes.mp4)
@@ -344,7 +365,8 @@ edit_multiline :: proc(..., cursor:^Txt_Pt, ...)
 
   }
 }
-```odin
+```
+
 [](/images/news/2024-06-codin_line-highlighting.mp4)
 
 Now that we highlight the line that cursor is on, let’s look at moving it around. We can move the cursor up and down by checking keyboard input events:
@@ -362,7 +384,8 @@ edit_multiline :: proc(...cursor:^Txt_Pt, auto_scroll:^bool ...)
   // clamp cursor so it stays in range...
   cursor.row = clamp(cursor.row, 0, len(lines)-1)
 }
-```odin
+```
+
 [](/images/news/2024-06-codin_keyboard-input.mp4)
 
 How about auto scrolling when the cursor is not in the visible range?
@@ -379,7 +402,8 @@ edit_multiline :: proc(..., cursor:^Txt_Pt, ...)
     sbox.offset.y = cursor.row * get_line_space()
   }
 }
-```odin
+```
+
 [](/images/news/2024-06-codin_auto-scroll.mp4)
 
 One thing I realized was that we don’t always want to auto scroll…often I manually scroll around a file and let the cursor go off screen. So I added a `scroll_trigger:^bool` as an input to give us a way to limit the auto scroll:
@@ -395,7 +419,8 @@ edit_multiline :: proc(..., cursor:^Txt_Pt, auto_scroll:^bool ...)
     }
   }
 }
-```odin
+```
+
 The above code above is a simpler version of codin’s `edit_multiline` widget that actually exists, but it accurately captures how I implemented the described features. For what it’s worth, the actual `edit_multiline` fuction definition looks like:
 
 ```odin
@@ -410,7 +435,8 @@ edit_multiline :: proc(
 {
   // actual implementation goes here...
 }
-```odin
+```
+
 The inputs:
 
 - `name` is just a unique identifier for all the boxes in the widget.
@@ -440,7 +466,8 @@ Terminal :: struct {
   build_status:    Build_Status,                            // enum {Nil, Failure, Success}
   build_thread:   ^thread.Thread,                           // build thread
 }
-```odin
+```
+
 A `Build_Error` looks like this:
 
 ```odin
@@ -451,7 +478,8 @@ Build_Error :: struct {
   message:      string,        // error message
   point:        ui.Text_Pt,    // row & column where error occurs
 }
-```odin
+```
+
 I create a new panel and add an `edit_text` widget to fill out the terminal.command string:
 
 [](/images/news/2024-06-codin_command-string.mp4)
@@ -479,7 +507,7 @@ execute_terminal_command :: proc(process_command: string) {
   si.hStdInput  = p.child_in_read
   si.dwFlags += windows.STARTF_USESTDHANDLES
 
-   // Start the child process. 
+   // Start the child process.
   pcommand := windows.utf8_to_utf16(process_command)
   pdir     := windows.utf8_to_utf16(app.project.path)
 
@@ -495,7 +523,8 @@ execute_terminal_command :: proc(process_command: string) {
   if app.terminal.build_thread != nil do  thread.terminate(app.terminal.build_thread, 0)
   app.terminal.build_thread = thread.create_and_start_with_data(&app, terminal_read)
 }
-```odin
+```
+
 …and then start a new thread to read from the pipe and fill out an array of Build Errors.
 
 ```odin
@@ -503,7 +532,7 @@ terminal_read :: proc(data:rawptr) {
   a := (^App)(data)
   t := &a.terminal
   p := &a.terminal.process
-  
+
   BUFSIZE :: 4096
   read:    windows.DWORD
   written: windows.DWORD
@@ -511,8 +540,8 @@ terminal_read :: proc(data:rawptr) {
   success: bool
 
   g.vp_clear(&t.vpool)     // clear memory/array/list for each build
-  clear(&t.build_errors)   
-  clear(&t.error_list)     
+  clear(&t.build_errors)
+  clear(&t.error_list)
 
   // read from pipe
   for {
@@ -541,7 +570,8 @@ terminal_read :: proc(data:rawptr) {
   t.build_status = .Failure
   set_active_error(&t.build_errors[0])
 }
-```odin
+```
+
 Back on the UI side, there are two jobs to do - first is to draw a list of build errors. In the new terminal panel, I add a `scrollbox` widget and then draw each error inside of clickable buttons:
 
 ```odin
@@ -588,7 +618,8 @@ terminal_panel :: proc() {
   }
   panel_end()
 }
-```odin
+```
+
 [](/images/news/2024-06-codin_build-errors1.mp4)
 
 The last step is to look back at the `edit_multiline` widget and highlight any visible rows that contain build errors. The full widget returns a list of visible boxes and row indices, so I used those like this:
@@ -627,7 +658,8 @@ buffer_panel :: proc() {
   }
   end_panel()
 }
-```odin
+```
+
 [](/images/news/2024-06-codin_build-errors2.mp4)
 
 ### Conclusion [#](#conclusion)
@@ -680,4 +712,4 @@ Just having ~250 lines of text boxes queued for rendering would increase the fra
 
 [](/images/news/2024-06-sectr_prototype_Sokol_Hot_Reload_closing_vod.mp4)
 
->Source: https://odin-lang.org/news/newsletter-2024-06
+> Source: https://odin-lang.org/news/newsletter-2024-06

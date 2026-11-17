@@ -1,3 +1,12 @@
+---
+title: "Software Renderer in Odin from Scratch, Part VII"
+date: 2025-10-04
+source: "https://marianpekar.com/blog/software-renderer-in-odin-from-scratch-part-vii"
+tags: [OdinRAG, kb, source/marianpekar, topic/rendering]
+type: reference
+status: active
+---
+
 # Software Renderer in Odin from Scratch, Part VII
 
 4th October 2025 • 7 min read
@@ -24,15 +33,12 @@ Create a new file, call it light.odin, and add the following code.
 package main
 
 Light :: struct {
-    direction: Vector3,
-    strength: f32,
+  direction: Vector3,
+  strength:  f32,
 }
 
 MakeLight :: proc(direction: Vector3, strength: f32) -> Light {
-    return { 
-        Vector3Normalize(direction), 
-        strength 
-    }
+  return {Vector3Normalize(direction), strength}
 }
 ```
 
@@ -46,11 +52,11 @@ Now, let's switch to the `draw.odin` file and start adding a new procedure, `Dra
 
 ```odin
 DrawFlatShaded :: proc(
-    vertices: []Vector3, 
+    vertices: []Vector3,
     triangles: []Triangle,
     projMat: Matrix4x4,
-    light: Light, 
-    color: rl.Color, 
+    light: Light,
+    color: rl.Color,
     zBuffer: ^ZBuffer,
     ambient:f32 = 0.2
 ) {
@@ -143,7 +149,7 @@ switch renderMode {
 
 ## Conclusion
 
-That's all for today. If you now compile and run the program (`odin run . -o:speed`), you should see a flat shaded white cube, and you should still be able to move it around with the WSADQD keys, rotate it with the IJKLUO keys, scale it using + and -, and cycle through rendering modes with the left and right arrows. If it doesn't work as expected, compare your implementation with the one in the *Part 7* directory in [this GitHub repository](https://github.com/marianpekar/software-renderer-odin-tutorials).
+That's all for today. If you now compile and run the program (`odin run . -o:speed`), you should see a flat shaded white cube, and you should still be able to move it around with the WSADQD keys, rotate it with the IJKLUO keys, scale it using + and -, and cycle through rendering modes with the left and right arrows. If it doesn't work as expected, compare your implementation with the one in the _Part 7_ directory in [this GitHub repository](https://github.com/marianpekar/software-renderer-odin-tutorials).
 
 ## Other Parts of This Series
 
@@ -165,4 +171,4 @@ That's all for today. If you now compile and run the program (`odin run . -o:spe
 > Author: Marian Pekar - <https://marianpekar.com>
 > (c) Marian Pekar. The posts stay freely readable on the author's site; this local copy is credited in `SOURCES.md` at the repo root. Please link back to the original article.
 
->Source: https://marianpekar.com/blog/software-renderer-in-odin-from-scratch-part-vii
+> Source: https://marianpekar.com/blog/software-renderer-in-odin-from-scratch-part-vii

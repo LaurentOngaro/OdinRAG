@@ -49,8 +49,8 @@ TEXT_EXTENSIONS: tuple[str, ...] = (".md", ".markdown")
 
 # Directories to skip entirely. These either contain third-party content (node_modules) or transient / cache material that should not be touched.
 SKIP_DIRS: tuple[str, ...] = (
-    "node_modules", ".git", "worktrees", "sessions", "cache", "build", "logs", "raw", "archives", "refs", "tools",
-    "odin-knowledge-base", "code", ".obsidian", ".venv", "venv"
+    "node_modules", ".git", "worktrees", "sessions", "cache", "build", "logs", "raw", "archives", "_Archives", "refs", "tools",
+    "odin-knowledge-base", "code", ".obsidian", ".venv", "venv", ".pytest_cache", ".ruff_cache", ".mypy_cache"
 )
 # Pre-computed for case-insensitive matching. Necessary on Windows / macOS where
 # the filesystem preserves case but compares insensitively (and git's

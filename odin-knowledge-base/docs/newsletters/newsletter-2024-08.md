@@ -1,3 +1,11 @@
+---
+title: "Projects shared this month"
+source: "https://odin-lang.org/news/newsletter-2024-08"
+tags: [OdinRAG, kb, source/newsletters, topic/raylib]
+type: reference
+status: active
+---
+
 Big highlights:
 
 - Update to LLVM 18.1.8
@@ -8,19 +16,19 @@ For the rest of the many compiler changes, read the [monthly release](https://gi
 
 ## Projects shared this month [#](#projects-shared-this-month)
 
-| Project Name | Description |
-| --- | --- |
-| [VEFontCache-Odin](https://github.com/Ed94/VEFontCache-Odin) | VEFontCache Port! |
-| [odin-renderdoc](https://github.com/2nafish117/odin-renderdoc) | odin renderdoc loader |
-| [KISSFFT](https://github.com/joaocarvalhoopen/kissfft_in_odin) | KISSFFT bindings |
-| [locale](https://codeberg.org/mgavioli/locale) | locale handling library |
-| [podin](https://codeberg.org/mgavioli/podin) | generates .pot files |
-| [simple\_neural\_network](https://github.com/Alkamist/odin_simple_neural_network) | simple neural network |
-| [odin-solitaire](https://github.com/A1029384756/odin-solitaire) | solitaire using raylib |
-| [todo-app](https://github.com/scheinheiser/todo-app/) | todo app using raylib |
-| [Odin-FreeCell](https://github.com/jfulto98/Odin-FreeCell/tree/master) | Odin FreeCell |
-| [tic-tac-toe](https://github.com/brunodeangelis/tic-tac-toe) | Tic Tac Toe |
-| [Odin-Libuv](https://github.com/Akmal4163/Odin-Libuv) | Libuv bindings |
+| Project Name                                                                      | Description             |
+| --------------------------------------------------------------------------------- | ----------------------- |
+| [VEFontCache-Odin](https://github.com/Ed94/VEFontCache-Odin)                      | VEFontCache Port!       |
+| [odin-renderdoc](https://github.com/2nafish117/odin-renderdoc)                    | odin renderdoc loader   |
+| [KISSFFT](https://github.com/joaocarvalhoopen/kissfft_in_odin)                    | KISSFFT bindings        |
+| [locale](https://codeberg.org/mgavioli/locale)                                    | locale handling library |
+| [podin](https://codeberg.org/mgavioli/podin)                                      | generates .pot files    |
+| [simple\_neural\_network](https://github.com/Alkamist/odin_simple_neural_network) | simple neural network   |
+| [odin-solitaire](https://github.com/A1029384756/odin-solitaire)                   | solitaire using raylib  |
+| [todo-app](https://github.com/scheinheiser/todo-app/)                             | todo app using raylib   |
+| [Odin-FreeCell](https://github.com/jfulto98/Odin-FreeCell/tree/master)            | Odin FreeCell           |
+| [tic-tac-toe](https://github.com/brunodeangelis/tic-tac-toe)                      | Tic Tac Toe             |
+| [Odin-Libuv](https://github.com/Akmal4163/Odin-Libuv)                             | Libuv bindings          |
 
 ---
 
@@ -149,7 +157,7 @@ the most important bits related to Odin.
 
 Q: It’s not every day someone comes out of nowhere and drops a complete
 overhaul of a testing framework, never mind with code quality suggesting a
-great familiarity with the language. Why *that* package, and what was the
+great familiarity with the language. Why _that_ package, and what was the
 design process like?
 
 A: The design process was a slow, methodical one. I said in the original pull
@@ -188,7 +196,7 @@ multithreaded programming.
 
 I like to think that the Odin test runner is my first real, serious multithreaded program.
 
-Now, as for *why* did I pick `core:testing` to overhaul first… The short
+Now, as for _why_ did I pick `core:testing` to overhaul first… The short
 answer is that tests are fundamental to development of large projects, and I
 believed at the time that I identified a point in the Odin ecosystem that could
 use some serious improvement.
@@ -328,4 +336,4 @@ behind the language stays the course over the years to come, weathering
 whatever new techno-fads and siren songs composed only of buzz words happen to
 entice and arouse the masses.
 
->Source: https://odin-lang.org/news/newsletter-2024-08
+> Source: https://odin-lang.org/news/newsletter-2024-08

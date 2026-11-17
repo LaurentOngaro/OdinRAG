@@ -1,3 +1,11 @@
+---
+title: "Release Trailer"
+source: "https://odin-lang.org/showcase/cat_and_onion"
+tags: [OdinRAG, kb, source/showcase, topic/raylib]
+type: reference
+status: active
+---
+
 [](/images/showcase/cat_and_onion_square_loop.mp4)
 
 A cozy and whimsical short cat adventure game! It is fully written in Odin with raylib.
@@ -20,4 +28,4 @@ When you buy it on itch you also get a drop of the full Odin source code and all
 
 The game is also coming out on Steam in Q1 2024: <https://store.steampowered.com/app/2781210/CAT__ONION/>
 
->Source: https://odin-lang.org/showcase/cat_and_onion
+> Source: https://odin-lang.org/showcase/cat_and_onion

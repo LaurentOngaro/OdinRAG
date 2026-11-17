@@ -7,16 +7,28 @@
 
 ---
 
+## 0. Repository audit 005 (2026-11-17)
+
+The full findings and the prioritized plan live in the private audit `_Private/docs/audits/005_audit_odinrag_repository.md`. Implementation status:
+
+- [x] **Anti-leak guards & `_Archives/` isolation**: centralized private rules in `_Helpers/config/private_paths.jsonc`, added `_Archives/` and nested `_Private/`/`_Archives/` matching in `publish_public.py`, `audit_public_safety.py`, and `pre-push`, and added automated tests under `_Helpers/tests/` (audit 005: C1, L1, L2).
+- [x] **Hook path & clone hygiene**: configured `core.hooksPath _Helpers/scripts/dev/hooks`, set executable bit on `pre-push`, pruned stale `pine-painter` worktree, cleaned `.git/info/exclude`, removed empty `metroidvania-10-testing-ignore`, and added course exclusion in `scrape_skool.py` (H2, H3, L5, M6).
+- [x] **KB index, reflow, frontmatter, and docs**: fixed `build_kb_index.py --check` exit code and idempotence, added `add_kb_frontmatter.py` + native frontmatter on scrape, excluded `_Archives` in `reflow_md.py`, wrote `ADR-003` and aligned `AGENTS.md` / `001_folder_structure.md` / `007` (M1-M5, L3, L4, L6).
+- [ ] **Commit and publish (requires explicit user validation)**: commit local changes on `main`, push `main` to `private`, then run `python _Helpers/scripts/diagnostic/publish_public.py` (H1).
+
+---
+
 ## 1. Cross-OS and cross-repo operations (Windows 11 <-> Fedora Linux)
 
 ### 1.1 Prepare a new clone or a switch to the Fedora machine
 
-The workspace relies on two mechanisms that are local to each machine: the Git line-ending policy and the workspace links.
+The workspace relies on local machine settings: Git line-ending policy, hooks path, and workspace links.
 
 - [ ] **Configure the clone** (once per clone, local settings, never versioned):
 
   ```bash
   git config core.autocrlf false
+  git config core.hooksPath _Helpers/scripts/dev/hooks
   ```
 
 - [ ] **Normalize the line endings** (one-off, the index is already in LF, the working tree may not be):
@@ -58,7 +70,7 @@ The workspace relies on two mechanisms that are local to each machine: the Git l
 
 ### 1.3 Same operations for the sibling repository
 
-- [ ] Apply steps 1.1 and 1.2 to `D:/Projets_Perso/03_Code/Godot/GodotRAG` (same tools, same manifest format). The detailed checklist lives in that repository's `ACTION_PLAN.md`.
+- [ ] Apply steps 1.1 and 1.2 to the sibling `GodotRAG` repository (same tools, same manifest format). The detailed checklist lives in `GodotRAG`'s `ACTION_PLAN.md`.
 
 ---
 

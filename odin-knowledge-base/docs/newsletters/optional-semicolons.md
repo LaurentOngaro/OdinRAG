@@ -1,3 +1,11 @@
+---
+title: "Compiler Features"
+source: "https://odin-lang.org/news/optional-semicolons"
+tags: [OdinRAG, kb, source/newsletters, topic/binding]
+type: reference
+status: active
+---
+
 The pull request (PR) [Optional Semicolons #1112](https://github.com/odin-lang/Odin/pull/1112) was recently merged into master. This PR makes semicolons truly optional with the language Odin. This effectively makes the now old flag `-insert-semicolon` on by default (and not opt-out-able).
 
 This is a **NON-BREAKING CHANGE**, which means all valid code before this PR is valid with the PR.
@@ -74,7 +82,8 @@ default:
     t->insert_semicolon = false;
     break;
 }
-```odin
+```
+
 ## Discussion Around the Idea [#](#discussion-around-the-idea)
 
 ### Previous Semicolon Rules [#](#previous-semicolon-rules)
@@ -86,10 +95,10 @@ Current optional semicolon rules
 --------------------------------
 
 A semicolon is optional if the statement is followed by one of these tokens on the same line:
-    } 
-    ) 
+    }
+    )
     else
-    "EOF" 
+    "EOF"
 
 After any block ("{}") (any control flow block)
 
@@ -111,7 +120,8 @@ A semicolon is optional after the following declarations:
     import declarations        (import "foo")
     foreign import declaration ("foreign import "bar")
     foreign block declaration  (foreign lib { })
-```odin
+```
+
 My person opinions about these rules is that they are a complete [bodge](https://www.urbandictionary.com/define.php?term=bodge). And I don’t want permanent bodges in the language’s rules. And the bodges still have issues to them, which would require adding even more rules to make them “feel good”.
 
 ### Arguments for Old Semicolon Rules [#](#arguments-for-old-semicolon-rules)
@@ -124,6 +134,7 @@ So it looks like the main arguments **against** making optional semicolons are:
 4. Semicolons are good to type because they act like a full-stop/period on a sentence in many languages
 
    a) Semicolons have semantic meaning as statement terminators
+
 5. I see little benefit over making them optional
 6. Consistent with other languages such as C or GLSL, when swapping between them
 7. If they will remain truly optional, what about the inevitable friction of style collisions?
@@ -136,6 +147,7 @@ Counter-points:
 4. I agree this is true but it’s mostly due to (1)
 
    a) This is true but adding rules for semicolon insertion achieves the same semantic end
+
 5. That’s because of (1) (2) and not understanding why people dislike semicolons
 6. Odin is already different enough from those languages, especially with regards to declaration syntax, that trying to unify them is not really a good idea
 7. Tooling such as `odin strip-semicolon` and the upcoming `odin fmt` can help to mitigate all of this
@@ -148,6 +160,7 @@ Counter-counter-points:
 4. They have semantic benefits showing the end of a statement (thus the term statement terminator)
 
    a) An explicit statement terminator is clearer than an implicit one (through a newline)
+
 5. Relating the (2), people know many rules intuitively rather than explicitly
 6. Odin is similar enough to other imperative procedural languages that the mental context switch can be bug prone
 7. Relying on external tool complicates changelogs to the point where it’s hard to see what the actual (non-formatting and whitespace) changes are. This confuses many version control systems (e.g. git), and much more. It would require everyone to use the tool, unless it was made automatic, which would require IMPLICIT tooling.
@@ -160,9 +173,11 @@ These are the arguments **for** making semicolons optional:
 2. Semicolons are not needed in other “modern” languages in [the current year]
 
    a) It’s very good for marketing purposes to keep up with trends
+
 3. the parsing rules are a lot more consistent, simplified, and not a bodge
 
    a) The current grammar (before the PR) is not expressible in EBNF
+
 4. Easier for code generation tools
 5. Productivity is slightly increased when you don’t have to type semicolons, many typos arising from forgetting to type a semicolon
 6. Because it’s possible
@@ -173,9 +188,11 @@ Counter-points:
 2. Why do other language TRENDS matter that much? I don’t care about fads.
 
    a) A lot of trends come from languages with no redeeming features
+
 3. But the previous ones felt fine, why change? “Just write a better parser”
 
    a) Why does that matter in practice?
+
 4. Make better code generation tools
 5. In a statically typed and compiled language, those typos are quickly caught. And the slight increase to productivity is highly debatable
 6. Have you ever thought that you should?
@@ -186,11 +203,13 @@ Counter-counter-points:
 2. If a trend is keeping around, there might be a good reason for it
 
    a) Ignoring trends is bad for marketing and advertisement. Ignoring this will make Odin harder to market.
+
 3. they were awful rules and complete bodges
 
    a) Bodges are never a good idea if they are going to be permanent. If you have the possibility of correct the rules, you should. Odin is not different.
+
 4. Sometimes you don’t need brilliant tools, just good enough
 5. Can still induce a minor mental overhead (but it’s most definitely not measurable)
 6. Yes, that’s why I’m writing all of these arguments for and against.
 
->Source: https://odin-lang.org/news/optional-semicolons
+> Source: https://odin-lang.org/news/optional-semicolons

@@ -1,4 +1,13 @@
-# A Reply to *Let’s stop copying C*
+---
+title: "A Reply to Let’s stop copying C"
+date: 2020-01-25
+source: "https://www.gingerbill.org/article/2020/01/25/a-reply-to-lets-stop-copying-c"
+tags: [OdinRAG, kb, source/gingerbill]
+type: reference
+status: active
+---
+
+# A Reply to _Let’s stop copying C_
 
 2020-01-25
 
@@ -14,7 +23,7 @@ Back in the day when C was made, it is perfectly understandable why `#include` w
 
 The preprocessor is technically a separate language on top of C, and single-pass too.. However, since the advent of more modern computers, this approach is not needed and a proper library/module/package system is a better solution to the problem. C++ approach with `namespace`s is not a solution and more of a hack.
 
-One huge annoyance with C is the issue of namespace collisions. The general approach to solve this is to make the interface to your library prefixed with something e.g. `lib_`. However, this does not guarantee that namespace collisions don’t happen, and it means that you have to write these extra prefixes when you just want to write the code as normal without having to worry about all of this. From a usability standpoint, when you “import” a library, you want to be able to have those imported entities belong to its own scope which can be named with an *import name*.
+One huge annoyance with C is the issue of namespace collisions. The general approach to solve this is to make the interface to your library prefixed with something e.g. `lib_`. However, this does not guarantee that namespace collisions don’t happen, and it means that you have to write these extra prefixes when you just want to write the code as normal without having to worry about all of this. From a usability standpoint, when you “import” a library, you want to be able to have those imported entities belong to its own scope which can be named with an _import name_.
 
 The main categories of how I think most languages handle libraries in this fashion are the following:
 
@@ -43,10 +52,11 @@ if condition do thing();
 
 // Mixing {} and do is not allowed
 if condition do { thing(); } // not allowed
-```odin
+```
+
 ## Bitwise operator precedence
 
-C’s operator precedence for bitwise operations is bad and requires an “overuse” of parentheses. I fixed this in Odin so that they feel a lot better. Getting the right precedence required a bit of experimentation to get it to *feel* correct.
+C’s operator precedence for bitwise operations is bad and requires an “overuse” of parentheses. I fixed this in Odin so that they feel a lot better. Getting the right precedence required a bit of experimentation to get it to _feel_ correct.
 
 ## Negative modulo
 
@@ -56,11 +66,13 @@ In different languages, the operator `%` is usually implemented as either divide
 
 ```odin
 a %% b == ((a % b) + b) % b
-```odin
+```
+
 ```odin
 a %  b = a - trunc(a/b) * b
 a %% b = a - floor(a/b) * b
-```odin
+```
+
 See the following for more information: <https://wikipedia.org/wiki/Modulo_operation>
 
 ## Leading zero for octal
@@ -105,7 +117,8 @@ int *x[3];   // array 3 of pointer to int
 int (*x)[3]; // pointer to array 3 of int
 
 _Atomic unsigned long long int const volatile *restrict foo[]; // Yeah...
-```odin
+```
+
 And not to mention that type qualifiers can be in different places and still mean the same thing:
 
 ```odin
@@ -114,18 +127,21 @@ const int x;
 
 const int *y;
 int const *y;
-```odin
+```
+
 C’s approach also requires a symbol table whilst parsing to disambiguate between types declarations and an expression e.g.:
 
 ```odin
 foo * bar; // Is this an expression or a declaration? You need to check the symbol table to find out
-```odin
+```
+
 This is why for Odin, I went for a more Pascal-style approach to types, which is a lot easier to read, parse, and comprehend.
 
 ```odin
 x: [3]^int; // array 3 of pointer to int
 y: ^[3]int; // pointer to array 3 of int
-```odin
+```
+
 Instead of following C’s approach of “declarations match usage”, Odin’s approach is “types on the left, usage on the right”.
 
 ```odin
@@ -137,19 +153,21 @@ y^ = 123;
 
 z: [6]^int = ...;
 z[3]^ = 123;
-```odin
-Coupled with Odin’s very strong and orthogonal type system, things *just work* as expected and are easy to comprehend for mere mortals like myself.
+```
+
+Coupled with Odin’s very strong and orthogonal type system, things _just work_ as expected and are easy to comprehend for mere mortals like myself.
 
 ## Weak typing
 
-C’s implicit numeric conversions and *array demotion to pointer* conversion are a source of many bugs and confusions. C++ tried to fix some of this but still its type system is quite weak in many regards.
+C’s implicit numeric conversions and _array demotion to pointer_ conversion are a source of many bugs and confusions. C++ tried to fix some of this but still its type system is quite weak in many regards.
 
 ```odin
 typedef int My_Int;
 
 int x = 123;
 My_Int y = x; // this is allowed as `My_Int` is just an alias of `int`
-```odin
+```
+
 Odin’s strong type system is one of its extremely huge advantages. More errors are caught earlier because of it, and it allows you to do a lot more.
 
 ```odin
@@ -163,7 +181,8 @@ x: int = 123;
 y: Int_Alias = x; // fine
 
 z: My_Int = x; // error, an explicit cast is required
-```odin
+```
+
 If you would like to see Odin’s approach to `distinct` types, I recommend reading the overview for them at <https://odin-lang.org/docs/overview/#distinct-types>.
 
 ## Integer division
@@ -174,7 +193,8 @@ I disagree with this conclusion here regarding integer division. I guess dimensi
 z := x / y;
 #assert(type_of(x) == type_of(y));
 #assert(type_of(z) == type_of(y));
-```odin
+```
+
 ## Bytestrings
 
 Strings are funny things because human languages are complicated things. With Odin I went with what I think is the best compromise: strings are internally byte slices with the assumption that they have UTF-8 encoding.
@@ -245,10 +265,10 @@ A lot of the issues in C come from C’s poor and lacking type system. I am not 
 
 A lot of C’s mistakes are only mistakes in retrospective, but C is still an extremely useful language to use, and I am still extremely productive in it.
 
-To quote Fred Brooks in his book *No Silver Bullet - Essence and Accident in Software Engineering*:
+To quote Fred Brooks in his book _No Silver Bullet - Essence and Accident in Software Engineering_:
 
 > There is no single development, in either technology or management technique, which by itself promises even one order of magnitude [tenfold] improvement within a decade in productivity, in reliability, in simplicity.
 
-And sadly, this is *still* true with regards to comparing C to other higher level general purpose languages, as they do not offer an order of magnitude improvement in productivity. C hit a local maximum of productive for which so many still have yet to understand why and learn from.
+And sadly, this is _still_ true with regards to comparing C to other higher level general purpose languages, as they do not offer an order of magnitude improvement in productivity. C hit a local maximum of productive for which so many still have yet to understand why and learn from.
 
->Source: https://www.gingerbill.org/article/2020/01/25/a-reply-to-lets-stop-copying-c
+> Source: https://www.gingerbill.org/article/2020/01/25/a-reply-to-lets-stop-copying-c

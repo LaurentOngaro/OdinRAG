@@ -1,0 +1,56 @@
+// Single source of truth for personal, private, and paywalled paths in OdinRAG.
+//
+// Consumed by:
+//   - _Helpers/scripts/lib/private_paths.py
+//   - _Helpers/scripts/diagnostic/publish_public.py
+//   - _Helpers/scripts/diagnostic/audit_public_safety.py
+//
+// Must stay synchronized with:
+//   - _Helpers/scripts/dev/hooks/pre-push (personal_pattern regex)
+//   - _Helpers/docs/007_mixing_public_and_private_history.md
+
+{
+  "version": 1,
+
+  // Root-anchored prefixes stripped from the `public` branch and rejected by audits.
+  "prefixes": [
+    {
+      "path": "_Archives",
+      "reason": "All _Archives/ content is private (main-only, never push to public)"
+    },
+    {
+      "path": "_Private",
+      "reason": "All _Private/ content is local-only (never push)"
+    },
+    {
+      "path": "odin-knowledge-base/courses",
+      "reason": "Skool courses (paywall)"
+    },
+    {
+      "path": "odin-knowledge-base/docs/karl_zylinski/odin-book",
+      "reason": "Karl Zylinski ebook (paid)"
+    }
+  ],
+
+  // Automatically include every entry with `"scope": "private"` from `_Helpers/links.jsonc`.
+  "include_private_links": true,
+  "links_manifest": "_Helpers/links.jsonc",
+  "private_link_reason": "Personal Odin project (not part of the RAG)",
+
+  // Path segments forbidden at ANY depth (defense in depth for mirror trees such as `_Archives/_Private/`).
+  "any_depth_segments": [
+    {
+      "segment": "_Private",
+      "reason": "Nested _Private/ directory is private at any depth (never push)"
+    },
+    {
+      "segment": "_Archives",
+      "reason": "Nested _Archives/ directory is private at any depth (never push)"
+    }
+  ],
+
+  // Explicitly curated public READMEs living inside an otherwise restricted folder.
+  "allowed_readmes": [
+    "odin-knowledge-base/docs/karl_zylinski/odin-book/README.md"
+  ]
+}

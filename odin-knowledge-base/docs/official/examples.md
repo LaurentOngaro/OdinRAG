@@ -1,3 +1,11 @@
+---
+title: "demo.odin"
+source: "https://odin-lang.org/docs/examples"
+tags: [OdinRAG, kb, source/official]
+type: reference
+status: active
+---
+
 Examples of Odin Code.
 
 ## `demo.odin` [#](#demoodin)

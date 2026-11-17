@@ -1,3 +1,11 @@
+---
+title: "Release note highlights"
+source: "https://odin-lang.org/news/newsletter-2023-06"
+tags: [OdinRAG, kb, source/newsletters, topic/raylib, topic/dod]
+type: reference
+status: active
+---
+
 Hey all 👋
 This month we’re doing things differently and want to show off more from the [Odin Discord Community](https://discord.gg/vafXTdubwr). We’ll go over release note highlights and official package news as usual.
 
@@ -37,7 +45,7 @@ This month we’re doing things differently and want to show off more from the [
 
 ## Primeagen Interview with GingerBill [#](#primeagen-interview-with-gingerbill)
 
-GingerBill was recently interviewed by [ThePrimeagen](https://www.youtube.com/@ThePrimeagen) (*~51 min.*). It included a walkthrough through the `demo.odin` file, going over odin’s features and answering viewer questions.
+GingerBill was recently interviewed by [ThePrimeagen](https://www.youtube.com/@ThePrimeagen) (_~51 min._). It included a walkthrough through the `demo.odin` file, going over odin’s features and answering viewer questions.
 
 ## Package Registry [#](#package-registry)
 
@@ -145,4 +153,4 @@ Multi-line text editing for custom UI - markersniffen
 
 Sparse fluid solver working in odin + dx12 - ProfPistachio
 
->Source: https://odin-lang.org/news/newsletter-2023-06
+> Source: https://odin-lang.org/news/newsletter-2023-06

@@ -1,10 +1,18 @@
+---
+title: "Iterator Approach"
+source: "https://odin-lang.org/news/read-a-file-line-by-line"
+tags: [OdinRAG, kb, source/newsletters, topic/allocator]
+type: reference
+status: active
+---
+
 Reading a file is very easy to do in Odin, but sometimes you just want to read the file line-by-line. Below we will show some approaches for this.
 
 ## Iterator Approach [#](#iterator-approach)
 
 Reading the entire file at once and then split line by line with an iterator.
 
-*This is the preferred approach in general on most modern machines.*
+_This is the preferred approach in general on most modern machines._
 
 ```odin
 package line_by_line
@@ -13,24 +21,25 @@ import "core:os"
 import "core:strings"
 
 read_file_by_lines_in_whole :: proc(filepath: string) {
-	data, err := os.read_entire_file(filepath, context.allocator)
-	if err != nil {
-		// could not read file
-		return
-	}
-	defer delete(data, context.allocator)
+  data, err := os.read_entire_file(filepath, context.allocator)
+  if err != nil {
+    // could not read file
+    return
+  }
+  defer delete(data, context.allocator)
 
-	it := string(data)
-	for line in strings.split_lines_iterator(&it) {
-		// process line
-	}
+  it := string(data)
+  for line in strings.split_lines_iterator(&it) {
+    // process line
+  }
 }
-```odin
+```
+
 ## Buffered IO Approach [#](#buffered-io-approach)
 
 Reading the file a chunk at a time and then copy a string from the buffer.
 
-*This is useful for when you have a general `io.Reader` which cannot read everything at once.*
+_This is useful for when you have a general `io.Reader` which cannot read everything at once._
 
 ```odin
 import "core:bufio"
@@ -64,4 +73,4 @@ read_file_by_lines_with_buffering :: proc(filepath: string) {
 }
 ```
 
->Source: https://odin-lang.org/news/read-a-file-line-by-line
+> Source: https://odin-lang.org/news/read-a-file-line-by-line

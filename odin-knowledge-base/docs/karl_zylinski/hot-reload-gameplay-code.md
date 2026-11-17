@@ -1,3 +1,12 @@
+---
+title: "Hot Reload Gameplay Code: What, why, limitations and examples!"
+date: 2023-09-15
+source: "https://zylinski.se/posts/hot-reload-gameplay-code"
+tags: [OdinRAG, kb, source/zylinski, topic/hot-reload, topic/raylib]
+type: reference
+status: active
+---
+
 # Hot Reload Gameplay Code: What, why, limitations and examples!
 
 September 15, 2023
@@ -8,7 +17,7 @@ Table of Contents
 
 - [What is hot reload and why do you do it?](#what-is-hot-reload-and-why-do-you-do-it)
   - [Hot reload is helpful when:](#hot-reload-is-helpful-when)
-  - [Hot reload is *not* helpful when:](#hot-reload-is-not-helpful-when)
+  - [Hot reload is _not_ helpful when:](#hot-reload-is-not-helpful-when)
 - [Example implementation in Odin Programming Language](#example-implementation-in-odin-programming-language)
   - [Part 1: The game DLL](#part-1-the-game-dll)
   - [Part 2: The main program](#part-2-the-main-program)
@@ -47,7 +56,7 @@ However, it is important to know when hot reload is helpful and when it falls sh
 
 In general, I would say that hot reload is extra helpful when tweaking fine details. Without hot reload you have to restart your game for each small change. When you think you’re almost done with a gameplay system you realize you have to tweak a handful of parameters a lot, which could mean 100 restarts of your game. I think that having something like hot reload will make your game better, since you may not have the stamina to do all those restarts.
 
-### Hot reload is *not* helpful when:[#](#hot-reload-is-not-helpful-when)
+### Hot reload is _not_ helpful when:[#](#hot-reload-is-not-helpful-when)
 
 - **You make changes to the memory layout of your game.** This means adding fields to structs or reordering fields. This might seem like a big downside, but the biggest frustration hot reload solves is that you don’t have to restart when making changes to or fine tuning the behavior of the game. I tend to spend a lot more time on gameplay behavior and algorithms than adding and removing fields from my structs.
 - **Your code relies heavily on procedure (function) pointers.** The hot reload will load new game code and kick out the old one. It will keep the same game memory around. Now, if that game memory has pointers to procedures within the old code then you are in trouble. There is more details on this under the heading [Can I patch up procedure pointers that point to the old game DLL?](#can-i-patch-up-procedure-pointers-that-point-to-the-old-game-dll)
@@ -126,7 +135,8 @@ hot reload occurs. See game_memory comments. */
 game_hot_reloaded :: proc(mem: ^GameMemory) {
   g_mem = mem
 }
-```odin
+```
+
 In order to compile this code as a DLL, save it to file named `game.odin` and then compile it using the command line:
 `odin build game.odin -file -build-mode:dll -out:game.dll`
 
@@ -139,10 +149,10 @@ Here follows the full source code for the main program. Note that when loading t
 ```odin
 package game
 
-import "core:dynlib"
-import "core:os"
-import "core:fmt"
 import "core:c/libc"
+import "core:dynlib"
+import "core:fmt"
+import "core:os"
 
 /* The main program loads a game DLL and checks
 once per frame if it changed. If changed, then
@@ -179,8 +189,7 @@ main :: proc() {
     try to do a hot reload. */
     dll_time, dll_time_err := os.last_write_time_by_name("game.dll")
 
-    reload := dll_time_err == os.ERROR_NONE &&
-              game_api.dll_time != dll_time
+    reload := dll_time_err == os.ERROR_NONE && game_api.dll_time != dll_time
 
     if reload {
       /* Load a new game API. Might fail due to
@@ -220,19 +229,19 @@ main :: proc() {
 /* Contains pointers to the procedures exposed
 by the game DLL. */
 GameAPI :: struct {
-  init: proc(),
-  update: proc() -> bool,
-  shutdown: proc(),
-  memory: proc() -> rawptr,
-  hot_reloaded: proc(rawptr),
+  init:         proc(),
+  update:       proc() -> bool,
+  shutdown:     proc(),
+  memory:       proc() -> rawptr,
+  hot_reloaded: proc(_: rawptr),
 
   // The loaded DLL handle
-  lib: dynlib.Library,
+  lib:          dynlib.Library,
 
   /* Used to compare write date on disk vs when
   game API was created. */
-  dll_time: os.File_Time,
-  api_version: int,
+  dll_time:     os.File_Time,
+  api_version:  int,
 }
 
 /* Load the game DLL and return a new GameAPI
@@ -278,15 +287,14 @@ load_game_api :: proc(api_version: int) -> (GameAPI, bool) {
   inside the game DLL. Note that we manually
   cast them to the correct signatures. */
   api := GameAPI {
-    init = cast(proc())(dynlib.symbol_address(lib, "game_init") or_else nil),
-    update = cast(proc() -> bool)(dynlib.symbol_address(lib, "game_update") or_else nil),
-    shutdown = cast(proc())(dynlib.symbol_address(lib, "game_shutdown") or_else nil),
-    memory = cast(proc() -> rawptr)(dynlib.symbol_address(lib, "game_memory") or_else nil),
-    hot_reloaded = cast(proc(rawptr))(dynlib.symbol_address(lib, "game_hot_reloaded") or_else nil),
-
-    lib = lib,
-    dll_time = dll_time,
-    api_version = api_version,
+    init         = cast(proc())(dynlib.symbol_address(lib, "game_init") or_else nil),
+    update       = cast(proc() -> bool)(dynlib.symbol_address(lib, "game_update") or_else nil),
+    shutdown     = cast(proc())(dynlib.symbol_address(lib, "game_shutdown") or_else nil),
+    memory       = cast(proc() -> rawptr)(dynlib.symbol_address(lib, "game_memory") or_else nil),
+    hot_reloaded = cast(proc(_: rawptr))(dynlib.symbol_address(lib, "game_hot_reloaded") or_else nil),
+    lib          = lib,
+    dll_time     = dll_time,
+    api_version  = api_version,
   }
 
   if api.init == nil || api.update == nil || api.shutdown == nil || api.memory == nil || api.hot_reloaded == nil {
@@ -312,7 +320,8 @@ unload_game_api :: proc(api: GameAPI) {
     fmt.println("Failed to remove game_{0}.dll copy", api.api_version)
   }
 }
-```odin
+```
+
 Save this code as `main.odin` and compile it using:
 `odin build main.odin -file`
 
@@ -368,7 +377,8 @@ for {
     }
   }
 }
-```odin
+```
+
 The difference compared to earlier is that we ask the Game API if we should do a full reset. If we should, then we run `game_api.shutdown()` clearing the memory, after which we unload the old game API. We then run `game_api.init()` again. This is like restarting the game, but without having to restart the exe. It doesn’t have anything to do with hot reload really, but it is handy.
 
 ### Can I avoid crashes when struct layouts change?[#](#can-i-avoid-crashes-when-struct-layouts-change)
@@ -407,7 +417,8 @@ game_hot_reloaded :: proc(mem: ^GameMemory) {
   g_mem = mem
   g_some_struct = &g_mem.some_struct
 }
-```odin
+```
+
 I do this in my game. There is a global pointer to the current world. But that world actually lives inside `GameMemory` and is reassigned when `game_hot_reloaded` is run.
 
 ### Can I patch up procedure pointers that point to the old game DLL?[#](#can-i-patch-up-procedure-pointers-that-point-to-the-old-game-dll)
@@ -439,7 +450,8 @@ main :: proc() {
 
   game.game_shutdown()
 }
-```odin
+```
+
 In our earlier examples we compiled using `odin build main.odin -file`, i.e. we hadn’t separated things into packages, instead we compiled specific source files directly. Now we need the code that goes into the game DLL to live in a separate package it can be imported into our main\_release program. Therefore we would in this example split everything into three packages that live in folders named game, main and main\_release. You’d compile the game DLL by running `odin build game -build-mode:dll -out:game.dll` and the main program by running `odin build main` and finally the main\_release program by running `odin build main_release`.
 
 Note: The main\_release program directly imports the game code. The game.dll is not needed for this type of release build, it’s all compiled into a single exe.
@@ -462,7 +474,8 @@ To do this, make sure you compile your `game.dll` with the flag `-define:RAYLIB_
 
 ```odin
 odin build game.odin -file -define:RAYLIB_SHARED=true -build-mode:dll -out:game.dll
-```odin
+```
+
 Windows users may also need to copy `raylib.dll` from `<odin_compiler>/vendor/raylib/windows/raylib.dll` to your project.
 
 #### Split `game_init` into `game_init` and `game_init_window`[#](#split-game_init-into-game_init-and-game_init_window)
@@ -485,4 +498,4 @@ Drop any comments or questions to me on:
 - Mastodon: <https://mastodon.gamedev.place/@karl_zylinski>
 - E-mail: [karl@zylinski.se](mailto:karl@zylinski.se)
 
->Source: https://zylinski.se/posts/hot-reload-gameplay-code
+> Source: https://zylinski.se/posts/hot-reload-gameplay-code

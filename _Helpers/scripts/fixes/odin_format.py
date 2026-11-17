@@ -111,7 +111,7 @@ def format_odin_file(path: Path) -> bool:
         return False
 
     try:
-        path.write_text(formatted, encoding="utf-8")
+        path.write_text(formatted, encoding="utf-8", newline="\n")
     except OSError:
         return False
     return True
@@ -169,7 +169,7 @@ def format_markdown_file(path: Path) -> tuple[bool, int, int]:
         return False, total, changed
 
     try:
-        path.write_text(new_text, encoding="utf-8")
+        path.write_text(new_text, encoding="utf-8", newline="\n")
     except OSError:
         return False, total, changed
     return True, total, changed

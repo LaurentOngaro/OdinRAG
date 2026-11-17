@@ -1,10 +1,19 @@
+---
+title: "Software Renderer in Odin from Scratch, Part IX"
+date: 2025-11-01
+source: "https://marianpekar.com/blog/software-renderer-in-odin-from-scratch-part-ix"
+tags: [OdinRAG, kb, source/marianpekar, topic/allocator, topic/rendering, topic/raylib]
+type: reference
+status: active
+---
+
 # Software Renderer in Odin from Scratch, Part IX
 
 1st November 2025 • 16 min read
 
 While in the previous part we loaded an image file to be used as a texture with the significant help of raylib, today we are going to implement our own loader for .obj files. We're going to use `strings`, `strconv`, and `os` from Odin's `core` package, and our loader will consist of a single procedure with two small inner procedures implemented in `mesh.odin`. This new procedure will accept a path to an .obj file and return a `Mesh`, just as `MakeCube` does. But before we dive into implementation, let’s first talk about the OBJ format.
 
-*Wavefront OBJ* is a geometry definition file format first developed by Wavefront Technologies in the 1980s. Although there are more modern and sophisticated formats, OBJ is very easy to understand. You can even describe a cube by hand in this format, just as we did when we were implementing our `MakeCube` procedure, and in fact, this is what we're going to do first to understand the format.
+_Wavefront OBJ_ is a geometry definition file format first developed by Wavefront Technologies in the 1980s. Although there are more modern and sophisticated formats, OBJ is very easy to understand. You can even describe a cube by hand in this format, just as we did when we were implementing our `MakeCube` procedure, and in fact, this is what we're going to do first to understand the format.
 
 Most 3D authoring software still allows exporting geometry into this format out of the box, and I'll show you how to do it in Blender at the end of today's part.
 
@@ -240,7 +249,7 @@ And run the application (`odin run . -o:speed`), you should see the same cube, b
 mesh := LoadMeshFromObjFile("assets/monkey.obj")
 ```
 
-Once you recompile the application, you should see the monkey mesh rendered with UV checker texture, and you should still be able to move this new mesh around with the WSADQD keys, rotate it with the IJKLUO keys, scale it using + and -, and cycle through all six rendering modes with the left and right arrows. If anything doesn't work as expected, compare your implementation with the one in the *Part 9* directory in [this GitHub repository](https://github.com/marianpekar/software-renderer-odin-tutorials).
+Once you recompile the application, you should see the monkey mesh rendered with UV checker texture, and you should still be able to move this new mesh around with the WSADQD keys, rotate it with the IJKLUO keys, scale it using + and -, and cycle through all six rendering modes with the left and right arrows. If anything doesn't work as expected, compare your implementation with the one in the _Part 9_ directory in [this GitHub repository](https://github.com/marianpekar/software-renderer-odin-tutorials).
 
 ![Monkey mesh in all six modes our software renderer currently supports.](/uploads/sv_rend_ix_monkey_all_modes.png)
 
@@ -250,9 +259,9 @@ Before we wrap this up today, I want to quickly show you one last thing. This is
 
 However, I think this part makes the tutorial more complete. I'm going to show you how to export a mesh from Blender in a triangulated OBJ format, so you can download models from the internet and use Blender to convert them or even create your own, and then load them into our renderer. There is something very satisfying about seeing a model you created in a 3D authoring program rendered in a software renderer you wrote from scratch.
 
-In Blender, you can open a native Blender file with the .blend extension by going to *File → Open*, or you can import models from various formats through *File → Import*. There are plenty of models you can download from sites like [Sketchfab](https://www.sketchfab.com).
+In Blender, you can open a native Blender file with the .blend extension by going to _File → Open_, or you can import models from various formats through _File → Import_. There are plenty of models you can download from sites like [Sketchfab](https://www.sketchfab.com).
 
-Once you have a model in Blender and you wish to export it, go to *File → Export → Wavefront (.obj)* and in the panel on the right side of the export window, make sure that *UV Coordinates* and *Normals* are checked, and most importantly, don't forget to check *Triangulated Mesh*.
+Once you have a model in Blender and you wish to export it, go to _File → Export → Wavefront (.obj)_ and in the panel on the right side of the export window, make sure that _UV Coordinates_ and _Normals_ are checked, and most importantly, don't forget to check _Triangulated Mesh_.
 
 ![](/uploads/sw_rend_ix_blender_obj_export.png)
 
@@ -264,7 +273,7 @@ If your .obj file is missing UV coordinates even though you had UV Coordinates c
 f 424//385 408//385 406//385
 ```
 
-In Blender, switch to *Edit Mode*, press *A* to select the entire mesh, then go to the top menu and choose *UV → Smart UV Project*. Confirm the process by clicking the *Unwrap* button. While the model is still selected, switch to the UV Editing workspace from the menu at the very top, and you should now see a square area on the left showing the unwrapped surface of your mesh. If you now export the mesh to an .obj file again, it will have UV coordinates as expected.
+In Blender, switch to _Edit Mode_, press _A_ to select the entire mesh, then go to the top menu and choose _UV → Smart UV Project_. Confirm the process by clicking the _Unwrap_ button. While the model is still selected, switch to the UV Editing workspace from the menu at the very top, and you should now see a square area on the left showing the unwrapped surface of your mesh. If you now export the mesh to an .obj file again, it will have UV coordinates as expected.
 
 ![You can find the dropdown menu for switching Blender to different modes in the top left corner of the 3D viewport.](/uploads/sw_rend_ix_blender_edit_mode.png)
 
@@ -313,4 +322,4 @@ With this tweak, for meshes missing UVs, the textured rendering modes in our ren
 > Author: Marian Pekar - <https://marianpekar.com>
 > (c) Marian Pekar. The posts stay freely readable on the author's site; this local copy is credited in `SOURCES.md` at the repo root. Please link back to the original article.
 
->Source: https://marianpekar.com/blog/software-renderer-in-odin-from-scratch-part-ix
+> Source: https://marianpekar.com/blog/software-renderer-in-odin-from-scratch-part-ix

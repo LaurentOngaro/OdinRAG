@@ -1,3 +1,11 @@
+---
+title: "Compiler Updates"
+source: "https://odin-lang.org/news/newsletter-2023-12"
+tags: [OdinRAG, kb, source/newsletters, topic/raylib, topic/wasm]
+type: reference
+status: active
+---
+
 ## Compiler Updates [#](#compiler-updates)
 
 Only minor fixes and additions to the core library.
@@ -17,7 +25,7 @@ As always [Karl Zylinski](https://www.youtube.com/@karl_zylinski) and [Rickard A
 
 ## Orca [#](#orca)
 
-Handmade Seattle hosted multiple amazing demos. There was one which I needed to mention is [Orca](https://orca-app.dev/) by *Martin Fouilleul*.
+Handmade Seattle hosted multiple amazing demos. There was one which I needed to mention is [Orca](https://orca-app.dev/) by _Martin Fouilleul_.
 
 WebAssembly apps without the web.  
 A brand-new stack for cross-platform apps.
@@ -188,4 +196,4 @@ I had this idea for a command-line engine for a while and decided to put it in p
 
 Added MenuBar to Winforms. Here is the code and output. 🙂 - kcvinker
 
->Source: https://odin-lang.org/news/newsletter-2023-12
+> Source: https://odin-lang.org/news/newsletter-2023-12

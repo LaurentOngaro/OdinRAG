@@ -1,3 +1,12 @@
+---
+title: "Software Renderer in Odin from Scratch, Part V"
+date: 2025-07-30
+source: "https://marianpekar.com/blog/software-renderer-in-odin-from-scratch-part-v"
+tags: [OdinRAG, kb, source/marianpekar, topic/rendering, topic/raylib]
+type: reference
+status: active
+---
+
 # Software Renderer in Odin from Scratch, Part V
 
 30th July 2025 • 20 min read
@@ -32,21 +41,21 @@ Soon, we pass the position of a camera as `eye` and also its `target` to the `Ma
 package main
 
 Camera :: struct {
-    position: Vector3,
-    target: Vector3
+  position: Vector3,
+  target:   Vector3,
 }
 
 MakeCamera :: proc(position, target: Vector3) -> Camera {
-    camera: Camera
-    camera.position = position
-    camera.target = target
-    return camera
+  camera: Camera
+  camera.position = position
+  camera.target = target
+  return camera
 }
 ```
 
 ## Implementing inputs.odin
 
-Before we dive back into rendering, let's first implement the input handling. Create a new file called `inputs.odin`. It will contain just a single procedure that accepts *translation*, *rotation*, and *scale*, as well as the *render mode index* as mutable references. It will also take the *count of render modes*, so we can cycle through them using left and right arrow keys, and the *delta time* to keep our logic frame-time independent.
+Before we dive back into rendering, let's first implement the input handling. Create a new file called `inputs.odin`. It will contain just a single procedure that accepts _translation_, _rotation_, and _scale_, as well as the _render mode index_ as mutable references. It will also take the _count of render modes_, so we can cycle through them using left and right arrow keys, and the _delta time_ to keep our logic frame-time independent.
 
 We'll return to the concept of delta time soon. Now, let's proceed with the implementation.
 
@@ -62,9 +71,9 @@ Passing by a pointer (using `^` in front of a type, e.g., `^Vector3`) means the 
 
 You probably already know the difference between passing by reference and passing by value, especially if you're coming from C or C++, where you distinguish between passing by pointer, by reference, or by value, and whether each is mutable or immutable. I just wanted to briefly mention this because in Odin, it works a bit differently and, in my opinion, much more user-friendly.
 
-In Odin, you don’t need to think about it as much as in C or C++. *You only pass by pointer if you want the value to be mutable inside the procedure* and that's it. Otherwise, you don't need to worry about it at all; the compiler decides whether to copy it or pass it as an **immutable** reference, which it will when the value is larger than the size of a pointer (8 bytes on 64-bit machines). Isn't Odin a great language?
+In Odin, you don’t need to think about it as much as in C or C++. _You only pass by pointer if you want the value to be mutable inside the procedure_ and that's it. Otherwise, you don't need to worry about it at all; the compiler decides whether to copy it or pass it as an **immutable** reference, which it will when the value is larger than the size of a pointer (8 bytes on 64-bit machines). Isn't Odin a great language?
 
-Let's proceed with the implementation of the `HandleInputs` procedure. We need variables for linear and angular step sizes, one for *translation* and *scaling*, the other for *rotation*. But it would be nice to slow things down when holding Left Shift, so we'll define these values using a ternary operator like this.
+Let's proceed with the implementation of the `HandleInputs` procedure. We need variables for linear and angular step sizes, one for _translation_ and _scaling_, the other for _rotation_. But it would be nice to slow things down when holding Left Shift, so we'll define these values using a ternary operator like this.
 
 ```odin
 linearStep: f32 = (rl.IsKeyDown(rl.KeyboardKey.LEFT_SHIFT) ? 0.25 : 1) * deltaTime
@@ -120,16 +129,16 @@ Now, let's create a new file, name it `draw.odin`. From this point, until the ve
 ```odin
 package main
 
-import rl "vendor:raylib"
 import "core:math"
+import rl "vendor:raylib"
 ```
 
-Then we'll proceed with implementing the `DrawWireframe` procedure. This procedure accepts *transformed* vertices, triangles, and a projection matrix, a perspective projection matrix in our case, though later, we'll also implement switching between orthographic and perspective projections. The procedure also accepts a color to draw mesh lines with and a flag we'll use to switch between two modes: with backface culling enabled and disabled.
+Then we'll proceed with implementing the `DrawWireframe` procedure. This procedure accepts _transformed_ vertices, triangles, and a projection matrix, a perspective projection matrix in our case, though later, we'll also implement switching between orthographic and perspective projections. The procedure also accepts a color to draw mesh lines with and a flag we'll use to switch between two modes: with backface culling enabled and disabled.
 
 ```odin
 DrawWireframe :: proc(
     vertices: []Vector3,
-    triangles: []Triangle, 
+    triangles: []Triangle,
     projMat: Matrix4x4,
     color: rl.Color,
     cullBackFace: bool
@@ -166,7 +175,7 @@ Now that we have the screen positions, there's one more optimization I'd like to
 We discussed the frustum in [Part III](https://marianpekar.com/blog/software-renderer-in-odin-from-scratch-part-iii), where we covered transformations. Just a brief reminder, it's the volume bounded by the near, far, top, bottom, left, and right planes, and it defines our visible area. While the position of near and far planes is optional, the others are typically determined by our screen dimensions.
 
 ```odin
-if (IsFaceOutsideFrustum(p1, p2, p3)) { 
+if (IsFaceOutsideFrustum(p1, p2, p3)) {
     continue
 }
 ```
@@ -194,13 +203,13 @@ IsBackFace :: proc(v1, v2, v3: Vector3) -> bool {
     crossNorm := Vector3Normalize(cross)
     toCamera := Vector3Normalize(v1)
 
-    return Vector3DotProduct(crossNorm, toCamera) >= 0.0 
+    return Vector3DotProduct(crossNorm, toCamera) >= 0.0
 }
 ```
 
-You might be wondering how this works if we don't pass in the camera. The reason is that these vertices are already transformed into *view space* (sometimes referred to as *camera space*), and in view space, the camera is always positioned at the origin `[0,0,0]`.
+You might be wondering how this works if we don't pass in the camera. The reason is that these vertices are already transformed into _view space_ (sometimes referred to as _camera space_), and in view space, the camera is always positioned at the origin `[0,0,0]`.
 
-So, if we get two vectors pointing from `v1` in the directions of `v2` and `v3`, which we called `edge1` and `edge2`, and then compute their cross product and *normalize* it, we get a *unit vector* pointing perpendicularly to the triangle. We called this vector cross, but it's also known as the normal. We talked about normals in the [previous part](https://marianpekar.com/blog/software-renderer-in-odin-from-scratch-part-iv).
+So, if we get two vectors pointing from `v1` in the directions of `v2` and `v3`, which we called `edge1` and `edge2`, and then compute their cross product and _normalize_ it, we get a _unit vector_ pointing perpendicularly to the triangle. We called this vector cross, but it's also known as the normal. We talked about normals in the [previous part](https://marianpekar.com/blog/software-renderer-in-odin-from-scratch-part-iv).
 
 ![](/uploads/sw_rend_v_norm_calc_for_bc.png)
 
@@ -214,13 +223,13 @@ Let's now implement the `ProjectToScreen` procedure, which is one of the most im
 ProjectToScreen :: proc(mat: Matrix4x4, p: Vector3) -> Vector3 {
 ```
 
-Inside the procedure, we first use the projection matrix to transform the point `p` into *clip space*, but we're also adding the fourth component `w`, set to `1`. You'll see why we're doing that in a moment.
+Inside the procedure, we first use the projection matrix to transform the point `p` into _clip space_, but we're also adding the fourth component `w`, set to `1`. You'll see why we're doing that in a moment.
 
 ```odin
 clip := Mat4MulVec4(mat, Vector4{p.x, p.y, p.z, 1.0})
 ```
 
-Now that we've transformed the point to *clip space*, we use the inverse of the `w` component to perform perspective division, effectively getting X and Y in *Normalized Device Coordinates (NDC)* in the range of -1 to 1.
+Now that we've transformed the point to _clip space_, we use the inverse of the `w` component to perform perspective division, effectively getting X and Y in _Normalized Device Coordinates (NDC)_ in the range of -1 to 1.
 
 ```odin
 invW : f32 = 1.0 / clip.w
@@ -243,7 +252,7 @@ And that’s it, now we simply return the point in screen space, but we also car
 }
 ```
 
-Before actually drawing lines between points, we need to check whether all points are inside the visible frustum, as we mentioned earlier. First, we check if the `z` components (which are now the values of `invW` from the ' ProjectToScreen `ProjectToScreen`procedure) of all points are in the range of -1 to 1, in other words, if points are behind the *near plane* and in front of the *far plane*.
+Before actually drawing lines between points, we need to check whether all points are inside the visible frustum, as we mentioned earlier. First, we check if the `z` components (which are now the values of `invW` from the ' ProjectToScreen `ProjectToScreen`procedure) of all points are in the range of -1 to 1, in other words, if points are behind the _near plane_ and in front of the _far plane_.
 
 ```odin
 IsFaceOutsideFrustum :: proc(p1, p2, p3: Vector3) -> bool {
@@ -255,7 +264,7 @@ IsFaceOutsideFrustum :: proc(p1, p2, p3: Vector3) -> bool {
 
 If at least one point is outside these boundaries, we consider the entire face to be outside as well. This simplification is good enough for our case.
 
-Then we do something similar for the *left*, *right*, *top*, and *bottom* planes, where the limits are 0, 800, 0, and 600, according to our screen resolution. Only this time, we find the minimum and maximum to create a bounding box around our triangle, and return `true` only if the entire bounding box is outside the visible screen area.
+Then we do something similar for the _left_, _right_, _top_, and _bottom_ planes, where the limits are 0, 800, 0, and 600, according to our screen resolution. Only this time, we find the minimum and maximum to create a bounding box around our triangle, and return `true` only if the entire bounding box is outside the visible screen area.
 
 ```odin
 ‎ ‎ ‎ ‎ ‎minX := math.min(p1.x, math.min(p2.x, p3.x))
@@ -316,7 +325,7 @@ Now that we have everything we need in the `camera.odin`, `inputs.odin`, and `dr
 camera := MakeCamera({0.0, 0.0, -3.0}, {0.0, 0.0, -1.0})
 ```
 
-Then, create two vectors, one for *translation* and one for *rotation*, and a *float* for scaling.
+Then, create two vectors, one for _translation_ and one for _rotation_, and a _float_ for scaling.
 
 ```odin
 translation := Vector3{0.0, 0.0, 0.0}
@@ -331,7 +340,7 @@ renderModesCount :: 2
 renderMode: i8 = renderModesCount - 1
 ```
 
-The last thing we need to do before entering our main loop is to create the projection matrix. But first, we need to go to `constants.odin` and add our field of view in degrees, let’s say 70 (feel free to experiment with this value), as well as our *near* and far *plane* values.
+The last thing we need to do before entering our main loop is to create the projection matrix. But first, we need to go to `constants.odin` and add our field of view in degrees, let’s say 70 (feel free to experiment with this value), as well as our _near_ and far _plane_ values.
 
 ```odin
 FOV :: 70
@@ -360,7 +369,7 @@ rotationMatrix    := MakeRotationMatrix(rotation.x, rotation.y, rotation.z)
 scaleMatrix       := MakeScaleMatrix(scale, scale, scale)
 ```
 
-Then, we use them to create our *model matrix*, followed by creating a *view matrix* and a *model-view matrix* by multiplying the view matrix with the model matrix. In this case, we can reuse the *viewMatrix* variable. This is what we covered in [Part III](https://marianpekar.com/blog/software-renderer-in-odin-from-scratch-part-iii), where we talked bout affine transformations.
+Then, we use them to create our _model matrix_, followed by creating a _view matrix_ and a _model-view matrix_ by multiplying the view matrix with the model matrix. In this case, we can reuse the _viewMatrix_ variable. This is what we covered in [Part III](https://marianpekar.com/blog/software-renderer-in-odin-from-scratch-part-iii), where we talked bout affine transformations.
 
 ```odin
 modelMatrix       := Mat4Mul(translationMatrix, Mat4Mul(rotationMatrix, scaleMatrix))
@@ -368,7 +377,7 @@ viewMatrix        := MakeViewMatrix(camera.position, camera.target)
 viewMatrix         = Mat4Mul(viewMatrix, modelMatrix)
 ```
 
-Now, we use our *final matrix* stored as the `viewMatrix` to transform all the vertices. Let’s write a small procedure for that. In the [previous part](https://marianpekar.com/blog/software-renderer-in-odin-from-scratch-part-iv), we discussed the anatomy of a mesh and implemented our `Mesh` struct with `vertices`, and `transformedVertices` array ready to hold the vertices after transformation. We're going to use them as intended in the `ApplyTransformations` procedure.
+Now, we use our _final matrix_ stored as the `viewMatrix` to transform all the vertices. Let’s write a small procedure for that. In the [previous part](https://marianpekar.com/blog/software-renderer-in-odin-from-scratch-part-iv), we discussed the anatomy of a mesh and implemented our `Mesh` struct with `vertices`, and `transformedVertices` array ready to hold the vertices after transformation. We're going to use them as intended in the `ApplyTransformations` procedure.
 
 ```odin
 ApplyTransformations :: proc(transformed: ^[]Vector3, original: []Vector3, mat: Matrix4x4) {
@@ -430,4 +439,4 @@ You should see a green wireframe cube, and you should be able to switch between 
 > Author: Marian Pekar - <https://marianpekar.com>
 > (c) Marian Pekar. The posts stay freely readable on the author's site; this local copy is credited in `SOURCES.md` at the repo root. Please link back to the original article.
 
->Source: https://marianpekar.com/blog/software-renderer-in-odin-from-scratch-part-v
+> Source: https://marianpekar.com/blog/software-renderer-in-odin-from-scratch-part-v

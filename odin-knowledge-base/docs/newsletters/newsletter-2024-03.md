@@ -1,24 +1,32 @@
+---
+title: "Projects shared this month"
+source: "https://odin-lang.org/news/newsletter-2024-03"
+tags: [OdinRAG, kb, source/newsletters, topic/hot-reload, topic/rendering, topic/raylib, topic/sokol]
+type: reference
+status: active
+---
+
 Read up on the compiler changes in the [monthly release](https://github.com/odin-lang/Odin/releases/tag/dev-2024-03) notes.
 
 GingerBill has been featured on a podcast from [Mike Shah](https://www.youtube.com/@MikeShah) this month
 
 ## Projects shared this month [#](#projects-shared-this-month)
 
-| Project Name | Description |
-| --- | --- |
-| [jolt](https://gitlab.com/raygarner13/jolt) | Jolt bindings |
-| [libpq](https://github.com/laytan/odin-postgresql) | PostgreSQL/libpq bindings |
-| [odin-xinput](https://github.com/lordhippo/odin-xinput) | Xinput bindings |
-| [odin-tray](https://github.com/lordhippo/odin-tray) | Tray library port |
-| [odin-bivector](https://github.com/softmonkey/odin-bivector) | Geometric Algebra |
-| [odin-protobuf](https://github.com/lordhippo/odin-protobuf) | Protobuf |
-| [odin-tilengine](https://github.com/akuspel/odin-tilengine) | Tilengine bindings |
+| Project Name                                                                  | Description                           |
+| ----------------------------------------------------------------------------- | ------------------------------------- |
+| [jolt](https://gitlab.com/raygarner13/jolt)                                   | Jolt bindings                         |
+| [libpq](https://github.com/laytan/odin-postgresql)                            | PostgreSQL/libpq bindings             |
+| [odin-xinput](https://github.com/lordhippo/odin-xinput)                       | Xinput bindings                       |
+| [odin-tray](https://github.com/lordhippo/odin-tray)                           | Tray library port                     |
+| [odin-bivector](https://github.com/softmonkey/odin-bivector)                  | Geometric Algebra                     |
+| [odin-protobuf](https://github.com/lordhippo/odin-protobuf)                   | Protobuf                              |
+| [odin-tilengine](https://github.com/akuspel/odin-tilengine)                   | Tilengine bindings                    |
 | [GameNetworkingSockets](https://github.com/Smilex/GameNetworkingSockets-Odin) | Valve’s GameNetworkingSocket bindings |
-| [odin-psapi](https://github.com/iansimonson/odin-psapi) | Windows PSAPI bindings |
+| [odin-psapi](https://github.com/iansimonson/odin-psapi)                       | Windows PSAPI bindings                |
 
 ## Project Showcase [#](#project-showcase)
 
-We’re trying something new this month, let us know what you think! We’ll focus on ***4*** projects that have been worked on. Each author tells you something about their project.
+We’re trying something new this month, let us know what you think! We’ll focus on _**4**_ projects that have been worked on. Each author tells you something about their project.
 
 ## Homeshift [#](#homeshift)
 
@@ -147,4 +155,4 @@ This game has been my first big and serious programming project, since I only st
 
 Odin itself has been a pleasure to work in, and 2Deez is made only with the core library, and the SDL and GGPO vendor bindings. It was way easier than trying to make a game with a game engine, since I could understand all of the moving parts myself, and had enough quality of life features to have a very low friction development experience without compromising on performance.
 
->Source: https://odin-lang.org/news/newsletter-2024-03
+> Source: https://odin-lang.org/news/newsletter-2024-03

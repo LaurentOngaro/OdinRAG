@@ -1,3 +1,12 @@
+---
+title: "Software Renderer in Odin from Scratch, Part XI"
+date: 2026-01-19
+source: "https://marianpekar.com/blog/software-renderer-in-odin-from-scratch-part-xi"
+tags: [OdinRAG, kb, source/marianpekar, topic/rendering, topic/raylib]
+type: reference
+status: active
+---
+
 # Software Renderer in Odin from Scratch, Part XI
 
 19th January 2026 • 20 min read
@@ -18,11 +27,11 @@ You will see the current frame rate (or FPS = Frames Per Second) in the top left
 
 The fact that the frame rate drops when we upscale the model or move it closer to the camera makes perfect sense, since we perform calculations per pixel. A bigger model means bigger triangles and bigger triangles mean more pixels on the screen, and more pixels on the screen mean more per-pixel calculations.
 
-This brings us to the concept of *cold* and *hot code*. Cold code refers to code that is usually executed only once, typically at the beginning of the program or when the program is shutting down. In our case, cold code includes initialization of a window, loading a mesh and texture, and all our factory procedures, whose names start with `Make`. On the other hand, hot code is code that runs over and over. In our renderer, hot code is easy to identify. It is everything that is executed inside the main loop.
+This brings us to the concept of _cold_ and _hot code_. Cold code refers to code that is usually executed only once, typically at the beginning of the program or when the program is shutting down. In our case, cold code includes initialization of a window, loading a mesh and texture, and all our factory procedures, whose names start with `Make`. On the other hand, hot code is code that runs over and over. In our renderer, hot code is easy to identify. It is everything that is executed inside the main loop.
 
 ```odin
 // cold code
-!rl.WindowShouldClose() { 
+!rl.WindowShouldClose() {
     // hot code
 }
 // cold code
@@ -60,7 +69,7 @@ Let's now open the `draw.odin` file, locate our `DrawPixel` procedure, and add t
 
 ```odin
 DrawPixel :: proc(
-    x, y: f32, 
+    x, y: f32,
     p1, p2, p3: ^Vector3,
     color: rl.Color,
     zBuffer: ^ZBuffer,
@@ -146,7 +155,7 @@ I believe you'd be able to make these changes without further guidance at this p
 ```odin
 DrawWireframe :: proc(
     vertices: []Vector3,
-    triangles: []Triangle, 
+    triangles: []Triangle,
     projMat: Matrix4x4,
     color: rl.Color,
     cullBackFace: bool,
@@ -192,18 +201,18 @@ DrawTexturedTriangleFlatShaded :: proc(
     // Draw a flat-bottom triangle
     // ...
     DrawTexelFlatShaded(
-        x, y, 
-        p1, p2, p3, 
-        uv1, uv2, uv3, 
+        x, y,
+        p1, p2, p3,
+        uv1, uv2, uv3,
         texture, intensity, zBuffer, image
     )
     // ...
     // Draw a flat-top triangle
     // ...
     DrawTexelFlatShaded(
-        x, y, 
-        p1, p2, p3, 
-        uv1, uv2, uv3, 
+        x, y,
+        p1, p2, p3,
+        uv1, uv2, uv3,
         texture, intensity, zBuffer, image
     )
     // ...
@@ -226,7 +235,7 @@ DrawTrianglePhongShaded :: proc(
     // ...
     DrawPixelPhongShaded(
         x, y,
-        v1, v2, v3, 
+        v1, v2, v3,
         n1, n2, n3,
         p1, p2, p3,
         color, light, zBuffer, image, ambient
@@ -236,11 +245,11 @@ DrawTrianglePhongShaded :: proc(
     // ...
     DrawPixelPhongShaded(
         x, y,
-        v1, v2, v3, 
+        v1, v2, v3,
         n1, n2, n3,
         p1, p2, p3,
         color, light, zBuffer, image, ambient
-    )    
+    )
     // ...
 }
 ```
@@ -262,10 +271,10 @@ DrawTexturedTrianglePhongShaded :: proc(
     // ...
     DrawTexelPhongShaded(
         x, y,
-        v1, v2, v3, 
-        n1, n2, n3, 
-        p1, p2, p3, 
-        uv1, uv2, uv3, 
+        v1, v2, v3,
+        n1, n2, n3,
+        p1, p2, p3,
+        uv1, uv2, uv3,
         texture, light, zBuffer, image, ambient
     )
     // ...
@@ -273,10 +282,10 @@ DrawTexturedTrianglePhongShaded :: proc(
     // ...
     DrawTexelPhongShaded(
         x, y,
-        v1, v2, v3, 
-        n1, n2, n3, 
-        p1, p2, p3, 
-        uv1, uv2, uv3, 
+        v1, v2, v3,
+        n1, n2, n3,
+        p1, p2, p3,
+        uv1, uv2, uv3,
         texture, light, zBuffer, image, ambient
     )
     // ...
@@ -287,10 +296,10 @@ Finally, we need to fix the last layer of procedures, the ones that we call from
 
 ```odin
 DrawUnlit :: proc(
-    vertices: []Vector3, 
+    vertices: []Vector3,
     triangles: []Triangle,
     projMat: Matrix4x4,
-    color: rl.Color, 
+    color: rl.Color,
     zBuffer: ^ZBuffer,
     image: ^rl.Image
 ) {
@@ -302,11 +311,11 @@ DrawUnlit :: proc(
 
 ```odin
 DrawFlatShaded :: proc(
-    vertices: []Vector3, 
+    vertices: []Vector3,
     triangles: []Triangle,
     projMat: Matrix4x4,
-    light: Light, 
-    color: rl.Color, 
+    light: Light,
+    color: rl.Color,
     zBuffer: ^ZBuffer,
     image: ^rl.Image,
     ambient:f32 = 0.2
@@ -319,10 +328,10 @@ DrawFlatShaded :: proc(
 
 ```odin
 DrawTexturedUnlit :: proc(
-    vertices: []Vector3, 
-    triangles: []Triangle, 
-    uvs: []Vector2, 
-    texture: Texture, 
+    vertices: []Vector3,
+    triangles: []Triangle,
+    uvs: []Vector2,
+    texture: Texture,
     zBuffer: ^ZBuffer,
     projMat: Matrix4x4,
     image: ^rl.Image
@@ -331,7 +340,7 @@ DrawTexturedUnlit :: proc(
     DrawTexturedTriangleFlatShaded(
         &p1, &p2, &p3,
         &uv1, &uv2, &uv3,
-        texture, 
+        texture,
         1.0, // Unlit
         zBuffer,
         image
@@ -342,11 +351,11 @@ DrawTexturedUnlit :: proc(
 
 ```odin
 DrawTexturedFlatShaded :: proc(
-    vertices: []Vector3, 
-    triangles: []Triangle, 
-    uvs: []Vector2, 
-    light: Light, 
-    texture: Texture, 
+    vertices: []Vector3,
+    triangles: []Triangle,
+    uvs: []Vector2,
+    light: Light,
+    texture: Texture,
     zBuffer: ^ZBuffer,
     projMat: Matrix4x4,
     image: ^rl.Image,
@@ -357,18 +366,18 @@ DrawTexturedFlatShaded :: proc(
         &p1, &p2, &p3,
         &uv1, &uv2, &uv3,
         texture, intensity, zBuffer, image
-    )    
+    )
     // ...
 }
 ```
 
 ```odin
 DrawPhongShaded :: proc(
-    vertices: []Vector3, 
-    triangles: []Triangle, 
-    normals: []Vector3, 
+    vertices: []Vector3,
+    triangles: []Triangle,
+    normals: []Vector3,
     light: Light,
-    color: rl.Color, 
+    color: rl.Color,
     zBuffer: ^ZBuffer,
     projMat: Matrix4x4,
     image: ^rl.Image,
@@ -376,23 +385,23 @@ DrawPhongShaded :: proc(
 ) {
     // ...
     DrawTrianglePhongShaded(
-        &v1, &v2, &v3, 
+        &v1, &v2, &v3,
         &p1, &p2, &p3,
         &n1, &n2, &n3,
         color, light, zBuffer, image, ambient
-    )    
+    )
     // ...
 }
 ```
 
 ```odin
 DrawTexturedPhongShaded :: proc(
-    vertices: []Vector3, 
-    triangles: []Triangle, 
-    uvs: []Vector2, 
-    normals: []Vector3, 
+    vertices: []Vector3,
+    triangles: []Triangle,
+    uvs: []Vector2,
+    normals: []Vector3,
     light: Light,
-    texture: Texture, 
+    texture: Texture,
     zBuffer: ^ZBuffer,
     projMat: Matrix4x4,
     image: ^rl.Image,
@@ -400,7 +409,7 @@ DrawTexturedPhongShaded :: proc(
 ) {
     // ...
     DrawTexturedTrianglePhongShaded(
-        &v1, &v2, &v3, 
+        &v1, &v2, &v3,
         &p1, &p2, &p3,
         &uv1, &uv2, &uv3,
         &n1, &n2, &n3,
@@ -477,4 +486,4 @@ Before we wrap this up today, I just want to point out that since we now have ou
 > Author: Marian Pekar - <https://marianpekar.com>
 > (c) Marian Pekar. The posts stay freely readable on the author's site; this local copy is credited in `SOURCES.md` at the repo root. Please link back to the original article.
 
->Source: https://marianpekar.com/blog/software-renderer-in-odin-from-scratch-part-xi
+> Source: https://marianpekar.com/blog/software-renderer-in-odin-from-scratch-part-xi

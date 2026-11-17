@@ -1,3 +1,12 @@
+---
+title: "Exceptions-And Why Odin Will Never Have Them"
+date: 2018-09-05
+source: "https://www.gingerbill.org/article/2018/09/05/exceptions---and-why-odin-will-never-have-them"
+tags: [OdinRAG, kb, source/gingerbill]
+type: reference
+status: active
+---
+
 # Exceptions-And Why Odin Will Never Have Them
 
 2018-09-05
@@ -32,7 +41,8 @@ except BarError as e:
 	pass # Handle error
 except (BazError, PlopError) as e:
 	pass # Handle errors
-```odin
+```
+
 Odin:
 
 ```odin
@@ -54,7 +64,8 @@ case BarError:
 case BazError, PlopError:
 	// Handle errors
 }
-```odin
+```
+
 The semantics are very similar in this case however the control flow is completely different. In the exceptions case (shown with Python), you enclose a block of code and catch any exceptions that have been raised. In the return value case (shown with Odin), you test the return value explicitly from the call.
 Exceptions require unwinding the stack; this can be slower 
 
@@ -69,7 +80,8 @@ try:
 	x = foo()
 except Exception:
 	pass # An error has happened
-```odin
+```
+
 Odin:
 
 ```odin
@@ -77,7 +89,8 @@ x, err := foo();
 if err != nil {
 	// An error has happened
 }
-```odin
+```
+
 One “advantage” many people like with exceptions is the ability to catch any error from a block of code:
 
 ```odin
@@ -87,7 +100,8 @@ try:
 	z = baz(y)
 except SomeError as e:
 	pass
-```odin
+```
+
 I personally see this as a huge vice, rather than a virtue. From reading the code, you cannot know where the error comes from. Return values are explicit about this and you know exactly what and where has caused the error.
 
 One of the consequences of exceptions is that errors can be raised anywhere and caught anywhere. This means that the culture of pass the error up the stack for “someone else” to handle. I hate this culture and I do not want to encourage it at the language level. Handle errors there and then and don’t pass them up the stack. You make your mess; you clean it.
@@ -98,7 +112,8 @@ Go’s built-in `error` type has the exact same tendency of people return errors
 if err != nil {
 	return nil, err
 }
-```odin
+```
+
 From what I have read, most people’s complaints about the Go error handling system is the if err != nil, and not the return nil, err aspect. Another complain people have is that this idiom is repeated a lot, that the Go team think it is necessary to add a construct to the language reduce typing in the draft [Go 2 proposal](https://go.googlesource.com/proposal/+/master/design/go2draft-error-handling-overview.md).
 
 ---
@@ -109,4 +124,4 @@ I hope this has cleared up a lot of the questions regarding Odin’s take on err
 
 P.S. If you really want “exceptions”, you can `longjmp` until the cows come home.
 
->Source: https://www.gingerbill.org/article/2018/09/05/exceptions---and-why-odin-will-never-have-them
+> Source: https://www.gingerbill.org/article/2018/09/05/exceptions---and-why-odin-will-never-have-them

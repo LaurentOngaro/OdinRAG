@@ -1,3 +1,12 @@
+---
+title: "Reliable fixed timestep & inputs"
+date: 2024-08-04
+source: "https://jakubtomsu.github.io/posts/input_in_fixed_timestep"
+tags: [OdinRAG, kb, source/jakubtomsu, topic/allocator, topic/entity-system, topic/collision]
+type: reference
+status: active
+---
+
 # Reliable fixed timestep & inputs
 
 2024-08-04
@@ -30,7 +39,8 @@ I use a slightly modified version of the update loop from Gaffer’s article, he
 18    alpha = accumulator / DELTA
 19    game_draw(game, prev_game, alpha)
 20}
-```odin
+```
+
 The main difference is that I calculate number of ticks from the accumulator, instead of running a while loop and subtracting delta from the accumulator directly.
 I find this a bit nicer but there isn’t much difference.
 
@@ -50,7 +60,7 @@ And in general setting up your simulation this way makes it easier to write fram
 
 So what’s the alternative?
 
-To have one big `tick` procedure which updates *everything* in the game, including gameplay, physics, etc.
+To have one big `tick` procedure which updates _everything_ in the game, including gameplay, physics, etc.
 And then run this tick in a fixed update loop.
 
 This way the game simulation is completely independent from “frames” and rendering.
@@ -62,7 +72,7 @@ But I have a custom engine and custom collision system, so I can set it up howev
 
 Okay, what about rendering then?
 
-You *could* just run your ticks in a fixed update loop, and then rendered the final game state every frame.
+You _could_ just run your ticks in a fixed update loop, and then rendered the final game state every frame.
 However the “tick time” and “frame time” doesn’t match perfectly. And in cases when the frame rate is much higher than tick rate, the game could look very laggy.
 
 The solution is interpolation.
@@ -85,7 +95,8 @@ Here is an example of interpolating the camera and enemies:
 12        draw_model(.Grunt_Enemy, enemy.transform, COLOR_RED)
 13    }
 14}
-```odin
+```
+
 The same concept applies to everything else, you can interpolate whatever properties you need.
 You could probably even automate it in a proper entity system, or if you use a scripting language.
 
@@ -122,7 +133,8 @@ Just for context, here is how my (simplified) input state looks like. This isn�
 12    Repeated,
 13    Multiple_Changes_This_Frame,
 14}
-```odin
+```
+
 Okay, now let’s see how to pass the inputs into the `game_tick` procedure.
 
 The naive solution is to just pass your regular input state like you would normally:
@@ -146,7 +158,8 @@ The naive solution is to just pass your regular input state like you would norma
 16    // but keep "down" states
 17    input_clear_temp(&frame_input)
 18}
-```odin
+```
+
 But, this has a number of problems:
 
 1. Inputs are lost when there are no ticks to run for few frames.
@@ -163,7 +176,7 @@ You could probably poll events and then “save” non-input ones for later, but
 
 This is what I went with, because it’s simple and the accuracy loss from not polling inputs every tick isn’t noticeable.
 
-The idea is to keep *two* separate input states, one for “per frame” stuff and the other one for ticks.
+The idea is to keep _two_ separate input states, one for “per frame” stuff and the other one for ticks.
 Both are updated with the same events at the start of your frame, but the state is updated in a different way during the frame.
 
 First idea is to discard temporary key flags (like Pressed and Released) after every tick, so they aren’t applied multiple times.
@@ -224,9 +237,10 @@ Here is the update loop example code:
 47    alpha = accumulator / DELTA
 48    game_draw(game, prev_game, alpha)
 49}
-```odin
+```
+
 And that’s it! This is the solution I currently use in my engine and works well so far. Let me know if you run into any problems or if you have a better solution in mind :)
 
 Thanks for reading!
 
->Source: https://jakubtomsu.github.io/posts/input_in_fixed_timestep
+> Source: https://jakubtomsu.github.io/posts/input_in_fixed_timestep

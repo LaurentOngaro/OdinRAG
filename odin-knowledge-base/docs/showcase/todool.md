@@ -1,3 +1,11 @@
+---
+title: "Text Editing Experience"
+source: "https://odin-lang.org/showcase/todool"
+tags: [OdinRAG, kb, source/showcase]
+type: reference
+status: active
+---
+
 ![](https://img.itch.zone/aW1nLzEwNTQ2NDQxLnBuZw==/original/dgSdqI.png)
 
 [Todool](https://skytrias.itch.io/todool) is a To-Do Editor with different modes, advanced movement & powerful commands. Track your development cycle with ease.
@@ -28,15 +36,15 @@ Each tag also uses a customizable color from the theme.
 
 ![](https://img.itch.zone/aW1hZ2UvMTY3MzU2Mi8xMDU0NjY2Mi5naWY=/original/zZfEoU.gif)
 
-Seamlessly switch between ***List*** and ***Kanban*** mode at any point.
+Seamlessly switch between _**List**_ and _**Kanban**_ mode at any point.
 
-Prompts like *Search* and *Goto* remain working in both modes.
+Prompts like _Search_ and _Goto_ remain working in both modes.
 
 ### Bookmarks & Jumps [#](#bookmarks--jumps)
 
 ![](https://img.itch.zone/aW1hZ2UvMTY3MzU2Mi8xMDU0NjY2My5naWY=/original/%2BdSPOE.gif)
 
-***Bookmarks*** can be assigned to each task to allow quick-jumping forwards/backwards.
+_**Bookmarks**_ can be assigned to each task to allow quick-jumping forwards/backwards.
 
 Once you start moving the next jump will be lead to the nearest bookmark.
 
@@ -44,7 +52,7 @@ Once you start moving the next jump will be lead to the nearest bookmark.
 
 ![](https://img.itch.zone/aW1hZ2UvMTY3MzU2Mi8xMDU0NjY2NC5naWY=/original/p86Rfy.gif)
 
-*Cut, Copy & Paste* can be done in 2 modes: Task | Text.
+_Cut, Copy & Paste_ can be done in 2 modes: Task | Text.
 
 When no text is selected and you perform a cut/copy - the next mode will be a task cut/copy. The next paste will then result in copying all selected tasks with all attached data like tags.
 
@@ -64,7 +72,7 @@ Customize amount of time **pomodoro** timers should last for.
 
 ![](https://img.itch.zone/aW1hZ2UvMTY3MzU2Mi8xMDU0NjY2OS5naWY=/original/cU1Ky8.gif)
 
-***Power-Mode*** makes typing and adding task properties feel great.
+_**Power-Mode**_ makes typing and adding task properties feel great.
 
 Enjoy particles flying throughout any action you take.
 
@@ -74,12 +82,12 @@ Options allow you to disable or adjust screenshake or coloring of the particles.
 
 ![](https://img.itch.zone/aW1hZ2UvMTY3MzU2Mi8xMDU0NjY3Mi5naWY=/original/t33NcF.gif)
 
-Tired of the simple default themes? Customize your theme to whatever you enjoy with the builtin ***Theme-Editor***
+Tired of the simple default themes? Customize your theme to whatever you enjoy with the builtin _**Theme-Editor**_
 
 Change color RGBA values manually or use the color picker.
 
-Randomize wanted colors between *Low* / *High* ranges in the HSV color space.
+Randomize wanted colors between _Low_ / _High_ ranges in the HSV color space.
 
 [Available on itch.io](https://skytrias.itch.io/todool)
 
->Source: https://odin-lang.org/showcase/todool
+> Source: https://odin-lang.org/showcase/todool

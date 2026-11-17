@@ -36,23 +36,19 @@ except Exception:
     pass
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
+SCRIPTS_DIR = Path(__file__).resolve().parents[1]
+if str(SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPTS_DIR))
+
+from lib.private_paths import find_violations as _find_private_violations  # noqa: E402
+from lib.private_paths import load_private_paths  # noqa: E402
+
 PUBLIC_BRANCH = "refs/heads/public"
 
-# Forbidden path prefixes. MUST stay in sync with .gitignore + .git/info/exclude. # Structure: (path_prefix, human-readable reason)
-FORBIDDEN_PATTERNS: list[tuple[str, str]] = [
-    ("_Private/", "All _Private/ content is local-only (never push)"),
-    ("code/projects/PVG03_RPG/", "Personal Odin project (not part of the RAG)"),
-    ("code/projects/PVG02_Metroidvania/", "Personal Odin project (not part of the RAG)"),
-    ("code/projects/Odin_Skeleton/", "Personal Odin project (not part of the RAG)"),
-    ("odin-knowledge-base/courses/", "Skool courses (paywall)"),
-    ("odin-knowledge-base/docs/karl_zylinski/odin-book/", "Karl Zylinski ebook (paid)"),
-]
-
-# A small set of files that DESCRIBE a forbidden source folder (README, INDEX...) and are explicitly curated for the public repo.
-# They live next to copyrighted content but never contain it themselves.
-ALLOWED_READMES: set[str] = {
-    "odin-knowledge-base/docs/karl_zylinski/odin-book/README.md",
-}
+# Loaded from `_Helpers/config/private_paths.jsonc` + `_Helpers/links.jsonc`.
+PRIVATE_CONFIG = load_private_paths(repo_root=REPO_ROOT)
+FORBIDDEN_PATTERNS: list[tuple[str, str]] = list(PRIVATE_CONFIG.forbidden_patterns)
+ALLOWED_READMES: set[str] = set(PRIVATE_CONFIG.allowed_readmes)
 
 
 def git_ls_files() -> list[str]:
@@ -63,8 +59,8 @@ def git_ls_files() -> list[str]:
 def git_ls_branch(branch: str) -> list[str]:
     """Return the list of file paths present in the given branch's tree.
 
-    Uses `git ls-tree -r --name-only <branch>` which lists files WITHOUT nstantiating them on disk.
-    Safe to call even when the branch's treeiffers from the working tree.
+    Uses `git ls-tree -r --name-only <branch>` which lists files WITHOUT instantiating them on disk.
+    Safe to call even when the branch's tree differs from the working tree.
     """
     return _git_lines("git", "ls-tree", "-r", "--name-only", branch)
 
@@ -92,16 +88,7 @@ def branch_exists(branch: str) -> bool:
 
 def find_violations(paths: list[str]) -> list[tuple[str, str]]:
     """Return the list of (path, reason) for any path matching a forbidden pattern."""
-    violations: list[tuple[str, str]] = []
-    for path in paths:
-        normalized = path.replace("\\", "/")
-        if normalized in ALLOWED_READMES:
-            continue
-        for prefix, reason in FORBIDDEN_PATTERNS:
-            if normalized.startswith(prefix):
-                violations.append((path, reason))
-                break
-    return violations
+    return _find_private_violations(paths, PRIVATE_CONFIG)
 
 
 def audit_scope(label: str, paths: list[str], verbose: bool) -> list[tuple[str, str]]:

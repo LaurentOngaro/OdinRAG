@@ -1,3 +1,12 @@
+---
+title: "Software Renderer in Odin from Scratch, Part II"
+date: 2025-04-05
+source: "https://marianpekar.com/blog/software-renderer-in-odin-from-scratch-part-ii"
+tags: [OdinRAG, kb, source/marianpekar, topic/rendering]
+type: reference
+status: active
+---
+
 # Software Renderer in Odin from Scratch, Part II
 
 5th April 2025 • 14 min read
@@ -12,25 +21,25 @@ Throughout this post, you'll see links to Wikipedia pages from time to time. You
 
 ![A unit circle.](/uploads/sw_rend_ii_unit_circle.png)
 
-Looking at the image above, you can see that finding [Cartesian coordinates](https://en.wikipedia.org/wiki/Cartesian_coordinate_system) for a given angle on a circle is very simple: *x* is the cosine of the angle, while *y* is the sine of the angle. Note that in many implementations, the angle input to trigonometric functions is expected to be in [radians](https://en.wikipedia.org/wiki/Radian), not degrees. **A full circle, 360 degrees, is equal to 2π radians, or approximately 6.28318 radians.**
+Looking at the image above, you can see that finding [Cartesian coordinates](https://en.wikipedia.org/wiki/Cartesian_coordinate_system) for a given angle on a circle is very simple: _x_ is the cosine of the angle, while _y_ is the sine of the angle. Note that in many implementations, the angle input to trigonometric functions is expected to be in [radians](https://en.wikipedia.org/wiki/Radian), not degrees. **A full circle, 360 degrees, is equal to 2π radians, or approximately 6.28318 radians.**
 
-When we already have a point with *x* and *y* coordinates , and an angle *t* by which we’d like to rotate the point around the origin (the point where both x and y are 0), we can use the following formulas.
+When we already have a point with _x_ and _y_ coordinates , and an angle _t_ by which we’d like to rotate the point around the origin (the point where both x and y are 0), we can use the following formulas.
 
 \begin{aligned} x' &= x \cdot \cos(t) - y \cdot \sin(t) \\ y' &= x \cdot \sin(t) + y \cdot \cos(t) \end{aligned}
 
-There’s actually a more elegant way to calculate this. To rotate an object in 3D space in our implementation, we’ll define rotations using rotation matrices, which we'll construct from three angles, one for each of the *XY*, *XZ*, and *YZ* planes. These angles are commonly referred to as Euler angles. I'll come back to this in the next part, when we'll be covering transformation matrices. Another way to represent rotations is by using [quaternions](https://en.wikipedia.org/wiki/Quaternion), which we won’t cover in this series.
+There’s actually a more elegant way to calculate this. To rotate an object in 3D space in our implementation, we’ll define rotations using rotation matrices, which we'll construct from three angles, one for each of the _XY_, _XZ_, and _YZ_ planes. These angles are commonly referred to as Euler angles. I'll come back to this in the next part, when we'll be covering transformation matrices. Another way to represent rotations is by using [quaternions](https://en.wikipedia.org/wiki/Quaternion), which we won’t cover in this series.
 
 ## Vectors
 
-Vectors are useful when we need to describe something that cannot be described by a single number. Typically, a position in 3D space, where we group 3 values to define how far a point lies along the *X*, *Y*, and *Z* axes.
+Vectors are useful when we need to describe something that cannot be described by a single number. Typically, a position in 3D space, where we group 3 values to define how far a point lies along the _X_, _Y_, and _Z_ axes.
 
-Formally, a vector does not possess locality; it describes only a direction and a magnitude. However, when we use vectors to represent points in [Euclidean space](https://en.wikipedia.org/wiki/Euclidean_space), they do imply a location relative to the origin at **[0, 0, 0]**, the point where the *X*, *Y*, and *Z* axes, that are perpendicular to each other, intersect.
+Formally, a vector does not possess locality; it describes only a direction and a magnitude. However, when we use vectors to represent points in [Euclidean space](https://en.wikipedia.org/wiki/Euclidean_space), they do imply a location relative to the origin at **[0, 0, 0]**, the point where the _X_, _Y_, and _Z_ axes, that are perpendicular to each other, intersect.
 
 You can add and subtract vectors, and subtraction will be particularly useful for us, because when we **subtract vector B from vector A, the resulting vector represents the direction from A to B**.
 
 \displaystyle \mathbf{a} + \mathbf{b} = \sum\_{i=1}^{n} (a\_i + b\_i) = (a\_1 + b\_1) + (a\_2 + b\_2) + \cdots + (a\_n + b\_n)
 
-You can scale a vector by multiplying each of its components by a number, typically referred to as a scalar (or constant, which is why it's denoted as *c* in the following formula). This changes the magnitude of the vector but not its direction. You can also divide a vector by a nonzero scalar, but you can't divide one vector by another vector.
+You can scale a vector by multiplying each of its components by a number, typically referred to as a scalar (or constant, which is why it's denoted as _c_ in the following formula). This changes the magnitude of the vector but not its direction. You can also divide a vector by a nonzero scalar, but you can't divide one vector by another vector.
 
 \displaystyle \mathbf{a} \cdot c = \sum\_{i=1}^{n} (a\_i c) = a\_1 c + a\_2 c + \cdots + a\_n c
 
@@ -82,7 +91,7 @@ Before we move to matrices, a couple of years ago, I created [this web applicati
 
 ## Matrices
 
-A [matrix](https://en.wikipedia.org/wiki/Matrix_(mathematics)) is simply a rectangular array of numbers, and we'll find it useful for transforming points in 3D space, since an n-vector can be treated as either a matrix with one row and n columns, or one column and n columns. We'll be creating so-called [transformation matrices](https://en.wikipedia.org/wiki/Transformation_matrix). Three for rotations, one for translation, and one for scaling.
+A [matrix](<https://en.wikipedia.org/wiki/Matrix_(mathematics)>) is simply a rectangular array of numbers, and we'll find it useful for transforming points in 3D space, since an n-vector can be treated as either a matrix with one row and n columns, or one column and n columns. We'll be creating so-called [transformation matrices](https://en.wikipedia.org/wiki/Transformation_matrix). Three for rotations, one for translation, and one for scaling.
 
 \displaystyle \mathbf{A} = \begin{bmatrix} a\_{11} & a\_{12} & \cdots & a\_{1n} \\ a\_{21} & a\_{22} & \cdots & a\_{2n} \\ \vdots & \vdots & \ddots & \vdots \\ a\_{m1} & a\_{m2} & \cdots & a\_{mn} \end{bmatrix}
 
@@ -194,4 +203,4 @@ Speaking of reinventing the wheel, the entire implementation of a 3D software re
 > Author: Marian Pekar - <https://marianpekar.com>
 > (c) Marian Pekar. The posts stay freely readable on the author's site; this local copy is credited in `SOURCES.md` at the repo root. Please link back to the original article.
 
->Source: https://marianpekar.com/blog/software-renderer-in-odin-from-scratch-part-ii
+> Source: https://marianpekar.com/blog/software-renderer-in-odin-from-scratch-part-ii

@@ -1,3 +1,12 @@
+---
+title: "Reverse engineering Unity games"
+date: 2022-03-24
+source: "https://jakubtomsu.github.io/posts/reverse-engineering-unity-games"
+tags: [OdinRAG, kb, source/jakubtomsu]
+type: reference
+status: active
+---
+
 # Reverse engineering Unity games
 
 2022-03-24
@@ -31,8 +40,9 @@ If you want to inject the code yourself, here is a simple example how to load an
  9		method.Invoke(obj, new object[0]);
 10	}
 11}
-```odin
-This code sould be ideally placed in some method that runs *as early as possible*.
+```
+
+This code sould be ideally placed in some method that runs _as early as possible_.
 Probably `Awake` function on a component somewhere on the first loading screen, main menu, etc. is good enough.
 
 ## inspecting the renderer
@@ -45,4 +55,4 @@ Here is a screenshot from Shady Knight when using RenderDoc:
 ![shady knight screenshot](/shady_knight_renderdoc.png)
 as you can see, it shows everything you might need
 
->Source: https://jakubtomsu.github.io/posts/reverse-engineering-unity-games
+> Source: https://jakubtomsu.github.io/posts/reverse-engineering-unity-games

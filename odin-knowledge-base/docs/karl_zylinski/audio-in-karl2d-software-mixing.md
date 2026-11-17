@@ -1,3 +1,12 @@
+---
+title: "Audio in Karl2D: Software mixing, OS APIs and general design"
+date: 2026-02-20
+source: "https://zylinski.se/posts/audio-in-karl2d-software-mixing"
+tags: [OdinRAG, kb, source/zylinski, topic/allocator]
+type: reference
+status: active
+---
+
 # Audio in Karl2D: Software mixing, OS APIs and general design
 
 February 20, 2026
@@ -62,7 +71,8 @@ mix_buffer: [1*mem.Megabyte]Audio_Sample,
 
 // Where the mixer currently is in the mix buffer.
 mix_buffer_offset: int,
-```odin
+```
+
 The `audio_backend` implements a simple interface for feeding mixed audio samples to the platform’s audio API. The interface definition is a struct that looks like this:
 
 ```odin
@@ -75,7 +85,8 @@ Audio_Backend_Interface :: struct #all_or_none {
 	feed: proc(samples: []Audio_Sample),
 	remaining_samples: proc() -> int,
 }
-```odin
+```
+
 As you can see, this is a very simple interface. Since we’re doing software mixing, all that the backend needs to do is receive mixed audio samples and send them off to the audio API we’ve chosen the current platform. So there is one backend for `waveOut`, one for `ALSA` and one for `Web Audio`.
 
 `mix_buffer` is a big array of audio samples, where and `Audio_Sample` is defined as `Audio_Sample :: [2]f32`. It has two channels (left and right) and each sample is stored as a floating point value. This is the format used by the mixer and loaded stereo sounds.
@@ -96,7 +107,8 @@ Sound_Data :: struct {
 	// Sound_Data and its samples slice are also destroyed/freed.
 	instances: int,
 }
-```odin
+```
+
 and then there is a concept of a `Sound_Instance`, which is a reference to the data plus some information about how to play that data:
 
 ```odin
@@ -110,7 +122,8 @@ Sound_Instance :: struct {
 	pitch: f32,
 	target_pitch: f32,
 }
-```odin
+```
+
 I have this split so that I can create multiple sound instances that all reference the same `Sound_Data`. This way I can play a single sound several times simultaneously without having to duplicate the data. For example, I can make two instances of a sound and play them at two different pitches simultaneously. This is good for creating variation without allocating extra memory.
 
 ## Playing sounds and mixing them[#](#playing-sounds-and-mixing-them)
@@ -129,7 +142,8 @@ play_sound :: proc(snd: Sound, loop := false) {
 		},
 	)
 }
-```odin
+```
+
 The “playing sounds” will be processed by the mixer procedure. That procedure is rather big; see [appendix A](#appendix-a-update_audio_mixer) for the complete procedure, or search for `update_audio_mixer` in [karl2d.odin](https://github.com/karl-zylinski/karl2d/blob/master/karl2d.odin) to see the latest code. Here I will go through the important parts.
 
 The abstract structure of `update_audio_mixer` is like this:
@@ -150,7 +164,8 @@ update_audio_mixer :: proc() {
 
 	// advance s.mix_buffer_offset
 }
-```odin
+```
+
 Here `ab` is the audio backend. The if statement at the top of the procedure means that we only run the mixer if the audio backend is “close to starvation”. This means that it will soon run out of samples, in our case it means that fewer than `1.5*AUDIO_MIX_CHUNK_SIZE` number of samples remains to be played by the backend. This `AUDIO_MIX_CHUNK_SIZE` is the number of samples we mix when the mixer does run. This way, a maximum of `2.5*AUDIO_MIX_CHUNK_SIZE` number of samples will ever be in the mixer buffer. At a sample rate of 44100 samples/second and a `AUDIO_MIX_CHUNK_SIZE` of `1400` this means that we have a maximum latency of `(1400*2.5)/44100=0.079 seconds`, or `79 ms`. That may be a bit high. We could make the chunk size smaller or use a smaller value than `1.5*AUDIO_MIX_CHUNK_SIZE` in the if statement. In any case, these are things I can easily tweak.
 
 > Perhaps I should have different chunk sizes for different backends. Some of them have less latency than others. The important thing is to never let the backend run dry, because then the audio just stops.
@@ -163,7 +178,8 @@ Writing a software mixer may sound scary, but it really isn’t. It’s mainly a
 
 ```odin
 samples_per_mixer_sample := (pitch*f32(data.sample_rate))/f32(AUDIO_MIX_SAMPLE_RATE)
-```odin
+```
+
 I feed that value to `add_interpolate` and use it to figure out which source samples are the previous and current ones, and interpolate between them.
 
 If you want to do this yourself, then just start with loading some 44100 Hz sound and use a 44100 Hz mixer buffer and just do the sample addition. Worry about the interpolation when the simple stuff works.
@@ -192,7 +208,8 @@ move_towards :: proc(current: f32, target: f32, delta: f32) -> f32 {
 
 volume_start := clamp(inst.volume, 0, 1)
 volume_end := clamp(move_towards(inst.volume, inst.target_volume, adjust_parameter_delta), 0, 1)
-```odin
+```
+
 Here `adjust_parameter_delta` is something like `44100.0 * 0.3`, i.e. I want it to take 0.3 second to go from volume `0` to `1`. Experiment to find values that avoid clicks.
 
 I feed these `volume_start` and `volume_end` sounds into my addition procedures. In there I lerp between them
@@ -222,7 +239,8 @@ add :: proc(
 
 	return to_write
 }
-```odin
+```
+
 ```odin
 add(
 	s.mix_buffer[s.mix_buffer_offset:],
@@ -233,7 +251,8 @@ add(
 	pan_stereo_start,
 	pan_stereo_end,
 )
-```odin
+```
+
 The reason for lerping between `volume_start` and `volume_end` is that I mix `AUDIO_MIX_CHUNK_SIZE` of samples in one go. If I just hop to a single volume or pan value for all those samples, then it will still click since a chunk is over a thousand samples.
 
 Note that `volume_end` is not the same as the target volume of sound. It’s just the volume that the sound should have after an additional `AUDIO_MIX_CHUNK_SIZE` number of samples have been mixed. The interpolation can happen over several mixer passes.
@@ -252,127 +271,118 @@ Thanks to the software mixing, the backend is very simple. When creating the bac
 #+private file
 package karl2d
 
-@(private="package")
+@(private = "package")
 AUDIO_BACKEND_WAVEOUT :: Audio_Backend_Interface {
-	state_size = waveout_state_size,
-	init = waveout_init,
-	shutdown = waveout_shutdown,
-	set_internal_state = waveout_set_internal_state,
-
-	feed = waveout_feed,
-	remaining_samples = waveout_remaining_samples,
+  state_size         = waveout_state_size,
+  init               = waveout_init,
+  shutdown           = waveout_shutdown,
+  set_internal_state = waveout_set_internal_state,
+  feed               = waveout_feed,
+  remaining_samples  = waveout_remaining_samples,
 }
 
 import "base:runtime"
-import "log"
+import "core:slice"
 import win32 "core:sys/windows"
 import "core:time"
-import "core:slice"
+import "log"
 
 Waveout_State :: struct {
-	device: win32.HWAVEOUT,
-	allocator: runtime.Allocator,
-	headers: [32]win32.WAVEHDR,
-	cur_header: int,
-	submitted_samples: int,
+  device:            win32.HWAVEOUT,
+  allocator:         runtime.Allocator,
+  headers:           [32]win32.WAVEHDR,
+  cur_header:        int,
+  submitted_samples: int,
 }
 
 waveout_state_size :: proc() -> int {
-	return size_of(Waveout_State)
+  return size_of(Waveout_State)
 }
 
 s: ^Waveout_State
 
 waveout_init :: proc(state: rawptr, allocator: runtime.Allocator) {
-	assert(state != nil)
-	s = (^Waveout_State)(state)
-	s.allocator = allocator
-	log.debug("Init audio backend waveout")
+  assert(state != nil)
+  s = (^Waveout_State)(state)
+  s.allocator = allocator
+  log.debug("Init audio backend waveout")
 
-	// Added constant missing in bindings:
-	// KSDATAFORMAT_SUBTYPE_IEEE_FLOAT GUID: 00000003-0000-0010-8000-00aa00389b71
-	KSDATAFORMAT_SUBTYPE_IEEE_FLOAT :: win32.GUID{0x00000003, 0x0000, 0x0010, {0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71}}
+  // Added constant missing in bindings:
+  // KSDATAFORMAT_SUBTYPE_IEEE_FLOAT GUID: 00000003-0000-0010-8000-00aa00389b71
+  KSDATAFORMAT_SUBTYPE_IEEE_FLOAT :: win32.GUID{0x00000003, 0x0000, 0x0010, {0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71}}
 
-	format := win32.WAVEFORMATEXTENSIBLE {
-		Format = {
-			nSamplesPerSec = 44100,
-			wBitsPerSample = 32,
-			nChannels = 2,
-			wFormatTag = win32.WAVE_FORMAT_EXTENSIBLE,
-			cbSize = size_of(win32.WAVEFORMATEXTENSIBLE) - size_of(win32.WAVEFORMATEX),
-		},
-		Samples = {
-			wValidBitsPerSample = 32,
-		},
-		dwChannelMask = { .FRONT_LEFT, .FRONT_RIGHT },
-		SubFormat = KSDATAFORMAT_SUBTYPE_IEEE_FLOAT,
-	}
+  format := win32.WAVEFORMATEXTENSIBLE {
+    Format = {
+      nSamplesPerSec = 44100,
+      wBitsPerSample = 32,
+      nChannels = 2,
+      wFormatTag = win32.WAVE_FORMAT_EXTENSIBLE,
+      cbSize = size_of(win32.WAVEFORMATEXTENSIBLE) - size_of(win32.WAVEFORMATEX),
+    },
+    Samples = {wValidBitsPerSample = 32},
+    dwChannelMask = {.FRONT_LEFT, .FRONT_RIGHT},
+    SubFormat = KSDATAFORMAT_SUBTYPE_IEEE_FLOAT,
+  }
 
-	format.nBlockAlign = (format.wBitsPerSample * format.nChannels) / 8 // see nBlockAlign docs
-	format.nAvgBytesPerSec = (u32(format.wBitsPerSample * format.nChannels) * format.nSamplesPerSec) / 8
+  format.nBlockAlign = (format.wBitsPerSample * format.nChannels) / 8 // see nBlockAlign docs
+  format.nAvgBytesPerSec = (u32(format.wBitsPerSample * format.nChannels) * format.nSamplesPerSec) / 8
 
-	ch(win32.waveOutOpen(
-		&s.device,
-		win32.WAVE_MAPPER,
-		&format,
-		0,
-		0,
-		win32.CALLBACK_NULL,
-	))
+  ch(win32.waveOutOpen(&s.device, win32.WAVE_MAPPER, &format, 0, 0, win32.CALLBACK_NULL))
 }
 
 ch :: proc(mr: win32.MMRESULT, loc := #caller_location) -> win32.MMRESULT {
-	if mr == 0 {
-		return mr
-	}
+  if mr == 0 {
+    return mr
+  }
 
-	log.errorf("waveout error. Error code: %v", u32(mr), location = loc)
-	return mr
+  log.errorf("waveout error. Error code: %v", u32(mr), location = loc)
+  return mr
 }
 
 waveout_shutdown :: proc() {
-	log.debug("Shutdown audio backend waveout")
-	win32.waveOutClose(s.device)
+  log.debug("Shutdown audio backend waveout")
+  win32.waveOutClose(s.device)
 }
 
 waveout_set_internal_state :: proc(state: rawptr) {
-	assert(state != nil)
-	s = (^Waveout_State)(state)
+  assert(state != nil)
+  s = (^Waveout_State)(state)
 }
 
 waveout_feed :: proc(samples: []Audio_Sample) {
-	h := &s.headers[s.cur_header]
+  h := &s.headers[s.cur_header]
 
-	for win32.waveOutUnprepareHeader(s.device, h, size_of(win32.WAVEHDR)) == win32.WAVERR_STILLPLAYING {
-		time.sleep(1 * time.Millisecond)
-	}
+  for win32.waveOutUnprepareHeader(s.device, h, size_of(win32.WAVEHDR)) == win32.WAVERR_STILLPLAYING {
+    time.sleep(1 * time.Millisecond)
+  }
 
-	byte_samples := slice.reinterpret([]u8, samples)
+  byte_samples := slice.reinterpret([]u8, samples)
 
-	h^ = {
-		dwBufferLength = u32(len(byte_samples)),
-		lpData = raw_data(byte_samples),
-	}
+  h^ = {
+    dwBufferLength = u32(len(byte_samples)),
+    lpData         = raw_data(byte_samples),
+  }
 
-	win32.waveOutPrepareHeader(s.device, h, size_of(win32.WAVEHDR))
-	win32.waveOutWrite(s.device, h, size_of(win32.WAVEHDR))
+  win32.waveOutPrepareHeader(s.device, h, size_of(win32.WAVEHDR))
+  win32.waveOutWrite(s.device, h, size_of(win32.WAVEHDR))
 
-	s.submitted_samples += len(samples)
-	s.cur_header += 1
+  s.submitted_samples += len(samples)
+  s.cur_header += 1
 
-	if s.cur_header >= len(s.headers) {
-		s.cur_header = 0
-	}
+  if s.cur_header >= len(s.headers) {
+    s.cur_header = 0
+  }
 }
 
 waveout_remaining_samples :: proc() -> int {
-	t := win32.MMTIME {
-		wType = .TIME_SAMPLES,
-	}
-	win32.waveOutGetPosition(s.device, &t, size_of(win32.MMTIME))
-	return s.submitted_samples - int(t.u.sample)
+  t := win32.MMTIME {
+    wType = .TIME_SAMPLES,
+  }
+  win32.waveOutGetPosition(s.device, &t, size_of(win32.MMTIME))
+  return s.submitted_samples - int(t.u.sample)
 }
-```odin
+```
+
 ## Web audio[#](#web-audio)
 
 For the web the Odin part of the backend looks like this:
@@ -383,14 +393,14 @@ For the web the Odin part of the backend looks like this:
 #+private file
 package karl2d
 
-@(private="package")
+@(private = "package")
 AUDIO_BACKEND_WEB_AUDIO :: Audio_Backend_Interface {
-	state_size = web_audio_state_size,
-	init = web_audio_init,
-	shutdown = web_audio_shutdown,
-	set_internal_state = web_audio_set_internal_state,
-	feed = web_audio_feed,
-	remaining_samples = web_audio_remaining_samples,
+  state_size         = web_audio_state_size,
+  init               = web_audio_init,
+  shutdown           = web_audio_shutdown,
+  set_internal_state = web_audio_set_internal_state,
+  feed               = web_audio_feed,
+  remaining_samples  = web_audio_remaining_samples,
 }
 
 import "base:runtime"
@@ -399,43 +409,44 @@ import "core:slice"
 foreign import karl2d_web_audio "karl2d_web_audio"
 
 // The `js_` prefix is there to just avoid clashes with the procs in this file.
-@(default_calling_convention="contextless")
+@(default_calling_convention = "contextless")
 foreign karl2d_web_audio {
-	@(link_name="web_audio_init")
-	js_web_audio_init :: proc() ---
-	@(link_name="web_audio_shutdown")
-	js_web_audio_shutdown :: proc() ---
-	@(link_name="web_audio_feed")
-	js_web_audio_feed :: proc(samples: []f32) ---
-	@(link_name="web_audio_remaining_samples")
-	js_web_audio_remaining_samples :: proc() -> int ---
+  @(link_name = "web_audio_init")
+  js_web_audio_init :: proc() ---
+  @(link_name = "web_audio_shutdown")
+  js_web_audio_shutdown :: proc() ---
+  @(link_name = "web_audio_feed")
+  js_web_audio_feed :: proc(samples: []f32) ---
+  @(link_name = "web_audio_remaining_samples")
+  js_web_audio_remaining_samples :: proc() -> int ---
 }
 
 web_audio_state_size :: proc() -> int {
-	return 0
+  return 0
 }
 
 web_audio_init :: proc(state: rawptr, allocator: runtime.Allocator) {
-	js_web_audio_init()
+  js_web_audio_init()
 }
 
 web_audio_shutdown :: proc() {
-	js_web_audio_shutdown()
+  js_web_audio_shutdown()
 }
 
 web_audio_set_internal_state :: proc(state: rawptr) {
-	// No hot reload on web.
+  // No hot reload on web.
 }
 
 web_audio_feed :: proc(samples: []Audio_Sample) {
-	// The JS backend just sees an array of f32. But it knows that they are interleaved Left & Right
-	js_web_audio_feed(slice.reinterpret([]f32, samples))
+  // The JS backend just sees an array of f32. But it knows that they are interleaved Left & Right
+  js_web_audio_feed(slice.reinterpret([]f32, samples))
 }
 
 web_audio_remaining_samples :: proc() -> int {
-	return js_web_audio_remaining_samples()
+  return js_web_audio_remaining_samples()
 }
-```odin
+```
+
 This is even simpler than the waveOut code. However, as you see, there is some bindings in there (the `foreign karl2d_web_audio {` stuff). Those are bindings to JavaScript code I’ve written. That code can be seen in [`audio_backend_web_audio.js`](https://github.com/karl-zylinski/karl2d/blob/master/audio_backend_web_audio.js) and [`audio_backend_web_audio_processor.js`](https://github.com/karl-zylinski/karl2d/blob/master/audio_backend_web_audio_processor.js). As with Windows, its mostly about opening some audio system for writing samples. It’s a bit more complicated on web due to it using some complicated “audio worklet” system. Also, I had to modify the `index.html` file that loads the WASM code so that it loads in this extra JS code.
 
 > The `index.html` file loads the `odin.js` runtime, my extra audio stuff and then runs the compiled WASM code.
@@ -444,7 +455,7 @@ This is even simpler than the waveOut code. However, as you see, there is some b
 
 I’ve also made a Linux ALSA backend that turned out quite simple: [`audio_backend_alsa.odin`](https://github.com/karl-zylinski/karl2d/blob/master/audio_backend_alsa.odin). For that backend, I tried having GitHub copilot help me write the basics. I haven’t used AI/LLM stuff much before. It gave a good foundation, including creating the ALSA bindings. But I made sure to understand every binding it added: I looked at the documentation of the ALSA procedures and made sure they were what I needed. I had to edit the code it wrote a lot, removing over-complicated stuff and stuff that felt off. The result is 146 lines of ALSA backend and 49 lines of ALSA bindings.
 
-Use LLMs with great care. Use them for contained things where you can understand all the things without being overwhelmed. The moment you accept code into your code base without understanding it, then you are on a slippery slope towards *slop*. If you can’t fight that urge, then just stop using such tools. It will ruin your code since you will lose control over it, making it unmaintainable. If you accept slop then very soon the only way to maintain the repository is to go 100% vibe code. And then you have no idea what you are making anymore. The craft is then dead.
+Use LLMs with great care. Use them for contained things where you can understand all the things without being overwhelmed. The moment you accept code into your code base without understanding it, then you are on a slippery slope towards _slop_. If you can’t fight that urge, then just stop using such tools. It will ruin your code since you will lose control over it, making it unmaintainable. If you accept slop then very soon the only way to maintain the repository is to go 100% vibe code. And then you have no idea what you are making anymore. The craft is then dead.
 
 ## What remains?[#](#what-remains)
 
@@ -735,4 +746,4 @@ update_audio_mixer :: proc() {
 }
 ```
 
->Source: https://zylinski.se/posts/audio-in-karl2d-software-mixing
+> Source: https://zylinski.se/posts/audio-in-karl2d-software-mixing

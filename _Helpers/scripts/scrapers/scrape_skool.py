@@ -138,6 +138,10 @@ SKOOL_GROUP = "programvideogames"  # nom du groupe Skool
 OUTPUT_DIR = ROOT_DIR / "odin-knowledge-base" / "courses" / "programvideogames"
 DELAY_BETWEEN = 1.0  # secondes entre chaque appel Skool (politesse)
 
+# Courses explicitly ignored (empty/test courses upstream).
+EXCLUDED_COURSE_SUBSTRINGS: tuple[str, ...] = ("testing, ignore", "testing-ignore")
+EXCLUDED_COURSE_SLUGS: frozenset[str] = frozenset({"metroidvania-10-testing-ignore"})
+
 # yt-dlp: read in this order - env var YT_DLP_EXE > user_config.jsonc paths.yt_dlp_exe > empty string
 from lib.user_config import env_or_config
 
@@ -648,15 +652,32 @@ def login(force: bool = False) -> bool:
         return False
 
 
-def get_courses() -> list[dict]:
-    """Liste tous les cours du groupe."""
+def _is_excluded_course(course: dict) -> bool:
+    """Return True if `course` is a known upstream placeholder/test course to skip."""
+    title = str(course.get("title", course.get("name", ""))).strip()
+    lower = title.lower()
+    if any(sub in lower for sub in EXCLUDED_COURSE_SUBSTRINGS):
+        return True
+    return slugify(title) in EXCLUDED_COURSE_SLUGS
+
+
+def get_courses(*, include_excluded: bool = False) -> list[dict]:
+    """Liste tous les cours du groupe (filtre les cours de test ignorés par défaut)."""
     print(f"[*] Fetching courses from '{SKOOL_GROUP}'...")
     data = run_skool(["list-courses", "-g", SKOOL_GROUP])
     if not data:
         return []
     # skool-cli returns {"courses": [...]} or directly a list
-    courses = data.get("courses", data) if isinstance(data, dict) else data
-    print(f"[+] {len(courses)} cours trouvés.")
+    raw_courses = data.get("courses", data) if isinstance(data, dict) else data
+    if include_excluded:
+        print(f"[+] {len(raw_courses)} cours trouvés.")
+        return raw_courses
+    courses = [c for c in raw_courses if not _is_excluded_course(c)]
+    skipped = len(raw_courses) - len(courses)
+    if skipped:
+        print(f"[+] {len(courses)} cours retenus ({skipped} cours ignoré(s) via EXCLUDED_COURSE_*).")
+    else:
+        print(f"[+] {len(courses)} cours trouvés.")
     return courses
 
 

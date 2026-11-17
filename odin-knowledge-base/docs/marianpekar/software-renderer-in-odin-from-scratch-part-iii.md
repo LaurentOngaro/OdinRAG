@@ -1,3 +1,12 @@
+---
+title: "Software Renderer in Odin from Scratch, Part III"
+date: 2025-06-04
+source: "https://marianpekar.com/blog/software-renderer-in-odin-from-scratch-part-iii"
+tags: [OdinRAG, kb, source/marianpekar, topic/rendering]
+type: reference
+status: active
+---
+
 # Software Renderer in Odin from Scratch, Part III
 
 4th June 2025 • 26 min read
@@ -26,9 +35,9 @@ You probably already know the answer. By adding the two vectors, `[1, 2, 3]` and
 
 \begin{bmatrix} 1 & 0 & 0 & t\_x \\ 0 & 1 & 0 & t\_y \\ 0 & 0 & 1 & t\_z \\ 0 & 0 & 0 & 1 \end{bmatrix}
 
-From the previous part, we know that we can treat an n-vector as a *1 × n* matrix, and we also learned that matrix multiplication is only defined when the number of columns in the first matrix equals the number of rows in the second. But here, we have a 3D vector and a 4×4 matrix, so how can we do the multiplication?
+From the previous part, we know that we can treat an n-vector as a _1 × n_ matrix, and we also learned that matrix multiplication is only defined when the number of columns in the first matrix equals the number of rows in the second. But here, we have a 3D vector and a 4×4 matrix, so how can we do the multiplication?
 
-We simply extend the 3D vector to a 4D vector by adding a fourth component with a value of 1. With this extra component, our 3D vector [1, 2, 3] becomes [1, 2, 3, 1], which can now be multiplied by a 4×4 [translation](https://en.wikipedia.org/wiki/Translation_(geometry)) matrix.
+We simply extend the 3D vector to a 4D vector by adding a fourth component with a value of 1. With this extra component, our 3D vector [1, 2, 3] becomes [1, 2, 3, 1], which can now be multiplied by a 4×4 [translation](<https://en.wikipedia.org/wiki/Translation_(geometry)>) matrix.
 
 \begin{bmatrix} 1 & 0 & 0 & t\_x \\ 0 & 1 & 0 & t\_y \\ 0 & 0 & 1 & t\_z \\ 0 & 0 & 0 & 1 \end{bmatrix} \begin{bmatrix} x \\ y \\ z \\ 1 \end{bmatrix} = \begin{bmatrix} x + t\_x \\ y + t\_y \\ z + t\_z \\ 1 \end{bmatrix}
 
@@ -68,7 +77,7 @@ However, we're not going to use these three matrices individually in our impleme
 
 ![Pitch, Yaw, and Roll. This is a derivative work of <a href="https://commons.wikimedia.org/wiki/File:Yaw_Axis_Corrected.svg">"Yaw_Axis_Corrected.svg" by Auawise</a>, used under <a href="https://creativecommons.org/licenses/by-sa/3.0/deed.en">CC BY-SA 3.0</a>. This file is licensed under the same license.](/uploads/sw_rend_iii_pitch_yaw_roll.png)
 
-Such a matrix looks like this, where *alpha*, *beta*, and *gamma* correspond to *yaw*, *pitch*, and *roll*, which, in our coordinate system, are rotations around the *Y*, *X*, and *Z* axes, respectively.
+Such a matrix looks like this, where _alpha_, _beta_, and _gamma_ correspond to _yaw_, _pitch_, and _roll_, which, in our coordinate system, are rotations around the _Y_, _X_, and _Z_ axes, respectively.
 
 \begin{bmatrix}\cos\alpha \cos\beta & \cos\alpha \sin\beta \sin\gamma - \sin\alpha \cos\gamma &\cos\alpha \sin\beta \cos\gamma + \sin\alpha \sin\gamma & 0 \\\sin\alpha \cos\beta & \sin\alpha \sin\beta\sin\gamma + \cos\alpha \cos\gamma & \sin\alpha \sin\beta \cos\gamma - \cos\alpha \sin\gamma & 0 \\-\sin\beta & \cos\beta \sin\gamma & \cos\beta \cos\gamma & 0 \\0 & 0 & 0 & 1\end{bmatrix}
 
@@ -88,7 +97,7 @@ Before we move on, I'd also like to point out that the example above shows unifo
 
 ## Model Matrix
 
-Now that we understand our three matrices for transformation, rotation, and scaling, we can multiply them in this order to get a single matrix, commonly called the *model matrix*. When we then multiply this matrix by a point, represented as a 4D vector with 1 as the W component, as we already saw, the result is a point with all three affine transformations applied!
+Now that we understand our three matrices for transformation, rotation, and scaling, we can multiply them in this order to get a single matrix, commonly called the _model matrix_. When we then multiply this matrix by a point, represented as a 4D vector with 1 as the W component, as we already saw, the result is a point with all three affine transformations applied!
 
 M = T \cdot R \cdot S
 
@@ -136,7 +145,7 @@ The smaller cube with red outlines illustrates how it might look after a transfo
 
 ## View Matrix
 
-To get a viewer into consideration, we need yet another transformation matrix, commonly known as the *view matrix*. When constructing one, we need a **position of a viewer** and a **direction the viewer is looking to**, we can represent both by a 3D vector, so later in the implementation, we're going to encapsulate these two vectors in a struct we call `Camera`.
+To get a viewer into consideration, we need yet another transformation matrix, commonly known as the _view matrix_. When constructing one, we need a **position of a viewer** and a **direction the viewer is looking to**, we can represent both by a 3D vector, so later in the implementation, we're going to encapsulate these two vectors in a struct we call `Camera`.
 
 Another thing related to the view matrix is the orientation of the coordinate system. It’s entirely up to us how we name our axes and in which directions we define them as positive, but once we do so, we have to stay consistent about it throughout the entire implementation.
 
@@ -160,7 +169,7 @@ Now we can use these three vectors, that defines our view space, to construct ou
 
 V = \begin{bmatrix} \text{right}\_x & \text{right}\_y & \text{right}\_z & -(\vec{right} \cdot \vec{camera}) \\ \text{up}\_x & \text{up}\_y & \text{up}\_z & -(\vec{up} \cdot \vec{camera}) \\ \text{forward}\_x & \text{forward}\_y & \text{forward}\_z & -(\vec{forward} \cdot \vec{camera}) \\ 0 & 0 & 0 & 1 \end{bmatrix}
 
-Now that we have our view matrix, we can multiply our model matrix by it. The result is a *model-view matrix* which transforms vertices from *model space* into *view space*, the space where the origin is located at the viewer (our camera, sometimes referred to as the "eye" or "view"), and the orientation depends on the direction the viewer is looking.
+Now that we have our view matrix, we can multiply our model matrix by it. The result is a _model-view matrix_ which transforms vertices from _model space_ into _view space_, the space where the origin is located at the viewer (our camera, sometimes referred to as the "eye" or "view"), and the orientation depends on the direction the viewer is looking.
 
 ![Origins and orientations of different spaces. This is a derivative work of <a href="https://commons.wikimedia.org/wiki/File:Perspective_projection_of_cube_above_plane.svg">"Perspective_projection_of_cube_above_plane.svg" by SharkD</a>, used under <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.en">CC BY-SA 4.0</a>. This file is licensed under the same license.](/uploads/sw_rend_iii_spaces.png)
 
@@ -168,7 +177,7 @@ However, the view space contains no information about perspective. To project ou
 
 ## Projection Matrix
 
-To construct a projection matrix, in our case, a *perspective* projection matrix, we need to define a few more values to be defined.
+To construct a projection matrix, in our case, a _perspective_ projection matrix, we need to define a few more values to be defined.
 
 First, the **field of view** (or FOV for short). The FOV is an angle that defines how wide the viewing cone of a camera is. We also need the **aspect ratio**. And last but not least, we need the **near** and **far** distances, which define how far from the camera our clipping planes will be.
 
@@ -266,7 +275,7 @@ MakeTranslationMatrix :: proc(x: f32, y: f32, z: f32) -> Matrix4x4 {
         {1.0,  0.0,  0.0,    x},
         {0.0,  1.0,  0.0,    y},
         {0.0,  0.0,  1.0,    z},
-        {0.0,  0.0,  0.0,  1.0}    
+        {0.0,  0.0,  0.0,  1.0}
     }
 }
 
@@ -365,4 +374,4 @@ That's all for today, and as always, you can find all the code from this and the
 > Author: Marian Pekar - <https://marianpekar.com>
 > (c) Marian Pekar. The posts stay freely readable on the author's site; this local copy is credited in `SOURCES.md` at the repo root. Please link back to the original article.
 
->Source: https://marianpekar.com/blog/software-renderer-in-odin-from-scratch-part-iii
+> Source: https://marianpekar.com/blog/software-renderer-in-odin-from-scratch-part-iii

@@ -1,3 +1,12 @@
+---
+title: "Fixed timestep without interpolation"
+date: 2024-10-11
+source: "https://jakubtomsu.github.io/posts/fixed_timestep_without_interpolation"
+tags: [OdinRAG, kb, source/jakubtomsu]
+type: reference
+status: active
+---
+
 # Fixed timestep without interpolation
 
 2024-10-11
@@ -38,7 +47,8 @@ Here is what the **old** game loop looked like. The game kept track of the game 
 19    // Interpolates between previous and current game state with the alpha factor.
 20    game_draw(game, prev_game, alpha)
 21}
-```odin
+```
+
 # Can we do better?
 
 The fundamental issue is that the fixed timestep simulation does as many timesteps as possible, however because the frame-rate is variable, the real time doesn’t always match the fixed time.
@@ -77,16 +87,17 @@ For this reason we **duplicate** the entire game state into a new, temporary ren
 25    // It matches real time pretty much perfectly.
 26    game_draw(temp_game)
 27}
-```odin
+```
+
 > Note:
 > This method probably won’t work very well in cases when `game_tick` can take a very significant amount of time, or the game state is gigantic, e.g. in a big AAA game which needs to run the physics engine and whatnot.
 
 ## Game state duplication
 
 In a more traditional system with individually dynamically allocated objects this might be a bit of an issue.
-Even if your language can do a *deep copy* of an object which holds the game state, the individual allocations could take a long time or it could make the GC sad.
+Even if your language can do a _deep copy_ of an object which holds the game state, the individual allocations could take a long time or it could make the GC sad.
 
-In my case the *entire* game state is trivially copyable, because:
+In my case the _entire_ game state is trivially copyable, because:
 
 1. I never store any pointers. ever. Only integer indexes or handles.
 2. All of the datastructures are fixed size, no dynamic allocations.
@@ -110,7 +121,8 @@ So here is how to accumulate the input states every frame:
 4    // Bitwise OR the bit flags
 5    tick_input.actions[action] += flags
 6}
-```odin
+```
+
 And this is how to apply it. Note how the temp flags are cleared after every tick, and all flags are cleared at the end of a frame when any tick happened.
 
 ```odin
@@ -123,24 +135,25 @@ And this is how to apply it. Note how the temp flags are cleared after every tic
 7game_tick(&temp_game, tick_input, accumulator)
 8game_draw(temp_game)
 9if any_tick do tick_input = {}
-```odin
+```
+
 (see the [Demo](/posts/fixed_timestep_without_interpolation/#demo) source code for the full implementation)
 
 ## Different TPS is a fundamentally different problem
 
 Something I’ve realized while working on this post and the Demo is how different the problem you’re trying to solve is, depending on your TPS. So here is what I think is a good way to roughly categorize it:
 
-- ~10 TPS: Here the way you render the in-between game states matters *a lot*. Latency from interpolation is *huge* but the predicted render ticks can be jittery because of different simulation results. And the exact way you accumulate inputs and how you pass them in the game matters a lot as well. This is completely unusable for any kind of real time action game.
-- 30-60 TPS: This is the most common for regular games. In this case the render tick method works really well, because there is almost no jitter due to input sampling inaccuracies. But the smoothing is still very visible. The added latency from interpolation is not *that* noticeable. However if you’re making a fast-paced action game, you probably want to eliminate every millisecond of unnecessary latency.
+- ~10 TPS: Here the way you render the in-between game states matters _a lot_. Latency from interpolation is _huge_ but the predicted render ticks can be jittery because of different simulation results. And the exact way you accumulate inputs and how you pass them in the game matters a lot as well. This is completely unusable for any kind of real time action game.
+- 30-60 TPS: This is the most common for regular games. In this case the render tick method works really well, because there is almost no jitter due to input sampling inaccuracies. But the smoothing is still very visible. The added latency from interpolation is not _that_ noticeable. However if you’re making a fast-paced action game, you probably want to eliminate every millisecond of unnecessary latency.
 - ~120+ TPS: At this point any kind of interpolation accounts for only a tiny fraction of a second. The only reason you might want to use it to remove some jitter, but it’s just not very significant.
 
 ### Accumulated render tick
 
 In case you wanted to run only a very small number of fixed update ticks per second, the basic render tick method described above has some limitations. The temporary render tick always uses the last fixed tick, which means as your fixed delta increases your render tick might be doing a single, very large time step.
 
-> This is not an issue in most singleplayer PC games. That’s because you *probably* want to simulate >30 ticks per second anyway, for stability reasons and just because there’s no reason to push TPS lower.
+> This is not an issue in most singleplayer PC games. That’s because you _probably_ want to simulate >30 ticks per second anyway, for stability reasons and just because there’s no reason to push TPS lower.
 
-The solution is to copy game state into temp game state *only* if you simulated a fixed tick that frame. Otherwise you keep simulating the old temp game state. This also means you need to keep another separate remainder timer, because alpha is no longer valid for each render tick.
+The solution is to copy game state into temp game state _only_ if you simulated a fixed tick that frame. Otherwise you keep simulating the old temp game state. This also means you need to keep another separate remainder timer, because alpha is no longer valid for each render tick.
 
 This is similar to client-side prediction in real-time multiplayer games.
 
@@ -186,7 +199,7 @@ Let’s summarize the all the different methods from the demo and how they compa
 
 This isn’t related to the main topic of this post, because it applies to any kind of gameplay where the timestep is fixed (it doesn’t matter whether you use prediction or interpolation). But if your gameplay is deterministic, meaning you always get the same game state T+1 by simulating game state T with the same input, there is a neat trick to do game replay.
 
-Regular replay systems would have to periodically store the game state, which ends up consuming a lot of memory, even if you try to compress it. But if your game is deterministic you only need to store the *starting* game state (or even just the starting settings to generate the game state), and then inputs for all the fixed timesteps. Then when you can just simulate the original game state N times to get any tick you want, once you need to do the replay.
+Regular replay systems would have to periodically store the game state, which ends up consuming a lot of memory, even if you try to compress it. But if your game is deterministic you only need to store the _starting_ game state (or even just the starting settings to generate the game state), and then inputs for all the fixed timesteps. Then when you can just simulate the original game state N times to get any tick you want, once you need to do the replay.
 
 By the way, this is what Media Molecule does in Dreams. The Trackmania racing games do this as well, to verify runs and make sure people aren’t cheating. Even their 3d physics engine is fully deterministic! very cool stuff.
 
@@ -206,4 +219,4 @@ After I published the original blog post, a number of people messaged me it help
 
 I was told about the render tick method by Radek Jurga on discord, a fellow handmade programmer. He uses it in his engine as well! And he found out about it from an old [Jonathan Blow Q&A stream](https://youtu.be/fdAOPHgW7qM?si=chCqgUTNoOLuHDvy) which is a much more in-depth explanation of this entire topic.
 
->Source: https://jakubtomsu.github.io/posts/fixed_timestep_without_interpolation
+> Source: https://jakubtomsu.github.io/posts/fixed_timestep_without_interpolation

@@ -1,0 +1,15 @@
+{
+  "include": ["_Helpers"],
+  "exclude": [
+    "**/__pycache__",
+    "node_modules",
+    ".venv",
+    "venv",
+    "code/vendored templates",
+    "code/projects",
+    "odin-knowledge-base",
+    "_Archives",
+    "_Private"
+  ],
+  "extraPaths": ["_Helpers/scripts", "_Helpers/scripts/diagnostic"]
+}

@@ -1,3 +1,12 @@
+---
+title: "Structured Control Flow (Brain Dump)"
+date: 2021-02-02
+source: "https://www.gingerbill.org/article/2021/02/02/structured-control-flow"
+tags: [OdinRAG, kb, source/gingerbill]
+type: reference
+status: active
+---
+
 # Structured Control Flow (Brain Dump)
 
 2021-02-02
@@ -53,7 +62,8 @@ foo :: proc(x: int) -> (val: int, err: Error) {
 	// returns all the named return values without having the manual specify them
 	return;
 }
-```odin
+```
+
 ```odin
 the_cases: switch x {
 case 1:
@@ -72,7 +82,8 @@ case 2, 3:
 case 4:
 	do_other_thing(&y);
 }
-```odin
+```
+
 ## Categories of Unstructured Control Flow
 
 - Procedure call
@@ -91,4 +102,4 @@ case 4:
   - [longjmp/setjmp](https://en.wikipedia.org/wiki/Setjmp.h)
   - [Interrupts](https://en.wikipedia.org/wiki/Interrupt)
 
->Source: https://www.gingerbill.org/article/2021/02/02/structured-control-flow
+> Source: https://www.gingerbill.org/article/2021/02/02/structured-control-flow

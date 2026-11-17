@@ -1,3 +1,12 @@
+---
+title: "Tom's Namespaces: An Odin Fanfic"
+date: 2026-05-11
+source: "https://zylinski.se/posts/toms-namespaces"
+tags: [OdinRAG, kb, source/zylinski, topic/raylib]
+type: reference
+status: active
+---
+
 # Tom's Namespaces: An Odin Fanfic
 
 May 11, 2026
@@ -8,7 +17,7 @@ Cover art by [Gerry](https://gerry.website/)
 
 Tom likes making games. He has worked professionally as a game developer, but he also likes to make games in his free time, as a hobby. He makes these hobby games in a “from scratch” kind of way. This means that he just has a `main` procedure and imports some libraries and builds things as needed.
 
-Recently, Tom has found out about a programming language called [*Odin*](https://odin-lang.org/). He found that it fixed many things he disliked about C++ and C. He thought that it looked like a fun language to use for game development.
+Recently, Tom has found out about a programming language called [_Odin_](https://odin-lang.org/). He found that it fixed many things he disliked about C++ and C. He thought that it looked like a fun language to use for game development.
 
 Soon he is making his first little game. He initially did some experiments using SDL, but has now settled on using Raylib. Raylib is a library for doing windowing, rendering, input and audio. All the stuff you need for a game!
 
@@ -16,7 +25,8 @@ After tinkering with his game for a while, he ended up with a huge file called `
 
 ```odin
 world_add :: proc(w: ^World, e: Entity)
-```odin
+```
+
 He felt the need to organize things a bit, perhaps to put all the “world things” into their own little compartment. After all, the Odin language is pretty modern! Tom read about something called “packages” that enables the programmer to split things up in neat ways.
 
 He read that a package is just a subfolder. So Tom moved `world.odin` into a subfolder called `world`. His game then had the following folder structure:
@@ -25,27 +35,31 @@ He read that a package is just a subfolder. So Tom moved `world.odin` into a sub
 game
 |
 +--world
-```odin
+```
+
 From within the `game` package he could then import the stuff from the `world` package by writing the following Odin code:
 
 ```odin
 import "world"
-```odin
+```
+
 The things from this imported `world` package is put into a namespace called `world`. To use anything from in there you’d write `world.some_procedure_in_the_world_package()`. So, in order to call `world_add` Tom had to write `world.world_add`. That’s silly, so naturally he dropped the `world_` prefix, so the procedure just became:
 
 ```odin
 add :: proc(w: ^World, e: Entity)
-```odin
+```
+
 Then he could neatly write `world.add(some_world, some_entity)`. But before he got there he went “Oh no! That `Entity` type lives in the main game package!”… So Tom tried to make the `world` package import the `game` package, like so:
 
 ```odin
 import game ".."
-```odin
+```
+
 Then he went “Oh no!” again. A compilation error! The error says that Odin does not allow cyclic package imports. `game` is importing `world` and `world` is importing `game`.
 
 He then thought that perhaps he needed to create an `entity` package that both `world` and `game` could import, or perhaps a `common` package for “often used types”. Oh boy, this is getting a bit hairy!
 
-Tom then hops on the Odin Discord server and starts a discussion on how to actually organize these things. He’s told that packages are *not* meant for fine-grained organization: They are better seen as individual libraries or completely independent parts of a program.
+Tom then hops on the Odin Discord server and starts a discussion on how to actually organize these things. He’s told that packages are _not_ meant for fine-grained organization: They are better seen as individual libraries or completely independent parts of a program.
 
 With this in mind, Tom tries to move everything back to the `game` package. It did indeed seem like he was over-complicating things a bit. He gently taps his laptop and says to himself: “Yeah! Keep things simple! I’ll just find some other way to namespace things within the `game` package”.
 
@@ -61,7 +75,8 @@ namespace world {
 
 	}
 }
-```odin
+```
+
 Why can’t I have this in Odin? Hah! I’ll just make my own fork of the Odin compiler and add it!!
 
 Tom starts sketching on some changes to the Odin compiler to support package-local namespaces.
@@ -88,7 +103,7 @@ Tom is actually me, Karl Zylinski. I went through this kind of namespace philoso
 
 The reason I thought that C++ namespaces were good was because I had mostly worked in small C++ projects. When you have a bigger project, then they mostly become annoying. In a big project, you must make sure that it is really easy to find stuff. And the best way to find stuff is by making sure that things have simple names. Here simple doesn’t mean “short”, but rather that the name is unambiguous.
 
-Tom’s co-worker Bob says that these issues are tooling problems. Tom’s reply “Too bad most of the tools I’ve tried don’t solve this then…” is important: These things *aren’t* solved by most tools I’ve tried. At the C++ gig, I saw other people struggle with navigating the codebase too.
+Tom’s co-worker Bob says that these issues are tooling problems. Tom’s reply “Too bad most of the tools I’ve tried don’t solve this then…” is important: These things _aren’t_ solved by most tools I’ve tried. At the C++ gig, I saw other people struggle with navigating the codebase too.
 
 There’s another thing to consider here: If your codebase requires lots of fancy tools to be explored, then perhaps you don’t have a very readable codebase. I would argue that if your code is not possible to navigate in the most simple source code editor, then you have a problem. You can’t assume that everyone has the same tools as you.
 
@@ -102,4 +117,4 @@ Learn more about Odin by reading my book [Understanding the Odin Programming Lan
 
 /Karl Zylinski
 
->Source: https://zylinski.se/posts/toms-namespaces
+> Source: https://zylinski.se/posts/toms-namespaces

@@ -1,3 +1,12 @@
+---
+title: "Generate Odin bindings for C libraries"
+date: 2025-04-02
+source: "https://zylinski.se/posts/generate-odin-bindings-for-c-libraries"
+tags: [OdinRAG, kb, source/zylinski, topic/rendering, topic/raylib, topic/binding]
+type: reference
+status: active
+---
+
 # Generate Odin bindings for C libraries
 
 April 2, 2025
@@ -185,7 +194,8 @@ clang_include_paths = [
 
 // Writes the clang JSON ast dump for debug inspection
 debug_dump_json_ast = false
-```odin
+```
+
 Let’s look a bit closer at a few of the things in there:
 
 ---
@@ -194,7 +204,8 @@ Let’s look a bit closer at a few of the things in there:
 inputs = [
 	"input"
 ]
-```odin
+```
+
 This will make the generator search the `input` folder for C header files. Any header file in there will be sent into `clang`. Clang will generate an abstract syntax tree from it, which we use to output the Odin binding code.
 
 It’ll also copy any `.odin`, `.lib`, `.a`, `.dll` or `.dylib` in the input folder. So you can put thing you want to “bring along” into your bindings in there.
@@ -207,7 +218,8 @@ It’ll also copy any `.odin`, `.lib`, `.a`, `.dll` or `.dylib` in the input fol
 import_lib = ""
 
 imports_file = "imports.odin"
-```odin
+```
+
 You can write `import_lib = "raylib.lib"` in order to add a `foreign import lib { "raylib.lib" }` line to the bindings. But if you want some additional set up, then you can also write your own little “imports” file. That’s what the `imports_file` thing does: It will paste in the contents of that file near the top of your bindings. In there you can do custom platform-specific logic for library file imports, etc.
 
 ---
@@ -221,7 +233,8 @@ bit_setify = {
 	"Gesture" = "Gestures"
 	"ConfigFlag" = "ConfigFlags"
 }
-```odin
+```
+
 The first part renames the type `ConfigFlags` to `ConfigFlag`. That’s done because we want to use that type for a `bit_set`. The second part says to create a `bit_set` called `ConfigFlags` that wraps the `ConfigFlag` enum. It also bit setifies the `Gesture` enum under the name `Gestures`.
 
 The bitsetification of `Gesture` will take the following C header code and turn it into the Odin code;
@@ -242,7 +255,8 @@ typedef enum {
     GESTURE_PINCH_IN    = 256,      // Pinch in gesture
     GESTURE_PINCH_OUT   = 512       // Pinch out gesture
 } Gesture;
-```odin
+```
+
 Odin Code:
 
 ```odin
@@ -262,7 +276,8 @@ Gesture :: enum c.int {
 }
 
 Gestures :: distinct bit_set[Gesture; c.int]
-```odin
+```
+
 Note how it has added a `Gestures` type and also modified the values of each enum member. The values are modified so that the `bit_set` works correctly.
 
 ---
@@ -275,7 +290,8 @@ type_overrides = {
 	"Matrix"  = "#row_major matrix[4, 4]f32"
 	"Color"   = "distinct [4]u8"
 }
-```odin
+```
+
 Some types in are better replaced completely. In raylib the vectors and color types are structs. It’s nice to instead use fixed arrays, so that you can do array programming swizzling (`some_vector.xyz` and `some_color.rgb` etc).
 
 ---
@@ -312,14 +328,16 @@ struct_field_overrides = {
 
 	// This is not a complete override list, it's just an example.
 }
-```odin
+```
+
 This one is important: As you can see you can override the type of a struct field. `"Image.format" = "PixelFormat"` will make the `format` field of the `Image` struct use the type `PixelFormat`. Raylib uses an integer for the type, but in Odin it makes sense to use the actual enum type.
 
 Another important thing are the lines that looks like so:
 
 ```odin
 "Mesh.vertices" = "[^]"
-```odin
+```
+
 This `Mesh` type looks like this in C:
 
 ```odin
@@ -348,17 +366,20 @@ typedef struct Mesh {
 	unsigned int vaoId;     // OpenGL Vertex Array Object id
 	unsigned int *vboId;    // OpenGL Vertex Buffer Objects id (default vertex data)
 } Mesh;
-```odin
+```
+
 The bindings for fields such as `vertices` would by default use the type `^f32`. But that field is actually supposed to be a C-style array. Such arrays are best represented as multi-pointers. So writing
 
 ```odin
 "Mesh.vertices" = "[^]"
-```odin
+```
+
 Will swap out that `^` in `^f32` for `[^]f32`, so the field in the generated Odin code for `Mesh` will contain a vertices field that looks like so:
 
 ```odin
 vertices: [^]f32
-```odin
+```
+
 For complete Raylib bindings the list of struct field type overrides would be longer than in this example. If you’re making bindings for a library, then I recommend: Just generate them and add overrides like this as you notice you need them. You can make the binding generator run as part of your build process, before building your program that uses the bindings, so you can quickly add these tweaks.
 
 ---
@@ -383,7 +404,8 @@ procedure_type_overrides = {
 	"IsGestureDetected.gesture"    = "Gestures"
 	"SetGesturesEnabled.flags"     = "Gestures"
 }
-```odin
+```
+
 Similarly to the struct type overrides, you can also override the type of procedure parameters and return values. Use the key `Procedure_Name.parameter` to override a parameter. Just write the procedure name to override the return value.
 
 On the right side, you can also write `[^]` and `#by_ptr` instead of a complete type name. That’ll modify the current type, just like with struct field type overrides.
@@ -454,14 +476,16 @@ bit_setify = {
     "Transform_Flag" = "Transform_Flags"
     "Baked_Key_Flag" = "Baked_Key_Flags"
 }
-```odin
+```
+
 ---
 
 ```odin
 remove_type_prefix = "ufbx_"
 
 remove_function_prefix = "ufbx_"
-```odin
+```
+
 This will strip the `ufbx_` prefixes that are everywhere in `ufbx`. Since the library will be loaded as a package, that package will have the `ufbx` namespace, so removing it makes everything more tidy.
 
 ---
@@ -470,14 +494,16 @@ This will strip the `ufbx_` prefixes that are everywhere in `ufbx`. Since the li
 clang_defines = {
     "UFBX_REAL_IS_FLOAT" = "1"
 }
-```odin
+```
+
 This sends along some defines to clang, so that it applies them when generating the bindings.
 
 ---
 
 ```odin
 force_ada_case_types = true
-```odin
+```
+
 This will make all types use ada case. I.e. `Look_Like_This`. In most cases I recommend staying with the library’s own convention. But `ufbx` had many names such as `ufbx_string`. When the `ufbx_` prefix was removed it caused a conflict with Odin’s own `string` type name. So in this case I found it best to force ada case.
 
 ## More examples and additional help[#](#more-examples-and-additional-help)
@@ -499,4 +525,4 @@ You can support my blog, my YouTube channel and my open-source projects by [beco
 Have a nice day!
 /Karl Zylinski
 
->Source: https://zylinski.se/posts/generate-odin-bindings-for-c-libraries
+> Source: https://zylinski.se/posts/generate-odin-bindings-for-c-libraries

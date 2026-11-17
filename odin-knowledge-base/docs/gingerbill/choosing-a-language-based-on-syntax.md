@@ -1,12 +1,21 @@
+---
+title: "Choosing a Language Based on its Syntax?"
+date: 2026-02-19
+source: "https://www.gingerbill.org/article/2026/02/19/choosing-a-language-based-on-syntax"
+tags: [OdinRAG, kb, source/gingerbill]
+type: reference
+status: active
+---
+
 # Choosing a Language Based on its Syntax?
 
 Series: [Syntax and how it Matters](/series/syntax-and-how-it-matters)
 
 2026-02-19
 
-I am still perplexed by how people judge a language purely by its ***declaration*** syntax, and will decide whether to use the language purely based on whether they like that aspect or not
+I am still perplexed by how people judge a language purely by its _**declaration**_ syntax, and will decide whether to use the language purely based on whether they like that aspect or not
 
-I am specifically talking about ***declaration*** syntax here and not other aspects of concrete syntax. Please do not extrapolate further..
+I am specifically talking about _**declaration**_ syntax here and not other aspects of concrete syntax. Please do not extrapolate further..
 
 The general categories of declarations can be classified as the following:
 
@@ -22,13 +31,13 @@ I probably do have a bias, in that I know how compilers work, but even when I di
 
 > **Edit**: Concrete syntax does matter a lot which is why I’ve had to write a follow-up article to explain why: [Does Syntax Matter?](https://www.gingerbill.org/article/2026/02/21/does-syntax-matter/)
 
-A programming language is not *merely* its syntax. *Semantics* actually exist, be that [denotation semantics](https://en.wikipedia.org/wiki/Denotational_semantics)
+A programming language is not _merely_ its syntax. _Semantics_ actually exist, be that [denotation semantics](https://en.wikipedia.org/wiki/Denotational_semantics)
 
-I’ve always found that focusing on the denotational semantics of a language is more important than focusing on the operational semantics because (for me at least) the operational semantics are “obvious” once the denotational semantics are decided upon., [operational semantics](https://en.wikipedia.org/wiki/Operational_semantics), or [algebraic semantics](https://en.wikipedia.org/wiki/Algebraic_semantics_(computer_science)). The issue is that many inexperienced programmers don’t have this mental distinction and think all languages are mostly the same but with just differing “syntax”. Just wait until they are exposed to a functional programming language or a database language, or even find out that a spreadsheet is a language.
+I’ve always found that focusing on the denotational semantics of a language is more important than focusing on the operational semantics because (for me at least) the operational semantics are “obvious” once the denotational semantics are decided upon., [operational semantics](https://en.wikipedia.org/wiki/Operational_semantics), or [algebraic semantics](<https://en.wikipedia.org/wiki/Algebraic_semantics_(computer_science)>). The issue is that many inexperienced programmers don’t have this mental distinction and think all languages are mostly the same but with just differing “syntax”. Just wait until they are exposed to a functional programming language or a database language, or even find out that a spreadsheet is a language.
 
 I wrote an article in 2018
 
-[On the Aesthetics of the Syntax of Declarations](https://gingerbill.org/article/2018/03/12/on-the-aesthetics-of-the-syntax-of-declarations/) about the different families of declaration syntax, but it is still weird to me how people view things when deciding whether to use a language or not. To use my language Odin as an example, do people think this substantially changes the *semantics* if its declaration syntax had these different looks?
+[On the Aesthetics of the Syntax of Declarations](https://gingerbill.org/article/2018/03/12/on-the-aesthetics-of-the-syntax-of-declarations/) about the different families of declaration syntax, but it is still weird to me how people view things when deciding whether to use a language or not. To use my language Odin as an example, do people think this substantially changes the _semantics_ if its declaration syntax had these different looks?
 
 ```odin
 // Actual Odin
@@ -38,7 +47,8 @@ FOO :: "some constant"
 bar :: proc() -> i32 {
     return 123
 }
-```odin
+```
+
 to this:
 
 ```odin
@@ -49,10 +59,11 @@ const FOO = "some constant"
 proc bar() -> i32 {
     return 123
 }
-```odin
+```
+
 At best the difference here is going to be slightly more typing needed for `var` and `const`, and thus just becomes a question of ergonomics or “optimizing for typing” (which is never the bottleneck). I’d argue most of the compiler would effectively be the same for the latter approach, since it already has to disambiguate between the different kinds of declarations 
 
-Internally within the compiler, they are called *entities*. Some other compilers will use the term *symbol*, and other terms.. However each syntax family does have its own trade-offs which allow or prevent certain possibilities.
+Internally within the compiler, they are called _entities_. Some other compilers will use the term _symbol_, and other terms.. However each syntax family does have its own trade-offs which allow or prevent certain possibilities.
 
 > Syntax restricts the possibilities of what semantics are possible.
 
@@ -75,7 +86,7 @@ When I first created Odin, semicolons were mostly required and inferred in many 
 - To make the grammar consistent, coherent, and simpler
 - To honestly shut up these kinds of bizarre people
 
-That second point might sound silly but it really was a thing where people were put off even *trying* Odin due to it having semicolons. The first point was the main reason I did it though, especially since even at work, many of my colleagues still use semicolons in the codebase purely out of habit from programming in C/C++ for decades 
+That second point might sound silly but it really was a thing where people were put off even _trying_ Odin due to it having semicolons. The first point was the main reason I did it though, especially since even at work, many of my colleagues still use semicolons in the codebase purely out of habit from programming in C/C++ for decades 
 
 We will eventually clean this up, even if removing unnecessary semicolons simple from our codebase is as simple as calling `odin strip-semicolon`..
 
@@ -84,7 +95,8 @@ However making semicolons optional in a language can come with a few compromises
 ```odin
 (function() print("Test1") end)(); -- That semicolon is required
 (function() print("Test2") end)()
-```odin
+```
+
 Another option is to do something like automatic semicolon insertion (ASI) based on a set of rules. Unfortunately, a lot of people’s first experience with this kind of approach is JavaScript and its really poor implementation of it, which means people usually just write semicolons regardless to remove the possible mistakes. However there are languages that have relatively sane approaches to ASI such as Go, Python, and Odin.
 
 Go’s approach is purely a lexical rule, which does mean you are forced to do things like trailing commas in lists that span multiple lines. However this is probably not just done for simplicity but also to enforce a code styling.
@@ -110,18 +122,19 @@ another_type :: proc() // note the extra newline separating the signature from a
 { // this is just a block
 
 }
-```odin
+```
+
 ## First Exposure Bias
 
-How is it that people literally choose a language purely on the most minute syntax issues rather than on the (denotational or operational) semantics? Or do most people not actually “program” but just “pattern match” syntax together and *hope* it works?
+How is it that people literally choose a language purely on the most minute syntax issues rather than on the (denotational or operational) semantics? Or do most people not actually “program” but just “pattern match” syntax together and _hope_ it works?
 
-Maybe I don’t need to be as cynical and it is a lot simpler than all of that: **first exposure bias**. It’s the tendency for an individual to develop a *preference* simply because they became familiar with it first, rather that it be a rational choice from a plethora of options. People keep to what they are familiar with, which can be rational. But saying they don’t like something without even trying it, is a bit irrational.
+Maybe I don’t need to be as cynical and it is a lot simpler than all of that: **first exposure bias**. It’s the tendency for an individual to develop a _preference_ simply because they became familiar with it first, rather that it be a rational choice from a plethora of options. People keep to what they are familiar with, which can be rational. But saying they don’t like something without even trying it, is a bit irrational.
 
 However I do think there are rational reasons people do not like a syntax of a language and thus do not use it. Sometimes that syntax is just too incoherent or inconsistent with the semantics of the language. Sometimes it is just too dense and full or sigils 
 
-Perl is a language that literally gives me headaches when scanning/reading the code. I am not exaggerating., making it very hard to *scan* 
+Perl is a language that literally gives me headaches when scanning/reading the code. I am not exaggerating., making it very hard to _scan_ 
 
-I am making a distinction between *scanning* and *reading* here, which I don’t think some people do. However that distinction is for another article. and find the patterns within the code. Sometimes it is just so foreign, that the time it takes to learn it would be a lot longer than another alternative.
+I am making a distinction between _scanning_ and _reading_ here, which I don’t think some people do. However that distinction is for another article. and find the patterns within the code. Sometimes it is just so foreign, that the time it takes to learn it would be a lot longer than another alternative.
 
 ## Syntax Decisions
 
@@ -132,13 +145,15 @@ Or read the C spec.. Most people think C’s declaration syntax is either just t
 ```odin
 x: [3]^int // array 3 of pointer to int
 y: ^[3]int // pointer to array 3 of int
-```odin
+```
+
 The unfortunate equivalent of this in C would be:
 
 ```odin
 int *x[3];   // array 3 of pointer to int
 int (*y)[3]; // pointer to array 3 of int
-```odin
+```
+
 Instead of following C’s approach of “declarations match usage”, Odin’s approach is “types on the left, usage on the right”:
 
 ```odin
@@ -150,7 +165,8 @@ y^ = 123
 
 z: [6]^int = ...
 z[3]^ = 123
-```odin
+```
+
 Coupled with Odin’s very strong and orthogonal type system, things *just work*TM as expected and are easy to comprehend for mere mortals like myself.
 
 I have seen many criticisms of Odin’s usage of a caret `^` for pointers 
@@ -159,9 +175,9 @@ Usually from people who have never tried the language, and only thinking of hypo
 
 I know I’ve spent a lot of time on Odin’s syntax so that it is as consistent as possible 
 
-And “inconsistent” where it is absolutely necessary. and to be very ergonomic with respect to the semantics of the language, but I don’t think the declaration syntax or optional semicolons of Odin “make or break” the language. For me, the essence of Odin is to *feel* like a modern C alternative with the joy of programming, rather than to *look* like C. Even languages which keep as close to the type-focused declaration syntax of C, such as [C3](https://c3-lang.org/), still depart from the rest of C’s syntax for other features and constructs. This is because C’s syntax has a lot of issues to it which should not be repeated, especially not its actual declaration syntax.
+And “inconsistent” where it is absolutely necessary. and to be very ergonomic with respect to the semantics of the language, but I don’t think the declaration syntax or optional semicolons of Odin “make or break” the language. For me, the essence of Odin is to _feel_ like a modern C alternative with the joy of programming, rather than to _look_ like C. Even languages which keep as close to the type-focused declaration syntax of C, such as [C3](https://c3-lang.org/), still depart from the rest of C’s syntax for other features and constructs. This is because C’s syntax has a lot of issues to it which should not be repeated, especially not its actual declaration syntax.
 
-Sometimes tiny syntax decisions do add friction, and they do add up. One of the approaches to designing Odin has been to *nudge* people in a direction which is usually a better way of doing things, rather than cause direct friction. However if friction is needed, usually what is needed is the equivalent of a brick wall, not sandpaper. But the syntax in this case is a reflection of the semantics of the language itself, and that’s what many people seem to misunderstand. Syntax is not everything, semantics are the actual foundation of a language.
+Sometimes tiny syntax decisions do add friction, and they do add up. One of the approaches to designing Odin has been to _nudge_ people in a direction which is usually a better way of doing things, rather than cause direct friction. However if friction is needed, usually what is needed is the equivalent of a brick wall, not sandpaper. But the syntax in this case is a reflection of the semantics of the language itself, and that’s what many people seem to misunderstand. Syntax is not everything, semantics are the actual foundation of a language.
 
 ## Ignoring Such Opinions
 
@@ -177,4 +193,4 @@ Look for the opinions of people that you do value and deem to be of worth, not s
 
 Please don’t choose a language solely for its syntax. Consider the actual language semantics since they will be the things that affect you the most down the line.
 
->Source: https://www.gingerbill.org/article/2026/02/19/choosing-a-language-based-on-syntax
+> Source: https://www.gingerbill.org/article/2026/02/19/choosing-a-language-based-on-syntax

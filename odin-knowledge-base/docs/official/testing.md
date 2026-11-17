@@ -1,3 +1,11 @@
+---
+title: "The Test Runner"
+source: "https://odin-lang.org/docs/testing"
+tags: [OdinRAG, kb, source/official, topic/allocator]
+type: reference
+status: active
+---
+
 ## The Test Runner [#](#the-test-runner)
 
 Odin comes with a powerful test runner.

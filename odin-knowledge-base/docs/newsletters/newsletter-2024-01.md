@@ -1,3 +1,11 @@
+---
+title: "Contributions"
+source: "https://odin-lang.org/news/newsletter-2024-01"
+tags: [OdinRAG, kb, source/newsletters, topic/rendering, topic/raylib]
+type: reference
+status: active
+---
+
 Happy new year everyone!
 
 This year we’ll be seeing lot’s of improvements on the compiler and also solidifying core packages. December itself was going slow since most people took a break.
@@ -162,4 +170,4 @@ just wrapped up my first odin project -- full implementation of mustache templat
 
 viewer for LMDB + CBOR (upcoming core:encoding/cbor from @laytan) byte blobs, similar to mongoDB compass - Skytrias
 
->Source: https://odin-lang.org/news/newsletter-2024-01
+> Source: https://odin-lang.org/news/newsletter-2024-01

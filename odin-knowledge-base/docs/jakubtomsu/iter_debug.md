@@ -1,3 +1,12 @@
+---
+title: "Coroutine-less way to visualize iterations"
+date: 2025-12-26
+source: "https://jakubtomsu.github.io/posts/iter_debug"
+tags: [OdinRAG, kb, source/jakubtomsu, topic/state-machine]
+type: reference
+status: active
+---
+
 # Coroutine-less way to visualize iterations
 
 2025-12-26
@@ -19,12 +28,13 @@ It could look something like this:
 11        // spawn entity ...
 12    }
 13}
-```odin
+```
+
 > All the logic being contained within one big procedure (possibly with a few helpers) is quite nice, especially for prototyping.
 
 But, what if something goes wrong, and the debugger, logging or 2D/3D visuals don’t help?
 
-You might want to inspect what the actual ***iterations*** are doing.
+You might want to inspect what the actual _**iterations**_ are doing.
 
 ## The usual solution
 
@@ -49,7 +59,8 @@ So let’s try that! Here’s a helper proc to mark each “step” of the algor
 6    curr_iter += n
 7    return ok
 8}
-```odin
+```
+
 Now all you need is to instrument your `generate_level` procedure:
 
 ```odin
@@ -68,7 +79,8 @@ Now all you need is to instrument your `generate_level` procedure:
 13        _iter() or_return
 14    }
 15}
-```odin
+```
+
 > In case you’re not using Odin, you can use `if (!_iter()) return` or another equivalent instead of `or_return`
 
 And a way to control `max_iter`:
@@ -80,9 +92,10 @@ And a way to control `max_iter`:
 4    generate_level(...)
 5    debug_draw_level()
 6}
-```odin
+```
+
 And that’s it. Of course it works only if `generate_level` is reasonably fast, otherwise you’d have use other methods.
 
 Thanks for reading, I hope it saves you some refactoring time.
 
->Source: https://jakubtomsu.github.io/posts/iter_debug
+> Source: https://jakubtomsu.github.io/posts/iter_debug

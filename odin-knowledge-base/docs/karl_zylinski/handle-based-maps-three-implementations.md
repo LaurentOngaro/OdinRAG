@@ -1,3 +1,12 @@
+---
+title: "Handle-based maps: Three implementations"
+date: 2025-04-10
+source: "https://zylinski.se/posts/handle-based-maps-three-implementations"
+tags: [OdinRAG, kb, source/zylinski, topic/allocator, topic/entity-system, topic/dod]
+type: reference
+status: active
+---
+
 # Handle-based maps: Three implementations
 
 April 10, 2025
@@ -38,7 +47,7 @@ The handle can be used as a permanent reference to the items in the map. In othe
 
 Handles are good because they store the index (“which item?”) and also the generation (“is it actually still the same item?”). Compared to using pointers, using handles also reduces the risk of crashing due to usage of dangling pointers to items.
 
-A common use case for handles is when you need to store references to *entities* in video games, which we’ll see some examples of below and in the [examples folder](https://github.com/karl-zylinski/odin-handle-map/tree/master/examples) of the repository.
+A common use case for handles is when you need to store references to _entities_ in video games, which we’ll see some examples of below and in the [examples folder](https://github.com/karl-zylinski/odin-handle-map/tree/master/examples) of the repository.
 
 Let’s look at the three variants and follow it up with some additional discussion.
 
@@ -73,7 +82,8 @@ Handle_Map :: struct($T: typeid, $HT: typeid, $N: int) {
 	// elements.
 	num_unused: u32,
 }
-```odin
+```
+
 Here the `items` array is of type `[N]T`. That’s a fixed array of size `N`, where `N` is passed as a polymorphic parameter when declaring the struct.
 
 You declare a static handle-based map like so:
@@ -96,7 +106,8 @@ h := hm.add(&entities, Entity { pos = { 5, 7 } })
 if e := hm.get(&entities, h); e != nil {
 	e.pos.y = 123
 }
-```odin
+```
+
 As you can see we feed `1024` into `N` here. Since it uses a fixed array (sometimes known as a “static array”), the `Handle_Map` will always use `1024*size_of(Entity)` bytes of memory. The memory usage will never shrink or grow, and you must specify how many things you want up-front.
 
 ![Shows how the items field of the <code>Handle_Map</code> uses <code>N*size_of(T)</code> directly within the <code>Handle_Map</code> struct, due to the fixed array living &lsquo;inline&rsquo; in the struct.](/handle-based-maps-3-impls/static.png)
@@ -147,7 +158,8 @@ Handle_Map :: struct($T: typeid, $HT: typeid, $Max: int) {
 	// will remove things from it.
 	unused_items: [dynamic]u32,
 }
-```odin
+```
+
 First thing to notice is that this uses `items: [dynamic]T`. In Variant 1 we just had `items: [N]T`.
 
 There’s also a virtual memory arena: `items_arena: ^vmem.Arena`. When the handle-based map is created, the dynamic array `items` is set up to use that arena. The elements of `items` all live in there.
@@ -174,8 +186,9 @@ h := hm.add(&entities, Entity { pos = { 5, 7 } })
 if e := hm.get(entities, h); e != nil {
 	e.pos.y = 123
 }
-```odin
-Note that we can use a very big “max number of items” number: Here it is `1000000`. The virtual arena will *reserve* virtual memory for that many elements. But that’s just a reservation. It does not result in consuming that amount of memory. Only as the dynamic array grows into that reserved space does the memory usage increase.
+```
+
+Note that we can use a very big “max number of items” number: Here it is `1000000`. The virtual arena will _reserve_ virtual memory for that many elements. But that’s just a reservation. It does not result in consuming that amount of memory. Only as the dynamic array grows into that reserved space does the memory usage increase.
 
 ![The items array of the dynamic array has a growable data field. That data field lives inside the committed part of the items_arena.](/handle-based-maps-3-impls/static_virtual.png)
 
@@ -183,7 +196,7 @@ The dynamic array `items` has a field inside it called `data` (see [`Raw_Dynamic
 
 > See the `make` proc [inside the source](https://github.com/karl-zylinski/odin-handle-map/blob/master/handle_map_static_virtual/handle_map.odin) for how the arena is created and set up.
 
-A benefit compared to Variant 1 appears: We can start with low memory consumption and have it go up as we go. This would happen if you use `items: [dynamic]T` without any arena as well. However, because of how we use the virtual arena, the data of the dynamic array will *not move* when the dynamic arrays grows. This makes pointers to items in the arena stable. You should still store handles when storing permanent references to the items. But whenever you need to temporarily access the item you’ll resolve the handle into a pointer, like we do with `e:= hm.get(blabla)` above.
+A benefit compared to Variant 1 appears: We can start with low memory consumption and have it go up as we go. This would happen if you use `items: [dynamic]T` without any arena as well. However, because of how we use the virtual arena, the data of the dynamic array will _not move_ when the dynamic arrays grows. This makes pointers to items in the arena stable. You should still store handles when storing permanent references to the items. But whenever you need to temporarily access the item you’ll resolve the handle into a pointer, like we do with `e:= hm.get(blabla)` above.
 
 > The dynamic array not having its data moved when it grows works because the virtual arena can re-allocate the dynamic array’s data if no other allocation has happened since the dynamic array allocated that memory.
 >
@@ -192,7 +205,7 @@ A benefit compared to Variant 1 appears: We can start with low memory consumptio
 ### Pros[#](#pros-1)
 
 - You can start with small memory usage (more memory efficient than variant 1)
-- Not *very* complicated
+- Not _very_ complicated
 - Pointers are stable
 
 ### Cons[#](#cons-1)
@@ -229,7 +242,8 @@ Handle_Map :: struct($T: typeid, $HT: typeid) {
 	// The index into `items` of unused slots. `remove` will add things to it.
 	unused_items: [dynamic]u32,
 }
-```odin
+```
+
 > Note that it says just `Arena`. On non-web `Arena` is `vmem.Arena`. On web it is `mem.Dynamic_Arena` (from `core:mem`). This abstraction is done using the two `arena_xx.odin` files [in the same folder](https://github.com/karl-zylinski/odin-handle-map/tree/master/handle_map_growing).
 
 One thing that may jump out is this: `items: [dynamic]^T`. In the other variants I stored elements of just type `T`. Why the need for the pointer? It has to to with how I allocate the items.
@@ -238,7 +252,7 @@ One thing that may jump out is this: `items: [dynamic]^T`. In the other variants
 
 The dynamic array stores items of type `^T`. So each item is just a pointer that refers to something else. Those pointers refers to the items of type `T` that are allocated in the arena. The arena consists of blocks of virtual memory. The blocks are by default `1 megabyte`. That’s big, but OK since it’s just a virtual reservation: The memory usage only goes up as new items are allocated, which will make the arena commit more and more of that reservation. Here ‘commit’ means ‘map reserved virtual memory to actual physical memory’
 
-With this variant I use a *virtual growing arena*. That arena consists of blocks of memory. When the current block is full, it virtually reserves a new one. It’s not the `items` dynamic array that uses it. Rather, I dynamically allocate each item into it. In other words, the allocation of each item looks something like this:
+With this variant I use a _virtual growing arena_. That arena consists of blocks of memory. When the current block is full, it virtually reserves a new one. It’s not the `items` dynamic array that uses it. Rather, I dynamically allocate each item into it. In other words, the allocation of each item looks something like this:
 
 ```odin
 items_allocator := arena_allocator(&m.items_arena)
@@ -247,7 +261,8 @@ new_item^ = v // v is the item to be added to the handle-based map
 new_item.handle.idx = u32(builtin.len(m.items))
 new_item.handle.gen = 1
 append(&m.items, new_item)
-```odin
+```
+
 > This code is from the `add` proc [in the source](https://github.com/karl-zylinski/odin-handle-map/blob/master/handle_map_growing/handle_map.odin).
 
 As I described in my post on [arenas and dynamic arrays](https://zylinski.se/posts/dynamic-arrays-and-arenas/), the items you allocate like this will end up one-next-to-each-other, since the arena just grows linearly. So the items are still fairly well-packed, which is good for making the code cache-friendly.
@@ -256,7 +271,7 @@ This means that the array `items` just contains a bunch of pointers into the are
 
 > WARNING: `items` is not, and should not be allocated into the arena. It will use the default allocator (or some other allocator you feed into `hm.make`). If you put it into the arena then it would waste memory due to leaving its old data behind in there. It would not be able to reuse the old data blocks due to the calls to `new` in the add `add` proc also allocating into the arena. Those allocations will end up in-between the array’s old and new data blocks, so it would not be able to reuse the same address. This is not as bad as in Variant 2 since the address of each item would still be stable, but you’d waste memory by leaving old dynamic array data in the arena. Again, see my [arenas and dynamic arrays](https://zylinski.se/posts/dynamic-arrays-and-arenas/) post for more info.
 
-I’ve tried to make this variant *universally usable*. It does work on web, but WASM does not support virtual memory. In that case it uses a `Dynamic_Arena` instead. That arena also uses blocks and the items of the array will be allocated into those blocks. But unlike the virtual arenas, the blocks always use the “full amount of memory” directly.
+I’ve tried to make this variant _universally usable_. It does work on web, but WASM does not support virtual memory. In that case it uses a `Dynamic_Arena` instead. That arena also uses blocks and the items of the array will be allocated into those blocks. But unlike the virtual arenas, the blocks always use the “full amount of memory” directly.
 
 > The `Dynamic_Arena` has a default block size of `65536` bytes. So the program’s memory usage will increase in steps of that amount. It may be wise to tweak the the block size to a larger number if you store very big items in the array, as each block would otherwise become full very quickly.
 
@@ -279,7 +294,8 @@ h := hm.add(&entities, Entity { pos = { 5, 7 } })
 if e := hm.get(entities, h); e != nil {
 	e.pos.y = 123
 }
-```odin
+```
+
 As promised, no magical number that represents a “maximum size” needs to be fed into `Handle_Map`.
 
 ### Pros[#](#pros-2)
@@ -310,7 +326,8 @@ The pointers I refer to are the ones you get when you do this:
 
 ```odin
 e := hm.get(entities, some_handle)
-```odin
+```
+
 Here `get` returns a pointer. Some implementations of handle-based maps use dynamic arrays straight up, without any kind of arena or fixed array. That will make pointers become invalid if the dynamic array grows while you have such a pointer in flight.
 
 In other words, look at the code below. In it, I get a pointer `e` based on a handle. Then I add a new item to the handle-based map. Then I use whatever `e` points to.
@@ -322,7 +339,8 @@ hm.add(&entities, Entity{ pos = { 5,1 } })
 if e != nil {
 	e.pos += {2, 1}
 }
-```odin
+```
+
 The code above will always work fine with the three variant’s I’ve presented in this post. If the handle-based map used a dynamic array without any of the arena tricks (or fixed arrays), then `e` might point at deallocated memory if `hm.add` caused the dynamic array to grow.
 
 Now you may say: “This seems silly, isn’t the point of the handle-based map that you should try to keep things as handles for as long as possible, and only resolve to pointers at the last moment?”. I talk about this in my [previous post](https://zylinski.se/posts/handle-based-arrays/#discussion-problems-with-dangling-_temporary_-pointers) on the topic. To summarize my thoughts on this:
@@ -351,12 +369,13 @@ hm.remove(&entities, some_handle)
 if e != nil {
 	e.pos += {2, 1}
 }
-```odin
+```
+
 Here we resolve handle `some_handle` to pointer `e`. Then we remove that entity from the list. But we already have the pointer around, so you may end up using it after the removal.
 
 > The code after `hm.get` could also have added removed it and then added new items, which may have recycled the slot. Then `e` would point at something else than you expected.
 
-I’d say that this is *fine*. It’s much less of a problem than unstable-pointers-when-the-array-grows. It may sometimes cause a slight logic error, but it won’t make your program crash.
+I’d say that this is _fine_. It’s much less of a problem than unstable-pointers-when-the-array-grows. It may sometimes cause a slight logic error, but it won’t make your program crash.
 
 ## Video[#](#video)
 
@@ -375,4 +394,4 @@ You can support my blog, my YouTube channel and my open-source projects by [beco
 Have a nice day!
 /Karl Zylinski
 
->Source: https://zylinski.se/posts/handle-based-maps-three-implementations
+> Source: https://zylinski.se/posts/handle-based-maps-three-implementations

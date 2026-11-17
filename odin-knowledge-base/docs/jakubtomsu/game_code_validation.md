@@ -1,3 +1,12 @@
+---
+title: "Gameplay code validation and catching NaNs"
+date: 2025-06-04
+source: "https://jakubtomsu.github.io/posts/game_code_validation"
+tags: [OdinRAG, kb, source/jakubtomsu]
+type: reference
+status: active
+---
+
 # Gameplay code validation and catching NaNs
 
 2025-06-04
@@ -7,7 +16,7 @@ I recently ran into a NaN propagation bug in my gameplay code, which required a 
 Often, those problems are straightforward to solve: it’s just a forgotten zero-check before dividing, normalizing zero-length vector, etc.
 I almost always find it immediately by looking through my most recent changes. But this time I had no idea!
 
-So I came up with a simple way to *help* catching these bugs in general (in fact, it’s so simple it’s probably the first thing you would think of too).
+So I came up with a simple way to _help_ catching these bugs in general (in fact, it’s so simple it’s probably the first thing you would think of too).
 But it’s a nice pattern, so I thought I would share it anyway.
 
 ## Gameplay testing in general
@@ -20,7 +29,7 @@ Those usually look like this:
 2. Execute some logic
 3. Assert correct results
 
-That’s just *not useful* for most gameplay code.
+That’s just _not useful_ for most gameplay code.
 
 Most of the bugs happen when the setup gets complex enough and the multiple systems interact together.
 And the expected results change all the time as you’re iterating on your game design.
@@ -37,7 +46,8 @@ First I created validation procedures for common data types, e.g. a float:
 2    assert(!math.is_nan(x))
 3    assert(!math.is_inf(x))
 4}
-```odin
+```
+
 Then it’s easy to use this for validating other data:
 
 ```odin
@@ -46,7 +56,8 @@ Then it’s easy to use this for validating other data:
 3        validate_f32(f)
 4    }
 5}
-```odin
+```
+
 And then validating actual entities:
 
 ```odin
@@ -58,7 +69,8 @@ And then validating actual entities:
 6    assert(linalg.length(ent.position) < 10000)
 7    assert(linalg.length(ent.velocity) < 10000)
 8}
-```odin
+```
+
 The validation procedure asserts the data isn’t in a completely unreasonable state.
 
 > I also add a `@(disabled = !DEV_BUILD)` to all those procedures since I don’t really need validation in release mode.
@@ -68,8 +80,8 @@ The validation procedure asserts the data isn’t in a completely unreasonable s
 Now, let’s just slap the validation in the most important parts of the codebase.
 I know this is really grug-brained, but just a few calls in the right places got me a lot of coverage!
 
-The point is to *reliably* catch possible errors soon after they happen, rather than letting them propagate for multiple frames before the issue becomes visible.
-This is about *debuggability* - not necessarily 100% correctness.
+The point is to _reliably_ catch possible errors soon after they happen, rather than letting them propagate for multiple frames before the issue becomes visible.
+This is about _debuggability_ - not necessarily 100% correctness.
 
 Here is a pattern I use a lot: validate every entity at the start and the end of interface procs like `entity_tick`, `entity_damage`, `entity_interact` etc.
 The defer makes sure it’s called on every return.
@@ -81,7 +93,8 @@ The defer makes sure it’s called on every return.
 4
 5    // gameplay logic...
 6}
-```odin
+```
+
 This is kinda like the “assert everywhere” advice, just in a slightly different form.
 
 With this in place, I’m significantly more confident I can debug issues with NaN etc much easier.
@@ -93,4 +106,4 @@ Turns out this isn’t really viable due to SIMD codegen of modern compilers (I 
 
 But in case you wanna try it yourself, here is a [Github gist](https://gist.github.com/jakubtomsu/361f9319f73ed0ae9c0e36df887226b9) for enabling the exceptions on win32 with Odin.
 
->Source: https://jakubtomsu.github.io/posts/game_code_validation
+> Source: https://jakubtomsu.github.io/posts/game_code_validation

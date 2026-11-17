@@ -1,3 +1,12 @@
+---
+title: "Memory Allocation Strategies - Part 4"
+date: 2019-02-16
+source: "https://www.gingerbill.org/article/2019/02/16/memory-allocation-strategies-004"
+tags: [OdinRAG, kb, source/gingerbill, topic/allocator]
+type: reference
+status: active
+---
+
 # Memory Allocation Strategies - Part 4
 
 ## Pool Allocators
@@ -8,13 +17,13 @@ Series: [Memory Allocation Strategies](/series/memory-allocation-strategies)
 
 # Pool-Based Allocation
 
-In the previous article, we looked at the [stack allocator](/article/2019/02/15/memory-allocation-strategies-003/), which was the natural evolution of the [linear/arena allocator](/article/2019/02/08/memory-allocation-strategies-002/). In this article, I will cover the fixed-sized *pool allocator*.
+In the previous article, we looked at the [stack allocator](/article/2019/02/15/memory-allocation-strategies-003/), which was the natural evolution of the [linear/arena allocator](/article/2019/02/08/memory-allocation-strategies-002/). In this article, I will cover the fixed-sized _pool allocator_.
 
-A pool allocator is a bit different from the previous allocation strategies that I have covered. A pool splits the supplied backing buffer into *chunks* of equal size and keeps track of which of the chunks are free. When an allocation is wanted, a free chunk is given. When a chunk is wanted to be freed, it adds that chunk to the list of free chunks.
+A pool allocator is a bit different from the previous allocation strategies that I have covered. A pool splits the supplied backing buffer into _chunks_ of equal size and keeps track of which of the chunks are free. When an allocation is wanted, a free chunk is given. When a chunk is wanted to be freed, it adds that chunk to the list of free chunks.
 
-Pool allocators are extremely useful when you need to allocate chunks of memory of the same size which need are created and destroy dynamically, especially in a random order. Pools also have the benefit that arenas and stacks have in that they provide very little fragmentation and allocate/free in constant time ***O(1)***.
+Pool allocators are extremely useful when you need to allocate chunks of memory of the same size which need are created and destroy dynamically, especially in a random order. Pools also have the benefit that arenas and stacks have in that they provide very little fragmentation and allocate/free in constant time _**O(1)**_.
 
-Pool allocators are usually used to allocate *groups* of “things” at once which share the same lifetime. An example could be within a game that creates and destroys entities in batches where each entity within a batch share the same lifetime.
+Pool allocators are usually used to allocate _groups_ of “things” at once which share the same lifetime. An example could be within a game that creates and destroys entities in batches where each entity within a batch share the same lifetime.
 
 # Basic Logic
 
@@ -28,11 +37,11 @@ The question is how are these allocations and frees determined? And how do they 
 
 ## Free Lists
 
-A [free list](https://wikipedia.org/wiki/Free_list) is a data structure that internally stores a [linked-list](https://wikipedia.org/wiki/Linked_list) of the free slots/chunks within the memory buffer. The nodes of the list are stored in-place as this means that there does not need to be another data structure (e.g. array, list, etc) to keep track of the free slots. The data is *only* stored *within* the backing buffer of the pool allocator.
+A [free list](https://wikipedia.org/wiki/Free_list) is a data structure that internally stores a [linked-list](https://wikipedia.org/wiki/Linked_list) of the free slots/chunks within the memory buffer. The nodes of the list are stored in-place as this means that there does not need to be another data structure (e.g. array, list, etc) to keep track of the free slots. The data is _only_ stored _within_ the backing buffer of the pool allocator.
 
 ![Pool Allocator List](/images/memory-allocation-strategies/pool_allocator_list.svg#center)
 
-The general approach is to store a header at the beginning of the chunk (not before the chunk like with the stack allocator) which *points* to the next available free chunk 
+The general approach is to store a header at the beginning of the chunk (not before the chunk like with the stack allocator) which _points_ to the next available free chunk 
 
 If there is not an available free chunk, it will point to nothing (`NULL`)..
 
@@ -40,7 +49,7 @@ If there is not an available free chunk, it will point to nothing (`NULL`)..
 
 ## Allocate and Free
 
-To allocate a chunk, just pop off the head (first element) from the free list. In [Big-O notation](https://wikipedia.org/wiki/Big_O_notation), the allocation has complexity of ***O(1)*** (constant).
+To allocate a chunk, just pop off the head (first element) from the free list. In [Big-O notation](https://wikipedia.org/wiki/Big_O_notation), the allocation has complexity of _**O(1)**_ (constant).
 
 ![Pool Allocator Alloc](/images/memory-allocation-strategies/pool_allocator_alloc.svg#center)
 
@@ -48,7 +57,7 @@ To allocate a chunk, just pop off the head (first element) from the free list. I
 
 ![Pool Allocator Alloc Unordered](/images/memory-allocation-strategies/pool_allocator_alloc_unordered.svg#center)
 
-To free a chunk, just push the freed chunk as the head of the free list. In Big-O notation, the freeing of this memory has complexity of ***O(1)*** (constant).
+To free a chunk, just push the freed chunk as the head of the free list. In Big-O notation, the freeing of this memory has complexity of _**O(1)**_ (constant).
 
 # Implementation
 
@@ -72,15 +81,17 @@ struct Pool {
 
 	Pool_Free_Node *head; // Free List Head
 };
-```odin
-Each node in the free list just contains a pointer to the next free chunk, which could be `NULL` if it is the *tail* (last element).
+```
+
+Each node in the free list just contains a pointer to the next free chunk, which could be `NULL` if it is the _tail_ (last element).
 
 ```odin
 typedef struct Pool_Free_Node Pool_Free_Node;
 struct Pool_Free_Node {
 	Pool_Free_Node *next;
 };
-```odin
+```
+
 ## Init
 
 Initializing a pool is pretty simple however, because each chunk has the same size and alignment, this logic can be done now rather than later.
@@ -113,7 +124,8 @@ void pool_init(Pool *p, void *backing_buffer, size_t backing_buffer_length,
 	// Set up the free list for free chunks
 	pool_free_all(p);
 }
-```odin
+```
+
 ## Alloc
 
 The `pool_alloc` procedure is a lot simpler than other allocators as each chunk has the same size and alignment and thus these parameters do not need to be passed to the procedure. The latest free chunk from the free list is popped off and is then used as the new allocation.
@@ -134,7 +146,8 @@ void *pool_alloc(Pool *p) {
 	// Zero memory by default
 	return memset(node, 0, p->chunk_size);
 }
-```odin
+```
+
 ## Free
 
 Freeing an allocation is pretty much the opposite of an allocation. The chunk to be freed is pushed onto the free list.
@@ -161,7 +174,8 @@ void pool_free(Pool *p, void *ptr) {
 	node->next = p->head;
 	p->head = node;
 }
-```odin
+```
+
 ## Free All
 
 Freeing all the memory is equivalent of pushing all the chunks onto the free list.
@@ -180,11 +194,12 @@ void pool_free_all(Pool *p) {
 		p->head = node;
 	}
 }
-```odin
+```
+
 # Conclusion
 
-The pool allocator is a very useful allocator for when you need to allocator “things” in *chunks* and the things within those chunks share the same lifetime. The full source code is [available here](/code/memory-allocation-strategies/part004.c).
+The pool allocator is a very useful allocator for when you need to allocator “things” in _chunks_ and the things within those chunks share the same lifetime. The full source code is [available here](/code/memory-allocation-strategies/part004.c).
 
 In the next article, I will discuss [free list memory allocators](/article/2021/11/30/memory-allocation-strategies-005/).
 
->Source: https://www.gingerbill.org/article/2019/02/16/memory-allocation-strategies-004
+> Source: https://www.gingerbill.org/article/2019/02/16/memory-allocation-strategies-004

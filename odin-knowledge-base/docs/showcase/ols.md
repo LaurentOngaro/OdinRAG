@@ -1,3 +1,11 @@
+---
+title: "Why would you want to use ols?"
+source: "https://odin-lang.org/showcase/ols"
+tags: [OdinRAG, kb, source/showcase, topic/allocator]
+type: reference
+status: active
+---
+
 [Ols](https://github.com/DanielGavin/ols) is a language server for Odin, and works on all the popular text editors.
 
 ![](https://raw.githubusercontent.com/DanielGavin/ols/master/images/completion.png)
@@ -49,4 +57,4 @@ Here you can see some of the main features of `ols`:
 
 ![](https://raw.githubusercontent.com/DanielGavin/ols/master/images/showcase/fake_methods.png)
 
->Source: https://odin-lang.org/showcase/ols
+> Source: https://odin-lang.org/showcase/ols

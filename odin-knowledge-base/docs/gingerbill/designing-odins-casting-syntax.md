@@ -1,3 +1,12 @@
+---
+title: "Designing Odin’s Casting Syntax"
+date: 2026-02-23
+source: "https://www.gingerbill.org/article/2026/02/23/designing-odins-casting-syntax"
+tags: [OdinRAG, kb, source/gingerbill]
+type: reference
+status: active
+---
+
 # Designing Odin’s Casting Syntax
 
 Series: [Syntax and how it Matters](/series/syntax-and-how-it-matters)
@@ -11,7 +20,8 @@ Enough that I had to make an FAQ entry..
 ```odin
 cast(type)value
 type(value) or (type)(value)
-```odin
+```
+
 The reason that there are two ways to do type conversions is because one approach may feel better than the other case. If you are converting a large expression, it sometimes a lot easier to use the operator-style approach, `cast(type)`. The call syntax is commonly used to specify a type of an expression which may be relatively short such as `u32(123)` or `uintptr(ptr)`.
 
 There are two other type conversion operators, [transmute](https://odin-lang.org/docs/overview/#type-conversion) and [auto\_cast](https://odin-lang.org/docs/overview/#auto-cast-operation).
@@ -25,7 +35,7 @@ In C, type conversions use the following syntax `(type)value`. The problem with 
 - Odin’s idea that `(x) == x`, and the parentheses are just for grouping expressions, and has no semantic meaning.
 - Ambiguity in contexts like `(a)+b`
   - Is that a type cast or a binary expression?
-- Not necessarily that obvious when *scanning* code.
+- Not necessarily that obvious when _scanning_ code.
 
 As I discuss in the [previous article](https://www.gingerbill.org/article/2026/02/21/does-syntax-matter/), sometimes it is good to keep to familiar syntax but if the parsing is awful or the underlying semantics wants the syntax to be something else, then departing from the familiar is usually the way to go. Be coherent with the language you are designing, not with some other language that is not this one.
 
@@ -44,14 +54,15 @@ cast(T)x // used
 T(x)     // used
 (T)(x)   // used
 // and a few more but they were just too bad to mention
-```odin
-One thing to consider is the need for parentheses and how that can actually cause issues in terms of scannability and ergonomics (not typing but flow). The `cast(T, x)` like syntaxes actually required *more* parentheses in practice that you might realize.
+```
+
+One thing to consider is the need for parentheses and how that can actually cause issues in terms of scannability and ergonomics (not typing but flow). The `cast(T, x)` like syntaxes actually required _more_ parentheses in practice that you might realize.
 
 ## Reflecting on the Semantics of Declarations
 
 The flow aspect was actually interesting because I wanted the syntax to match the semantics more correctly and I found that the type must be on the left of the expression since that is how declarations work too: `name: type = value`, so a cast would make sense that way too: `name := type(value)`. This also turned out to be a similar realization in languages like Newsqueak (where that declaration syntax originates from) and Ada. This actually ruled out a lot of the other syntax options as a result.
 
-But before that, I experimenting with `x as T` because it *seemed* like a good idea but turned out to be a mess because of precedence rules. Either `as` was “tight” towards the expression meaning you then had to use a lot of parentheses to be clear what was being cast, or you had it very “loose” towards the expression which lead to the same problem. `as` didn’t reduce the need for parentheses in practice and only led to confusion with precedence.
+But before that, I experimenting with `x as T` because it _seemed_ like a good idea but turned out to be a mess because of precedence rules. Either `as` was “tight” towards the expression meaning you then had to use a lot of parentheses to be clear what was being cast, or you had it very “loose” towards the expression which lead to the same problem. `as` didn’t reduce the need for parentheses in practice and only led to confusion with precedence.
 
 I then reused `x.(T)` syntax for the type assertions. One because it has some familiarity from Go but also because the “type” itself is the tag in the `union`, making it feel more like a field access using a type. The parentheses around the type in this case are necessary to remove any ambiguity syntactically and semantically.
 
@@ -69,26 +80,28 @@ I did not want to have something as common and as important as casting operation
 
 ## Scannability is Very Important
 
-As I say in the [previous article](https://www.gingerbill.org/article/2026/02/21/does-syntax-matter/), I will stick to coherency over consistency if necessary, and this was on of those cases. And I didn’t want to fall into the trap that some languages have done which makes the entire thing *unscannable*. Zig is a “great” example of a language with poor scannability due to its very dense and sigil-heavy syntax. And it having way too many casting operations (17+ IIRC) does not help this matter any better, nor does not actually give any real benefit in the long run to anyone (even the compiler). A real world example of this syntactic mess 
+As I say in the [previous article](https://www.gingerbill.org/article/2026/02/21/does-syntax-matter/), I will stick to coherency over consistency if necessary, and this was on of those cases. And I didn’t want to fall into the trap that some languages have done which makes the entire thing _unscannable_. Zig is a “great” example of a language with poor scannability due to its very dense and sigil-heavy syntax. And it having way too many casting operations (17+ IIRC) does not help this matter any better, nor does not actually give any real benefit in the long run to anyone (even the compiler). A real world example of this syntactic mess 
 
 I am not sure what to call this but it’s the exact opposute of syntactic diabetes.:
 
 ```odin
 const gap: f32 = @divTrunc(@as(f32, @floatFromInt(rl.getScreenWidth() - (4 * objectWidth))), 5.0);
 const offsetX: f32 = @as(f32, @floatFromInt(index + 1)) * gap + @as(f32, @floatFromInt(index)) * @as(f32, @floatFromInt(objectWidth));
-```odin
+```
+
 The equivalent in Odin would be written as this:
 
 ```odin
 gap := math.trunc(f32(rl.GetScreenWidth() - 4 * objectWidth) / 5)
 offsetX := f32(index+1) * gap + f32(index)*f32(objectWidth)
-```odin
+```
+
 Note that where many of the parentheses exist in that Odin snippet, most would already exist any way without the explicit casting, and thus all you are doing is annotating the grouped expressions with a specific type.
 
 ## Design as a Human Endeavour
 
-All I can say is, humans are odd creatures and you’ll be surprised how they think in practice. Design is about understanding humans. How they function, mentally and physically. Their perception, psychology, sociology, physiology, ergonomics, needs, desires, etc. It’s all about being able to put yourself in other people’s shoes, more than making *the thing*.
+All I can say is, humans are odd creatures and you’ll be surprised how they think in practice. Design is about understanding humans. How they function, mentally and physically. Their perception, psychology, sociology, physiology, ergonomics, needs, desires, etc. It’s all about being able to put yourself in other people’s shoes, more than making _the thing_.
 
 Designing a programming language is no exception to this. Syntax is how we express the semantics we want in a program. It’s the interface to the code itself. The littlest of things matter and they do add up when you have so many little things.
 
->Source: https://www.gingerbill.org/article/2026/02/23/designing-odins-casting-syntax
+> Source: https://www.gingerbill.org/article/2026/02/23/designing-odins-casting-syntax

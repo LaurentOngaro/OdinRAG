@@ -1,3 +1,11 @@
+---
+title: "New Website"
+source: "https://odin-lang.org/news/new-package-documentation"
+tags: [OdinRAG, kb, source/newsletters]
+type: reference
+status: active
+---
+
 ## New Website [#](#new-website)
 
 Odin is taking documentation seriously. Documentation is a large part of making software easy to learn, accessible, and maintainable; programming languages are no exception.
@@ -28,14 +36,16 @@ The commenting convention is simple: to document any declaration (variable, cons
 // next reads and returns the next Unicode character. It returns EOF at the end of the source.
 // next does not update the Scanner's pos field. Use 'position(s)' to get the current position.
 next :: proc(s: ^Scanner) -> rune {
-```odin
+```
+
 Comments on package declarations should provide information about the general package documentation. These comments can be short, like with [`package compress`](https://pkg.odin-lang.org/core/compress/):
 
 ```odin
 // package compress is a collection of utilities to aid with other compression packages
 package compress
-```odin
-Package comments can also be detailed like the [`package fmt`](https://pkg.odin-lang.org/core/fmt/) overview. That package uses a convention that aids with large introductory documentation where the package comment is placed within its own file, [doc.odin](https://github.com/odin-lang/Odin/blob/master/core/fmt/doc.odin). *Please note* that when writing package comments of any size, the first sentence of the comment will appear in the package directory listing (e.g. [`core`’s listing](https://pkg.odin-lang.org/core/)).
+```
+
+Package comments can also be detailed like the [`package fmt`](https://pkg.odin-lang.org/core/fmt/) overview. That package uses a convention that aids with large introductory documentation where the package comment is placed within its own file, [doc.odin](https://github.com/odin-lang/Odin/blob/master/core/fmt/doc.odin). _Please note_ that when writing package comments of any size, the first sentence of the comment will appear in the package directory listing (e.g. [`core`’s listing](https://pkg.odin-lang.org/core/)).
 
 Regarding the [pkg.odin-lang.org](https://pkg.odin-lang.org) HTML generation, there are a few formatting rules that the tool uses:
 
@@ -49,4 +59,4 @@ We are really excited to share this is brand new site with you. As always, any f
 
 If you are interested in contributing to this project, to existing [packages](https://github.com/odin-lang/Odin/tree/master/core) and the [generation tool](https://github.com/odin-lang/pkg.odin-lang.org), both are of course open source!
 
->Source: https://odin-lang.org/news/new-package-documentation
+> Source: https://odin-lang.org/news/new-package-documentation

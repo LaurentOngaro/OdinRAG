@@ -1,3 +1,12 @@
+---
+title: "Good Tools Are Invisible"
+date: 2026-07-10
+source: "https://www.gingerbill.org/article/2026/07/10/good-tools-are-invisible"
+tags: [OdinRAG, kb, source/gingerbill]
+type: reference
+status: active
+---
+
 # Good Tools Are Invisible
 
 2026-07-10
@@ -6,7 +15,7 @@ TL;DR: A good tool is and ought to be invisible—striving to make such tools is
 
 One habit I see a lot, and have to push back on, is taking a tool’s shortcomings and reselling them as a “puzzle game” which is “fun” to solve.
 
-I don’t want my tools to be “fun”. I want my tools to be *invisible*.
+I don’t want my tools to be “fun”. I want my tools to be _invisible_.
 
 ## Text Editor Wars
 
@@ -28,25 +37,25 @@ I think I’ve only “needed” a macro in Sublime twice in the past decade, an
 
 To be honest, I have forgotten most of my “vim motions” knowledge over the years, because I don’t regularly exercise it, nor do I need to.. And since I virtually never write code in a terminal, my need for a terminal-oriented editor is effectively nonexistent.
 
-If people find vim, emacs, or whatever genuinely good and productive, I’m not going to criticize them for using it. People are most comfortable with what they know. But for the people I am discussing, that same familiarity blinds them to their tools’ flaws, and leads them to celebrate those flaws, flaunting them as *games*.
+If people find vim, emacs, or whatever genuinely good and productive, I’m not going to criticize them for using it. People are most comfortable with what they know. But for the people I am discussing, that same familiarity blinds them to their tools’ flaws, and leads them to celebrate those flaws, flaunting them as _games_.
 
 ## Tools as an Identity
 
-Part of why these debates turn religious is that a tool choice becomes a flag you plant—it says something about who you are. The “hacker vibe” isn’t a *mere aesthetic*; it’s tribal signaling, and that’s the real trap. Once your identity is invested in a tool, admitting its flaws starts to feel like admitting something about yourself. So people don’t just tolerate the flaws—they defend them, and eventually flaunt them. You cannot have an honest conversation about a tool with someone who’s decided the tool is part of their personality.
+Part of why these debates turn religious is that a tool choice becomes a flag you plant—it says something about who you are. The “hacker vibe” isn’t a _mere aesthetic_; it’s tribal signaling, and that’s the real trap. Once your identity is invested in a tool, admitting its flaws starts to feel like admitting something about yourself. So people don’t just tolerate the flaws—they defend them, and eventually flaunt them. You cannot have an honest conversation about a tool with someone who’s decided the tool is part of their personality.
 
 ## Feeling Productive versus being Productive
 
-The text-editor-macro anecdote I mentioned is really about a gap between *feeling productive* versus *being productive*. There’s a sensation of cleverness that comes from solving a fiddly problem, and it’s easy to mistake that feeling for actual output. A tool that makes hard things feel heroic and clever feel like an achievement can register as “powerful” while quietly being slow. The honest test isn’t how engaged or clever you felt, it’s wall-clock time and how many mistakes you made getting there. A lot of the tools people *evangelize* would lose that test.
+The text-editor-macro anecdote I mentioned is really about a gap between _feeling productive_ versus _being productive_. There’s a sensation of cleverness that comes from solving a fiddly problem, and it’s easy to mistake that feeling for actual output. A tool that makes hard things feel heroic and clever feel like an achievement can register as “powerful” while quietly being slow. The honest test isn’t how engaged or clever you felt, it’s wall-clock time and how many mistakes you made getting there. A lot of the tools people _evangelize_ would lose that test.
 
 If productivity is actually the goal, actually question your own views on this, and try to see what makes you more productive. You will be surprised when you do.
 
 ## Terminal UIs vs GUIs
 
-Another example in this same vein is when people advocate for terminal apps over GUIs. If you’re stuck in a terminal all day, then I completely get the *obvious* advantage, but most programmers aren’t stuck in a terminal all day.
+Another example in this same vein is when people advocate for terminal apps over GUIs. If you’re stuck in a terminal all day, then I completely get the _obvious_ advantage, but most programmers aren’t stuck in a terminal all day.
 
 From those people who generally advocate for a TUI over a GUI, one of the criticisms of GUI apps tends to be: “I cannot navigate them with the keyboard alone”.
 
-Okay? That doesn’t make GUI apps *inherently* bad. It just means the GUIs people build aren’t good enough to be keyboard-navigable. There’s nothing inherently impossible about making a GUI navigable with a keyboard, rather it’s just that most toolmakers never bother to implement, and usually because they don’t realize how much more productive keyboard navigation is than reaching for the mouse a lot of the time. If the argument was that a specific TUI app is better than the other alternatives which are GUI based, then that is a fair argument, but arguing that TUIs are inherently better than GUIs is very misinformed.
+Okay? That doesn’t make GUI apps _inherently_ bad. It just means the GUIs people build aren’t good enough to be keyboard-navigable. There’s nothing inherently impossible about making a GUI navigable with a keyboard, rather it’s just that most toolmakers never bother to implement, and usually because they don’t realize how much more productive keyboard navigation is than reaching for the mouse a lot of the time. If the argument was that a specific TUI app is better than the other alternatives which are GUI based, then that is a fair argument, but arguing that TUIs are inherently better than GUIs is very misinformed.
 
 And this is the common mistake: people look at the current state of a category of tools and assume its current limitations are inherent/essential, when really no one has put in the work to make those tools better.
 
@@ -62,9 +71,9 @@ Maximal configurability shouldn’t be a tool’s goal, it should be an option f
 
 The appeal of accidental 
 
-Characteristics that an object has contingently and can change without altering the object’s *essential* identity. complexity is something a lot of programmers/techy-folk love, giving them a weird sense of security.
+Characteristics that an object has contingently and can change without altering the object’s _essential_ identity. complexity is something a lot of programmers/techy-folk love, giving them a weird sense of security.
 
-Having *good defaults* is fundamentally a toolmaker’s responsibility. We as toolmakers have a tendency to put the burden on the user: to configure it, to tweak it, to learn it. A lot of that burden is really a designer declining to make a decision. “Highly configurable” is often just an excuse for shipping no opinion at all and calling the resulting work your problem. Good defaults are a form of respect for the user’s time: the toolmaker does the thinking once so a thousand users don’t each have to. And part of designing a tool is to allow for some escape hatches tool; those escape hatches are there for the genuine minority who need something unusual; they should not be a substitute for getting the common case right.
+Having _good defaults_ is fundamentally a toolmaker’s responsibility. We as toolmakers have a tendency to put the burden on the user: to configure it, to tweak it, to learn it. A lot of that burden is really a designer declining to make a decision. “Highly configurable” is often just an excuse for shipping no opinion at all and calling the resulting work your problem. Good defaults are a form of respect for the user’s time: the toolmaker does the thinking once so a thousand users don’t each have to. And part of designing a tool is to allow for some escape hatches tool; those escape hatches are there for the genuine minority who need something unusual; they should not be a substitute for getting the common case right.
 
 ## Steep Learning Curve as a “Feature”?
 
@@ -80,4 +89,4 @@ So by all means, enjoy your tools, for the joy of programming itself. Just be ho
 
 A good tool is and ought to be invisible—striving to make such tools is the goal of a toolmaker.
 
->Source: https://www.gingerbill.org/article/2026/07/10/good-tools-are-invisible
+> Source: https://www.gingerbill.org/article/2026/07/10/good-tools-are-invisible

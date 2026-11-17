@@ -1,3 +1,11 @@
+---
+title: "Odin Packages"
+source: "https://pkg.odin-lang.org/"
+tags: [OdinRAG, kb, source/official]
+type: reference
+status: active
+---
+
 # Odin Packages
 
 ⌘K
@@ -20,4 +28,4 @@ Documentation for all the packages part of the `core` library collection.
 
 Documentation for all the packages part of the `vendor` library collection.
 
->Source: https://pkg.odin-lang.org/
+> Source: https://pkg.odin-lang.org/

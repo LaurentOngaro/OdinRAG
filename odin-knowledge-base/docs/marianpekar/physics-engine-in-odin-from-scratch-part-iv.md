@@ -1,12 +1,21 @@
+---
+title: "Physics Engine in Odin from Scratch, Part IV"
+date: 2026-07-26
+source: "https://marianpekar.com/blog/physics-engine-in-odin-from-scratch-part-iv"
+tags: [OdinRAG, kb, source/marianpekar, topic/collision, topic/rendering]
+type: reference
+status: active
+---
+
 # Physics Engine in Odin from Scratch, Part IV
 
 26th July 2026 • 17 min read
 
-Today, we're going to implement something that every physics engine has to have. It's commonly referred to as collisions, but to be precise, there are two parts: *collision detection* and *collision resolution*. First, we must detect objects that overlap; that's the detection part, and once we have this information, we must decide what to do about it; that's the resolution part.
+Today, we're going to implement something that every physics engine has to have. It's commonly referred to as collisions, but to be precise, there are two parts: _collision detection_ and _collision resolution_. First, we must detect objects that overlap; that's the detection part, and once we have this information, we must decide what to do about it; that's the resolution part.
 
 For rigid bodies, the resolution typically means preventing them from overlapping, so once we detect there is an overlap, we push these objects in opposite directions. Note this is happening every frame, before rendering, so a player won't see any overlap, because in the rendering phase, the positions are already corrected.
 
-Games typically have various kinds of collision resolution; for example, *trigger volumes* (also called a *trigger boxes* or *trigger colliders*), which are usually invisible to the player, and once a player enters such a volume, meaning the player's position overlaps with the position of a trigger volume, it might trigger some action like spawning enemies just around the corner to make it look like an ambush.
+Games typically have various kinds of collision resolution; for example, _trigger volumes_ (also called a _trigger boxes_ or _trigger colliders_), which are usually invisible to the player, and once a player enters such a volume, meaning the player's position overlaps with the position of a trigger volume, it might trigger some action like spawning enemies just around the corner to make it look like an ambush.
 
 Or, when you shoot in an FPS game, what typically happens is that a ray is cast from the center of the screen. This ray is usually a straight line, but some games focus on realism and actually simulate proper bullet trajectories. Some even take the direction and speed of wind into consideration! If this ray intersects an enemy, or one of their hitboxes, to be precise, which are invisible boundaries around the head, torso, and limbs, damage is dealt to the enemy. The amount of damage is calculated based on the weapon used and the hitbox intersected. That's why headshots with a rifle cause more damage than "legshots" with a pistol.
 
@@ -18,7 +27,7 @@ In the following picture, you can see two squares at four different positions, a
 
 ![](/uploads/phys_eng_iv_sat1.png)
 
-The SAT splits the problem into a few smaller steps. First, we need to find the normals of every *edge* (in 3D, we're looking for the normals of every *face*).
+The SAT splits the problem into a few smaller steps. First, we need to find the normals of every _edge_ (in 3D, we're looking for the normals of every _face_).
 
 ![The normal is a vector perpendicular to the edge of a 2D shape or face of a 3D object.](/uploads/phys_eng_iv_sat2.png)
 
@@ -26,13 +35,13 @@ These normals form a set of axes, as you can see in the following image.
 
 ![A set of 8 axes (4 from each square).](/uploads/phys_eng_iv_sat3.png)
 
-The SAT is named like that because it's about looking for a *separating axis*. In the next step, we pick one axis and *project* both shapes onto this axis. If you went through the Software Renderer in Odin from Scratch series, or at least the recommended parts, you already know that projection reduces a projected object or shape to an N-1 dimensional object or shape where N is the number of dimensions in space from which we project it.
+The SAT is named like that because it's about looking for a _separating axis_. In the next step, we pick one axis and _project_ both shapes onto this axis. If you went through the Software Renderer in Odin from Scratch series, or at least the recommended parts, you already know that projection reduces a projected object or shape to an N-1 dimensional object or shape where N is the number of dimensions in space from which we project it.
 
 A 3D object is projected as a 2D shape on a screen, or it casts a shadow, which is also a two-dimensional shape. A 2D shape is projected into a line, and a line is a 1D shape. This works in higher dimensions too; you can project a 4D object, such as a hypercube, into 3D space. Anyway, in our 2D example, we conceptually project both shapes onto one of the axes made by a normal.
 
 ![](/uploads/phys_eng_iv_sat4.png)
 
-If there's a gap between these two lines, in other words, if they don't overlap, then we can be sure these shapes don't intersect each other, and if that's true for *at least one axis*, we don't have to look further; we found a separation axis, thus the shapes don't collide.
+If there's a gap between these two lines, in other words, if they don't overlap, then we can be sure these shapes don't intersect each other, and if that's true for _at least one axis_, we don't have to look further; we found a separation axis, thus the shapes don't collide.
 
 We were lucky. The first axis we chose is the one where the projections don't overlap. However, if we'd chosen a different one, we might get an overlap, in which case we'd have to look further. In the following image, you can see these two shapes projected on all potential separation axes.
 
@@ -139,7 +148,7 @@ for axis in axes {
 }
 ```
 
-Notice we also added a guard to skip very small axes; this solves the issue of parallel axes producing near-zero cross products. As you can see, once we find there's a single *non-overlapping* axis, we early return from the `GetCollisionResult` procedure with a `CollisionResult` where `hit` is set to `false`, indicating no collision. This loop is the heart of SAT, since this is the exact place we're looking for a separation axis.
+Notice we also added a guard to skip very small axes; this solves the issue of parallel axes producing near-zero cross products. As you can see, once we find there's a single _non-overlapping_ axis, we early return from the `GetCollisionResult` procedure with a `CollisionResult` where `hit` is set to `false`, indicating no collision. This loop is the heart of SAT, since this is the exact place we're looking for a separation axis.
 
 Also notice that we pass our collider scaled by the scale of the model. We have boxes of different sizes, and we can scale them with the plus and minus keys on the keypad, so this is necessary to always get the collider that matches the size of the visual model. Without scaling in runtime, this, of course, could be precalculated once when adding a collider to the model.
 
@@ -147,8 +156,8 @@ In case the objects collide, we get past the loop, and we now use the correct`mi
 
 ```odin
 return CollisionResult{
-    hit = true, 
-    normal = -minNormal if Vector3DotProduct(direction, minNormal) < 0 else minNormal, 
+    hit = true,
+    normal = -minNormal if Vector3DotProduct(direction, minNormal) < 0 else minNormal,
     depth = minDepth
 }
 ```
@@ -177,7 +186,7 @@ ResolveCollisions :: proc(models: []Model) {
 
             if a.rigidBody.isStatic && b.rigidBody.isStatic do continue
 
-            if (a.collider.x * a.collider.y * a.collider.z < 1e-6 || 
+            if (a.collider.x * a.collider.y * a.collider.z < 1e-6 ||
                 b.collider.x * b.collider.y * b.collider.z < 1e-6) { continue }
 
             result := GetCollisionResult(a, b)
@@ -284,4 +293,4 @@ If something doesn't work as expected, you can always refer to the complete impl
 > Author: Marian Pekar - <https://marianpekar.com>
 > (c) Marian Pekar. The posts stay freely readable on the author's site; this local copy is credited in `SOURCES.md` at the repo root. Please link back to the original article.
 
->Source: https://marianpekar.com/blog/physics-engine-in-odin-from-scratch-part-iv
+> Source: https://marianpekar.com/blog/physics-engine-in-odin-from-scratch-part-iv

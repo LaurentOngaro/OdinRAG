@@ -1,3 +1,12 @@
+---
+title: "Physics Engine in Odin from Scratch, Part V"
+date: 2026-08-30
+source: "https://marianpekar.com/blog/physics-engine-in-odin-from-scratch-part-v"
+tags: [OdinRAG, kb, source/marianpekar, topic/rendering]
+type: reference
+status: active
+---
+
 # Physics Engine in Odin from Scratch, Part V
 
 30th August 2026 • 19 min read
@@ -12,7 +21,7 @@ Additionally, we might want to know the point where the ray enters the object. W
 
 In most FPS games, raycasting is typically used for shooting, and if the game doesn't aim for high realism (pun intended), a straight ray from the center of the screen where your crosshair sits is enough to represent a bullet trajectory. If this ray intersects an enemy (or an enemy's hitbox, to be precise), the enemy is hit, and their health points are reduced. In realistic games and simulations, a proper ballistic curve is calculated, and even the strength and direction of the wind, air pressure, and humidity might be considered; also, the time it would take a bullet to reach its target is taken into account. While the algorithms are far more complex, the general idea is similar to raycasting. I had my fair share of these things when working on military simulators some years ago.
 
-In our case, we're going to cast a ray from a point on screen where we place our cursor when a mouse button is pressed. For that, we'd need to convert 2D screen-space coordinates to a 3D world position. Since our software renderer supports two types of projection, *perspective* and *orthographic*, we'll have to take care of both cases.
+In our case, we're going to cast a ray from a point on screen where we place our cursor when a mouse button is pressed. For that, we'd need to convert 2D screen-space coordinates to a 3D world position. Since our software renderer supports two types of projection, _perspective_ and _orthographic_, we'll have to take care of both cases.
 
 In fact, we'll split this task into two procedures, `GetRayOrigin` and `GetRayDirection`. Once we have this, we'll iterate over all models and check if we have a hit; if so, a `Ray` struct we'll define with a Boolean variable`hit` would have this variable set to `true`, and we also include a reference to a model that has been hit, and a direction of the ray to push or pull it along. An instance of the `Ray` struct will be returned at the end of the `CastRay` procedure, even when there's no hit (with`hit` set to `false`).
 
@@ -26,9 +35,9 @@ package main
 import "core:math"
 
 Ray :: struct {
-    hit: bool,
-    model: ^Model,
-    direction: Vector3
+  hit:       bool,
+  model:     ^Model,
+  direction: Vector3,
 }
 ```
 
@@ -75,7 +84,7 @@ Even if we use the value in one place, it's useful to define a named constant, s
 
 Later, we're going to call this procedure from `HandleInputs`, which we have implemented in `inputs.odin`. The `CastRay` procedure takes screen coordinates, a camera, the current projection type, and a collection of all models in the scene, and, as mentioned already, returns a `Ray`.
 
-With screen coordinates, we first calculate the normalized device coordinates (NDC) by dividing X and Y by the screen width and height, respectively, multiplying by 2, and subtracting 1 from the result. We then get X and Y always between -1.0 and 1.0. With [0,0] right in the center of the screen no matter the screen size and the aspect ratio, hence the name *normalized* device coordinates (some people call them normalized screen coordinates; I'll stick with normalized device coordinates, since it's the most commonly used term, often abbreviated as NDC).
+With screen coordinates, we first calculate the normalized device coordinates (NDC) by dividing X and Y by the screen width and height, respectively, multiplying by 2, and subtracting 1 from the result. We then get X and Y always between -1.0 and 1.0. With [0,0] right in the center of the screen no matter the screen size and the aspect ratio, hence the name _normalized_ device coordinates (some people call them normalized screen coordinates; I'll stick with normalized device coordinates, since it's the most commonly used term, often abbreviated as NDC).
 
 Then we use NDC, camera, and projection type to get the origin and direction of a ray, using two other procedures we'll implement at the end of the `CastRay` as inner procedures. We also define the closest distance with the initial value of the maximum of 32-bit float type. The value could be any very high number (or relatively small if we'd be making a game and want to use raycasting to pick only objects within the player's reach).
 
@@ -145,7 +154,7 @@ t1 := (e + size[i]) / f
 t2 := (e - size[i]) / f
 
 if t1 > t2 {
-    t1, t2 = t2, t1 
+    t1, t2 = t2, t1
 }
 ```
 
@@ -297,4 +306,4 @@ Before we wrap this up, note that we don't have to limit ourselves to casting a 
 > Author: Marian Pekar - <https://marianpekar.com>
 > (c) Marian Pekar. The posts stay freely readable on the author's site; this local copy is credited in `SOURCES.md` at the repo root. Please link back to the original article.
 
->Source: https://marianpekar.com/blog/physics-engine-in-odin-from-scratch-part-v
+> Source: https://marianpekar.com/blog/physics-engine-in-odin-from-scratch-part-v

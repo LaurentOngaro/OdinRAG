@@ -1,3 +1,11 @@
+---
+title: "Release note highlights"
+source: "https://odin-lang.org/news/newsletter-2022-11"
+tags: [OdinRAG, kb, source/newsletters, topic/allocator]
+type: reference
+status: active
+---
+
 ## Release note highlights [#](#release-note-highlights)
 
 - `raw_data` was made an intrinsic, resulting in a speedup for slice heavy code.
@@ -32,7 +40,7 @@ Q: What would you say your favorite thing about Odin is, and what would you say 
 
 A: Definitely the [core](https://pkg.odin-lang.org/core/) library. You have all the power at your fingertips - from doing various encodings, string manipulation, formatting, etc.
 
-The core library could also use some *more* love/help from the community. There are a few unfinished packages and code that needs more fixing/testing.
+The core library could also use some _more_ love/help from the community. There are a few unfinished packages and code that needs more fixing/testing.
 
 Q: We’ve enjoyed your Todool progress updates in `#showcase` on our [Discord](https://discord.gg/vafXTdubwr) and your [YT channel](https://www.youtube.com/c/Skytrias/videos). Is there a site people can pre-order it at?
 
@@ -55,9 +63,9 @@ The best way to currently learn Odin is to dive through the [overview](https://o
 
 From **cstring:**
 
-| To | Action | Code |
-| --- | --- | --- |
-| `string` | ***alias*** | `string(st)` |
-| `[^]u8` | ***alias*** | `transmute([^]u8)st` |
+| To       | Action      | Code                 |
+| -------- | ----------- | -------------------- |
+| `string` | _**alias**_ | `string(st)`         |
+| `[^]u8`  | _**alias**_ | `transmute([^]u8)st` |
 
->Source: https://odin-lang.org/news/newsletter-2022-11
+> Source: https://odin-lang.org/news/newsletter-2022-11

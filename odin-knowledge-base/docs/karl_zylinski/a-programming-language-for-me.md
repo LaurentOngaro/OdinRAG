@@ -1,3 +1,12 @@
+---
+title: "Odin: A programming language made for me"
+date: 2025-05-12
+source: "https://zylinski.se/posts/a-programming-language-for-me"
+tags: [OdinRAG, kb, source/zylinski, topic/allocator, topic/entity-system, topic/dod]
+type: reference
+status: active
+---
+
 # Odin: A programming language made for me
 
 May 12, 2025
@@ -37,7 +46,7 @@ At my job we had implemented our own `Allocator` interface in C. An allocator pr
 
 If a function accepted a parameter of type `Allocator`, then it was a hint that its return value was dynamically allocated.
 
-This is exactly how it works in Odin. But the `Allocator` interface [is built into the language’s `base` library collection](https://pkg.odin-lang.org/base/runtime/#Allocator)! This meant that Odin’s `base` and `core` libraries support these allocators too. At my job, the `Allocator` interface was only supported in our own code: The C standard library didn’t support any of that. But in Odin, my own code *and* the `core` libraries can reason about custom allocators, making the concept even more powerful.
+This is exactly how it works in Odin. But the `Allocator` interface [is built into the language’s `base` library collection](https://pkg.odin-lang.org/base/runtime/#Allocator)! This meant that Odin’s `base` and `core` libraries support these allocators too. At my job, the `Allocator` interface was only supported in our own code: The C standard library didn’t support any of that. But in Odin, my own code _and_ the `core` libraries can reason about custom allocators, making the concept even more powerful.
 
 > In Odin, `core` and `base` are two collections of libraries that come with the compiler. Some refer to them as the “standard library” of Odin. But they are shipped as source with the compiler. You are encouraged to make copies of the packages inside `core`, making it possible to tailor those packages to your own needs. So it’s more of a “default library” than a “standard library”. There’s a sensible default, but you’re free do things however you want.
 
@@ -45,7 +54,7 @@ This is exactly how it works in Odin. But the `Allocator` interface [is built in
 
 Temporary memory allocators provide a way to do dynamic memory allocations that are only needed for a short while. What’s “a short while”? Video games have a very convenient “short while”: A single frame.
 
-At my C job we had a temporary allocator that I used *a lot*. Gone was the need to manually `malloc` and `free` strings and arrays that were only needed for a short while. Just use the temp allocator. It’ll be gone the next frame! And it’s more efficient: The temp allocator allocates into pre-allocated blocks of memory.
+At my C job we had a temporary allocator that I used _a lot_. Gone was the need to manually `malloc` and `free` strings and arrays that were only needed for a short while. Just use the temp allocator. It’ll be gone the next frame! And it’s more efficient: The temp allocator allocates into pre-allocated blocks of memory.
 
 I was happy to discover that Odin came with exactly this functionality. There’s a built in temp allocator available under the name `context.temp_allocator`. And again, the `core` libraries and my code uses the same `Allocator` interface. So I can just pass `context.temp_allocator` into any `core` library procedure that accepts an `Allocator` parameter. Whatever that procedure allocates will then be temporary. Nice!
 
@@ -73,7 +82,8 @@ defer {
 	}
 	mem.tracking_allocator_destroy(&track)
 }
-```odin
+```
+
 > You’ll also need to do `import "core:mem"` and `import "core:fmt"` at the top of the file. The code above is from the [Odin overview](https://odin-lang.org/docs/overview/#tracking-allocator).
 
 ## Zero is initialized (ZII)[#](#zero-is-initialized-zii)
@@ -84,7 +94,8 @@ In Odin all variables are automatically zero initialized. Not just integers and 
 
 ```odin
 x: Some_Type
-```odin
+```
+
 This makes ZII extra powerful! There is little risk of variables accidentally being uninitialized. You can lean on that zero initialization. Also, the whole `core` library of Odin relies on ZII as well. So it feels very natural throughout the whole language and its ecosystem.
 
 > You can skip zero initialization by writing `x: Some_Type = ---`. You rarely need to do so, but it can be a good idea in some specific, performance sensitive situations. It’s great that zero initialization is opt out, instead of opt in. That way we get way less bugs due to uninitialized memory.
@@ -106,9 +117,10 @@ Another_Type :: struct {
 }
 
 x := My_Type {
-	number = 7,	
+	number = 7,
 }
-```odin
+```
+
 ## Cache friendly programming[#](#cache-friendly-programming)
 
 The CPU has some memory inside it that is very fast. It’s called a cache. If you keep the cache filled with whatever data the CPU might need next, then your program will run very fast.
@@ -126,7 +138,8 @@ Person :: struct {
 }
 
 people: [128]Person
-```odin
+```
+
 The memory layout of the `people` array looks like this:
 
 ```odin
@@ -141,7 +154,8 @@ people[3].age
 people[4].health
 people[4].age
 ... etc
-```odin
+```
+
 If you add `#soa` in front of `[128]Person`, like so:
 
 ```odin
@@ -151,7 +165,8 @@ Person :: struct {
 }
 
 people: #soa[128]Person
-```odin
+```
+
 then the memory layout of `people` will instead look like this:
 
 ```odin
@@ -167,7 +182,8 @@ people[2].age
 people[3].age
 people[4].age
 ... and 123 more age items
-```odin
+```
+
 Achieving this in C is manual work. But here you just add `#soa`.
 
 Now, don’t go putting `#soa` everywhere, just because you can. It will still make the code a bit trickier to write (you need to use `#soa` pointers etc instead of normal pointers). The code will also be a bit harder to debug. Put it in if you have proof of a clear performance benefit.
@@ -194,4 +210,4 @@ Have a nice day!
 
 /Karl Zylinski
 
->Source: https://zylinski.se/posts/a-programming-language-for-me
+> Source: https://zylinski.se/posts/a-programming-language-for-me

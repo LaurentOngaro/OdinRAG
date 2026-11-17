@@ -1,3 +1,11 @@
+---
+title: "Package Updates"
+source: "https://odin-lang.org/news/newsletter-2023-08"
+tags: [OdinRAG, kb, source/newsletters, topic/allocator, topic/entity-system, topic/collision, topic/raylib]
+type: reference
+status: active
+---
+
 ## Package Updates [#](#package-updates)
 
 `laytan` has been implementing Non-Blocking IO into [odin-http](https://github.com/laytan/odin-http/commit/64b8627bbe35c10f166988c7f1e9c99ca90c0402). Here is what he shared on our [Discord](https://discord.gg/vafXTdubwr).
@@ -8,7 +16,8 @@ Darwin uses kqueue
 Linux uses io_uring
 Windows uses a thread pool (IOCP in the future but I am out of juice and wanted it merged)
 All in a nice event-loop based abstraction.
-```odin
+```
+
 ## Blog Posts [#](#blog-posts)
 
 Discord User `Charlie` has uploaded a [blog](https://cshenton.com/posts/2022-proto-topple/) on their 2022 prototypes done in odin. It looks like a good showcase of Physics and also shows SIMD usage.
@@ -111,4 +120,4 @@ First time kqueue doesn't segfault trying to do non blocking IO in odin-http ðŸŽ
 
 After a little bit of linking headache, working bindings for Cyber!!! - Scoobery Doobery
 
->Source: https://odin-lang.org/news/newsletter-2023-08
+> Source: https://odin-lang.org/news/newsletter-2023-08

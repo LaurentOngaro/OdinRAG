@@ -1,3 +1,12 @@
+---
+title: "Understand the Temporary Allocator; Understand arenas"
+date: 2025-08-25
+source: "https://zylinski.se/posts/temporary-allocator-your-first-arena"
+tags: [OdinRAG, kb, source/zylinski, topic/allocator]
+type: reference
+status: active
+---
+
 # Understand the Temporary Allocator; Understand arenas
 
 August 25, 2025
@@ -49,7 +58,8 @@ get_all_player_actions :: proc() -> [dynamic]PlayerAction {
 
 	return actions
 }
-```odin
+```
+
 Here is some code that runs the procedure and then displays all the actions on the screen:
 
 ```odin
@@ -60,12 +70,13 @@ for a in actions {
 }
 
 delete(actions)
-```odin
+```
+
 Note how we loop over the list of actions and draw an icon for each. After the loop I call `delete(actions)`, because the calls to `append` within `get_all_player_actions` caused dynamic allocations. Forgetting the call to `delete` would leak the allocated memory. Since this UI drawing code runs each frame of the game, it would cause the game’s memory usage to continuously grow: A classic memory leak. The tracking allocator would catch these leaks. But it would be nice if I never had to worry about this at all, tracking allocator or no tracking allocator.
 
 That’s where the temporary allocator comes in.
 
-In the game I actually only need the list of actions to be around for drawing or doing some logic checks. With that in mind, the *actual* code that I use in CAT & ONION is the following. The only difference is the first line of the procedure: When I create the `actions` array, I tell it to use the temporary allocator.
+In the game I actually only need the list of actions to be around for drawing or doing some logic checks. With that in mind, the _actual_ code that I use in CAT & ONION is the following. The only difference is the first line of the procedure: When I create the `actions` array, I tell it to use the temporary allocator.
 
 ```odin
 get_all_player_actions :: proc() -> [dynamic]PlayerAction {
@@ -94,7 +105,8 @@ get_all_player_actions :: proc() -> [dynamic]PlayerAction {
 
 	return actions
 }
-```odin
+```
+
 > The line `actions := make([dynamic]PlayerAction, context.temp_allocator)` does not cause any allocation. It just returns a dynamic array with its internal `allocator` field set to `context.temp_allocator`. The allocations happen later, as `append` runs. The dynamic array will need to grow at least once (it has the initial size of zero). When growing, it will use the temporary allocator we fed into `make`.
 >
 > This “internal `allocator` field” exists on the struct `Raw_Dynamic_Array`, which is the type that a dynamic array uses “behind the scenes”. You can see that type here: <https://pkg.odin-lang.org/base/runtime/#Raw_Dynamic_Array>
@@ -109,7 +121,8 @@ main :: proc() {
 		free_all(context.temp_allocator)
 	}
 }
-```odin
+```
+
 Now when drawing the icons, I can skip the `delete(actions)` line:
 
 ```odin
@@ -118,16 +131,17 @@ actions := get_all_player_actions()
 for a in actions {
 	draw_action_icon(a)
 }
-```odin
-The `actions` array will thus be valid until `free_all(context.temp_allocator)` happens, meaning *until the end of frame*.
+```
+
+The `actions` array will thus be valid until `free_all(context.temp_allocator)` happens, meaning _until the end of frame_.
 
 ## Your first arena allocator[#](#your-first-arena-allocator)
 
 You may have heard about arena allocators. You may be a bit confused about when it is a good idea to use them.
 
-An arena allocator has the property that all the allocations into it shares a common *lifetime*. This means that they will all get deallocated at the same time.
+An arena allocator has the property that all the allocations into it shares a common _lifetime_. This means that they will all get deallocated at the same time.
 
-If you look back at the code above, then you see that everything on the temporary allocator has the *lifetime of a single frame*, because we clear it at the end of the frame.
+If you look back at the code above, then you see that everything on the temporary allocator has the _lifetime of a single frame_, because we clear it at the end of the frame.
 
 In other words: The temporary allocator is an arena allocator. It has a predetermined use-case (temporary things), but you chose what temporary means (when do you clear it? What is the lifetime?)
 
@@ -140,4 +154,4 @@ If you enjoyed this post and want to learn more about Odin, then check out my eB
 Have a nice day!
 /Karl Zylinski
 
->Source: https://zylinski.se/posts/temporary-allocator-your-first-arena
+> Source: https://zylinski.se/posts/temporary-allocator-your-first-arena

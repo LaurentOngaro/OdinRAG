@@ -1,3 +1,11 @@
+---
+title: "Odin release highlights"
+source: "https://odin-lang.org/news/newsletter-2024-09"
+tags: [OdinRAG, kb, source/newsletters, topic/raylib, topic/wasm]
+type: reference
+status: active
+---
+
 ## Odin release highlights [#](#odin-release-highlights)
 
 - Add support for linux\_riscv64 and freestanding\_riscv64
@@ -9,21 +17,21 @@ For the rest of the many compiler changes, read the [monthly release](https://gi
 
 ## Projects shared this month [#](#projects-shared-this-month)
 
-| Project Name | Description |
-| --- | --- |
-| [Android-Native-Example](https://github.com/IllusionMan1212/android-native-example-odin) | Android Native Example |
-| [odin-leif](https://github.com/sudokit/odin-leif) | bindings to leif GPU gui library |
-| [Odin-Breakout](https://github.com/f43792/Odin-Breakout) | Breakout example using raylib |
-| [particle-fluid-sim](https://github.com/nuclearshadow/particle-fluid-sim) | Particle Fluid Sim |
-| [raylib-wasm](https://github.com/Aronicu/Odin-Raylib-WASM-Template) | Raylib & Wasm template |
-| [winforms](https://github.com/kcvinker/Winforms) | Winforms gui library |
-| [odin-ts](https://github.com/Sampie159/odin-ts-mode) | tresitter mode for emacs |
-| [odin-harfbuzz](https://codeberg.org/mgavioli/odin-harfbuzz) | Harfbuzz bindings |
-| [colorpicker](https://github.com/brunodeangelis/okhsv-picker) | colorpicker in Okhsv & Okhsl |
-| [4ZCP-4-bit-emulator](https://github.com/Z7-Z7L/4ZCP-4-bit-computer-emulator/tree/main) | 4ZCP 4 bit emulator |
-| [audio-example](https://github.com/markersniffen/odin-audio-example) | audio example showcase |
-| [sdf-terrain-painter](https://github.com/karl-zylinski/sdf-terrain-painter) | An SDF terrain painter |
-| [the-garden-of-odin](https://asibahi.github.io/thoughts/the-garden-of-odin/) | An abstract board game |
+| Project Name                                                                             | Description                      |
+| ---------------------------------------------------------------------------------------- | -------------------------------- |
+| [Android-Native-Example](https://github.com/IllusionMan1212/android-native-example-odin) | Android Native Example           |
+| [odin-leif](https://github.com/sudokit/odin-leif)                                        | bindings to leif GPU gui library |
+| [Odin-Breakout](https://github.com/f43792/Odin-Breakout)                                 | Breakout example using raylib    |
+| [particle-fluid-sim](https://github.com/nuclearshadow/particle-fluid-sim)                | Particle Fluid Sim               |
+| [raylib-wasm](https://github.com/Aronicu/Odin-Raylib-WASM-Template)                      | Raylib & Wasm template           |
+| [winforms](https://github.com/kcvinker/Winforms)                                         | Winforms gui library             |
+| [odin-ts](https://github.com/Sampie159/odin-ts-mode)                                     | tresitter mode for emacs         |
+| [odin-harfbuzz](https://codeberg.org/mgavioli/odin-harfbuzz)                             | Harfbuzz bindings                |
+| [colorpicker](https://github.com/brunodeangelis/okhsv-picker)                            | colorpicker in Okhsv & Okhsl     |
+| [4ZCP-4-bit-emulator](https://github.com/Z7-Z7L/4ZCP-4-bit-computer-emulator/tree/main)  | 4ZCP 4 bit emulator              |
+| [audio-example](https://github.com/markersniffen/odin-audio-example)                     | audio example showcase           |
+| [sdf-terrain-painter](https://github.com/karl-zylinski/sdf-terrain-painter)              | An SDF terrain painter           |
+| [the-garden-of-odin](https://asibahi.github.io/thoughts/the-garden-of-odin/)             | An abstract board game           |
 
 ---
 
@@ -111,4 +119,4 @@ A: For any programmers interested in contributing to OstrichDB, I encourage you 
 
 If you’re considering learning Odin but need a nudge, I say go for it. Build something new or revisit an old project and rebuild it using Odin-you might be pleasantly surprised by what you can achieve and how quickly you can achieve it. Thank you for the opportunity to share my thoughts in this interview. I’m both honored and excited to see it published!
 
->Source: https://odin-lang.org/news/newsletter-2024-09
+> Source: https://odin-lang.org/news/newsletter-2024-09

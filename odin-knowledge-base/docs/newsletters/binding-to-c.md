@@ -1,3 +1,11 @@
+---
+title: "Binding to C"
+source: "https://odin-lang.org/news/binding-to-c"
+tags: [OdinRAG, kb, source/newsletters, topic/allocator, topic/binding]
+type: reference
+status: active
+---
+
 ## Binding to C [#](#binding-to-c)
 
 Odin makes it fairly easy to bind to C code (but not C++ code, unless wrapped) that is compiled as a local static or dynamic/shared library, or to a system library.
@@ -19,17 +27,20 @@ int foo_add_int(int a, int b) {
 double foo_add_double(double a, double b) {
     return a + b;
 }
-```odin
+```
+
 then, depending on your platform:
 
 ```odin
 gcc -c foo.c
 ar rcs foo.a foo.o
-```odin
+```
+
 ```odin
 cl -TC -c foo.c
 lib -nologo foo.obj -out:foo.lib
-```odin
+```
+
 And finally, to use it in Odin, you could do:
 
 ```odin
@@ -48,7 +59,8 @@ main :: proc() {
     fmt.println(foo_add_int(2, 2))
     fmt.println(foo_add_double(2.71828, 3.14159))
 }
-```odin
+```
+
 Note that the procedure declaration has to end in `---` inside the `foreign` block to denote that the body is found elsewhere. This is to prevent a parsing ambiguity with procedure variables and types. See the [Attributes and Directives sections](https://odin-lang.org/docs/overview/#attributes) for more information.
 
 ### Foreign blocks [#](#foreign-blocks)
@@ -62,7 +74,8 @@ foreign foo {
     foo_add_int    :: proc(a, b: c.int)    -> c.int ---
     foo_add_double :: proc(a, b: c.double) -> c.double ---
 }
-```odin
+```
+
 ```odin
 foreign foo {
     @(link_name="foo_add_int")
@@ -71,14 +84,16 @@ foreign foo {
     @(link_name="foo_add_double")
     add_double :: proc(a, b: c.double) -> c.double ---
 }
-```odin
+```
+
 ```odin
 @(link_prefix="foo_");
 foreign foo {
     add_int    :: proc(a, b: c.int)    -> c.int ---
     add_double :: proc(a, b: c.double) -> c.double ---
 }
-```odin
+```
+
 ### Static vs shared libraries [#](#static-vs-shared-libraries)
 
 Static libraries work the same on every platform: you specify the relative paths of the library file in the .odin file you are importing it to.
@@ -98,7 +113,8 @@ foreign import foo "foo.so"         // shared lib in linux links to /path/to/exe
 foreign import foo "foo.lib"        // static/import library in windows, links to /path/to/file/foo.lib
 foreign import foo "system:foo"     // system library (static or shared) in linux. Links to /usr/lib/libfoo.a
 foreign import foo "system:foo.lib" // system library (static or import) in windows. Links to foo.lib
-```odin
+```
+
 ### Calling conventions [#](#calling-conventions)
 
 C supports a plethora of calling conventions, most of them for Windows. Procedure calling conventions are added after the `proc` in the signature:
@@ -107,7 +123,8 @@ C supports a plethora of calling conventions, most of them for Windows. Procedur
 foo :: proc "c" () {}
 bar :: proc "stdcall" () {}
 bar :: proc "system" () {} // "stdcall" on Windows, "c" on *nix systems
-```odin
+```
+
 Procedure declarations in `foreign` blocks default to the “c” calling convention, but this can be changed by adding the `@(default_calling_convention=<string>)` attribute prior to the `foreign` block.
 
 ```odin
@@ -115,7 +132,8 @@ Procedure declarations in `foreign` blocks default to the “c” calling conven
 foreign lib {
     ...
 }
-```odin
+```
+
 Possible calling conventions are:
 
 - `"odin"`
@@ -149,14 +167,15 @@ Rather than a dynamic allocation, you might alternatively want to use `strings.c
 
 #### Structs [#](#structs)
 
-Odin structs with fields that are the same size as their C equivalents, (see [`core:c`](https://github.com/odin-lang/Odin/blob/master/core/c/c.odin)) Odin structs have the same layout as the equivalent C struct. *Please note* that structs initialized from C may not have their padding between fields zeroed unlike Odin. Please take this into consideration when interfacing with foreign code in general.
+Odin structs with fields that are the same size as their C equivalents, (see [`core:c`](https://github.com/odin-lang/Odin/blob/master/core/c/c.odin)) Odin structs have the same layout as the equivalent C struct. _Please note_ that structs initialized from C may not have their padding between fields zeroed unlike Odin. Please take this into consideration when interfacing with foreign code in general.
 
 Packed structs in Odin work the same as C with compiler extensions, with the `#packed` tag:
 
 ```odin
 S :: struct #packed { x: i64, y: u8 }
 #assert(size_of(S) == 9)
-```odin
+```
+
 #### Unions [#](#unions)
 
 `union`s in Odin do not have a compatible data layout to their equivalent C union.
@@ -174,7 +193,8 @@ Multi-Pointers in Odin are a way to describe foreign (C-like) pointers which act
 
 ```odin
 p: [^]f32
-```odin
+```
+
 What multi-pointers support:
 
 - Index (without any bounds checking)
@@ -198,7 +218,8 @@ x[:]   -> [^]T
 x[i:]  -> [^]T
 x[:n]  -> []T
 x[i:n] -> []T
-```odin
+```
+
 ### Learning More [#](#learning-more)
 
 If you want to learn more about how to structure your bindings for foreign code, it is highly recommended to read through the source code many of the packages within the `vendor` library collection:
@@ -206,4 +227,4 @@ If you want to learn more about how to structure your bindings for foreign code,
 - Documentation: <https://pkg.odin-lang.org/vendor/>
 - Source Code: <https://github.com/odin-lang/Odin/tree/master/vendor>
 
->Source: https://odin-lang.org/news/binding-to-c
+> Source: https://odin-lang.org/news/binding-to-c

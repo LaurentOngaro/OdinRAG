@@ -1,3 +1,12 @@
+---
+title: "String Type Distinctions"
+date: 2024-04-05
+source: "https://www.gingerbill.org/article/2024/04/05/string-type-distinctions"
+tags: [OdinRAG, kb, source/gingerbill, topic/allocator]
+type: reference
+status: active
+---
+
 # String Type Distinctions
 
 2024-04-05
@@ -32,4 +41,4 @@ Coupled with Run-Time Type Information (RTTI), having a distinction between []by
 
 P.S. Even C makes a distinction between a string an array of integers
 
->Source: https://www.gingerbill.org/article/2024/04/05/string-type-distinctions
+> Source: https://www.gingerbill.org/article/2024/04/05/string-type-distinctions

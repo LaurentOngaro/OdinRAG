@@ -67,6 +67,7 @@ from bs4.element import Tag  # noqa: E402
 
 from lib.html2md import html_to_markdown  # noqa: E402
 from lib.http_client import fetch, normalize_url  # noqa: E402
+from lib.kb_frontmatter import ensure_kb_frontmatter  # noqa: E402
 
 _DESCRIPTION = "Marian Pekar blog scraper (marianpekar.com) - Odin posts only, re-entrant via RSS, --force to rewrite."
 
@@ -307,7 +308,15 @@ def extract_post(url: str, out_path: Path) -> bool:
     footer = ["", ATTRIBUTION, COPYRIGHT, "", f">Source: {url}", ""]
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    out_path.write_text("\n".join(header) + "\n" + body + "\n" + "\n".join(footer), encoding="utf-8")
+    raw_doc = "\n".join(header) + "\n" + body + "\n" + "\n".join(footer)
+    raw_doc, _ = ensure_kb_frontmatter(
+        raw_doc,
+        file_path=out_path,
+        source_tag="source/marianpekar",
+        source_url=url,
+        title=title,
+    )
+    out_path.write_text(raw_doc, encoding="utf-8", newline="\n")
 
     _format_odin_blocks(out_path)
     return True

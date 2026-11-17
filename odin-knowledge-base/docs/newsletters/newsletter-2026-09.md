@@ -1,3 +1,11 @@
+---
+title: "Odin release highlights"
+source: "https://odin-lang.org/news/newsletter-2026-09"
+tags: [OdinRAG, kb, source/newsletters, topic/raylib, topic/sokol]
+type: reference
+status: active
+---
+
 ## Odin release highlights [#](#odin-release-highlights)
 
 - Odin has gained an experimental [inline asm template](https://odin-lang.org/docs/inline-asm/) system, supporting amd64, arm64, and riscv64.
@@ -107,7 +115,7 @@ I did a lot of things backwards and didn’t make a 2d renderer until recently, 
 
 Q: What’s your favorite thing about Odin, and what do you think could use some love? This could be the language semantics, the packages that come with it, the community, anything.
 
-A: My favourite thing about Odin is that it seems to be designed to *help* me do what I’m trying to do. Actual everyday things get easier but I don’t forfeit control.
+A: My favourite thing about Odin is that it seems to be designed to _help_ me do what I’m trying to do. Actual everyday things get easier but I don’t forfeit control.
 
 I love that the core packages are useful and readable - I can actually learn from them. Odin seems to have everything I need for the job at hand.
 
@@ -121,4 +129,4 @@ A: Just a big thanks to the Odin team and community, it’s a language I really 
 
 Also we are working toward a first round of playtesting for Daisy Trains so please drop by the Discord if you’re interested in trying out the first playable version of the game!
 
->Source: https://odin-lang.org/news/newsletter-2026-09
+> Source: https://odin-lang.org/news/newsletter-2026-09

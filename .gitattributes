@@ -1,18 +1,18 @@
 # gitattributes - OdinRAG line endings and binary rules
 #
-# Objectif : un fichier doit avoir les memes octets sur les deux OS.
+# Objectif : un fichier doit avoir les mêmes octets sur les deux OS.
 #   - Index (dépôt) : toujours LF.
 #   - Copie de travail : toujours LF, sur Windows comme sur Linux.
-# Un fichier dont seuls les fins de ligne changent n'est donc JAMAIS
-# signale comme modifie par Git, quel que soit l'OS qui l'ait edite.
+# Un fichier dont seules les fins de ligne changent n'est donc JAMAIS
+# signalé comme modifié par Git, quel que soit l'OS qui l'ait édité.
 #
-# Seul le contenu binaire est declare comme tel pour empecher toute
+# Seul le contenu binaire est déclaré comme tel pour empêcher toute
 # tentative de conversion.
 #
-# Regle : `* text=auto eol=lf` s'applique a tout. Les types texte sont
-# ensuite reaffirmes explicitement (documentation) et les scripts Windows
+# Règle : `* text=auto eol=lf` s'applique à tout. Les types texte sont
+# ensuite réaffirmés explicitement (documentation) et les scripts Windows
 # (.bat, .cmd, .ps1) conservent CRLF, car cmd.exe et PowerShell les
-# executent avec des fins de ligne CRLF.
+# exécutent avec des fins de ligne CRLF.
 #
 # Rappel : `core.autocrlf` doit rester a false sur chaque clone local
 # (`git config core.autocrlf false`). Les attributs ci-dessus primeront

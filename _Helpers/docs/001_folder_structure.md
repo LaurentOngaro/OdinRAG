@@ -4,9 +4,9 @@ date: "2026-07-01"
 tags: [OdinRAG, reference, structure]
 type: reference
 status: active
-version: 1.1.0
-lastUpdated: "2026-07-05"
-updatedBy: "Perplexity (MCP GitHub)"
+version: 1.2.0
+lastUpdated: "2026-11-17"
+updatedBy: "Antigravity (Google DeepMind)"
 ---
 
 # 001_folder_structure
@@ -23,8 +23,10 @@ OdinRAG/
 ├── LICENSE
 ├── AGENTS.md
 ├── TODO.md
+├── ACTION_PLAN.md
 ├── kilo.json                <- Kilo runtime config (single source)
 ├── odinfmt.json
+├── pyrightconfig.json
 ├── .markdownlint.json
 ├── .markdownlintignore
 ├── .editorconfig
@@ -35,7 +37,8 @@ OdinRAG/
 ├── code/                    <- Bucket 1b - Public code references + personal projects (sanitized in public)
 ├── _shared/                 <- Canonical mirror for shared project tooling (odinfmt.json, ols.json, build scripts, templates)
 ├── _Helpers/                <- Bucket 2 - Public RAG management
-└── _Private/                <- Bucket 3 - Private (tracked in local main, absent from public branch)
+├── _Private/                <- Bucket 3 - Private (tracked in local main, absent from public branch)
+└── _Archives/               <- Bucket 4 - Private mirror tree for archived docs (tracked in local main, absent from public branch)
 ```
 
 > **Important - what "private" means in this repo**: paywalled and personal content is **NOT gitignored**.
@@ -76,9 +79,11 @@ code/
 │   ├── odin-raylib-web/
 │   ├── odin-sokol-hot-reload/
 │   └── odin-sokol-web/
-└── projects/                <- personal Odin projects (ABSENT from public)
+└── projects/                <- personal Odin projects (links, ABSENT from public)
     ├── README - projects.md
-    └── PVG03_RPG/           <- the author's RPG remake
+    ├── PVG03_RPG/           <- link to external RPG remake repo
+    ├── PVG02_Metroidvania/  <- link to external Metroidvania repo
+    └── Odin_Skeleton/       <- link to external skeleton repo
 ```
 
 ## Bucket 2 - `_Helpers/`
@@ -87,15 +92,17 @@ code/
 _Helpers/
 ├── README - helpers.md
 ├── links.jsonc                <- link topology (workspace junctions / symlinks), consumed by scripts/dev/sync_links.py
+├── config/                    <- shared declarative config (private_paths.jsonc, gitIngest_repos.jsonc)
+├── tests/                     <- automated unit tests (`pytest` / `unittest`)
 ├── scripts/                 <- thematic sub-folders
 │   ├── README - scripts.md
-│   ├── dev/                 <- editor integration scripts (odin_task.ps1) + workspace link manager (sync_links.py)
+│   ├── dev/                 <- editor integration scripts (odin_task.ps1), hooks/, normalize_eol.py, sync_links.py
 │   ├── diagnostic/          <- audit_public_safety.py, auditReadmeCoherence.py, publish_public.py, vaultConfigOdinRAG.py + vaultDiagnostic.py + validateFrontmatter.py (R2 TerraBloom port)
 │   │   └── code_auditor/    <- code_auditor.py + odin_rules.{jsonc,schema.json} + rule_loader.py + scanner.py + kb_index.py + context_builder.py + reporter.py + README - code_auditor.md (self-contained package, Phase 1+2+3)
-│   ├── fixes/               <- format_odin_in_files, fix_mojibake, reflow_md, odin_format, book_html_to_md, lint_pylance
+│   ├── fixes/               <- add_kb_frontmatter, format_kb_md, format_odin_in_files, fix_mojibake, reflow_md, odin_format, book_html_to_md, lint_pylance
 │   ├── indexing/            <- build_kb_index.py
 │   ├── scrapers/            <- scrape_*.py + download_*.py
-│   └── lib/                 <- text_clean, http_client, html2md, user_config (shared libs; per-package modules stay inside their own folder)
+│   └── lib/                 <- text_clean, http_client, html2md, kb_frontmatter, private_paths, user_config
 ├── docs/                    <- meta docs about this repo (NNN_*.md)
 │   ├── README - docs.md
 │   ├── 001_folder_structure.md
@@ -124,17 +131,16 @@ _Helpers/
 _Private/
 ├── README - private.md
 ├── .config/                 <- user_config.jsonc, cookies.txt, skool_credentials.txt (DOUBLY: .gitignore + main-only)
-├── archives/                <- archived/superseded docs (ABSENT from public)
-│   ├── README - archives.md
-│   └── ...
 ├── docs/                    <- private meta docs (ABSENT from public)
 │   ├── README - docs.md
+│   ├── audits/              <- repository and project audits
 │   ├── decisions/           <- Architecture Decision Records (ADR) - see naming convention below
 │   │   ├── README.md
-│   │   └── YYYY-MM-DD_ADR-NNN_<slug>.md
-│   ├── devlogs/             <- per-project devlogs (J_YYYY-MM-DD_<topic>.md). Private by location, not by inheritance.
-│   │   └── <project>/
+│   │   └── ADR-NNN_<slug>.md
+│   ├── social/              <- social media post drafts
 │   └── ...
+├── devlogs/                 <- per-project devlogs (J_YYYY-MM-DD_<topic>.md). Private by location, not by inheritance.
+│   └── <project>/
 ├── planning/                <- day-by-day planning (ABSENT from public)
 │   ├── README - planning.md
 │   ├── ...
@@ -144,24 +150,28 @@ _Private/
     └── Perplexity decisions/<- decision drafts in transit before ADR validation
 ```
 
-> `_Private/` content is **NOT gitignored** - it is tracked in the local `main` branch and pushed to the private remote `OdinRag-private`, then excluded from the public `public` branch via `publish_public.py` (two-branch strategy). Local `git status` keeps personal paths quiet via `.git/info/exclude` (LOCAL only, never version-controlled). Only `/_Private/.config/` is doubly protected (also in the tracked `.gitignore`) because credentials must never reach history.
+## Bucket 4 - `_Archives/`
+
+```text
+_Archives/                   <- mirror tree for archived/superseded docs (ABSENT from public, main-only)
+├── README.md
+├── _Private/                <- archived private docs (audits, daily logs, raw notes, social posts)
+└── _Helpers/                <- archived helper docs (when applicable)
+```
+
+> `_Private/` and `_Archives/` content is **NOT gitignored** - it is tracked in the local `main` branch and pushed to the private remote `OdinRag-private`, then excluded from the public `public` branch via `publish_public.py` using `_Helpers/config/private_paths.jsonc` (two-branch strategy). Local `git status` keeps personal paths quiet via `.git/info/exclude` (LOCAL only, never version-controlled). Only `/_Private/.config/` is doubly protected (also in the tracked `.gitignore`) because credentials must never reach history.
 >
-> The `archives/` subfolder keeps the evolution of decisions traceable when a doc is rewritten or translated.
-> See [`_Private/archives/README - archives.md`](../../_Private/archives/README%20-%20archives.md) for the convention (when to archive, naming, frontmatter annotations).
->
-> For PUBLIC archives (old versions of public-facing docs that should stay visible to collaborators), use a `_Helpers/archives/` folder instead - to be created on first need.
->
-> **ADR naming convention** (`_Private/docs/decisions/`): `YYYY-MM-DD_ADR-NNN_<slug>.md`. NNN is a global sequential counter (001, 002, ...). Source drafts transit through `_Private/raw/Perplexity decisions/` before being promoted to a stable ADR.
+> **ADR naming convention** (`_Private/docs/decisions/`): `ADR-NNN_<slug>.md` (stable naming; date tracked in YAML frontmatter). NNN is a global sequential counter (001, 002, ...). Source drafts transit through `_Private/raw/Perplexity decisions/` before being promoted to a stable ADR.
 
 ## Perplexity workflow (raw -> ADR)
 
 Sessions Perplexity produce two kinds of outputs:
 
-| Output type                          | Destination                          | Naming                       |
-| ------------------------------------ | ------------------------------------ | ---------------------------- |
-| Session notes, Q&A, syntheses        | `_Private/raw/Perplexity backlog/`   | `<DATE>_<NNN>_<slug>.md`     |
-| Decision drafts (pending validation) | `_Private/raw/Perplexity decisions/` | `<DATE>_<NNN>_<slug>.md`     |
-| Validated ADRs                       | `_Private/docs/decisions/`           | `<DATE>_ADR-<NNN>_<slug>.md` |
+| Output type                          | Destination                          | Naming                   |
+| ------------------------------------ | ------------------------------------ | ------------------------ |
+| Session notes, Q&A, syntheses        | `_Private/raw/Perplexity backlog/`   | `<DATE>_<NNN>_<slug>.md` |
+| Decision drafts (pending validation) | `_Private/raw/Perplexity decisions/` | `<DATE>_<NNN>_<slug>.md` |
+| Validated ADRs                       | `_Private/docs/decisions/`           | `ADR-<NNN>_<slug>.md`    |
 
 Perplexity uses GitHub MCP (read + write) to push directly into `OdinRAG-private/main`. No manual upload needed for repo-bound content.
 

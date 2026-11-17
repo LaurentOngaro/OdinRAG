@@ -1,3 +1,12 @@
+---
+title: "Software Renderer in Odin from Scratch, Part I"
+date: 2025-03-02
+source: "https://marianpekar.com/blog/software-renderer-in-odin-from-scratch-part-i"
+tags: [OdinRAG, kb, source/marianpekar, topic/rendering, topic/raylib, topic/dod]
+type: reference
+status: active
+---
+
 # Software Renderer in Odin from Scratch, Part I
 
 2nd March 2025 • 17 min read
@@ -24,7 +33,7 @@ C is a very powerful but also quite old and cumbersome language. Yet, for implem
 
 Don’t get me wrong, I think automatic memory management is a great thing, and I wrote a lot of C# code. I wouldn’t want to develop, say, a Web API or an Android app in C. But when it comes to a software renderer, C is a natural choice. But wait a minute, we're going to implement our software renderer in Odin, not C, right? Yes! According to its official website, Odin is:
 
-*"A general-purpose programming language with distinct typing, built for high performance, modern systems, and data-oriented programming. Odin is the C alternative for the Joy of Programming."*
+_"A general-purpose programming language with distinct typing, built for high performance, modern systems, and data-oriented programming. Odin is the C alternative for the Joy of Programming."_
 
 I have to admit I was a bit sceptical when I was reading this statement for the first time, especially after my disappointment with Rust. Rust claims to solve many issues of C++, but in my opinion, it does so just by replacing them with a different set of even worse issues.
 
@@ -124,7 +133,7 @@ When you think about it, it's dead simple… well, that's a huge oversimplificat
 
 So, let's now break down a software rendering pipeline. We're not going into too much detail right now. The goal is just to give you a brief overview before we start actually building the pipeline.
 
-The first step is typically reading a file that contains data that defines a 3D object and an image file that will be mapped onto the object's surface. We usually call such a file a *texture*. However, in our implementation, we first hard-code a cube definition for testing purposes and write the file loader later. A 3D object itself is typically called a *mesh*.
+The first step is typically reading a file that contains data that defines a 3D object and an image file that will be mapped onto the object's surface. We usually call such a file a _texture_. However, in our implementation, we first hard-code a cube definition for testing purposes and write the file loader later. A 3D object itself is typically called a _mesh_.
 
 If you look at the content of the `cube.obj` file more closely, you'll see that every line starts with one or two characters followed by numbers and eventually some slashes. The first group starts with `v`, which stands for vertices. Vertices are points in 3D space, for example, `1.000000 1.000000 1.000000` represents a point that is one unit away from the origin along the `X`, `Y`, and `Z` axes.
 
@@ -138,7 +147,7 @@ The last group starts with `f`, which stands for face. These lines reference dat
 
 What I just described is the main part of the [Wavefront OBJ file format](https://en.wikipedia.org/wiki/Wavefront_.obj_file). We'll learn how to parse it in one of the upcoming parts. You don't need to worry too much about the details right now. What's important is that you now have a broad understanding of how a 3D mesh will be defined so that our program, our rendering pipeline, can understand it. There are many file formats for 3D models, but this one, as you'll see, can be very easily parsed.
 
-When files are parsed and all data is loaded into memory, usually in a set of arrays, the fun really begins. We typically want to transform these points to *rotate*, *move*, or *scale* the 3D object before rendering it. This can be achieved elegantly by using 4×4 transformation matrices for *rotation*, *translation*, and *scaling*. These matrices are optional; if you don't need all transformations, you can apply only rotation and translation, for example. However, we always need to consider the observer, which is also represented as a 4×4 matrix. This matrix is commonly called the *view matrix*, but in some implementations, you might see this matrix stored in a variable called `eye`.
+When files are parsed and all data is loaded into memory, usually in a set of arrays, the fun really begins. We typically want to transform these points to _rotate_, _move_, or _scale_ the 3D object before rendering it. This can be achieved elegantly by using 4×4 transformation matrices for _rotation_, _translation_, and _scaling_. These matrices are optional; if you don't need all transformations, you can apply only rotation and translation, for example. However, we always need to consider the observer, which is also represented as a 4×4 matrix. This matrix is commonly called the _view matrix_, but in some implementations, you might see this matrix stored in a variable called `eye`.
 
 The cool thing about these transformations is that they are just linear algebra. Each vertex from our set of vertices is multiplied by a final transformation matrix, which is the product of multiplying all the individual transformation matrices together. The order of multiplication matters, as it determines how transformations are applied, but in the end, they are all applied as expected using that single final matrix.
 
@@ -146,13 +155,13 @@ Again, this is a very simple explanation. We'll return to this topic and cover i
 
 Now that we have our vertices transformed to their final positions, we need to render them on the screen. In other words, project their 3D space coordinates onto 2D screen coordinates.
 
-In this series, we’ll start with drawing a wireframe model. This will be very simple since we’ll just draw lines between the points of the triangles that form a 3D model. Then, we’re going to build on top of that by filling these triangles with pixels. Initially, with a solid white color. Later, we’ll modify this color per triangle based on the angle between a light direction and the triangle’s orientation. This creates a simple illusion of lighting and is commonly referred to as *flat shading*.
+In this series, we’ll start with drawing a wireframe model. This will be very simple since we’ll just draw lines between the points of the triangles that form a 3D model. Then, we’re going to build on top of that by filling these triangles with pixels. Initially, with a solid white color. Later, we’ll modify this color per triangle based on the angle between a light direction and the triangle’s orientation. This creates a simple illusion of lighting and is commonly referred to as _flat shading_.
 
 ![From the top-left, clockwise: wireframe, solid color without lighting, solid color with flat shading, and textured with flat shading.](/uploads/sw_renderer_i_render_modes_2.png)
 
 Next, we’ll introduce textures, both with and without flat shading, and finally, in the last part, we’ll implement Phong shading, a more advanced lighting technique where we calculate the intensity per pixel rather than per triangle, as is the case in flat shading.
 
-This process is also known as [rasterization](https://en.wikipedia.org/wiki/Rasterisation), and it is the essence of the renderer. It's a process of converting an image described with vectors into a raster image, an image composed of dots on the screen. We usually call these dots *pixels*. When I mentioned at the very beginning that you would understand every pixel, this is what I meant.
+This process is also known as [rasterization](https://en.wikipedia.org/wiki/Rasterisation), and it is the essence of the renderer. It's a process of converting an image described with vectors into a raster image, an image composed of dots on the screen. We usually call these dots _pixels_. When I mentioned at the very beginning that you would understand every pixel, this is what I meant.
 
 I should emphasize again that this is a huge simplification. I’ve skipped many details, which we’ll cover much more throughout this series. But enough theory for now, even if that was just a very high-level overview, and…
 
@@ -181,16 +190,16 @@ package main
 import rl "vendor:raylib"
 
 main :: proc() {
-    rl.InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Renderer")
+  rl.InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Renderer")
 
-    for !rl.WindowShouldClose() {
+  for !rl.WindowShouldClose() {
 
-        // TODO
+    // TODO
 
-        rl.EndDrawing()
-    }
+    rl.EndDrawing()
+  }
 
-    rl.CloseWindow()
+  rl.CloseWindow()
 }
 ```
 
@@ -263,4 +272,4 @@ And before we wrap this up, I’ve created a [GitHub repository](https://github.
 > Author: Marian Pekar - <https://marianpekar.com>
 > (c) Marian Pekar. The posts stay freely readable on the author's site; this local copy is credited in `SOURCES.md` at the repo root. Please link back to the original article.
 
->Source: https://marianpekar.com/blog/software-renderer-in-odin-from-scratch-part-i
+> Source: https://marianpekar.com/blog/software-renderer-in-odin-from-scratch-part-i

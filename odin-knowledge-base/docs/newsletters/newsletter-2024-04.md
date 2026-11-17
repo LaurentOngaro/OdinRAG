@@ -1,3 +1,11 @@
+---
+title: "Game Releases"
+source: "https://odin-lang.org/news/newsletter-2024-04"
+tags: [OdinRAG, kb, source/newsletters, topic/raylib]
+type: reference
+status: active
+---
+
 Read up on the compiler changes in the [monthly release](https://github.com/odin-lang/Odin/releases/tag/dev-2024-04) notes.
 
 ## Game Releases [#](#game-releases)
@@ -16,15 +24,15 @@ I’d like to mention [awesome-odin](https://github.com/jakubtomsu/awesome-odin)
 
 ## Projects shared this month [#](#projects-shared-this-month)
 
-| Project Name | Description |
-| --- | --- |
-| [ncurses](https://github.com/RaphGL/Ncurses.odin) | Ncurses bindings |
-| [Edo](https://github.com/RaphGL/Edo) | Minimal text editor |
-| [box2d](https://github.com/cr1sth0fer/odin-box2d) | box2d 3.0 bindings |
-| [timealloc](https://github.com/antogp24/timealloc) | time management app |
-| [performance\_aware](https://github.com/iansimonson/performance_aware) | performance aware course solutions |
-| [graphql-parser](https://github.com/thetarnav/odin-graphql-parser) | graphql-parser currently only schema |
-| [websocket-client](https://github.com/FreerGit/websocket-client) | websocket client with SSL |
+| Project Name                                                           | Description                          |
+| ---------------------------------------------------------------------- | ------------------------------------ |
+| [ncurses](https://github.com/RaphGL/Ncurses.odin)                      | Ncurses bindings                     |
+| [Edo](https://github.com/RaphGL/Edo)                                   | Minimal text editor                  |
+| [box2d](https://github.com/cr1sth0fer/odin-box2d)                      | box2d 3.0 bindings                   |
+| [timealloc](https://github.com/antogp24/timealloc)                     | time management app                  |
+| [performance\_aware](https://github.com/iansimonson/performance_aware) | performance aware course solutions   |
+| [graphql-parser](https://github.com/thetarnav/odin-graphql-parser)     | graphql-parser currently only schema |
+| [websocket-client](https://github.com/FreerGit/websocket-client)       | websocket client with SSL            |
 
 ## Project Showcase [#](#project-showcase)
 
@@ -76,7 +84,8 @@ myInput : cstring
 
 // In main loop
 raylib.GuiTextBox({0, 0, 200, 30}, myInput, 255, true)
-```odin
+```
+
 It will segfault the moment you’ll try to type or delete a letter. And you can’t just pass a pointer to this string - the compiler wouldn’t let you.
 
 But the friendly community helped me out with that case. All I need to do is create a buffer memory for that string before using it:
@@ -88,7 +97,8 @@ str := cstring(&buf[0])
 
 // In main loop
 raylib.GuiTextBox({0, 0, 200, 30}, str, maxSize, true)
-```odin
+```
+
 There’s also a way with dynamic allocation but I didn’t bother to try that :shrug:
 
 Another problem was with file explorer. Raylib has two methods of getting the contents of directory:
@@ -137,7 +147,8 @@ cd :: proc(dir: cstring) -> (result: bool) {
   fileListActive = -1
   fileListFocus = -1
 }
-```odin
+```
+
 There’s a lot of potential problems with that code but hey! It works fine for me now.
 
 Also this file explorer is not very comfortable to use because you can’t just double-click an item to open it. Raygui does not provide it out of the box and I haven’t tried to implement it yet.
@@ -174,4 +185,4 @@ One weakness is that much of the standard library is missing human-language desc
 
 I used the `testing` package to write a simple procedure to benchmark the game’s performance. In just 5 lines of code I would read the best bench from disk, test for statistically-significant improvement from best bench to current bench, write the better bench to disk, and log the results.
 
->Source: https://odin-lang.org/news/newsletter-2024-04
+> Source: https://odin-lang.org/news/newsletter-2024-04

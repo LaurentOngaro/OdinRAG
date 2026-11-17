@@ -1,3 +1,11 @@
+---
+title: "Spall"
+source: "https://odin-lang.org/showcase/spall"
+tags: [OdinRAG, kb, source/showcase]
+type: reference
+status: active
+---
+
 Spall is a fast, easy-to-use profiler, on the web, and natively on your computer
 
 ![](https://gravitymoth.com/media/odin-landscape.png)
@@ -34,4 +42,4 @@ Need bigger traces, or more data about your data? We’ve got a native version o
 - [December 2022 Newsletter](https://odin-lang.org/news/newsletter-2022-12/)
 - [Interview with Cloin, author of Spall](https://odin-lang.org/news/newsletter-2022-12/#interview-with-cloin-author-of-spall)
 
->Source: https://odin-lang.org/showcase/spall
+> Source: https://odin-lang.org/showcase/spall

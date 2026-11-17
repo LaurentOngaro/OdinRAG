@@ -1,3 +1,12 @@
+---
+title: "If Odin Had Macros"
+date: 2025-07-31
+source: "https://www.gingerbill.org/article/2025/07/31/if-odin-had-macros"
+tags: [OdinRAG, kb, source/gingerbill]
+type: reference
+status: active
+---
+
 # If Odin Had Macros
 
 2025-07-31
@@ -38,7 +47,8 @@ for e, i in backward(s) {
 	}
 	fmt.println(e, i)
 }
-```odin
+```
+
 The internally expanded code in the backend would look something similar to this:
 
 ```odin
@@ -59,7 +69,8 @@ s := []string{"a", "b", "c"}
 		}
 	}
 }
-```odin
+```
+
 This is of course a restricted form of a hyigenic macro only applicable to iterators. However this is only way to achieve such a construct in the language.
 
 However the way you’d write the macro is still extremely imperative in nature. The push-iterator approach allows you to store state/data in the control flow itself without the need for explicit state which a pull-iterator would require.
@@ -81,7 +92,8 @@ my_string_map_iterator :: iterator(m: My_String_Map($V)) -> (string, V) {
 for k, v in my_string_map_iterator(m) {
 	fmt.printfln("Key: %v, Value: %v", k, v)
 }
-```odin
+```
+
 ## Composability (or Lack Of)
 
 This approach to iterators is very imperative and not very “composable” in the functional sense. You cannot chain multiple iterators together using this approach. I personally don’t have much need for composing iterators in practice and I usually just want the ability to iterate across a custom data structure and that’s it. I honestly don’t think the composability of iterators is an actual need most programmers have, but rather something that “seems cool” 
@@ -102,4 +114,4 @@ The road to hell is not paved with good intentions but rather the lack of intent
 
 So my current answer at the time of writing to this construct is this: **No**.
 
->Source: https://www.gingerbill.org/article/2025/07/31/if-odin-had-macros
+> Source: https://www.gingerbill.org/article/2025/07/31/if-odin-had-macros

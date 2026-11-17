@@ -1,3 +1,11 @@
+---
+title: "Custom Odin Engine"
+source: "https://odin-lang.org/showcase/solar_storm"
+tags: [OdinRAG, kb, source/showcase, topic/allocator, topic/collision, topic/rendering, topic/sokol]
+type: reference
+status: active
+---
+
 Solar Storm is a retro turn-based artillery shooter with tons of explosions and unique weapons. It’s inspired by local multiplayer games from the 90s, such as Worms or Scorched Earth.
 
 ### Demo Trailer [#](#demo-trailer)
@@ -31,4 +39,4 @@ You can play a free demo on Steam: <https://store.steampowered.com/app/2754920/S
 
 The full version is coming in Q1 2024.
 
->Source: https://odin-lang.org/showcase/solar_storm
+> Source: https://odin-lang.org/showcase/solar_storm

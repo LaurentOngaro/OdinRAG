@@ -33,8 +33,9 @@ The exclusion patterns are split between two files:
 
 Verify they jointly cover:
 
-- `code/projects/PVG03_RPG/`
-- `_Private/` (whole folder, except the README captured by the strategy doc)
+- `code/projects/<project>/` (declared in `_Helpers/links.jsonc`)
+- `_Private/` (whole folder)
+- `_Archives/` (whole folder, private mirror archives)
 - `odin-knowledge-base/courses/`
 - `odin-knowledge-base/docs/karl_zylinski/odin-book/`
 
@@ -88,8 +89,9 @@ Compare the output to the expected count (~ 8-10 top-level items: `_Helpers/`, `
 
 Browse the `Code` tab on GitHub manually to confirm the absence of:
 
-- `code/projects/PVG03_RPG/`
+- `code/projects/<project>/`
 - `_Private/`
+- `_Archives/`
 - `odin-knowledge-base/courses/`
 - `odin-knowledge-base/docs/karl_zylinski/*.md` (other than README)
 
@@ -105,5 +107,5 @@ Browse the `Code` tab on GitHub manually to confirm the absence of:
 - Before any private -> public transition.
 - Before sharing the repo with a third party (colleague, mentor).
 - Before mirroring on another platform (GitLab, Codeberg, etc.).
-- After adding a new scraping source: update `SOURCES.md`, AND update `.gitignore` (and the per-developer `.git/info/exclude` if relevant), AND `_Helpers/scripts/diagnostic/audit_public_safety.py` (`FORBIDDEN_PATTERNS`), AND `_Helpers/scripts/diagnostic/publish_public.py` (`STRIP_RULES`).
-- After adding a new personal project folder: update `.git/info/exclude` and the two scripts above.
+- After adding a new scraping source: update `SOURCES.md`, AND update [`_Helpers/config/private_paths.jsonc`](../config/private_paths.jsonc) (single source of truth for `audit_public_safety.py` and `publish_public.py`), AND synchronize `_Helpers/scripts/dev/hooks/pre-push` if needed.
+- After adding a new personal project folder: declare it in `_Helpers/links.jsonc` with `"scope": "private"` (automatically picked up by `private_paths.jsonc`) and ensure `/code/projects/*` in `.git/info/exclude` covers it.

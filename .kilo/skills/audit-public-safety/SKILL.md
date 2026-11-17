@@ -14,13 +14,13 @@ Pre-push audit for the `public` branch of OdinRAG. The repo uses a **single-repo
 - **Before any push** to the `public` remote (`git push public public`).
 - Before sharing a `git bundle` of the local repo.
 - Before mirroring on another platform (GitLab, Codeberg, etc.).
-- After adding a **new scraping source** (update `SOURCES.md`, `.gitignore`, `.git/info/exclude`, `audit_public_safety.py` `FORBIDDEN_PATTERNS`, and `publish_public.py` `STRIP_RULES`).
-- After adding a **new personal project folder** under `code/projects/` (update `.git/info/exclude` and the two scripts above).
+- After adding a **new scraping source** (update `SOURCES.md`, [`_Helpers/config/private_paths.jsonc`](../../_Helpers/config/private_paths.jsonc), and `_Helpers/scripts/dev/hooks/pre-push`).
+- After adding a **new personal project folder** under `code/projects/` (declare it with `"scope": "private"` in `_Helpers/links.jsonc`).
 
 ## The 3 MUST-PASS conditions
 
 1. `python _Helpers/scripts/diagnostic/audit_public_safety.py` → **must exit 0**.
-2. `.git/info/exclude` contains the local-only paywall patterns (`/odin-knowledge-base/courses/`, `/odin-knowledge-base/docs/karl_zylinski/odin-book/`, `/code/projects/PVG03_RPG/`, etc.) so personal content stays untracked locally. The tracked `.gitignore` itself only carries secrets + build/IDE ignores.
+2. `.git/info/exclude` ignores local project junctions (`/code/projects/*`, `!/code/projects/README - projects.md`) and `.agents`, while **NOT** ignoring `odin-knowledge-base/courses/`, `odin-book/`, or `.kilo/` (which are tracked on `main` and stripped from `public` via `_Helpers/config/private_paths.jsonc`). The tracked `.gitignore` itself only carries secrets (`/_Private/.config/`) + build/IDE ignores.
 3. No `_Private/planning/daily/`, `_Private/raw/`, or `_Private/docs/` files are staged.
 
 ## Quick audit

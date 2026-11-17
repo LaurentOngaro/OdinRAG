@@ -1,3 +1,12 @@
+---
+title: "Physics Engine in Odin from Scratch, Part II"
+date: 2026-05-30
+source: "https://marianpekar.com/blog/physics-engine-in-odin-from-scratch-part-ii"
+tags: [OdinRAG, kb, source/marianpekar, topic/rendering]
+type: reference
+status: active
+---
+
 # Physics Engine in Odin from Scratch, Part II
 
 30th May 2026 • 21 min read
@@ -10,25 +19,25 @@ This part is also the only one in the series in which we won't be adding any new
 
 ## The year is 1687…
 
-The year is 1687, and Isaac Newton (\*1643–†1727) has just published *Philosophiæ Naturalis Principia Mathematica*, fundamentally changing the understanding of motion. In his magnum opus, among many other groundbreaking ideas of the time, he formulated the three laws of motion we are particularly interested in. These laws form the foundation of classical mechanics and, by extension, the basis of modern physics engines used in games today:
+The year is 1687, and Isaac Newton (\*1643–†1727) has just published _Philosophiæ Naturalis Principia Mathematica_, fundamentally changing the understanding of motion. In his magnum opus, among many other groundbreaking ideas of the time, he formulated the three laws of motion we are particularly interested in. These laws form the foundation of classical mechanics and, by extension, the basis of modern physics engines used in games today:
 
-**The First Law (Law of Inertia):** *Every object remains at rest, or in uniform motion in a straight line, unless acted on by an unbalanced force.*
+**The First Law (Law of Inertia):** _Every object remains at rest, or in uniform motion in a straight line, unless acted on by an unbalanced force._
 
-**The Second Law (Law of Acceleration):** *The net force acting on an object is equal to the rate of change of its momentum.* For objects with constant mass, this is commonly written as:
+**The Second Law (Law of Acceleration):** _The net force acting on an object is equal to the rate of change of its momentum._ For objects with constant mass, this is commonly written as:
 
 F = ma
 
 And as you're going to see very soon, the second law of motion is the one we are most interested in.
 
-**The Third Law (Action and Reaction):** *For every action, there is an equal and opposite reaction.*
+**The Third Law (Action and Reaction):** _For every action, there is an equal and opposite reaction._
 
 Isaac Newton also laid the foundations of calculus, independently of Gottfried Wilhelm Leibniz, developing it primarily to describe motion in physics. Let's stop here for a second and ask ourselves a question that might seem trivial, but which you’ll soon see is actually a very important one.
 
-*What is motion?*
+_What is motion?_
 
 Imagine you are living in the 17th century and trying to answer this question as if you had never attended any physics class. After some time of pondering about this, you come up with a very neat answer:
 
-*Motion is the change of position of an object over time.*
+_Motion is the change of position of an object over time._
 
 Later, a friend of yours insists on foretelling your future. He places three cards in front of you and asks you to pick one. Although you are a man of science, you say you want the left one, but he flips the right one. You say, "I meant my left."
 
@@ -84,15 +93,15 @@ Let's now get back to Newton's second law, which relates force and acceleration.
 
 \displaystyle a = \frac{F}{m}
 
-That makes sense, right? The relationship between mass and acceleration is *inversely proportional*, which is just another way of saying that the greater the mass of an object is, the more force we need to move it.
+That makes sense, right? The relationship between mass and acceleration is _inversely proportional_, which is just another way of saying that the greater the mass of an object is, the more force we need to move it.
 
-Though we've covered only a fraction of Newtonian physics, this is almost all you need to implement a very simple physics simulation in which forces are applied to a particle and then *integrated* each frame to compute its velocity and subsequently update its position. And that's exactly what we're going to do later in this part.
+Though we've covered only a fraction of Newtonian physics, this is almost all you need to implement a very simple physics simulation in which forces are applied to a particle and then _integrated_ each frame to compute its velocity and subsequently update its position. And that's exactly what we're going to do later in this part.
 
-The last piece of theoretical knowledge we need is *integration*. However, talking about integration without first covering *differentiation* would feel like skipping ahead a few pages. These concepts come from *differential calculus* and *integral calculus*, the two major branches of calculus, which is an area of mathematics that's about studying *continuous change*.
+The last piece of theoretical knowledge we need is _integration_. However, talking about integration without first covering _differentiation_ would feel like skipping ahead a few pages. These concepts come from _differential calculus_ and _integral calculus_, the two major branches of calculus, which is an area of mathematics that's about studying _continuous change_.
 
 ## Differentiation 101
 
-We've actually already touched on this concept in the previous paragraphs when we talked about position, velocity, and acceleration. You might remember from school that *velocity is the first derivative of position with respect to time*, and *acceleration is the first derivative of velocity with respect to time*. Let's now make clear what that means exactly.
+We've actually already touched on this concept in the previous paragraphs when we talked about position, velocity, and acceleration. You might remember from school that _velocity is the first derivative of position with respect to time_, and _acceleration is the first derivative of velocity with respect to time_. Let's now make clear what that means exactly.
 
 The following graph shows the change in displacement of an object over time. Since displacement varies quadratically with time (forming a parabola on a displacement-time graph), the motion has constant acceleration.
 
@@ -106,13 +115,13 @@ Now we can calculate the average velocity by subtracting and dividing the change
 
 \displaystyle v\_{\text{avg}} = \frac{25 - 4}{5 - 2} = \frac{21}{3} = 7
 
-This tells us that the displacement increases by 7 units per unit of time between times *t=2* and *t=5*. But what if we ask instead:
+This tells us that the displacement increases by 7 units per unit of time between times _t=2_ and _t=5_. But what if we ask instead:
 
-*What was the velocity at time 3?*
+_What was the velocity at time 3?_
 
 When you look at the graph again, you can see that the hypotenuse of our triangle lies close to the white curve, but it does not match it exactly. Of course, it represents the average rate of change we calculated using two points that are separated in time.
 
-We would definitely get a better estimate of the velocity at time 3 with smaller interval, but even with interval between *t=2.99999* and *t=3.00001*, the result is still only an approximation. No matter how small we make the interval, we are still computing the slope between two distinct points. To obtain the exact instantaneous velocity, we need to consider what happens in the limit as the interval approaches zero.
+We would definitely get a better estimate of the velocity at time 3 with smaller interval, but even with interval between _t=2.99999_ and _t=3.00001_, the result is still only an approximation. No matter how small we make the interval, we are still computing the slope between two distinct points. To obtain the exact instantaneous velocity, we need to consider what happens in the limit as the interval approaches zero.
 
 What we're really looking for here is the slope of the curve at a single point rather than between two points. This is where differentiation comes to the rescue. Calculus was originally called infinitesimal calculus. We can make our interval infinitely small, which makes our triangle infinitely small as well. But that's not a problem. In fact, it's the key idea that solves our problem. However, we need to introduce yet another concept, the concept of a limit.
 
@@ -120,15 +129,15 @@ With a limit, instead of calculating the slope between two separate points, we l
 
 \displaystyle v(t) = \lim\_{\Delta t \to 0} \frac{\Delta d}{\Delta t}
 
-Notice the notation written below the *lim* symbol. We read it as: delta t (time) approaches 0. Let's now differentiate the function that describes this uniformly accelerated movement and thus get its first derivative, the velocity. The function is:
+Notice the notation written below the _lim_ symbol. We read it as: delta t (time) approaches 0. Let's now differentiate the function that describes this uniformly accelerated movement and thus get its first derivative, the velocity. The function is:
 
 \displaystyle d(t)=t^2
 
-Don't let yourself get confused with the limit; it's still the same idea as with two distinct points, only with an infinitesimal small interval. Replace *Δd* with the change in the displacement function:
+Don't let yourself get confused with the limit; it's still the same idea as with two distinct points, only with an infinitesimal small interval. Replace _Δd_ with the change in the displacement function:
 
 \displaystyle v(t)=\lim\_{\Delta t\to0}\frac{d(t+\Delta t)-d(t)}{\Delta t}
 
-Substitute our displacement function *d(t)=t²*:
+Substitute our displacement function _d(t)=t²_:
 
 \displaystyle v(t)=\lim\_{\Delta t\to0}\frac{(t+\Delta t)^2-t^2}{\Delta t}
 
@@ -136,15 +145,15 @@ And now we can simplify step by step with simple algebra. First expand the squar
 
 \displaystyle v(t)=\lim\_{\Delta t\to0}\frac{t^2+2t\Delta t+(\Delta t)^2-t^2}{\Delta t}
 
-Cancel the *t²* terms:
+Cancel the _t²_ terms:
 
 \displaystyle v(t)=\lim\_{\Delta t\to0}\frac{2t\Delta t+(\Delta t)^2}{\Delta t}
 
-Factor out *Δt*:
+Factor out _Δt_:
 
 \displaystyle v(t)=\lim\_{\Delta t\to0}\frac{\Delta t(2t+\Delta t)}{\Delta t}
 
-Cancel the *Δt*:
+Cancel the _Δt_:
 
 \displaystyle v(t)=\lim\_{\Delta t\to0}(2t+\Delta t)
 
@@ -152,11 +161,11 @@ And now comes the trick with the limit. Let Δt approach 0:
 
 \displaystyle v(t)=2t
 
-So the derivative, the instantaneous velocity, of *d(t)=t²* at *t=3* is:
+So the derivative, the instantaneous velocity, of _d(t)=t²_ at _t=3_ is:
 
 \displaystyle v(3)=2 \cdot 3=6
 
-On the graph, this corresponds to the tangent to the curve at *t=3*. The *slope* illustrates the *rate of change of displacement* at that point, the *instantaneous velocity*:
+On the graph, this corresponds to the tangent to the curve at _t=3_. The _slope_ illustrates the _rate of change of displacement_ at that point, the _instantaneous velocity_:
 
 ![Change in displacement over time and instantaneous velocity at t=3.](/uploads/phys_sim_ii_displacement_over_time_slope_instant.png)
 
@@ -168,15 +177,15 @@ There's a simpler way of calculating the derivative of the quadratic function, w
 
 \displaystyle \frac{d}{dx}(Ax^B)=ABx^{B-1}
 
-Where *A* is a constant coefficient and *B* is the exponent. Using the power rule, we would have gotten the same result:
+Where _A_ is a constant coefficient and _B_ is the exponent. Using the power rule, we would have gotten the same result:
 
 \displaystyle v(t)=2t^{2-1} \\ v(t)=2t^1 \\ v(t)=2t \\ v(3)=2 \cdot 3 = 6\\
 
 There are many differentiation rules in calculus, but before we move to integration, let's ask ourselves the following question:
 
-*What if we now differentiate the velocity?*
+_What if we now differentiate the velocity?_
 
-We can, of course, differentiate the *v(t)=2t* function. I'm not going over it step by step again. The idea is still the same. Let's make our life easier and simply use the power rule. Although this is a linear function, we can still apply the power rule by rewriting it with an exponent of 1:
+We can, of course, differentiate the _v(t)=2t_ function. I'm not going over it step by step again. The idea is still the same. Let's make our life easier and simply use the power rule. Although this is a linear function, we can still apply the power rule by rewriting it with an exponent of 1:
 
 \displaystyle v(t)=2t=2t^1
 
@@ -264,8 +273,8 @@ Create a file in a new directory and name it `main.odin`. After the usual packag
 ```odin
 package main
 
-import "core:strings"
 import "core:fmt"
+import "core:strings"
 import rl "vendor:raylib"
 ```
 
@@ -297,10 +306,10 @@ Now we have all the data we need, let's implement the logic. We only need three 
 
 ```odin
 HandleInputs :: proc(particle: ^Particle) {
-    if rl.IsKeyDown(rl.KeyboardKey.W) do particle.force += UP * STRENGTH 
-    if rl.IsKeyDown(rl.KeyboardKey.S) do particle.force += DOWN * STRENGTH 
-    if rl.IsKeyDown(rl.KeyboardKey.A) do particle.force += LEFT * STRENGTH 
-    if rl.IsKeyDown(rl.KeyboardKey.D) do particle.force += RIGHT * STRENGTH 
+    if rl.IsKeyDown(rl.KeyboardKey.W) do particle.force += UP * STRENGTH
+    if rl.IsKeyDown(rl.KeyboardKey.S) do particle.force += DOWN * STRENGTH
+    if rl.IsKeyDown(rl.KeyboardKey.A) do particle.force += LEFT * STRENGTH
+    if rl.IsKeyDown(rl.KeyboardKey.D) do particle.force += RIGHT * STRENGTH
 }
 ```
 
@@ -327,7 +336,7 @@ Draw :: proc(particle: Particle) {
 
     text := fmt.tprintf("force=(%.2f, %.2f)\nvelocity=(%.2f, %.2f)\nposition=(%.2f, %.2f)\nmass=%.2f",
         particle.force.x, particle.force.y,
-        particle.velocity.x, particle.velocity.y, 
+        particle.velocity.x, particle.velocity.y,
         particle.position.x, particle.position.y,
         particle.mass)
     rl.DrawText(
@@ -407,4 +416,4 @@ Have fun! Learning by building things on your own and experimenting is one of th
 > Author: Marian Pekar - <https://marianpekar.com>
 > (c) Marian Pekar. The posts stay freely readable on the author's site; this local copy is credited in `SOURCES.md` at the repo root. Please link back to the original article.
 
->Source: https://marianpekar.com/blog/physics-engine-in-odin-from-scratch-part-ii
+> Source: https://marianpekar.com/blog/physics-engine-in-odin-from-scratch-part-ii

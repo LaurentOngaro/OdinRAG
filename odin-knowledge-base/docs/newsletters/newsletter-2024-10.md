@@ -1,3 +1,11 @@
+---
+title: "Odin release highlights"
+source: "https://odin-lang.org/news/newsletter-2024-10"
+tags: [OdinRAG, kb, source/newsletters, topic/allocator, topic/hot-reload, topic/raylib, topic/sokol, topic/wasm]
+type: reference
+status: active
+---
+
 ## Odin release highlights [#](#odin-release-highlights)
 
 - Replace `//+` syntax with `#+` (Used in cases like `#+build windows`)
@@ -8,18 +16,18 @@ For the rest of the many compiler changes, read the [monthly release](https://gi
 
 ## Projects shared this month [#](#projects-shared-this-month)
 
-| Project Name | Description |
-| --- | --- |
-| [atlas-builder](https://github.com/karl-zylinski/atlas-builder) | Atlas Builder |
-| [SpyPlayer](https://github.com/quonic/SpyPlayer) | SpyPlayer MP3 Player |
-| [gl-win32](https://gist.github.com/GrumpyLion/7298282a6c7e2bcab699a72806d2ca59) | OpenGL & win32 window creation |
-| [odin-html](https://git.sr.ht/~jackmordaunt/odin-html) | HTML parser |
-| [lama-odin](https://github.com/yevhen-k/llama.odin) | LLama Odin bindings |
-| [sokol-gp-odin](https://git.sr.ht/~ekliot/sokol-gp-odin) | Sokol GP odin bindings |
-| [odin-rure](https://github.com/enerqi/odin-rure) | Odin bindings for rust regex C API |
-| [odin-yyjson](https://github.com/enerqi/odin-yyjson) | Odin bindings for yyjson C library |
-| [win32-software-rendering](https://github.com/karl-zylinski/odin-win32-software-rendering) | Win32 Software Rendering in odin |
-| [simd-verlet](https://github.com/sudokit/odin-simd-verlet) | SIMD verlet integration |
+| Project Name                                                                               | Description                        |
+| ------------------------------------------------------------------------------------------ | ---------------------------------- |
+| [atlas-builder](https://github.com/karl-zylinski/atlas-builder)                            | Atlas Builder                      |
+| [SpyPlayer](https://github.com/quonic/SpyPlayer)                                           | SpyPlayer MP3 Player               |
+| [gl-win32](https://gist.github.com/GrumpyLion/7298282a6c7e2bcab699a72806d2ca59)            | OpenGL & win32 window creation     |
+| [odin-html](https://git.sr.ht/~jackmordaunt/odin-html)                                     | HTML parser                        |
+| [lama-odin](https://github.com/yevhen-k/llama.odin)                                        | LLama Odin bindings                |
+| [sokol-gp-odin](https://git.sr.ht/~ekliot/sokol-gp-odin)                                   | Sokol GP odin bindings             |
+| [odin-rure](https://github.com/enerqi/odin-rure)                                           | Odin bindings for rust regex C API |
+| [odin-yyjson](https://github.com/enerqi/odin-yyjson)                                       | Odin bindings for yyjson C library |
+| [win32-software-rendering](https://github.com/karl-zylinski/odin-win32-software-rendering) | Win32 Software Rendering in odin   |
+| [simd-verlet](https://github.com/sudokit/odin-simd-verlet)                                 | SIMD verlet integration            |
 
 ---
 
@@ -140,7 +148,8 @@ Bird_Id :: union {
     Turkey_Id,
     Goose_Id,
 }
-```odin
+```
+
 Now, let’s say I have a `Bird_Id` and I want to switch on the value and use it. The way to do it in Odin is thus:
 
 ```odin
@@ -152,7 +161,8 @@ case Turkey_Id:
 case Goose_Id:
     goose_handler(id)
 }
-```odin
+```
+
 Now, each of those `*_handler` procs takes the value `id` and the type of `id` depends on the switch case. Makes sense, but I come from F# and I would rather the name of `id` be specific to the case I’m unpacking. Something like this:
 
 ```odin
@@ -164,7 +174,8 @@ case Turkey_Id(turkey_id):
 case Goose_Id(goose_id):
     goose_handler(goose_id)
 }
-```odin
+```
+
 This is akin to how F# would do it. In each of the cases I can name the contained value according to the case of the switch statement. At the end of the day, I trust Ginger Bill. Any time I’ve had a gripe with Odin and asked, “Why is it this way?” the answer made sense. I’m guessing there is some reason he did it this way but if I could change one thing about Odin, this would be it.
 
 This is truly minor though. This barely registers on the annoyance scale compared to the insanity I have suffered with in R, C++, or .NET.
@@ -179,4 +190,4 @@ Q: Any closing remarks about your software and/or Odin?
 
 A: Odin has been a real joy and I believe I am actually more productive now than I was in F#. I am no longer fighting .NET to achieve the performance that I want. I love that Odin is “done” and I don’t have to worry about new features being added and having to constantly learn new idioms or best practices. When you have a stable foundation, it is easier to build something larger and more complex because you don’t have the ground constantly shifting under you. My hope is that Odin will remain simple.
 
->Source: https://odin-lang.org/news/newsletter-2024-10
+> Source: https://odin-lang.org/news/newsletter-2024-10

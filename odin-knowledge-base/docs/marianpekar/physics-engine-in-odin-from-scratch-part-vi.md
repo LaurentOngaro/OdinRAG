@@ -1,12 +1,21 @@
+---
+title: "Physics Engine in Odin from Scratch, Part VI"
+date: 2026-09-23
+source: "https://marianpekar.com/blog/physics-engine-in-odin-from-scratch-part-vi"
+tags: [OdinRAG, kb, source/marianpekar, topic/collision]
+type: reference
+status: active
+---
+
 # Physics Engine in Odin from Scratch, Part VI
 
 23rd September 2026 • 19 min read
 
-In the sixth part, we'll add *mass*, *friction*, and *bounciness* to our physics simulation as properties of the `Rigidbody` struct. However, that would make this part quite short, so we'll make the rigidbody optional by changing its type in the `Model` struct from `Rigidbody` to `Maybe(Rigidbody)`. `Maybe(T)` is a union that either returns a type `T` or `nil`, as you can read in [Odin Docs](https://odin-lang.org/docs/overview/#maybet).
+In the sixth part, we'll add _mass_, _friction_, and _bounciness_ to our physics simulation as properties of the `Rigidbody` struct. However, that would make this part quite short, so we'll make the rigidbody optional by changing its type in the `Model` struct from `Rigidbody` to `Maybe(Rigidbody)`. `Maybe(T)` is a union that either returns a type `T` or `nil`, as you can read in [Odin Docs](https://odin-lang.org/docs/overview/#maybet).
 
 Later, we'll make `collider` optional too, but not with `Maybe(T)`. Since `BoxCollider` is an alias for `Vector3`, representing a box, and `SphereCollider` will be an alias for `f32`, representing a sphere radius, the `Collider` union will be able to contain either a `Vector3`, `f32`, or be `nil`.
 
-Before we start talking more about *mass*, *friction*, and *bounciness*, let's first make rigidbody optional as described in the previous paragraph. Go to `model.odin` and change the type of the `rigidBody` to `Maybe(RigidBody)`.
+Before we start talking more about _mass_, _friction_, and _bounciness_, let's first make rigidbody optional as described in the previous paragraph. Go to `model.odin` and change the type of the `rigidBody` to `Maybe(RigidBody)`.
 
 ```odin
 Model :: struct {
@@ -62,8 +71,8 @@ if rb == nil do return
 Again, this won't work, and this time, it won't even compile because on the following line where we try to add force to `rb.force`, we get a compile-time error:
 
 ```odin
-physics.odin(16:5) Error: 'rb' of type '^Maybe($T=RigidBody)' has no field 'force' 
-        rb.force += force 
+physics.odin(16:5) Error: 'rb' of type '^Maybe($T=RigidBody)' has no field 'force'
+        rb.force += force
         ^^
 ```
 
@@ -80,7 +89,7 @@ ApplyPhysics :: proc(models: []Model, deltaTime: f32) {
 }
 ```
 
-In this case, instead of `.(RigidBody)` we wrote just `.?`, which is a syntactic shorthand that produces the same effect. I wanted to show you both syntaxes, but with `Maybe(T)` the `.?` might be more appropriate. Specifying the type explicitly will be important for us later, when we'll have that union of `BoxCollider` and `SphereCollider`. *Don't forget that `Maybe(T)` itself is a union*.
+In this case, instead of `.(RigidBody)` we wrote just `.?`, which is a syntactic shorthand that produces the same effect. I wanted to show you both syntaxes, but with `Maybe(T)` the `.?` might be more appropriate. Specifying the type explicitly will be important for us later, when we'll have that union of `BoxCollider` and `SphereCollider`. _Don't forget that `Maybe(T)` itself is a union_.
 
 The last fixes in the `physics.odin` file are needed in the `ApplyGravity` and `IntegrateLinearForce` procedures, but since we already checked the presence of a rigidbody in the caller, the `ApplyPhysics` procedure, we don't need to check again. Every model that is passed to `ApplyGravity` and `IntegrateLinearForce` must have a rigidbody and thus is not static.
 
@@ -104,7 +113,7 @@ Let's now hop over to the `collisions.odin` file to make similar changes. In the
 ```odin
 rba, has_rba := a.rigidBody.?
 rbb, has_rbb := b.rigidBody.?
-if (!has_rba || rba.isStatic) && (!has_rbb || rbb.isStatic) || 
+if (!has_rba || rba.isStatic) && (!has_rbb || rbb.isStatic) ||
     (a.collider.x * a.collider.y * a.collider.z < 1e-6 || b.collider.x * b.collider.y * b.collider.z < 1e-6) {
         continue
     }
@@ -251,7 +260,7 @@ CastRayFromWorldPosition :: proc(origin: Vector3, direction: Vector3, models: []
             t2 := (e - size[i]) / f
 
             if t1 > t2 {
-                t1, t2 = t2, t1 
+                t1, t2 = t2, t1
             }
 
             tMin = max(tMin, t1)
@@ -388,4 +397,4 @@ And that's it for today. If something doesn't work as expected, you can always f
 > Author: Marian Pekar - <https://marianpekar.com>
 > (c) Marian Pekar. The posts stay freely readable on the author's site; this local copy is credited in `SOURCES.md` at the repo root. Please link back to the original article.
 
->Source: https://marianpekar.com/blog/physics-engine-in-odin-from-scratch-part-vi
+> Source: https://marianpekar.com/blog/physics-engine-in-odin-from-scratch-part-vi

@@ -1,3 +1,12 @@
+---
+title: "OpenGL is not Right-Handed"
+date: 2024-11-10
+source: "https://www.gingerbill.org/article/2024/11/10/opengl-is-not-right-handed"
+tags: [OdinRAG, kb, source/gingerbill]
+type: reference
+status: active
+---
+
 # OpenGL is not Right-Handed
 
 2024-11-10
@@ -12,10 +21,10 @@ Specifically: OpenGL is **NOT** right-handed; the confusion over column-major �
 
 Let’s clear up the first point. Many people will say OpenGL uses a right-handed coordinate system. Loads of articles/tutorials will keep repeating the view that OpenGL uses a right-handed coordinate system. So the question is, why do people think this?
 
-Modern OpenGL only knows about the *Normalized Device Coordinates (NDC)*, which is treated as if it is a left-handed 3D coordinate space. This means that OpenGL “is” left-handed, not right-handed as many articles will tell you.
+Modern OpenGL only knows about the _Normalized Device Coordinates (NDC)_, which is treated as if it is a left-handed 3D coordinate space. This means that OpenGL “is” left-handed, not right-handed as many articles will tell you.
 
 The origin of “right-handed” comes from the fixed-function days, where Z entries in the functions `glOrtho` and `glFrustum` were negated, which flips the handedness. Back in those days, it forced users to pretty much had to use a right-handed world space coordinate system.
-The Z-axis flip is to convert from the *conventional* world/entity space to the left handed Normalized Device Coordinates (NDC). And modern OpenGL only knowns the NDC.
+The Z-axis flip is to convert from the _conventional_ world/entity space to the left handed Normalized Device Coordinates (NDC). And modern OpenGL only knowns the NDC.
 
 ![image](/images/proj_to_ndc.jpg)
 
@@ -53,4 +62,4 @@ It is common to write a matrix in a language like the following `float x[3][3] =
 
 The [Odin](https://odin-lang.org/) programming language has both built-in array programming (vectors & swizzling) and matrices, and as a result, this textual issue is completely removed! It even allows you to treat vectors as if they are column-vectors or row-vectors, and things will “just work”! You can even specify the memory layout of the matrices if needed too with `#column_major matrix[R, C]T` (the default) or `#row_major matrix[R, C]T`.
 
->Source: https://www.gingerbill.org/article/2024/11/10/opengl-is-not-right-handed
+> Source: https://www.gingerbill.org/article/2024/11/10/opengl-is-not-right-handed

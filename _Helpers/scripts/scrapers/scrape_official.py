@@ -50,6 +50,7 @@ from lib.http_client import (  # noqa: E402
     path_to_filename,
 )
 from lib.html2md import scrape_to_markdown  # noqa: E402
+from lib.kb_frontmatter import ensure_kb_frontmatter  # noqa: E402
 from fixes.odin_format import format_path_if_odin  # noqa: E402
 
 _DESCRIPTION = "Official Docs Scraper (odin-lang.org) - re-entrant, --force to rewrite."
@@ -133,9 +134,17 @@ def scrape_awesome() -> bool:
         status = resp.status_code if resp else "no response"
         print(f"  [ERR] awesome-odin: status={status}")
         return False
-    (OUT / "awesome-odin.md").write_text(resp.text, encoding="utf-8")
-    format_path_if_odin(OUT / "awesome-odin.md", silent=True)
-    print(f"  [+] awesome-odin.md ({len(resp.text)} chars)")
+    awesome_path = OUT / "awesome-odin.md"
+    raw_doc, _ = ensure_kb_frontmatter(
+        resp.text,
+        file_path=awesome_path,
+        source_tag="source/official",
+        source_url="https://github.com/jakubtomsu/awesome-odin",
+        title="Awesome Odin",
+    )
+    awesome_path.write_text(raw_doc, encoding="utf-8", newline="\n")
+    format_path_if_odin(awesome_path, silent=True)
+    print(f"  [+] awesome-odin.md ({len(raw_doc)} chars)")
     return True
 
 

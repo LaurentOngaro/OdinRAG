@@ -1,3 +1,12 @@
+---
+title: "Software Renderer in Odin from Scratch, Part VI"
+date: 2025-09-13
+source: "https://marianpekar.com/blog/software-renderer-in-odin-from-scratch-part-vi"
+tags: [OdinRAG, kb, source/marianpekar, topic/rendering]
+type: reference
+status: active
+---
+
 # Software Renderer in Odin from Scratch, Part VI
 
 13th September 2025 • 20 min read
@@ -8,7 +17,7 @@ However, since all pixels will have the same color, there will be no shading, an
 
 ![Render modes, from left: (1) wireframe with backface culling enabled, (2) triangles filled with a solid color, unlit mode.](/uploads/sw_rend_vi_wire_unlit_cube.png)
 
-In this part, we're also going to implement a *depth buffer*, also known as a *z-buffer*. This helps us to prevent overdrawing pixels that are closer to the camera from those that are supposed to be behind them.
+In this part, we're also going to implement a _depth buffer_, also known as a _z-buffer_. This helps us to prevent overdrawing pixels that are closer to the camera from those that are supposed to be behind them.
 
 But first, let's briefly discuss how we can fill a triangle with pixels using the Flat-Top Flat-Bottom (FTFB) rasterization technique.
 
@@ -18,7 +27,7 @@ The FTFB rasterization technique for filling triangles is named after the idea o
 
 ![](/uploads/sw_rend_vi_fttb_split.png)
 
-To split the original triangle, we first need to sort its points by their Y-coordinate. Then, we can process each of the resulting triangles like this: for every horizontal line (a.k.a. scanline), we determine the left and right edge positions on the triangle and draw pixels between them from left to right. Then we repeat the process for all scanlines, from top to bottom, until the entire triangle is filled with pixels, or, in other words, until the entire triangle is *rasterized*.
+To split the original triangle, we first need to sort its points by their Y-coordinate. Then, we can process each of the resulting triangles like this: for every horizontal line (a.k.a. scanline), we determine the left and right edge positions on the triangle and draw pixels between them from left to right. Then we repeat the process for all scanlines, from top to bottom, until the entire triangle is filled with pixels, or, in other words, until the entire triangle is _rasterized_.
 
 ![The word rasterization comes from the term raster, which refers to a rectangular grid of pixels. Rasterization, therefore, is the process of converting geometric shapes, like triangles, in our case, into their corresponding pixel representations on this grid.](/uploads/sw_rend_vi_triangle_rasterization.png)
 
@@ -26,7 +35,7 @@ This very simplified, high-level understanding of the FTFB technique should be e
 
 ## Depth Buffering
 
-Another concept we're going to cover today is the *depth buffering*, also known as the *z-buffering*. The idea is based on creating an array with one entry per screen pixel, which means its size is calculated as screen width times screen height.
+Another concept we're going to cover today is the _depth buffering_, also known as the _z-buffering_. The idea is based on creating an array with one entry per screen pixel, which means its size is calculated as screen width times screen height.
 
 Initially, each entry is set to a very large value (representing "infinite" depth) and each frame, when we're about to draw a point, we check whether its z-coordinate is smaller than the value currently stored as the corresponding entry of the depth buffer and only in that case, we draw the point and update that entry with the new z-coordinate.
 
@@ -42,25 +51,25 @@ Our sorting procedure will be quite simple, and we're going to use two neat Odin
 package main
 
 Sort :: proc {
-    SortPoints
+  SortPoints,
 }
 
 SortPoints :: proc(p1, p2, p3: ^Vector3) {
-    if p1.y > p2.y {
-        p1.x, p2.x = p2.x, p1.x
-        p1.y, p2.y = p2.y, p1.y
-        p1.z, p2.z = p2.z, p1.z
-    }
-    if p2.y > p3.y {
-        p2.x, p3.x = p3.x, p2.x
-        p2.y, p3.y = p3.y, p2.y
-        p2.z, p3.z = p3.z, p2.z
-    }
-    if p1.y > p2.y {
-        p1.x, p2.x = p2.x, p1.x
-        p1.y, p2.y = p2.y, p1.y
-        p1.z, p2.z = p2.z, p1.z
-    }
+  if p1.y > p2.y {
+    p1.x, p2.x = p2.x, p1.x
+    p1.y, p2.y = p2.y, p1.y
+    p1.z, p2.z = p2.z, p1.z
+  }
+  if p2.y > p3.y {
+    p2.x, p3.x = p3.x, p2.x
+    p2.y, p3.y = p3.y, p2.y
+    p2.z, p3.z = p3.z, p2.z
+  }
+  if p1.y > p2.y {
+    p1.x, p2.x = p2.x, p1.x
+    p1.y, p2.y = p2.y, p1.y
+    p1.z, p2.z = p2.z, p1.z
+  }
 }
 ```
 
@@ -74,7 +83,7 @@ Sort :: proc {
 }
 ```
 
-This is Odin's [explicit procedure overloading](https://odin-lang.org/docs/overview/#explicit-procedure-overloading). It might look unnecessary, since we only have one procedure, but later we'll add more procedures for sorting not just projected points, but also *vertices*, *normals*, and *UVs*.
+This is Odin's [explicit procedure overloading](https://odin-lang.org/docs/overview/#explicit-procedure-overloading). It might look unnecessary, since we only have one procedure, but later we'll add more procedures for sorting not just projected points, but also _vertices_, _normals_, and _UVs_.
 
 With procedure overloading, in `draw.odin`, we'll be able to call `Sort` with different parameters. In fact, this indirection is indeed unnecessary, but since this is a tutorial code, I saw this as a good opportunity to showcase an Odin language feature you might not know about.
 
@@ -85,14 +94,14 @@ Our `sort.odin` is complete, for now. It's time to introduce a depth buffer. Cre
 I decided to use `ZBuffer` in the code because, in our implementation, the Z-axis represents depth. In the text, however, I'll refer to it, using a more generic term, as a depth buffer.
 
 ```odin
-package main 
+package main
 
 ZBuffer :: [SCREEN_WIDTH * SCREEN_HEIGHT]f32
 
 ClearZBuffer :: proc(zBuffer: ^ZBuffer) {
-    for i in 0..<len(zBuffer) {
-        zBuffer[i] = 999_999;
-    }
+  for i in 0 ..< len(zBuffer) {
+    zBuffer[i] = 999_999
+  }
 }
 ```
 
@@ -115,10 +124,10 @@ Now we have all the utilities we need to implement another rendering pipeline in
 
 ```odin
 DrawUnlit :: proc(
-    vertices: []Vector3, 
+    vertices: []Vector3,
     triangles: []Triangle,
     projMat: Matrix4x4,
-    color: rl.Color, 
+    color: rl.Color,
     zBuffer: ^ZBuffer
 ) {
     for &tri in triangles {
@@ -175,7 +184,7 @@ With the points sorted, we can now proceed with drawing both the flat-bottom and
 
 However, if the triangle is already flat-bottom or flat-top, we want to skip the other part. That's why we wrap the rasterization of the flat-bottom triangle with a `p2.y != p1.y` check, and the flat-top with a `p3.y != p1.y` check.
 
-Let's start with drawing the flat-bottom triangle, step by step. After the check mentioned above, we need to calculate the inverse slopes *(dx/dy)* between the second and first point, and between the third and first point.
+Let's start with drawing the flat-bottom triangle, step by step. After the check mentioned above, we need to calculate the inverse slopes _(dx/dy)_ between the second and first point, and between the third and first point.
 
 ```odin
 // Draw a flat-bottom triangle
@@ -257,7 +266,7 @@ BarycentricWeights :: proc(a, b, c, p: Vector2) -> Vector3 {
 Inside the procedure, we first calculate the vectors between the triangle vertices, as well as the vectors from the point `p` to the vertices. This should be familiar by now: a simple vector subtraction can be used to find the direction from one point to another.
 
 ```odin
-ac := c - a 
+ac := c - a
 ab := b - a
 ap := p - a
 pc := c - p
@@ -306,7 +315,7 @@ Now we can finally proceed with implementing `DrawPixel`. Let’s start with its
 
 ```odin
 DrawPixel :: proc(
-    x, y: f32, 
+    x, y: f32,
     p1, p2, p3: ^Vector3,
     color: rl.Color,
     zBuffer: ^ZBuffer
@@ -344,9 +353,9 @@ denom  := alpha*p1.z + beta*p2.z + gamma*p3.z
 depth  := 1.0 / denom
 ```
 
-Remember how we calculated *inverse W* as `1.0` divided by the fourth component (W) of a point transformed to clip space in the `ProjectToScreen` procedure. Depth buffering is the reason we did this and why we kept the projected point as a `Vector3`, so we can store this `invW` as the z component of the projected points that we now use to calculate the denominator for per-pixel depth calculation.
+Remember how we calculated _inverse W_ as `1.0` divided by the fourth component (W) of a point transformed to clip space in the `ProjectToScreen` procedure. Depth buffering is the reason we did this and why we kept the projected point as a `Vector3`, so we can store this `invW` as the z component of the projected points that we now use to calculate the denominator for per-pixel depth calculation.
 
-Finally, we check if the value in our depth buffer for the corresponding screen coordinates is smaller than the calculated depth to only draw the pixel with *raylib's DrawPixel* if this is the case. **And when drawing the pixel, we mustn't forget to update the depth value in the depth buffer.**
+Finally, we check if the value in our depth buffer for the corresponding screen coordinates is smaller than the calculated depth to only draw the pixel with _raylib's DrawPixel_ if this is the case. **And when drawing the pixel, we mustn't forget to update the depth value in the depth buffer.**
 
 ```odin
 ‎ ‎ ‎ ‎ zIndex := SCREEN_WIDTH*iy + ix
@@ -387,7 +396,7 @@ switch renderMode {
 
 ## Conclusion
 
-And that's it for today. If you now compile and run the program (`odin run . -o:speed`), you should see an unlit white cube. You should still be able to move it around with the WSADQD keys, rotate it with the IJKLUO keys, and cycle through rendering modes with the left and right arrows. If it doesn't work as expected, compare your implementation with the one in the *Part 6* directory in [this GitHub repository](https://github.com/marianpekar/software-renderer-odin-tutorials).
+And that's it for today. If you now compile and run the program (`odin run . -o:speed`), you should see an unlit white cube. You should still be able to move it around with the WSADQD keys, rotate it with the IJKLUO keys, and cycle through rendering modes with the left and right arrows. If it doesn't work as expected, compare your implementation with the one in the _Part 6_ directory in [this GitHub repository](https://github.com/marianpekar/software-renderer-odin-tutorials).
 
 ## Other Parts of This Series
 
@@ -409,4 +418,4 @@ And that's it for today. If you now compile and run the program (`odin run . -o:
 > Author: Marian Pekar - <https://marianpekar.com>
 > (c) Marian Pekar. The posts stay freely readable on the author's site; this local copy is credited in `SOURCES.md` at the repo root. Please link back to the original article.
 
->Source: https://marianpekar.com/blog/software-renderer-in-odin-from-scratch-part-vi
+> Source: https://marianpekar.com/blog/software-renderer-in-odin-from-scratch-part-vi

@@ -1,3 +1,12 @@
+---
+title: "The Video That Inspired Me To Create Odin"
+date: 2024-04-04
+source: "https://www.gingerbill.org/article/2024/04/04/video-that-inspired-odin"
+tags: [OdinRAG, kb, source/gingerbill]
+type: reference
+status: active
+---
+
 # The Video That Inspired Me To Create Odin
 
 2024-04-04
@@ -50,4 +59,4 @@ This eventually lead to Odin’s [package system](https://odin-lang.org/docs/ove
 
 I highly recommend everyone to watch [this talk](https://www.youtube.com/embed/eAhWIO1Ra6M) by Sean Barrett! It was a huge inspiration for me, and just a general eye-opener for something which should have been obvious to me at the time but wasn’t.
 
->Source: https://www.gingerbill.org/article/2024/04/04/video-that-inspired-odin
+> Source: https://www.gingerbill.org/article/2024/04/04/video-that-inspired-odin

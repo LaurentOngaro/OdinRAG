@@ -1,3 +1,12 @@
+---
+title: "A Defer Statement For C++11"
+date: 2015-08-19
+source: "https://www.gingerbill.org/article/2015/08/19/defer-in-cpp"
+tags: [OdinRAG, kb, source/gingerbill]
+type: reference
+status: active
+---
+
 # A Defer Statement For C++11
 
 2015-08-19
@@ -25,7 +34,8 @@ privDefer<F> defer_func(F f) {
 #define DEFER_2(x, y) DEFER_1(x, y)
 #define DEFER_3(x)    DEFER_2(x, __COUNTER__)
 #define defer(code)   auto DEFER_3(_defer_) = defer_func([&](){code;})
-```odin
+```
+
 ## Explanation
 
 One of the most common examples for this in Go is files.
@@ -44,7 +54,8 @@ func someFunc() {
 
 	return // No need to close file explicitly
 }
-```odin
+```
+
 In C/C++, before every return, `fclose` must be called.
 
 ```odin
@@ -63,7 +74,8 @@ void some_func(void) {
 
 	fclose(file); // Have to explicit close file
 }
-```odin
+```
+
 You may say that RAII in C++ solves this issue but this would require a class wrapper. `defer` allows for the same thing as RAII but without manually creating a wrapper type. Also, `defer` conceptually links the creation with the destruction without hiding it.
 
 ## Examples In C++ Code
@@ -87,7 +99,8 @@ void some_func(void) {
 
 	// Do whatever...
 }
-```odin
+```
+
 I use this regularly within C++ code as it is very useful when dealing with C code bases.
 
 There are numerous other implementations of this too and I have linked to these below.
@@ -107,7 +120,8 @@ void another_func(void) {
 		defer (printf(" %d", i));
 	printf(" Hello");
 }
-```odin
-to return  `Hello 3 2 1 0`. However, it will return  `0 1 2 3 Hello`. I personally prefer the scope behaviour but that is just a matter of opinion.
+```
 
->Source: https://www.gingerbill.org/article/2015/08/19/defer-in-cpp
+to return `Hello 3 2 1 0`. However, it will return `0 1 2 3 Hello`. I personally prefer the scope behaviour but that is just a matter of opinion.
+
+> Source: https://www.gingerbill.org/article/2015/08/19/defer-in-cpp

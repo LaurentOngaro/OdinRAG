@@ -1,3 +1,11 @@
+---
+title: "Official Releases"
+source: "https://odin-lang.org/docs/install"
+tags: [OdinRAG, kb, source/official, topic/wasm]
+type: reference
+status: active
+---
+
 Odin is dead-simple to get started with!
 
 There are 3 main ways of getting Odin:

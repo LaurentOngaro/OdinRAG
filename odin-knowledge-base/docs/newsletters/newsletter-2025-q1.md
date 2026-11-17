@@ -1,3 +1,11 @@
+---
+title: "Odin Changes in Detail"
+source: "https://odin-lang.org/news/newsletter-2025-q1"
+tags: [OdinRAG, kb, source/newsletters, topic/entity-system, topic/hot-reload, topic/sokol, topic/binding]
+type: reference
+status: active
+---
+
 ## Odin Changes in Detail [#](#odin-changes-in-detail)
 
 ### Dynamic Literals are now disallowed [#](#dynamic-literals-are-now-disallowed)
@@ -15,7 +23,8 @@ main :: proc() {
         3 = "three",
     }
 }
-```odin
+```
+
 Now this is not supported anymore and can only be turned on explicitly through the flag `#+feature dynamic-literals` to have backwards compatibility when necessary.
 
 ### `map_entry` builtin [#](#map_entry-builtin)
@@ -85,4 +94,4 @@ Github: <https://github.com/karl-zylinski/odin-sokol-hot-reload-template>
 &amp;lt;a href=https://midnightmeat.itch.io/devil-raisd-the-storm&amp;gt;the Devil rais'd the storm by the Midnight Meat Society&amp;lt;/a&amp;gt;
 &amp;lt;a href=https://nikola-stefanov.itch.io/bogwalker&amp;gt;Bogwalker by nik1oo&amp;lt;/a&amp;gt;
 
->Source: https://odin-lang.org/news/newsletter-2025-q1
+> Source: https://odin-lang.org/news/newsletter-2025-q1

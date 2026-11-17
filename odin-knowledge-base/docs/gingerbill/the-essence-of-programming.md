@@ -1,8 +1,17 @@
+---
+title: "The Essence of Programming"
+date: 2021-02-01
+source: "https://www.gingerbill.org/article/2021/02/01/the-essence-of-programming"
+tags: [OdinRAG, kb, source/gingerbill]
+type: reference
+status: active
+---
+
 # The Essence of Programming
 
 2021-02-01
 
-One thing I have noticed a lot when a programmer is struggling to solve a problem, especially a novice, is that he is stuck worrying about the “best way” to *implement* the solution rather than actually understanding the problem he has. I believe a lot of this stems from not understanding the essence of what programming fundamentally is.
+One thing I have noticed a lot when a programmer is struggling to solve a problem, especially a novice, is that he is stuck worrying about the “best way” to _implement_ the solution rather than actually understanding the problem he has. I believe a lot of this stems from not understanding the essence of what programming fundamentally is.
 
 ## Essentially Ordered Aspects
 
@@ -21,23 +30,23 @@ Each following aspect/stage is a fulfilment of the previous, to which so stage c
 
 ### Purpose
 
-A tool by its very nature is a means to achieve a particular ends. A good tool is one that fulfils its *purpose* well, the *reason* it was made. We use and build tools for *purposes*, there is a *why* behind the tool.
+A tool by its very nature is a means to achieve a particular ends. A good tool is one that fulfils its _purpose_ well, the _reason_ it was made. We use and build tools for _purposes_, there is a _why_ behind the tool.
 
 ### Function
 
-The *function* of a tool, is the tasks that a particular means is assigned to accomplish. Using an example, the function of hammer may be described in that it used to drive nails, but in general, it hits other lesser tools (a nail being another kind of tool). The specific function of the tool is determined by the specific problem.
+The _function_ of a tool, is the tasks that a particular means is assigned to accomplish. Using an example, the function of hammer may be described in that it used to drive nails, but in general, it hits other lesser tools (a nail being another kind of tool). The specific function of the tool is determined by the specific problem.
 
-**Note:** To clarify the difference, the purpose is the *why* behind the tool and the function is the *what* behind the tool.
+**Note:** To clarify the difference, the purpose is the _why_ behind the tool and the function is the _what_ behind the tool.
 
 ### Usage
 
-A tool is *used* in a particular way by the user. The *usage* is the fulfilment of its function. Most hammers will have a place for the user to hold, its handle, and a part which it can be used to hit things, its head/face. The *usage* of a tool is restricted by what *function* that tool has.
+A tool is _used_ in a particular way by the user. The _usage_ is the fulfilment of its function. Most hammers will have a place for the user to hold, its handle, and a part which it can be used to hit things, its head/face. The _usage_ of a tool is restricted by what _function_ that tool has.
 
 ### Implementation/Form
 
-Finally, how that tool is to be *implemented* is restricted and dictated by how tool is meant to be *used*. If all of the previous aspects have been fulfilled, then the *implementation* is most of the time not complicated (especially in programming). A hammer used for bricklaying may be implemented with a wooden handle, and a flat smooth steel head.
+Finally, how that tool is to be _implemented_ is restricted and dictated by how tool is meant to be _used_. If all of the previous aspects have been fulfilled, then the _implementation_ is most of the time not complicated (especially in programming). A hammer used for bricklaying may be implemented with a wooden handle, and a flat smooth steel head.
 
-**Note:** *Aesthetics* fits under this category of implementation or form. The implementation and how it appears can be separated, but rarely is in practice. How someone implements a tool is part of the aesthetic of that specific tool. Aesthetics is usually something that is evolved and discovered through tradition and not from pure reason.
+**Note:** _Aesthetics_ fits under this category of implementation or form. The implementation and how it appears can be separated, but rarely is in practice. How someone implements a tool is part of the aesthetic of that specific tool. Aesthetics is usually something that is evolved and discovered through tradition and not from pure reason.
 
 ## The Novice’s Pitfall
 
@@ -49,7 +58,7 @@ For the vast majority of problems, especially the problems novices have, if you 
 
 When teaching novices, I have found that there are usually two different kinds of people (sometimes embodied in the same person):
 
-- Novices who are stuck worrying about how to best implement their programs, but do not actually understand what the *purpose* of the program they are trying to do
+- Novices who are stuck worrying about how to best implement their programs, but do not actually understand what the _purpose_ of the program they are trying to do
 - Novices who understand what the purpose, function, and usage, of what their program is, but do not know the tools well enough about how to implement stuff
 
 Interestingly, the former is much more common than the latter.
@@ -60,17 +69,17 @@ In the former case, it does not matter if all the tools can be taught at all if 
 
 Understanding this process of structuring your thinking of what a is tool, allows you to apply it further, and that can be applied to every aspect itself recursively. Each stage can be split up further into its own four-part structure. For example, there usually are many different ways to implement something to achieve the same ends which means understanding which one is the best compromise for the current situation.
 
-Each stage can also give feedback as to whether it is possible to fulfil the previous stage, i.e. trying to implement a particular usage may unearth the impracticability or impossibility of the usage. This does not mean the process has been reversed but rather shown that the previous aspects were not stable foundations to work upon. Understanding how something is implemented can aid a lot about *why* something is used a particular way too.
+Each stage can also give feedback as to whether it is possible to fulfil the previous stage, i.e. trying to implement a particular usage may unearth the impracticability or impossibility of the usage. This does not mean the process has been reversed but rather shown that the previous aspects were not stable foundations to work upon. Understanding how something is implemented can aid a lot about _why_ something is used a particular way too.
 
 Sometimes the implementation of something is difficult to determine, as hard problems are hard. Sometimes you cannot make a problem less complicated, but you can try to make it less complex by breaking it down into smaller problems. This is a skill that is continually learnt over many years, and not something you will ever perfect but will get better at.
 
 ### “Best Way”
 
-There is no such thing as an unqualified universal *“best way”* to solve a given problem in the abstract. And what is needed to be done is to understand the particular situations that requires one to attend to such problems. Compromise is a given, and the only way to get better is to practice, practice, practice. Abstract solutions are called algorithms, but how that algorithm is implemented depends on what it will be implemented on-the machine.
+There is no such thing as an unqualified universal _“best way”_ to solve a given problem in the abstract. And what is needed to be done is to understand the particular situations that requires one to attend to such problems. Compromise is a given, and the only way to get better is to practice, practice, practice. Abstract solutions are called algorithms, but how that algorithm is implemented depends on what it will be implemented on-the machine.
 
 For novices, it should be made clear that being taught tools (e.g algorithms, data structures, paradigms, idioms, etc), does not imply that the “correct way” to do things has been learnt. The “correct way” is heavily specific to the problem domain; this cannot be taught but only learnt through experience over many years. Actualizing abstract ideas into reality is difficult to do, even for veterans to programming.
 
-Aiming to abstract/generalize a problem is a recipe for disaster, especially for novices, because it is rarely ever the case problems are abstract/general. Most problems are particular/specific, and require knowledge of the domain of that problem. Application is should not be separated from the teaching of the topic. Try to solve the *specific* problem that is actually at hand, not a *general* problem that *might* exist
+Aiming to abstract/generalize a problem is a recipe for disaster, especially for novices, because it is rarely ever the case problems are abstract/general. Most problems are particular/specific, and require knowledge of the domain of that problem. Application is should not be separated from the teaching of the topic. Try to solve the _specific_ problem that is actually at hand, not a _general_ problem that _might_ exist
 
 https://www.gingerbill.org/article/2020/05/31/progamming-pragmatist-proverbs/. Programming is an inherently practical endeavour rather than a theoretical one. And its teaching should reflect that. Theory is important, but most programmers do not want to, nor should they, have to become mathematicians in order to understand the application of anything.
 
@@ -78,10 +87,10 @@ https://www.gingerbill.org/article/2020/05/31/progamming-pragmatist-proverbs/. P
 
 ### Process of Thinking
 
-It should be clearly noted that this ordering only works for solving known problems, it is a way of thinking about purpose-driven domains, i.e. *engineering*. This process of structuring your thinking does not apply to exploratory things such as *research* and *science*. *Science* is not a purpose-driven domain but a exploration-driven domain. There is not a “goal” to the art of science, but a continuous process of discovery. As a discipline, programming is fundamentally closer to something like carpentry than a science. Programming is a craft of solving problems on computers.
+It should be clearly noted that this ordering only works for solving known problems, it is a way of thinking about purpose-driven domains, i.e. _engineering_. This process of structuring your thinking does not apply to exploratory things such as _research_ and _science_. _Science_ is not a purpose-driven domain but a exploration-driven domain. There is not a “goal” to the art of science, but a continuous process of discovery. As a discipline, programming is fundamentally closer to something like carpentry than a science. Programming is a craft of solving problems on computers.
 
 ## Conclusion
 
 Understanding the essence of what a tool is helps us structure our thinking when solving problems. It gives us a language and process to understand why and how we approach building tools. Many novices fall into the same trap of not understanding the problem that is trying to be solved, and are too concerned about the implementation. Teaching novices how to think about solving problems is extremely important in improving and honing in the craft.
 
->Source: https://www.gingerbill.org/article/2021/02/01/the-essence-of-programming
+> Source: https://www.gingerbill.org/article/2021/02/01/the-essence-of-programming

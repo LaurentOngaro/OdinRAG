@@ -1,3 +1,12 @@
+---
+title: "Software Renderer in Odin from Scratch, Part X"
+date: 2025-11-30
+source: "https://marianpekar.com/blog/software-renderer-in-odin-from-scratch-part-x"
+tags: [OdinRAG, kb, source/marianpekar, topic/rendering]
+type: reference
+status: active
+---
+
 # Software Renderer in Odin from Scratch, Part X
 
 30th November 2025 • 30 min read
@@ -22,17 +31,13 @@ That said, open `light.odin` and add a `Vector3` position to our `Light` struct 
 package main
 
 Light :: struct {
-    position: Vector3,
-    direction: Vector3,
-    strength: f32,
+  position:  Vector3,
+  direction: Vector3,
+  strength:  f32,
 }
 
 MakeLight :: proc(position, direction: Vector3, strength: f32, viewMatrix: Matrix4x4) -> Light {
-    return { 
-        Mat4MulVec3(viewMatrix, position),
-        Vector3Normalize(direction),
-        strength
-    }
+  return {Mat4MulVec3(viewMatrix, position), Vector3Normalize(direction), strength}
 }
 ```
 
@@ -46,7 +51,7 @@ Let's open the `sort.odin` file and extend it as just described. I am not going 
 
 ```odin
 SortPointsAndVertices :: proc(
-    p1, p2, p3: ^Vector3, 
+    p1, p2, p3: ^Vector3,
     v1, v2, v3: ^Vector3,
 ) {
     if p1.y > p2.y {
@@ -63,7 +68,7 @@ SortPointsAndVertices :: proc(
         p2.z, p3.z = p3.z, p2.z
         v2.x, v3.x = v3.x, v2.x
         v2.y, v3.y = v3.y, v2.y
-        v2.z, v3.z = v3.z, v2.z    
+        v2.z, v3.z = v3.z, v2.z
     }
     if p1.y > p2.y {
         p1.x, p2.x = p2.x, p1.x
@@ -76,7 +81,7 @@ SortPointsAndVertices :: proc(
 }
 
 SortPointsUVsAndVertices :: proc(
-    p1, p2, p3: ^Vector3, 
+    p1, p2, p3: ^Vector3,
     uv1, uv2, uv3: ^Vector2,
     v1, v2, v3: ^Vector3,
 ) {
@@ -99,7 +104,7 @@ SortPointsUVsAndVertices :: proc(
         uv2.y, uv3.y = uv3.y, uv2.y
         v2.x, v3.x = v3.x, v2.x
         v2.y, v3.y = v3.y, v2.y
-        v2.z, v3.z = v3.z, v2.z    
+        v2.z, v3.z = v3.z, v2.z
     }
     if p1.y > p2.y {
         p1.x, p2.x = p2.x, p1.x
@@ -131,11 +136,11 @@ In the `draw.odin` file, we are going to start as usual by implementing a proced
 
 ```odin
 DrawPhongShaded :: proc(
-    vertices: []Vector3, 
-    triangles: []Triangle, 
-    normals: []Vector3, 
+    vertices: []Vector3,
+    triangles: []Triangle,
+    normals: []Vector3,
     light: Light,
-    color: rl.Color, 
+    color: rl.Color,
     zBuffer: ^ZBuffer,
     projMat: Matrix4x4,
     ambient:f32 = 0.1
@@ -162,7 +167,7 @@ DrawPhongShaded :: proc(
         }
 
         DrawTrianglePhongShaded(
-            &v1, &v2, &v3, 
+            &v1, &v2, &v3,
             &p1, &p2, &p3,
             &n1, &n2, &n3,
             color, light, zBuffer, ambient
@@ -207,7 +212,7 @@ DrawTrianglePhongShaded :: proc(
             for x := xStart; x <= xEnd; x += 1 {
                 DrawPixelPhongShaded(
                     x, y,
-                    v1, v2, v3, 
+                    v1, v2, v3,
                     n1, n2, n3,
                     p1, p2, p3,
                     color, light, zBuffer, ambient
@@ -232,7 +237,7 @@ DrawTrianglePhongShaded :: proc(
             for x := xStart; x <= xEnd; x += 1 {
                 DrawPixelPhongShaded(
                     x, y,
-                    v1, v2, v3, 
+                    v1, v2, v3,
                     n1, n2, n3,
                     p1, p2, p3,
                     color, light, zBuffer, ambient
@@ -332,17 +337,17 @@ Or you can follow along. We start once again by implementing a procedure we will
 
 ```odin
 DrawTexturedPhongShaded :: proc(
-    vertices: []Vector3, 
-    triangles: []Triangle, 
-    uvs: []Vector2, 
-    normals: []Vector3, 
+    vertices: []Vector3,
+    triangles: []Triangle,
+    uvs: []Vector2,
+    normals: []Vector3,
     light: Light,
-    texture: Texture, 
+    texture: Texture,
     zBuffer: ^ZBuffer,
     projMat: Matrix4x4,
     ambient:f32 = 0.2
 ) {
-    for &tri in triangles { 
+    for &tri in triangles {
         v1 := vertices[tri[0]]
         v2 := vertices[tri[1]]
         v3 := vertices[tri[2]]
@@ -368,7 +373,7 @@ DrawTexturedPhongShaded :: proc(
         }
 
         DrawTexturedTrianglePhongShaded(
-            &v1, &v2, &v3, 
+            &v1, &v2, &v3,
             &p1, &p2, &p3,
             &uv1, &uv2, &uv3,
             &n1, &n2, &n3,
@@ -390,7 +395,7 @@ DrawTexturedTrianglePhongShaded :: proc(
     light: Light,
     zBuffer: ^ZBuffer,
     ambient:f32 = 0.2
-) { 
+) {
     Sort(p1, p2, p3, uv1, uv2, uv3, v1, v2, v3)
 
     FloorXY(p1)
@@ -413,10 +418,10 @@ DrawTexturedTrianglePhongShaded :: proc(
             for x := xStart; x <= xEnd; x += 1 {
                 DrawTexelPhongShaded(
                     x, y,
-                    v1, v2, v3, 
-                    n1, n2, n3, 
-                    p1, p2, p3, 
-                    uv1, uv2, uv3, 
+                    v1, v2, v3,
+                    n1, n2, n3,
+                    p1, p2, p3,
+                    uv1, uv2, uv3,
                     texture, light, zBuffer, ambient
                 )
             }
@@ -439,10 +444,10 @@ DrawTexturedTrianglePhongShaded :: proc(
             for x := xStart; x <= xEnd; x += 1 {
                 DrawTexelPhongShaded(
                     x, y,
-                    v1, v2, v3, 
-                    n1, n2, n3, 
-                    p1, p2, p3, 
-                    uv1, uv2, uv3, 
+                    v1, v2, v3,
+                    n1, n2, n3,
+                    p1, p2, p3,
+                    uv1, uv2, uv3,
                     texture, light, zBuffer, ambient
                 )
             }
@@ -576,4 +581,4 @@ And that is it for today. During these last ten parts, we have done a lot of wor
 > Author: Marian Pekar - <https://marianpekar.com>
 > (c) Marian Pekar. The posts stay freely readable on the author's site; this local copy is credited in `SOURCES.md` at the repo root. Please link back to the original article.
 
->Source: https://marianpekar.com/blog/software-renderer-in-odin-from-scratch-part-x
+> Source: https://marianpekar.com/blog/software-renderer-in-odin-from-scratch-part-x

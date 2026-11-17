@@ -1,4 +1,12 @@
-A [Quine](https://wikipedia.org/wiki/Quine_(computing)) in [Odin](/):
+---
+title: "Quine In Odin"
+source: "https://odin-lang.org/news/quine-in-odin"
+tags: [OdinRAG, kb, source/newsletters]
+type: reference
+status: active
+---
+
+A [Quine](<https://wikipedia.org/wiki/Quine_(computing)>) in [Odin](/):
 
 ```odin
 package quine
@@ -6,7 +14,7 @@ package quine
 import "core:fmt"
 
 main :: proc() {
-	fmt.printf("%s%c%s%c;\n", s, 0x60, s, 0x60)
+  fmt.printf("%s%c%s%c;\n", s, 0x60, s, 0x60)
 }
 
 s := `package quine
@@ -17,7 +25,7 @@ main :: proc() {
 	fmt.printf("%s%c%s%c;\n", s, 0x60, s, 0x60)
 }
 
-s := `;
+s := `
 ```
 
->Source: https://odin-lang.org/news/quine-in-odin
+> Source: https://odin-lang.org/news/quine-in-odin

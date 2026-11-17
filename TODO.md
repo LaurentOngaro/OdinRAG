@@ -59,6 +59,8 @@ python _Helpers/scripts/diagnostic/audit_public_safety.py
 Some scrapers and external tools write CRLF. The working tree must stay LF on both OS, and the workspace links must match the current OS.
 
 ```bash
+python _Helpers/scripts/fixes/add_kb_frontmatter.py --check
+python _Helpers/scripts/fixes/format_kb_md.py --check
 python _Helpers/scripts/dev/normalize_eol.py --check
 python _Helpers/scripts/dev/sync_links.py --check
 ```
@@ -69,6 +71,7 @@ Local setup, run once per clone. Details in [`ACTION_PLAN.md`](ACTION_PLAN.md).
 
 ```bash
 git config core.autocrlf false
+git config core.hooksPath _Helpers/scripts/dev/hooks
 python _Helpers/scripts/dev/normalize_eol.py --apply
 python _Helpers/scripts/dev/sync_links.py --apply
 ```

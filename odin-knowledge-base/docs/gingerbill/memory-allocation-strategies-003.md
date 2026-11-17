@@ -1,3 +1,12 @@
+---
+title: "Memory Allocation Strategies - Part 3"
+date: 2019-02-15
+source: "https://www.gingerbill.org/article/2019/02/15/memory-allocation-strategies-003"
+tags: [OdinRAG, kb, source/gingerbill, topic/allocator]
+type: reference
+status: active
+---
+
 # Memory Allocation Strategies - Part 3
 
 ## Stack Allocators
@@ -8,25 +17,25 @@ Series: [Memory Allocation Strategies](/series/memory-allocation-strategies)
 
 # Stack-Like (LIFO) Allocation
 
-In the previous article, we looked at the [linear/arena allocator](/article/2019/02/08/memory-allocation-strategies-002/), which is the simplest of all memory allocators. In this article, I will cover the fixed-sized stack-like allocator. Throughout this article, I will refer to this allocator as a *stack allocator*.
+In the previous article, we looked at the [linear/arena allocator](/article/2019/02/08/memory-allocation-strategies-002/), which is the simplest of all memory allocators. In this article, I will cover the fixed-sized stack-like allocator. Throughout this article, I will refer to this allocator as a _stack allocator_.
 
-**Note:** A stack-like allocator means that the allocator acts like a data structure following the *last-in, first-out* (LIFO) principle. This has nothing to do with *the stack* or the *stack frame*.
+**Note:** A stack-like allocator means that the allocator acts like a data structure following the _last-in, first-out_ (LIFO) principle. This has nothing to do with _the stack_ or the _stack frame_.
 
 The stack allocator is the natural evolution from the arena allocator. The approach with the stack allocator is to manage memory in a stack-like fashion following the LIFO principle. Therefore, like a stack of books, if you put something on the top of the stack earlier, you need to pick that book up first before you get one underneath.
 
-As with the arena allocator, an offset into the memory block will be stored and will be moved forwards on every allocation. The difference is that the offset can also be moved backwards when memory is *freed*. With an arena, you could only free all the memory all at once.
+As with the arena allocator, an offset into the memory block will be stored and will be moved forwards on every allocation. The difference is that the offset can also be moved backwards when memory is _freed_. With an arena, you could only free all the memory all at once.
 
 ## Basic Logic
 
-As with the extended arena in the [previous article](/article/2019/02/08/memory-allocation-strategies-002/), the offset of the previous allocation needs to be tracked. This is required in order to free memory on a *per-allocation* basis. One approach is to store a *header* which stores information about that allocation. This *header* means that the allocator can know how far back it should move the offset to free that memory.
+As with the extended arena in the [previous article](/article/2019/02/08/memory-allocation-strategies-002/), the offset of the previous allocation needs to be tracked. This is required in order to free memory on a _per-allocation_ basis. One approach is to store a _header_ which stores information about that allocation. This _header_ means that the allocator can know how far back it should move the offset to free that memory.
 
 ![Stack Allocator Layout](/images/memory-allocation-strategies/stack_allocator.svg#center)
 
-To allocate some memory from the stack allocator, as with the arena allocator, it is as simple as moving the offset forward whilst accounting for the header. In [Big-O notation](https://wikipedia.org/wiki/Big_O_notation), the allocation has complexity of ***O(1)*** (constant).
+To allocate some memory from the stack allocator, as with the arena allocator, it is as simple as moving the offset forward whilst accounting for the header. In [Big-O notation](https://wikipedia.org/wiki/Big_O_notation), the allocation has complexity of _**O(1)**_ (constant).
 
 ![Stack Allocator Alloc](/images/memory-allocation-strategies/stack_allocator_alloc.svg#center)
 
-To free a block, the header that is stored before the block of memory can be read in order to move the offset backwards. In Big-O notation, the freeing of this memory has complexity of ***O(1)*** (constant).
+To free a block, the header that is stored before the block of memory can be read in order to move the offset backwards. In Big-O notation, the freeing of this memory has complexity of _**O(1)**_ (constant).
 
 ![Stack Allocator Free](/images/memory-allocation-strategies/stack_allocator_free.svg#center)
 
@@ -38,7 +47,7 @@ You may have noticed that I never actually state what to store in the allocation
 - Store the previous offset
 - Store the size of the allocation
 
-In this article, I will cover the first two approaches, the first of which I will refer to as a *loose stack* or *small stack* as it stores very little information in the header. The third approach is useful if you want to query the size of an allocation dynamically 
+In this article, I will cover the first two approaches, the first of which I will refer to as a _loose stack_ or _small stack_ as it stores very little information in the header. The third approach is useful if you want to query the size of an allocation dynamically 
 
 I rarely need this as I usually track the size of the allocation manually..
 
@@ -48,7 +57,7 @@ The stack allocator will act like an arena allocator in many regards except for 
 
 - `stack_init` initialize the stack with a pre-allocated memory buffer
 - `stack_alloc` increments the offset to indicate the current buffer offset whilst taking into account the allocation header
-- `stack_free` frees the memory passed to it and decrements the offset to *free* that memory
+- `stack_free` frees the memory passed to it and decrements the offset to _free_ that memory
 - `stack_resize` first checks to see if the allocation being resized was the previously performed allocation and if so, the same pointer will be returned and the buffer offset is changed. Otherwise, stack\_alloc will be called instead.
 - `stack_free_all` is used to free all the memory within the allocator by setting the buffer offsets to zero.
 
@@ -63,7 +72,8 @@ struct Stack {
 	size_t buf_len;
 	size_t offset;
 };
-```odin
+```
+
 The allocation header for this particular stack implementation uses an integer to encode the padding.
 
 ```odin
@@ -71,7 +81,8 @@ typedef struct Stack_Allocation_Header Stack_Allocation_Header;
 struct Stack_Allocation_Header {
 	uint8_t padding;
 };
-```odin
+```
+
 This padding stores the amount of bytes that has to be placed before the header in order to have the new allocation correctly aligned.
 
 ![Stack Allocator Header](/images/memory-allocation-strategies/stack_allocator_header.svg#center)
@@ -92,7 +103,8 @@ void stack_init(Stack *s, void *backing_buffer, size_t backing_buffer_length) {
 	s->buf_len = backing_buffer_length;
 	s->offset = 0;
 }
-```odin
+```
+
 ## Alloc
 
 Unlike an arena, a stack allocator requires a header alongside the allocation. As previously stated above, the `calc_padding_with_header` procedure is similar to the `align_forward` procedure from the previous article, however it determines how much space is needed with respect to the header and the requested alignment. In the header, the amount padding needs to be stored and the address after that header needs to be returned.
@@ -163,10 +175,11 @@ void *stack_alloc_align(Stack *s, size_t size, size_t alignment) {
 void *stack_alloc(Stack *s, size_t size) {
 	return stack_alloc_align(s, size, DEFAULT_ALIGNMENT);
 }
-```odin
+```
+
 ## Free
 
-For `stack_free`, the pointer passed needs to be checked as to whether it is valid (i.e. it was allocated by this allocator). If it is valid, this means it is possible to acquire the header of this allocation. Using a little *pointer arithmetic*, we can reset the offset to the allocation previous to the passed pointer.
+For `stack_free`, the pointer passed needs to be checked as to whether it is valid (i.e. it was allocated by this allocator). If it is valid, this means it is possible to acquire the header of this allocation. Using a little _pointer arithmetic_, we can reset the offset to the allocation previous to the passed pointer.
 
 ```odin
 void stack_free(Stack *s, void *ptr) {
@@ -195,7 +208,8 @@ void stack_free(Stack *s, void *ptr) {
 		s->offset = prev_offset;
 	}
 }
-```odin
+```
+
 ## Resize
 
 Resizing an allocation is sometimes useful in an stack allocator. As we don’t store the previous offset for this particular version, we will just reallocate new memory if there needs to be a change in allocation size 
@@ -240,7 +254,8 @@ void *stack_resize_align(Stack *s, void *ptr, size_t old_size, size_t new_size, 
 void *stack_resize(Stack *s, void *ptr, size_t old_size, size_t new_size) {
 	return stack_resize_align(s, ptr, old_size, new_size, DEFAULT_ALIGNMENT);
 }
-```odin
+```
+
 ## Free All
 
 Finally, `stack_free_all` is used to free all the memory within the allocator by setting the buffer offsets to zero. This is very useful for when you want to reset on a per cycle/frame basis. This acts identically to an arena in this case.
@@ -249,7 +264,8 @@ Finally, `stack_free_all` is used to free all the memory within the allocator by
 void stack_free_all(Stack *s) {
 	s->offset = 0;
 }
-```odin
+```
+
 # Improving the Stack Allocator
 
 This loose/small stack allocator above is already very useful but it does not enforce the LIFO principle for frees. It allows the user to free any block of memory in any order but frees everything that was allocated after it. In order to enforce the LIFO principle, data about the previous offset needs to be stored in the header and the general data structure.
@@ -266,7 +282,8 @@ struct Stack {
 	size_t prev_offset;
 	size_t curr_offset;
 };
-```odin
+```
+
 This new header is a lot larger compared to the simple padding approach 
 
 You can reduce the size of the header by using smaller integers but this does reduce the size of the allocations that can be used., but it does mean that LIFO for frees can be enforced. There only needs to be a few adjustments to the code. The resize procedure is left as an exercise for the reader.
@@ -285,7 +302,8 @@ header->padding = padding;
 header->prev_offset = s->prev_offset; // store the previous offset in the header
 
 s->offset += size;
-```odin
+```
+
 ### `stack_free`
 
 ```odin
@@ -304,15 +322,16 @@ if (prev_offset != header->prev_offset) {
 // Reset the offsets to the previous allocation
 s->curr_offset = s->prev_offset;
 s->prev_offset = header->prev_offset;
-```odin
+```
+
 # Comments and Conclusion
 
-The stack allocator is the first of many allocators that will use the concept of a *header* for allocations. In this basic form of a stack allocator, unless you want the LIFO behaviour enforced, I would personally recommend using an arena allocator with the `Temp_Arena_Memory` construct instead. However if you require something like C++’s constructors and destructors, a stack allocator will be more friendly to that framework (RAII) 
+The stack allocator is the first of many allocators that will use the concept of a _header_ for allocations. In this basic form of a stack allocator, unless you want the LIFO behaviour enforced, I would personally recommend using an arena allocator with the `Temp_Arena_Memory` construct instead. However if you require something like C++’s constructors and destructors, a stack allocator will be more friendly to that framework (RAII) 
 
 <https://wikipedia.org/wiki/Placement_syntax>.
 
 You can extend the stack allocator even further by having two different offsets: one that starts at the beginning and increments forwards, and another that starts at the end and increments backwards. This is called a double-ended stack and allows for the maximization of memory usage whilst keeping fragmentation extremely low (as long as the offset never overlap).
 
-In the next article, I will discuss *pool allocators* and how they are extremely useful for creating and destroying things in completely random order of the same size.
+In the next article, I will discuss _pool allocators_ and how they are extremely useful for creating and destroying things in completely random order of the same size.
 
->Source: https://www.gingerbill.org/article/2019/02/15/memory-allocation-strategies-003
+> Source: https://www.gingerbill.org/article/2019/02/15/memory-allocation-strategies-003

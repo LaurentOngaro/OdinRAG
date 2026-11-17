@@ -1,3 +1,12 @@
+---
+title: "Signed By Default Camp"
+date: 2026-05-03
+source: "https://www.gingerbill.org/article/2026/05/03/signed-by-default"
+tags: [OdinRAG, kb, source/gingerbill]
+type: reference
+status: active
+---
+
 # Signed By Default Camp
 
 2026-05-03
@@ -39,7 +48,8 @@ Implicit integer conversion rules can be complex or very simplistic, and differe
 a: u8  = 53
 b: u8  = 34
 c: u16 = a * b
-```odin
+```
+
 The question is: what happens to `a * b`? These are the possible approaches:
 
 0. No implicit conversions (Odin-style)
@@ -58,4 +68,4 @@ Some languages, such as Rust, treat overflowing arithmetic as a trap in debug bu
 
 A separate question is which is worse when it happens: overflow or underflow, with signed or unsigned. I’d argue that overflow is far less common than going below zero for both signed and unsigned integers. And because of this, underflow on unsigned integers is the more common bug, and more likely to cause serious problems than simply having a negative value.
 
->Source: https://www.gingerbill.org/article/2026/05/03/signed-by-default
+> Source: https://www.gingerbill.org/article/2026/05/03/signed-by-default

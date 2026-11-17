@@ -1,3 +1,11 @@
+---
+title: "Release note highlights"
+source: "https://odin-lang.org/news/newsletter-2023-04"
+tags: [OdinRAG, kb, source/newsletters, topic/collision, topic/raylib, topic/binding]
+type: reference
+status: active
+---
+
 ## Release note highlights [#](#release-note-highlights)
 
 - Add `-o:none` optimization mode (useful for `-debug` builds)
@@ -26,7 +34,7 @@ A: Well put. That’s exactly the impression I get, too.
 
 I came at all of this as a self-taught web-dev that had been frustrated over the years with my lack of understanding of computing fundamentals. Everywhere I sought hands-on knowledge, the process was made complicated by other things like high-level languages, frameworks, and philosophies like OOP, Rust-ownership, etc. Sure I could read books, but I wanted the hands-on experience, and I wanted it to be straight-forward, fun and modern. So I saw Odin as the perfect tool to help me learn on modern systems.
 
-Q: I feel that a lot of programmers try their hands at games because of the immediate and visceral feedback. You make thing A move and you know right away if you succeeded. And as the game grows there is plenty of room to become more serious about performance and learn more. Why a side scroller and not a platform, or why *this* game?
+Q: I feel that a lot of programmers try their hands at games because of the immediate and visceral feedback. You make thing A move and you know right away if you succeeded. And as the game grows there is plenty of room to become more serious about performance and learn more. Why a side scroller and not a platform, or why _this_ game?
 
 A: First, I agree entirely - the quick feedback and fun factor of programming games make it an especially good avenue to learn and grow as a programmer.
 
@@ -44,4 +52,4 @@ A: My favorite thing about Odin is its simplicity. I hope that never changes. I�
 
 As for improvements, I would like to see more learning material. Specifically, how to do various low-level things using the language. Learning the syntax and standard lib isn’t too tough - you can learn a lot from reading the source code. But I would love to see more examples of using the language to build something. Further, I would love to see Odin code to demonstrate things like Bill’s blog posts on memory allocation strategies. I think there are many programmers struggling with this sort of low-level understanding, and Odin is simple enough to be a great teaching tool.
 
->Source: https://odin-lang.org/news/newsletter-2023-04
+> Source: https://odin-lang.org/news/newsletter-2023-04

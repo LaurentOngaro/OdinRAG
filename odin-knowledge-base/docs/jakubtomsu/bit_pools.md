@@ -1,9 +1,18 @@
+---
+title: "You don't need free lists"
+date: 2026-02-20
+source: "https://jakubtomsu.github.io/posts/bit_pools"
+tags: [OdinRAG, kb, source/jakubtomsu, topic/allocator]
+type: reference
+status: active
+---
+
 # You don't need free lists
 
 2026-02-20
 
 Pool-like datastructures are incredibly practical, especially when [combined with generational handles](https://floooh.github.io/2018/06/17/handles-vs-pointers.html).
-They let you have an array of reusable item slots, but crucially all actions such as insertions, removals and lookups are *always O(1)*, including worst case! (Assuming you preallocate all buffers)
+They let you have an array of reusable item slots, but crucially all actions such as insertions, removals and lookups are _always O(1)_, including worst case! (Assuming you preallocate all buffers)
 
 The usual way to implement the slot-reuse mechanism is to store some kind of a list of currently unused slots.
 There are a bunch of different ways to implement this list, from a dumb array with slot indices, an intrusive/non-intrusive singly-linked-list.
@@ -18,8 +27,9 @@ Here’s how the datastructure internals could look like:
 4    free:   u32, // free list head
 5    max:    u32, // max used slot
 6}
-```odin
-But I have been using a very different approach lately, which is *NOT* based on any kind of free-list-like system.
+```
+
+But I have been using a very different approach lately, which is _NOT_ based on any kind of free-list-like system.
 It has a few nice performance properties:
 
 - only ~1 bit overhead per slot
@@ -47,12 +57,13 @@ Let’s start with this, though we will improve it a lot later:
 4    data:   [N]T,
 5    used:   [N/64]u64,
 6}
-```odin
+```
+
 > For the rest of this article we assume all pools store a multiple of 64 elements.
 
 This of course has a fatal flaw - once you have thousands of items, you need to search through all the individual bits.
 
-## *tzcnt* is your friend
+## _tzcnt_ is your friend
 
 It’s wasteful to search the 64 bits of each `used` field individually with something like a loop of shr+mask+branch.
 
@@ -62,9 +73,9 @@ And while a smart optimizing compiler could convert a tiny loop into a single `t
 
 > In Odin, I use a procedure called `count_trailing_zeros` from the `base:intrinsics` package, which implements this in a cross-platform way.
 
-## Searching slots with *tzcnt*
+## Searching slots with _tzcnt_
 
-All you need to do to find an empty slot in a single `u64` is to call `count_trailing_zeros(~used[index])`. We’re negating the used mask to actually *count trailing ones* (used slots) to *find the first zero* (unused) bit index.
+All you need to do to find an empty slot in a single `u64` is to call `count_trailing_zeros(~used[index])`. We’re negating the used mask to actually _count trailing ones_ (used slots) to _find the first zero_ (unused) bit index.
 
 The code could look like this:
 
@@ -80,7 +91,8 @@ The code could look like this:
  9    // Pool is full
 10    return 0, false
 11}
-```odin
+```
+
 Okay, this is quite a nice improvement, but you still have to search `N/64` u64s in the worst case.
 Can we improve this? Can we somehow quickly search among all those u64s and find one that isn’t full?
 
@@ -100,7 +112,8 @@ The actual struct ends up something like this. I’ll only implement the bit poo
 6    // 'used' array from before
 7    l0: [N / 64]u64,
 8}
-```odin
+```
+
 Each field in the L1 array stores info about 64 fields in L0. This way each `tzcnt` instruction effectively searches 4096 slots.
 
 The arrows in this illustration show the implicit mappings between the data:
@@ -119,7 +132,8 @@ data             L0               L1
 ┌──────────┐   ┌───────┐  │
 │4096..8191│◄──┤64..127│◄─┘
 └──────────┘   └───────┘
-```odin
+```
+
 ## Search
 
 This is how the code looks like. There is a loop so while the “theoretical asymptotic complexity” is still based on N.
@@ -149,8 +163,9 @@ In practice, the N is either quite small so this loop is taken only a few times,
 21
 22    return -1, false // Pool is full
 23}
-```odin
-As you can see this has a nice “front loading” property, where it always allocates slots with the lowest index first. This is *great* for memory locality, especially in burst-like slot allocation patterns.
+```
+
+As you can see this has a nice “front loading” property, where it always allocates slots with the lowest index first. This is _great_ for memory locality, especially in burst-like slot allocation patterns.
 A regular list-based pool would scatter the values all across the pool!
 
 The generated code also looks reasonably nice, LLVM can unroll the loop in many cases and even collapse it.
@@ -162,7 +177,7 @@ A full implementation is on [Github](https://github.com/jakubtomsu/raven/blob/ma
 
 ## More levels
 
-If your **N** gets *significantly* larger than 4096, you could trivially add more levels. It’s still all O(1) in every case. The only reason I don’t do this is because my pools tend to be relatively small, tens of thousands of items at most.
+If your **N** gets _significantly_ larger than 4096, you could trivially add more levels. It’s still all O(1) in every case. The only reason I don’t do this is because my pools tend to be relatively small, tens of thousands of items at most.
 
 For example, if you added `l2` bit array, a single `tzcnt` instruction would effectively search 64^3 (262144) slots. That is a lot of slots.
 
@@ -189,7 +204,8 @@ I quite enjoy keeping datastructures simple, instead of wrapping everything in m
 12    used:       Bit_Pool(MAX_FOOS),
 13    batches:    [MAX_FOOS / 64]Foo_Batch,
 14}
-```odin
+```
+
 Explaining this in more detail is out of scope for this article, but I’ll leave this here just as a vague idea for inspiration.
 
 ## Possibly atomic?
@@ -213,4 +229,4 @@ Jakub
 
 > 2026-02-23: Typo fixes, demo
 
->Source: https://jakubtomsu.github.io/posts/bit_pools
+> Source: https://jakubtomsu.github.io/posts/bit_pools

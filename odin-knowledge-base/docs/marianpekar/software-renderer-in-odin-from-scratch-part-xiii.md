@@ -1,3 +1,12 @@
+---
+title: "Software Renderer in Odin from Scratch, Part XIII"
+date: 2026-02-26
+source: "https://marianpekar.com/blog/software-renderer-in-odin-from-scratch-part-xiii"
+tags: [OdinRAG, kb, source/marianpekar, topic/rendering]
+type: reference
+status: active
+---
+
 # Software Renderer in Odin from Scratch, Part XIII
 
 26th February 2026 • 18 min read
@@ -18,17 +27,13 @@ Let's start in the `light.odin` file you have already opened and replace the `st
 package main
 
 Light :: struct {
-    position: Vector3,
-    direction: Vector3,
-    color: Vector4,
+  position:  Vector3,
+  direction: Vector3,
+  color:     Vector4,
 }
 
 MakeLight :: proc(position, direction: Vector3, color: Vector4, viewMatrix: Matrix4x4) -> Light {
-    return { 
-        Mat4MulVec3(viewMatrix, position), 
-        Vector3Normalize(direction), 
-        color
-    }
+  return {Mat4MulVec3(viewMatrix, position), Vector3Normalize(direction), color}
 }
 ```
 
@@ -42,19 +47,19 @@ Let's start with the `DrawFlatShaded` procedure. This is the simplest change; we
 
 ```odin
 DrawFlatShaded :: proc(
-    vertices: []Vector3, 
+    vertices: []Vector3,
     triangles: []Triangle,
     projMat: Matrix4x4,
     projType: ProjectionType,
-    lights: []Light, 
-    color: rl.Color, 
+    lights: []Light,
+    color: rl.Color,
     zBuffer: ^ZBuffer,
     image: ^rl.Image,
     ambient: Vector3
 )
 ```
 
-Inside the procedure, we're now going to remove the `intensity,` and instead, we're going to define a new variable for *accumulated light*, `lightAccum`, that we initialize using the `ambient` light. Then, inside a for loop over all lights, we're going to add to each color channel of `lightAccum`, the result of the respective color channel from each light multiplied by `diffuse`, that is, the color of the entire triangle calculated for flat shading as before, but now we calculate it for each light. We also multiply each color channel by the alpha channel of the light, the 4th component, since we decided to pack the strength of our light there.
+Inside the procedure, we're now going to remove the `intensity,` and instead, we're going to define a new variable for _accumulated light_, `lightAccum`, that we initialize using the `ambient` light. Then, inside a for loop over all lights, we're going to add to each color channel of `lightAccum`, the result of the respective color channel from each light multiplied by `diffuse`, that is, the color of the entire triangle calculated for flat shading as before, but now we calculate it for each light. We also multiply each color channel by the alpha channel of the light, the 4th component, since we decided to pack the strength of our light there.
 
 ```odin
 lightAccum := ambient
@@ -148,7 +153,7 @@ DrawTrianglePhongShaded :: proc(
 
     DrawPixelPhongShaded(
         x, y,
-        v1, v2, v3, 
+        v1, v2, v3,
         n1, n2, n3,
         p1, p2, p3,
         color, lights, zBuffer, image, ambient
@@ -158,7 +163,7 @@ DrawTrianglePhongShaded :: proc(
 
     DrawPixelPhongShaded(
         x, y,
-        v1, v2, v3, 
+        v1, v2, v3,
         n1, n2, n3,
         p1, p2, p3,
         color, lights, zBuffer, image, ambient
@@ -172,11 +177,11 @@ And `DrawPhongShaded`, our entry procedure for this pipeline, which we call from
 
 ```odin
 DrawPhongShaded :: proc(
-    vertices: []Vector3, 
-    triangles: []Triangle, 
-    normals: []Vector3, 
+    vertices: []Vector3,
+    triangles: []Triangle,
+    normals: []Vector3,
     lights: []Light,
-    color: rl.Color, 
+    color: rl.Color,
     zBuffer: ^ZBuffer,
     projMat: Matrix4x4,
     projType: ProjectionType,
@@ -187,7 +192,7 @@ DrawPhongShaded :: proc(
     // Here's the rest of the procedure that remains unchanged.
 
     DrawTrianglePhongShaded(
-        &v1, &v2, &v3, 
+        &v1, &v2, &v3,
         &p1, &p2, &p3,
         &n1, &n2, &n3,
         color, lights, zBuffer, image, ambient
@@ -237,8 +242,8 @@ DrawTexturedTriangleFlatShaded :: proc(
 
     DrawTexelFlatShaded(
         x, y,
-        p1, p2, p3, 
-        uv1, uv2, uv3, 
+        p1, p2, p3,
+        uv1, uv2, uv3,
         texture, light, zBuffer, image
     )
 
@@ -246,8 +251,8 @@ DrawTexturedTriangleFlatShaded :: proc(
 
     DrawTexelFlatShaded(
         x, y,
-        p1, p2, p3, 
-        uv1, uv2, uv3, 
+        p1, p2, p3,
+        uv1, uv2, uv3,
         texture, light, zBuffer, image
     )
 
@@ -259,11 +264,11 @@ And the last change for this rendering pipeline needs to be done in its entry pr
 
 ```odin
 DrawTexturedFlatShaded :: proc(
-    vertices: []Vector3, 
-    triangles: []Triangle, 
-    uvs: []Vector2, 
-    lights: []Light, 
-    texture: Texture, 
+    vertices: []Vector3,
+    triangles: []Triangle,
+    uvs: []Vector2,
+    lights: []Light,
+    texture: Texture,
     zBuffer: ^ZBuffer,
     projMat: Matrix4x4,
     projType: ProjectionType,
@@ -347,16 +352,16 @@ DrawTexturedTrianglePhongShaded :: proc(
     zBuffer: ^ZBuffer,
     image: ^rl.Image,
     ambient: Vector3
-) { 
+) {
 
     // Here's the rest of the procedure that remains unchanged.
 
     DrawTexelPhongShaded(
         x, y,
-        v1, v2, v3, 
-        n1, n2, n3, 
-        p1, p2, p3, 
-        uv1, uv2, uv3, 
+        v1, v2, v3,
+        n1, n2, n3,
+        p1, p2, p3,
+        uv1, uv2, uv3,
         texture, lights, zBuffer, image, ambient
     )
 
@@ -364,10 +369,10 @@ DrawTexturedTrianglePhongShaded :: proc(
 
     DrawTexelPhongShaded(
         x, y,
-        v1, v2, v3, 
-        n1, n2, n3, 
-        p1, p2, p3, 
-        uv1, uv2, uv3, 
+        v1, v2, v3,
+        n1, n2, n3,
+        p1, p2, p3,
+        uv1, uv2, uv3,
         texture, lights, zBuffer, image, ambient
     )
 
@@ -379,12 +384,12 @@ In our entry procedure for this pipeline, we just need to once again replace `li
 
 ```odin
 DrawTexturedPhongShaded :: proc(
-    vertices: []Vector3, 
-    triangles: []Triangle, 
-    uvs: []Vector2, 
-    normals: []Vector3, 
+    vertices: []Vector3,
+    triangles: []Triangle,
+    uvs: []Vector2,
+    normals: []Vector3,
     lights: []Light,
-    texture: Texture, 
+    texture: Texture,
     zBuffer: ^ZBuffer,
     projMat: Matrix4x4,
     projType: ProjectionType,
@@ -396,7 +401,7 @@ DrawTexturedPhongShaded :: proc(
         // Here's the rest of the procedure that remains unchanged.
 
         DrawTexturedTrianglePhongShaded(
-            &v1, &v2, &v3, 
+            &v1, &v2, &v3,
             &p1, &p2, &p3,
             &uv1, &uv2, &uv3,
             &n1, &n2, &n3,
@@ -464,4 +469,4 @@ If something doesn't work as expected, you can always compare your version with 
 > Author: Marian Pekar - <https://marianpekar.com>
 > (c) Marian Pekar. The posts stay freely readable on the author's site; this local copy is credited in `SOURCES.md` at the repo root. Please link back to the original article.
 
->Source: https://marianpekar.com/blog/software-renderer-in-odin-from-scratch-part-xiii
+> Source: https://marianpekar.com/blog/software-renderer-in-odin-from-scratch-part-xiii

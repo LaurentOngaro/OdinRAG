@@ -1,3 +1,12 @@
+---
+title: "Dungeon of Quake Alpha"
+date: 2022-03-24
+source: "https://jakubtomsu.github.io/posts/dungeon-of-quake-alpha"
+tags: [OdinRAG, kb, source/jakubtomsu, topic/raylib]
+type: reference
+status: active
+---
+
 # Dungeon of Quake Alpha
 
 2022-03-24
@@ -25,4 +34,4 @@ DQMake is a super-simple tool for editing DoQ maps.
 
 ![screenshot](/dqmake_screenshot1.png)
 
->Source: https://jakubtomsu.github.io/posts/dungeon-of-quake-alpha
+> Source: https://jakubtomsu.github.io/posts/dungeon-of-quake-alpha

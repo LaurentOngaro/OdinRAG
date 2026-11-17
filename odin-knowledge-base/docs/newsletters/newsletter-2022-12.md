@@ -1,3 +1,11 @@
+---
+title: "Release note highlights"
+source: "https://odin-lang.org/news/newsletter-2022-12"
+tags: [OdinRAG, kb, source/newsletters, topic/allocator, topic/dod, topic/wasm]
+type: reference
+status: active
+---
+
 ## Release note highlights [#](#release-note-highlights)
 
 - New `map` implementation is that high performance, cache-friendly, and uses a open-addressed Robin Hood hash map data structure with various optimizations for Odin
@@ -19,7 +27,7 @@ For prototyping, having hashmaps, dynamic arrays, and generics on hand is a majo
 
 Q: And now you’re using it to develop a very impressive piece of kit. Can you tell us something about what prompted you to write `spall`, and why Odin was the right fit?
 
-A: `Spall` was written on a whim. [Ben Visness of Handmade Network](https://handmade.network/m/bvisness) fame asked around for a replacement for the soon-to-be-deprecated `chrome://tracing`, and I thought it sounded like a fun little project to tackle. `chrome://tracing` is a browser-based profiler, so I had to play on its terms (at least to start). I chose Odin because it had reasonable [WASM](https://webassembly.org) support, and was relatively painless to get up and running (after knocking out a few little issues here or there). Odin’s custom allocator support turned out to be a *critical* feature, making spall fast and lightweight with WASM’s low-memory footprint, high allocation-cost constraints.
+A: `Spall` was written on a whim. [Ben Visness of Handmade Network](https://handmade.network/m/bvisness) fame asked around for a replacement for the soon-to-be-deprecated `chrome://tracing`, and I thought it sounded like a fun little project to tackle. `chrome://tracing` is a browser-based profiler, so I had to play on its terms (at least to start). I chose Odin because it had reasonable [WASM](https://webassembly.org) support, and was relatively painless to get up and running (after knocking out a few little issues here or there). Odin’s custom allocator support turned out to be a _critical_ feature, making spall fast and lightweight with WASM’s low-memory footprint, high allocation-cost constraints.
 
 Q: You’ve run into some problems with WASM as a target, namely memory limits and file I/O. Is there something Odin can do here, or are these inherent platform-specific issues?
 
@@ -61,4 +69,4 @@ Q: Was there anything you wanted to say about Odin or spall in addition to this?
 
 A: The community is very responsive, and happy to answer questions if you run into issues! I highly encourage newbies to check out the discord, and ask questions when they run into problems with the language. It helps us a ton, figuring out where the documentation needs the most work, and if it gets you unstuck and on the road to a happy Odin user, it’s a major win-win.
 
->Source: https://odin-lang.org/news/newsletter-2022-12
+> Source: https://odin-lang.org/news/newsletter-2022-12

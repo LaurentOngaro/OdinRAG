@@ -1,3 +1,11 @@
+---
+title: "Installing Odin"
+source: "https://odin-lang.org/docs/demo"
+tags: [OdinRAG, kb, source/official, topic/dod]
+type: reference
+status: active
+---
+
 Source: [demo.odin](https://github.com/odin-lang/Odin/blob/master/examples/demo/demo.odin)
 
 The original demonstration of the Odin in a single file, including numerous examples of concepts and features of the programming language.

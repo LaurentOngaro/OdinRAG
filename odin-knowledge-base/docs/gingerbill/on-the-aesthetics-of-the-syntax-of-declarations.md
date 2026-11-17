@@ -1,3 +1,12 @@
+---
+title: "On the Aesthetics of the Syntax of Declarations"
+date: 2018-03-12
+source: "https://www.gingerbill.org/article/2018/03/12/on-the-aesthetics-of-the-syntax-of-declarations"
+tags: [OdinRAG, kb, source/gingerbill]
+type: reference
+status: active
+---
+
 # On the Aesthetics of the Syntax of Declarations
 
 2018-03-12
@@ -43,7 +52,8 @@ foreign my_lib {
     some_var: i32;
     amazing_foo :: proc "c" (a, b: i32, c: f32) -> rawptr ---;
 }
-```odin
+```
+
 There are two reasons for this conflict that I have between qualifier-focused and name-focused. The first is that name-focused is elegant and terse to write compared to qualifier-focused. The second is the “ugliness” of qualifier-focused with conjunction with other forms of statements.
 
 Qualifier-focused looks “ugly” when it is combined with control statements:
@@ -51,13 +61,15 @@ Qualifier-focused looks “ugly” when it is combined with control statements:
 ```odin
 for var x = 0; x < 10; x += 1 {
 }
-```odin
+```
+
 The two keywords together in the `for var` block looks “dense and wrong” to me and makes reading the construct much more difficult. However, placing an open parenthesis in between the keywords reduces some of this “density”:
 
 ```odin
 for (var x = 0; x < 10; x += 1) {
 }
-```odin
+```
+
 It does look slightly better but it is still “dense”. These parentheses make it less “ugly” for some reason and it’s not self apparent as to why the separation between the two words by punctuation improves matters.
 
 This is probably a reason as to why Go uses the `:=` operator, especially in this case:
@@ -67,9 +79,10 @@ for x := 0; x < 10; x += 1 {
 }
 for idx, val := range array {
 }
-```odin
+```
+
 `:=` is a pragmatic solution to this aesthetic problem with the qualifier-focused `var`. However, this is not to say that the `:=` operator is great. In Go, it has extra semantics to make Go feel more like a “dynamic language” (variables will be shadowed with `:=`). Even if you had both `var` and `:=`, and that they did the exact same thing, it does beg the question: why have two things that do exactly the same thing?
 
 I have been researching the topic of syntax in language design for a long time now. It’s been an interesting topic and I think I should actually write most of my findings. I hope this condensed explanation of the issues with regards to declaration syntax has aided others as to my predicament.
 
->Source: https://www.gingerbill.org/article/2018/03/12/on-the-aesthetics-of-the-syntax-of-declarations
+> Source: https://www.gingerbill.org/article/2018/03/12/on-the-aesthetics-of-the-syntax-of-declarations

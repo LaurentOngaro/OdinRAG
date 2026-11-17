@@ -60,6 +60,10 @@ jobs:
             --scope branch \
             --verbose
 
+      - name: Run repository unit tests
+        run: |
+          python -m unittest discover -s _Helpers/tests -v
+
       - name: Summary
         if: always()
         run: |

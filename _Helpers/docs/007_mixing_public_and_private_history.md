@@ -120,7 +120,7 @@ And put the precise personal patterns in `.git/info/exclude`:
 /odin-knowledge-base/docs/karl_zylinski/odin-book/
 ```
 
-Adapt the patterns to your own private folders. Keep them in sync with `FORBIDDEN_PATTERNS` in `audit_public_safety.py` and `STRIP_RULES` in `publish_public.py` - three places to update when the set of personal paths changes. The personal projects exposed under `code/projects/` are declared once in [`_Helpers/links.jsonc`](links.jsonc) and never tracked by git: see [`009_cross_platform_links.md`](009_cross_platform_links.md).
+Adapt the local ignore patterns to your own personal project links. Do **not** ignore `odin-knowledge-base/courses/` or `odin-book/` in `.git/info/exclude` once they are tracked on `main`, or new scraped lessons become invisible to `git status`. The authoritative strip/audit rules live once in [`_Helpers/config/private_paths.jsonc`](../config/private_paths.jsonc) (consumed by both `audit_public_safety.py` and `publish_public.py`), plus `_Helpers/scripts/dev/hooks/pre-push`. The personal projects exposed under `code/projects/` are declared once in [`_Helpers/links.jsonc`](../links.jsonc) and never tracked by git: see [`009_cross_platform_links.md`](009_cross_platform_links.md).
 
 ## Step 3 - import personal content under the override
 
@@ -197,6 +197,7 @@ git filter-branch -f \
   --index-filter 'sh -c '"'"'
     git rm --cached -r --ignore-unmatch code/projects/PVG03_RPG
     git rm --cached -r --ignore-unmatch _Private
+    git rm --cached -r --ignore-unmatch _Archives
     git rm --cached -r --ignore-unmatch odin-knowledge-base/courses
     git rm --cached -r --ignore-unmatch odin-knowledge-base/docs/karl_zylinski/odin-book
   '"'"' \
@@ -221,53 +222,21 @@ Verify the tree sent is what you expect:
 git ls-tree -r public --name-only | head -20
 ```
 
-You should see nothing starting with `_Private/`, nothing under `code/projects/<your-project>`, and no `odin-knowledge-base/courses/` files.
+You should see nothing starting with `_Private/` or `_Archives/`, nothing under `code/projects/<your-project>`, and no `odin-knowledge-base/courses/` files.
 
 ### Why filter-branch and not filter-repo
 
 `git filter-repo` is the modern, faster, safer replacement recommended by upstream. It is a separate Python tool (`pip install git-filter-repo`) and not bundled with `git`. Until filter-repo is a dependency of this repo, we rely on filter-branch. The migration is mechanical when the time comes - see [Trade-offs](#trade-offs).
 
-## Step 5 - install the pre-push hook
+## Step 5 - configure the pre-push hook
 
-Save the script below as `.git/hooks/pre-push` (no extension). On git for Windows the executable bit is set automatically when the file has a shebang; on Unix run `chmod +x .git/hooks/pre-push`.
+Point Git directly at the versioned hook directory (prevents drift across machines; no manual copy needed):
 
 ```bash
-#!/usr/bin/env bash
-# Pre-push hook: refuses pushes to the `public` remote that contain personal paths.
-# See _Helpers/docs/007_mixing_public_and_private_history.md for the full workflow.
-
-set -euo pipefail
-
-remote="$1"
-
-# Only enforce on the public remote.
-if [ "$remote" != "public" ]; then
-  exit 0
-fi
-
-# Personal patterns anchored at repo root. MUST stay in sync with publish_public.py STRIP_RULES and audit_public_safety.py FORBIDDEN_PATTERNS.
-# `code/projects/[^/]+/` covers every personal project folder without matching the README that lives in code/projects/.
-personal_pattern='^(code/projects/[^/]+/|_Private/|odin-knowledge-base/courses/|odin-knowledge-base/docs/karl_zylinski/odin-book/)'
-
-while read -r local_ref _remote_ref; do
-  if [ -z "$local_ref" ]; then
-    continue
-  fi
-
-  diff_output="$(git diff --name-only "public-orphan..$local_ref" 2>/dev/null || true)"
-
-  if echo "$diff_output" | grep -qE "$personal_pattern"; then
-    echo "Refusing push to public remote: personal paths detected in $local_ref." >&2
-    echo "Push that branch to the 'private' remote, not 'public'." >&2
-    echo "" >&2
-    echo "Offending paths:" >&2
-    echo "$diff_output" | grep -E "$personal_pattern" >&2
-    exit 1
-  fi
-done
-
-exit 0
+git config --local core.hooksPath _Helpers/scripts/dev/hooks
 ```
+
+The versioned hook at [`_Helpers/scripts/dev/hooks/pre-push`](../scripts/dev/hooks/pre-push) enforces `git fetch` before push and blocks any push to `public` containing `_Archives/`, `_Private/` (at any depth), `code/projects/<project>/`, `courses/`, or `odin-book/`. On Unix, keep its executable bit set (`chmod +x`).
 
 To test without risking a real push:
 
@@ -302,7 +271,7 @@ Exit codes:
 - `1` - forbidden paths found. Re-run `publish_public.py --check` if it's a branch issue, or update `.gitignore` / `.git/info/exclude` if it's a tree issue.
 - `2` - git missing, branch absent, etc.
 
-The script's `FORBIDDEN_PATTERNS` list drives both the audit scan and the inline display. Keep it in sync with the `personal_pattern` regex in the hook and the `STRIP_RULES` list in `publish_public.py`.
+The script's rules are loaded from [`_Helpers/config/private_paths.jsonc`](../config/private_paths.jsonc) (merged with `"scope": "private"` links in `_Helpers/links.jsonc`) and shared with `publish_public.py`. Keep `_Helpers/scripts/dev/hooks/pre-push` aligned with it (verified automatically by `_Helpers/tests/test_public_safety.py`).
 
 ## Step 7 - CI: GitHub Action for paranoid double-check
 
@@ -401,7 +370,8 @@ After completing all steps you will have touched these files (paths are repo-roo
 | `refs/heads/main`                                    | full history, the local source of truth             | yes        |
 | `refs/heads/public-orphan`                           | empty anchor for `public-orphan..<ref>` diff checks | yes        |
 | `refs/heads/public`                                  | filter-branch output, pushed to the public remote   | yes        |
-| `.git/hooks/pre-push`                                | refuses main -> public pushes                       | NO (local) |
+| `_Helpers/config/private_paths.jsonc`                | single source of truth for private/stripped paths   | yes        |
+| `_Helpers/scripts/dev/hooks/pre-push`                | refuses main -> public pushes (`core.hooksPath`)    | yes        |
 | `_Helpers/scripts/diagnostic/audit_public_safety.py` | `--scope tree/branch/both`, lint-clean              | yes        |
 | `_Helpers/scripts/diagnostic/publish_public.py`      | idempotent wrapper, lint-clean                      | yes        |
 | `.github/workflows/public_safety.yml`                | CI re-runs audit on push + PR                       | yes        |

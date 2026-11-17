@@ -1,10 +1,19 @@
+---
+title: "Software Renderer in Odin from Scratch, Part IV"
+date: 2025-07-04
+source: "https://marianpekar.com/blog/software-renderer-in-odin-from-scratch-part-iv"
+tags: [OdinRAG, kb, source/marianpekar, topic/rendering]
+type: reference
+status: active
+---
+
 # Software Renderer in Odin from Scratch, Part IV
 
 4th July 2025 • 12 min read
 
 In the previous two parts, we covered a lot of mathematics and learned how to use matrices to transform points in space. But where are we going to get those points from? That’s the topic of this part, where we’ll focus rather on data than on mathematics and algorithms.
 
-A mesh typically consists of *vertices*, these are simply 3D coordinates of points relative to the origin of a mesh, *normals*, which are 3D vectors defining the direction a face is… well, facing, and *UVs*, which are 2D vectors used for each face to determine which part of a texture image should be rendered on that face, and the faces themselves, they put this all together since they are a set of indices to their corresponding vertices, normals, and UVs. But don’t worry if this feels disconnected right now (pun not intended), we’re going to cover all of this step by step in more detail.
+A mesh typically consists of _vertices_, these are simply 3D coordinates of points relative to the origin of a mesh, _normals_, which are 3D vectors defining the direction a face is… well, facing, and _UVs_, which are 2D vectors used for each face to determine which part of a texture image should be rendered on that face, and the faces themselves, they put this all together since they are a set of indices to their corresponding vertices, normals, and UVs. But don’t worry if this feels disconnected right now (pun not intended), we’re going to cover all of this step by step in more detail.
 
 At the end of this part, we also implement the `mesh.odin` file with the `MakeCube` procedure, where we hardcode data of a cube mesh, so in the next part, we’ll finally be able to render something more interesting on the screen than just a solid background with a few disconnected pixels. Later, we’ll write a loader for reading meshes from `.obj` files, but until then, our `MakeCube` procedure will provide all we need to continue working on our software renderer.
 
@@ -26,7 +35,7 @@ And similarly, we’d define the five remaining faces. But here’s the catch: l
 
 ![Fun fact: The model included in Blender since version 2.25 was created by Willem-Paul van Overbruggen (SLiD3), who named it Suzanne after the orangutan in the Kevin Smith film Jay and Silent Bob Strike Back (2001).](/uploads/sw_rend_iv_suzzane.png)
 
-Did you notice something about its faces? That’s right, it’s all triangles! You can model any object using triangles, and the more triangles you can have, the more detailed your model can be. On the other hand, more triangles mean more data to process and thus, in our case, more work for the CPU, since we're implementing a *software* renderer.
+Did you notice something about its faces? That’s right, it’s all triangles! You can model any object using triangles, and the more triangles you can have, the more detailed your model can be. On the other hand, more triangles mean more data to process and thus, in our case, more work for the CPU, since we're implementing a _software_ renderer.
 
 Let’s get back to our cube and, instead of using quads, define its faces as a set of triangles. We’re not going to add more points, but our array of faces will have 12 triangles instead of 6 quads, since we’re cutting each quad diagonally.
 
@@ -34,7 +43,7 @@ Let’s get back to our cube and, instead of using quads, define its faces as a 
 
 A triangle with indices `0`, `5`, and `4` corresponds to the points with coordinates `[-1,+1,-1]`, `[+1,+1,+1]`, and `[-1,+1,+1]` respectively.
 
-But there will be more data associated with a face than just a set of three vertices. We’re also going to store, for each vertex, a vector called a *normal*, which we’ll use later to determine whether the face is pointing toward the camera, so we can skip rendering faces that are facing away. This process is called backface culling. And if you scroll up and look again at the wireframe render of the Suzanne model, you can see it was applied there. You see no triangles from the back of her head, right?
+But there will be more data associated with a face than just a set of three vertices. We’re also going to store, for each vertex, a vector called a _normal_, which we’ll use later to determine whether the face is pointing toward the camera, so we can skip rendering faces that are facing away. This process is called backface culling. And if you scroll up and look again at the wireframe render of the Suzanne model, you can see it was applied there. You see no triangles from the back of her head, right?
 
 Normals will also help us compute Phong shading, which is why we store them per vertex rather than using a single normal for an entire face. However, in our cube, all three vertices of each face will share the same normal. This will make more sense once we get to the part where we implement both flat and Phong shading, and especially when we start working with a more complex model loaded from an .obj file.
 
@@ -58,7 +67,7 @@ package main
 Triangle :: [9]int
 ```
 
-I’ve been using the terms *face* and *triangle* interchangeably. However, a mesh can actually have polygonal faces with more than 3 vertices, in other words: the N-gons with N bigger than 3, and the [OBJ format](https://en.wikipedia.org/wiki/Wavefront_.obj_file) supports this. However, if you work with such meshes, you’ll need to divide these faces into triangles in your pipeline before rasterization anyway. In the later parts of this series, you’ll see why.
+I’ve been using the terms _face_ and _triangle_ interchangeably. However, a mesh can actually have polygonal faces with more than 3 vertices, in other words: the N-gons with N bigger than 3, and the [OBJ format](https://en.wikipedia.org/wiki/Wavefront_.obj_file) supports this. However, if you work with such meshes, you’ll need to divide these faces into triangles in your pipeline before rasterization anyway. In the later parts of this series, you’ll see why.
 
 For simplicity, I decided to skip this step and implement the renderer that assumes the meshes are already triangulated, and the majority of 3D authoring software allows you to export meshes with triangulated faces.
 
@@ -66,7 +75,7 @@ For simplicity, I decided to skip this step and implement the renderer that assu
 
 Now, let’s define a struct called `Mesh`, with slices of `Vector3` for vertices and normals, a `Vector2` slice for UVs, and a slice of `[9]int` arrays for triangles, we’ve just defined an alias of, so we can increase clarity of our code using, for example, `[]Triangle` instead of `[][9]int`.
 
-If you’re not familiar with the concept of slices in Odin, I highly recommend that you read this chapter of the *Odin by Example* written by the creator of the Odin language, Ginger Bill: [Arrays, Slices, and Vectors](https://gingerbill.gitbooks.io/odin-by-example/content/primitives/arrays-slices-and-vectors.html), before moving on.
+If you’re not familiar with the concept of slices in Odin, I highly recommend that you read this chapter of the _Odin by Example_ written by the creator of the Odin language, Ginger Bill: [Arrays, Slices, and Vectors](https://gingerbill.gitbooks.io/odin-by-example/content/primitives/arrays-slices-and-vectors.html), before moving on.
 
 ```odin
 Mesh :: struct {
@@ -75,7 +84,7 @@ Mesh :: struct {
     vertices: []Vector3,
     normals: []Vector3,
     uvs: []Vector2,
-    triangles: []Triangle, 
+    triangles: []Triangle,
 }
 ```
 
@@ -144,7 +153,7 @@ triangles[10] = Triangle{5, 7, 0,  0, 1, 2,  5, 5, 5}
 triangles[11] = Triangle{5, 0, 3,  0, 2, 3,  5, 5, 5}
 ```
 
-Notice how the values are really nothing more than *indices* pointing to items of the previously defined slices. The first three are pointing to vertices, the next three to normals corresponding to those vertices in the respective order, and the last three are for the UVs. With all that, we can return a new mesh from our `MakeCube` factory procedure:
+Notice how the values are really nothing more than _indices_ pointing to items of the previously defined slices. The first three are pointing to vertices, the next three to normals corresponding to those vertices in the respective order, and the last three are for the UVs. With all that, we can return a new mesh from our `MakeCube` factory procedure:
 
 ```odin
 return Mesh{
@@ -192,4 +201,4 @@ And that’s all for today. You’ve learned about the anatomy of a mesh and imp
 > Author: Marian Pekar - <https://marianpekar.com>
 > (c) Marian Pekar. The posts stay freely readable on the author's site; this local copy is credited in `SOURCES.md` at the repo root. Please link back to the original article.
 
->Source: https://marianpekar.com/blog/software-renderer-in-odin-from-scratch-part-iv
+> Source: https://marianpekar.com/blog/software-renderer-in-odin-from-scratch-part-iv

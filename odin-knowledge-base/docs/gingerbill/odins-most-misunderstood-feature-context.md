@@ -1,3 +1,12 @@
+---
+title: "context-Odin’s Most Misunderstood Feature"
+date: 2025-12-15
+source: "https://www.gingerbill.org/article/2025/12/15/odins-most-misunderstood-feature-context"
+tags: [OdinRAG, kb, source/gingerbill, topic/allocator]
+type: reference
+status: active
+---
+
 # context-Odin’s Most Misunderstood Feature
 
 2025-12-15
@@ -16,11 +25,11 @@ Fundamentally, the entire point of the `context` system is to intercept third-pa
 
 I expect most people to 100% ignore the `context` because its existence is not for whatever preconceived reason they think it is for, be that minimizing typing/passing things around, or dynamic scoping, etc. It’s just for interception of third-party code.
 
-Ironically, `context` works *because* people misunderstand it, and thus generally leave it alone. That allows those who do understand it to work around less-than-ideal API’s.
+Ironically, `context` works _because_ people misunderstand it, and thus generally leave it alone. That allows those who do understand it to work around less-than-ideal API’s.
 
 I understand a lot of people may not understand why it exists when they might not currently need it, but it’s fundamentally a solution to a specific problem which cannot really be solved in another way.
 
-A common misunderstanding usually arises when it is necessary to interact with third-party code and having to write callbacks which do not use the Odin calling convention. There is a general misunderstanding that because some procedure may not *appear* to use `context` directly (or at least not obviously do so), people will say that they should be marked as `"contextless"` or `"c"`, however this misses the entire point. Because the default calling convention of Odin has this `context`, you don’t actually know if the code needs it or not (which is by design).
+A common misunderstanding usually arises when it is necessary to interact with third-party code and having to write callbacks which do not use the Odin calling convention. There is a general misunderstanding that because some procedure may not _appear_ to use `context` directly (or at least not obviously do so), people will say that they should be marked as `"contextless"` or `"c"`, however this misses the entire point. Because the default calling convention of Odin has this `context`, you don’t actually know if the code needs it or not (which is by design).
 
 The first common example of this of this interaction complain usually happens when using Odin’s printing procedures in `core:fmt`. For most people, they just do `context = runtime.default_context()` to define a `context` and then continue, but I have had a lot of people “complain” as to why that is even necessary. Arguing that other than the `assert`, why would you need the `context`? This complaint is due to not understanding what `fmt.printf` et al actually do. `printf` is a wrapper around `wprintf` which takes in a generic `io.Stream`. Since other libraries can utilize these procedures, it might be necessary to intercept/override/track this behaviour. And from that, there is little choice to but require the `context`.
 
@@ -48,7 +57,7 @@ The field `assertion_failure_proc` exists because you might honestly want a diff
 
 ### `logger`
 
-Logging is common throughout most applications and we wanted to provide a default approach. I expect most people to default to this as they want a simple unified logging experience. Most people don’t want their logs to be handled by different libraries in numerous different ways *BY DEFAULT*. But because it is on the `context`, the default logging behaviour can now overridden easily. If you something more than this logger interface, then use what you want. The point as I keep trying to iterate is: what is the default and what will third-party libraries default to so that you can then intercept it if necessary?
+Logging is common throughout most applications and we wanted to provide a default approach. I expect most people to default to this as they want a simple unified logging experience. Most people don’t want their logs to be handled by different libraries in numerous different ways _BY DEFAULT_. But because it is on the `context`, the default logging behaviour can now overridden easily. If you something more than this logger interface, then use what you want. The point as I keep trying to iterate is: what is the default and what will third-party libraries default to so that you can then intercept it if necessary?
 
 ### `random_generator`
 
@@ -74,17 +83,17 @@ I do recommend that an API should be designed to minimize the need for callbacks
 
 ### Lastly, `_internal`
 
-This just exists for internal use within the core library, which no-one should never use *for any reason*. Most of the time, it exists just for temporary things which will be improved in the future, or for passing things down the stack in a bodgy way. Again, this is not for the programmer, it’s for the compiler/core library developers only.
+This just exists for internal use within the core library, which no-one should never use _for any reason_. Most of the time, it exists just for temporary things which will be improved in the future, or for passing things down the stack in a bodgy way. Again, this is not for the programmer, it’s for the compiler/core library developers only.
 
 ## Circumventing Bad APIs
 
-As I said in the `user_ptr` and `user_index` section, a lot of the impetus for making `context` comes from the experience of using numerous C libraries. The *GOOD* C libraries that allow for a form of interception usually do it through a macro; at best, they only do `MY_MALLOC` and `MY_FREE` style things, and sometimes `MY_ASSERT`. However, those are not the norm and usually only written by people in a similar “sphere of influence” to myself. Sadly, the average C library doesn’t allow for this.
+As I said in the `user_ptr` and `user_index` section, a lot of the impetus for making `context` comes from the experience of using numerous C libraries. The _GOOD_ C libraries that allow for a form of interception usually do it through a macro; at best, they only do `MY_MALLOC` and `MY_FREE` style things, and sometimes `MY_ASSERT`. However, those are not the norm and usually only written by people in a similar “sphere of influence” to myself. Sadly, the average C library doesn’t allow for this.
 
-Even so, with the *GOOD* C libraries, this macro approach fails across a LIB/DLL boundary. Which is part of the problem when interfacing with a foreign language (e.g. Odin). So even in the *GOOD* case for C, it’s not that good in practice.
+Even so, with the _GOOD_ C libraries, this macro approach fails across a LIB/DLL boundary. Which is part of the problem when interfacing with a foreign language (e.g. Odin). So even in the _GOOD_ case for C, it’s not that good in practice.
 
 Now some library writers are **REALLY GOOD** and they provide things like an allocation interface, but I probably know all of these library writers personally at this point, so I’d be preaching to the choir with my complaints.
 
-I’ve honestly had a few people effectively tell me that if it’s an bad API then the user should put up with it-“It’s API is bad? Oh well, tough luck”. However, I’ve had a lot the same people then ask “but why does *the language* need to solve that? Isn’t it a library problem?”.
+I’ve honestly had a few people effectively tell me that if it’s an bad API then the user should put up with it-“It’s API is bad? Oh well, tough luck”. However, I’ve had a lot the same people then ask “but why does _the language_ need to solve that? Isn’t it a library problem?”.
 
 I’m sorry but telling someone the API is at fault doesn’t help them in the slightest, and if a API/library cannot be easily modified, then how can that be fixed in code? It’s fundamentally only fixable at the language itself.
 
@@ -127,4 +136,4 @@ I hope this clarifies a lot of the design rationale behind the implicit `context
 
 If you have any more questions, or want me to clarify something further, please feel to contact me!
 
->Source: https://www.gingerbill.org/article/2025/12/15/odins-most-misunderstood-feature-context
+> Source: https://www.gingerbill.org/article/2025/12/15/odins-most-misunderstood-feature-context

@@ -1,3 +1,11 @@
+---
+title: "Compiler Updates"
+source: "https://odin-lang.org/news/newsletter-2023-11"
+tags: [OdinRAG, kb, source/newsletters, topic/allocator, topic/entity-system, topic/raylib, topic/dod, topic/binding]
+type: reference
+status: active
+---
+
 ## Compiler Updates [#](#compiler-updates)
 
 [Monthly Release](https://github.com/odin-lang/Odin/releases/tag/dev-2023-11) includes LLVM 17.0.1 support for linux and darwin.
@@ -77,52 +85,51 @@ main :: proc() {
   world := init_world()
   defer deinit_world(world)
 
-  Position :: struct{
-      val : #simd[4]f32,
+  Position :: struct {
+    val: #simd[4]f32,
   }
 
-  Rotation :: struct{
-      val : #simd[4]f32,
+  Rotation :: struct {
+    val: #simd[4]f32,
   }
 
-  Scale :: struct{
-      val : #simd[4]f32,
+  Scale :: struct {
+    val: #simd[4]f32,
   }
 
-  Velocity :: struct{
-      val : #simd[4]f32,
+  Velocity :: struct {
+    val: #simd[4]f32,
   }
 
   register(world, Position)
   register(world, Rotation)
   register(world, Scale)
   register(world, Velocity)
-  
+
   entity := create_entity(world)
-  entity1 := create_entity(world) 
-  entity2 := create_entity(world) 
-  entity3 := create_entity(world) 
+  entity1 := create_entity(world)
+  entity2 := create_entity(world)
+  entity3 := create_entity(world)
   entity4 := create_entity(world)
 
-  velocityx := Velocity{
-      val = {1.0, 0.0, 0.0, 0.0},
+  velocityx := Velocity {
+    val = {1.0, 0.0, 0.0, 0.0},
   }
 
-  postion_x := Position{
-      val = {2.0, 0.0, 0.0, 0.0},
+  postion_x := Position {
+    val = {2.0, 0.0, 0.0, 0.0},
   }
 
-  postion_y := Position{
-      val = {0.0,3.14,0.0,0.0},
+  postion_y := Position {
+    val = {0.0, 3.14, 0.0, 0.0},
   }
 
-  position_xy := Position{
-      val = {24.0,7.11,0.0,0.0},
+  position_xy := Position {
+    val = {24.0, 7.11, 0.0, 0.0},
   }
- 
 
-  Quaternion_IDENTITY := Rotation{
-      val = {0.0,0.0,0.0,1.0},
+  Quaternion_IDENTITY := Rotation {
+    val = {0.0, 0.0, 0.0, 1.0},
   }
 
   add_soa_component(world, entity2, velocityx)
@@ -138,13 +145,13 @@ main :: proc() {
 
   position_rotation_query1 := query(world, Position, Rotation) //doesn't register or sort using group uses the cache result
   postion_scale_query1 := query(world, Velocity, Scale) //doesn't register or sort using group uses the cache result
- 
-  for component_storage, index in run(&position_rotation_query){
+
+  for component_storage, index in run(&position_rotation_query) {
     mut_component_storage := component_storage
 
-    if component_storage.entities[index] == 2{
-        fmt.println("Moving the player entity", component_storage.entities[index] , "Right by 100" )
-        mut_component_storage.component_a[index].val += {100.0, 0.0, 0.0, 0.0}
+    if component_storage.entities[index] == 2 {
+      fmt.println("Moving the player entity", component_storage.entities[index], "Right by 100")
+      mut_component_storage.component_a[index].val += {100.0, 0.0, 0.0, 0.0}
     }
 
     fmt.print(component_storage.entities[index], " :\t")
@@ -154,7 +161,8 @@ main :: proc() {
   }
   fmt.println("\n")
 }
-```odin
+```
+
 ### Job Scheduler - `jakubtomsu (Jacob)` [#](#job-scheduler---jakubtomsu-jacob)
 
 Read more on: <https://github.com/jakubtomsu/jobs>
@@ -184,7 +192,8 @@ main :: proc() {
 hello_job :: proc(_: rawptr) {
     fmt.println("Hello from thread", jobs.current_thread_index())
 }
-```odin
+```
+
 ### Cody: A simple code counter - `JetDove` [#](#cody-a-simple-code-counter---jetdove)
 
 Read more on: <https://github.com/CoolDove/cody>
@@ -203,47 +212,46 @@ package box2d_example
 import b2 "box2d"
 import "core:fmt"
 
-main :: proc()
-{
-    world_def := b2.DEFAULT_WORLD_DEF
-    world_def.gravity = b2.Vec2{0, -10}
-    world_id := b2.create_world(&world_def)
-    defer b2.destroy_world(world_id)
-    
-    ground_body_def := b2.DEFAULT_BODY_DEF
-    ground_body_def.position = b2.Vec2{0, -10}
-    ground_body_id := b2.world_create_body(world_id, &ground_body_def)
+main :: proc() {
+  world_def := b2.DEFAULT_WORLD_DEF
+  world_def.gravity = b2.Vec2{0, -10}
+  world_id := b2.create_world(&world_def)
+  defer b2.destroy_world(world_id)
 
-    ground_box := b2.make_box(50, 10)
-    ground_shape_def := b2.DEFAULT_SHAPE_DEF
-    b2.body_create_polygon(ground_body_id, &ground_shape_def, &ground_box)
+  ground_body_def := b2.DEFAULT_BODY_DEF
+  ground_body_def.position = b2.Vec2{0, -10}
+  ground_body_id := b2.world_create_body(world_id, &ground_body_def)
 
-    body_def := b2.DEFAULT_BODY_DEF
-    body_def.type = .Dynamic
-    body_def.position = b2.Vec2{0, 4}
-    body_id := b2.world_create_body(world_id, &body_def)
+  ground_box := b2.make_box(50, 10)
+  ground_shape_def := b2.DEFAULT_SHAPE_DEF
+  b2.body_create_polygon(ground_body_id, &ground_shape_def, &ground_box)
 
-    shape_def := b2.DEFAULT_SHAPE_DEF
-    shape_def.density = 1
-    shape_def.friction = 0.3
+  body_def := b2.DEFAULT_BODY_DEF
+  body_def.type = .Dynamic
+  body_def.position = b2.Vec2{0, 4}
+  body_id := b2.world_create_body(world_id, &body_def)
 
-    circle: b2.Circle
-    circle.radius = 1
-    b2.body_create_circle(body_id, &shape_def, &circle)
+  shape_def := b2.DEFAULT_SHAPE_DEF
+  shape_def.density = 1
+  shape_def.friction = 0.3
 
-    time_step: f32 = 1.0 / 60.0
-    velocity_iterations: i32 = 6
-    position_iterations: i32 = 2
-    
-    for i in 0..<60
-    {
-        b2.world_step(world_id, time_step, velocity_iterations, position_iterations)
-        position := b2.body_get_position(body_id)
-        angle := b2.body_get_angle(body_id)
-        fmt.println(position, angle)
-    }
+  circle: b2.Circle
+  circle.radius = 1
+  b2.body_create_circle(body_id, &shape_def, &circle)
+
+  time_step: f32 = 1.0 / 60.0
+  velocity_iterations: i32 = 6
+  position_iterations: i32 = 2
+
+  for i in 0 ..< 60 {
+    b2.world_step(world_id, time_step, velocity_iterations, position_iterations)
+    position := b2.body_get_position(body_id)
+    angle := b2.body_get_angle(body_id)
+    fmt.println(position, angle)
+  }
 }
-```odin
+```
+
 ### MagicaVoxel .vox model Loader - `jakubtomsu (Jacob)` [#](#magicavoxel-vox-model-loader---jakubtomsu-jacob)
 
 Read more on: <https://github.com/jakubtomsu/odin-vox>
@@ -266,7 +274,8 @@ if data, ok := vox.load_from_file("my_model.vox", context.temp_allocator); ok {
     }
   }
 }
-```odin
+```
+
 ---
 
 ## Community Showcase [#](#community-showcase)
@@ -345,4 +354,4 @@ My first test run of my MIPS assembler producing a binary usable by my emulator.
 
 The true purpose of the emulator. I am associating part of the memory with a text display beginning at 0x400. - Heinrich
 
->Source: https://odin-lang.org/news/newsletter-2023-11
+> Source: https://odin-lang.org/news/newsletter-2023-11

@@ -1,3 +1,12 @@
+---
+title: "Physics Engine in Odin from Scratch, Part III"
+date: 2026-06-20
+source: "https://marianpekar.com/blog/physics-engine-in-odin-from-scratch-part-iii"
+tags: [OdinRAG, kb, source/marianpekar, topic/collision]
+type: reference
+status: active
+---
+
 # Physics Engine in Odin from Scratch, Part III
 
 20th June 2026 • 9 min read
@@ -26,9 +35,9 @@ Now, add a new file into the project and name it `physics.odin`. We're going to 
 package main
 
 RigidBody :: struct {
-    force: Vector3,
-    velocity: Vector3,
-    isStatic: bool
+  force:    Vector3,
+  velocity: Vector3,
+  isStatic: bool,
 }
 ```
 
@@ -47,7 +56,7 @@ ApplyPhysics :: proc(models: []Model, deltaTime: f32) {
 }
 ```
 
-The `ApplyGravity` is almost embarrassingly simple (this is not a technical term, unlike *embarrassingly parallel*, which surprisingly is).
+The `ApplyGravity` is almost embarrassingly simple (this is not a technical term, unlike _embarrassingly parallel_, which surprisingly is).
 
 ```odin
 ApplyGravity :: proc(model: ^Model, deltaTime: f32) {
@@ -170,7 +179,7 @@ for !rl.WindowShouldClose() {
     }
 ```
 
-If you now compile and run the program (`odin run . -o:speed`). You should see the medium and small cubes fall and pass through the biggest one, which is static, just as in the video below. They pass through because we still need to implement collisions, or to be more precise, *collision detection and resolution*, which we're going to learn about in the next part.
+If you now compile and run the program (`odin run . -o:speed`). You should see the medium and small cubes fall and pass through the biggest one, which is static, just as in the video below. They pass through because we still need to implement collisions, or to be more precise, _collision detection and resolution_, which we're going to learn about in the next part.
 
 [](/uploads/phys_eng_iii_gravity_no_collision.mp4)
 
@@ -190,4 +199,4 @@ If something doesn't work as expected, you can always compare your implementatio
 > Author: Marian Pekar - <https://marianpekar.com>
 > (c) Marian Pekar. The posts stay freely readable on the author's site; this local copy is credited in `SOURCES.md` at the repo root. Please link back to the original article.
 
->Source: https://marianpekar.com/blog/physics-engine-in-odin-from-scratch-part-iii
+> Source: https://marianpekar.com/blog/physics-engine-in-odin-from-scratch-part-iii

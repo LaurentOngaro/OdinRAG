@@ -1,3 +1,12 @@
+---
+title: "Named Return Values Without Oopsies"
+date: 2026-09-01
+source: "https://zylinski.se/posts/named-return-values-without-oopsies"
+tags: [OdinRAG, kb, source/zylinski]
+type: reference
+status: active
+---
+
 # Named Return Values Without Oopsies
 
 September 1, 2026
@@ -41,9 +50,9 @@ ok = true
 return
 ```
 
-Naked returns send back whatever is in `stream` and `ok` when `return` happens. I don’t like it! It’s easy to make a mistake. With an ordinary return you always see both things being returned on the same line. With naked returns the assignment can be *anywhere* in the whole procedure. Something invalid might be in `stream` when the naked `return` happens. We shall soon see an example of such a mistake.
+Naked returns send back whatever is in `stream` and `ok` when `return` happens. I don’t like it! It’s easy to make a mistake. With an ordinary return you always see both things being returned on the same line. With naked returns the assignment can be _anywhere_ in the whole procedure. Something invalid might be in `stream` when the naked `return` happens. We shall soon see an example of such a mistake.
 
-But before we get there, let’s talk about a case where I want to use naked returns. `load_audio_stream_from_file` is a long procedure. I had a lot of error states where I needed to do `return AUDIO_STREAM_NONE, false`. For *that reason* I added named return values so I could just write a naked `return` and send back the zero value of both `stream` and `ok`. `AUDIO_STREAM_NONE` was in this case the same as the zero value. In other words, I just wanted naked returns for a single thing: Returning everything zeroed, to signal that an error had happened.
+But before we get there, let’s talk about a case where I want to use naked returns. `load_audio_stream_from_file` is a long procedure. I had a lot of error states where I needed to do `return AUDIO_STREAM_NONE, false`. For _that reason_ I added named return values so I could just write a naked `return` and send back the zero value of both `stream` and `ok`. `AUDIO_STREAM_NONE` was in this case the same as the zero value. In other words, I just wanted naked returns for a single thing: Returning everything zeroed, to signal that an error had happened.
 
 > Named return values also allow you to use `or_return`, which many like. `or_return` works without named return values if the procedure just has a single return value. But if there are two or more return values, then they must be named for `or_return` to work.
 >
@@ -62,7 +71,7 @@ if stream_add_err != nil {
 return stream, true
 ```
 
-Note that `stream` is the same name as the named return value I just added. They would now shadow each other, which won’t compile. I could swap that `:=` for a `=` and just write to the `stream` return value directly. But I *do not* want to assign to the return value. Why? If the `stream_add_err != nil` case is hit, then I would have to unset `stream` again before returning. Yuck! Another likely scenario is that I just forget to unset `stream`, which would return some value I didn’t intend to, since the “I just hit an error”-usage of the naked `return` should return everything zeroed.
+Note that `stream` is the same name as the named return value I just added. They would now shadow each other, which won’t compile. I could swap that `:=` for a `=` and just write to the `stream` return value directly. But I _do not_ want to assign to the return value. Why? If the `stream_add_err != nil` case is hit, then I would have to unset `stream` again before returning. Yuck! Another likely scenario is that I just forget to unset `stream`, which would return some value I didn’t intend to, since the “I just hit an error”-usage of the naked `return` should return everything zeroed.
 
 > I would also have to do something like
 >
@@ -98,4 +107,4 @@ Thanks for reading! Check out my library [Karl2D](https://karl2d.com) and my boo
 
 /Karl Zylinski
 
->Source: https://zylinski.se/posts/named-return-values-without-oopsies
+> Source: https://zylinski.se/posts/named-return-values-without-oopsies

@@ -1,3 +1,12 @@
+---
+title: "Software Renderer in Odin from Scratch, Part XIV"
+date: 2026-03-02
+source: "https://marianpekar.com/blog/software-renderer-in-odin-from-scratch-part-xiv"
+tags: [OdinRAG, kb, source/marianpekar, topic/rendering, topic/raylib]
+type: reference
+status: active
+---
+
 # Software Renderer in Odin from Scratch, Part XIV
 
 2nd March 2026 • 16 min read
@@ -22,13 +31,13 @@ package main
 import rl "vendor:raylib"
 
 Model :: struct {
-    mesh: Mesh,
-    texture: Texture,
-    color: rl.Color,
-    wireColor: rl.Color,
-    translation: Vector3,
-    rotation: Vector3,
-    scale: f32,
+  mesh:        Mesh,
+  texture:     Texture,
+  color:       rl.Color,
+  wireColor:   rl.Color,
+  translation: Vector3,
+  rotation:    Vector3,
+  scale:       f32,
 }
 ```
 
@@ -86,7 +95,7 @@ However, that's not the only change I'd like to propose in this file. Since we n
 
 ```odin
 HandleInputs :: proc(
-    model: ^Model, modelIdx: ^int, modelCount: int, 
+    model: ^Model, modelIdx: ^int, modelCount: int,
     renderMode: ^i8, renderModesCount: i8,
     projType: ^ProjectionType,
     deltaTime: f32
@@ -211,8 +220,8 @@ Here's the complete key mapping:
 - **Numpad [+]** and **Numpad [-]** scale the selected model up and down, respectively.
 - **[Left] and [Right] Arrows** cycle trough rendering modes down and up, respectively.
 - **[Up] and [Down] Arrows** select the next and previous model, respectively.
-- **Numpad [1]** sets the projection to *orthographic*.
-- **Numpad [0]** sets the projection to *perspective*.
+- **Numpad [1]** sets the projection to _orthographic_.
+- **Numpad [0]** sets the projection to _perspective_.
 
 If something doesn't work as expected, you can always refer to this [GitHub repository](https://github.com/marianpekar/software-renderer-odin-tutorials), where you now find 14 directories, each containing the end state of the project after each part of this series.
 
@@ -254,4 +263,4 @@ There's also a [repository with reimplementation into the C language that uses S
 > Author: Marian Pekar - <https://marianpekar.com>
 > (c) Marian Pekar. The posts stay freely readable on the author's site; this local copy is credited in `SOURCES.md` at the repo root. Please link back to the original article.
 
->Source: https://marianpekar.com/blog/software-renderer-in-odin-from-scratch-part-xiv
+> Source: https://marianpekar.com/blog/software-renderer-in-odin-from-scratch-part-xiv

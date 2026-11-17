@@ -1,3 +1,12 @@
+---
+title: "Marketing the Odin Programming Language is Weird"
+date: 2024-09-08
+source: "https://www.gingerbill.org/article/2024/09/08/odin-weird-to-market"
+tags: [OdinRAG, kb, source/gingerbill, topic/dod]
+type: reference
+status: active
+---
+
 # Marketing the Odin Programming Language is Weird
 
 2024-09-08
@@ -55,7 +64,7 @@ I make those distinctions because I believe it makes things a lot clearer about 
 
 ## Funding
 
-Another issue is that Odin is *free*.
+Another issue is that Odin is _free_.
 
 As weird as it sounds but since about 20 years ago, it’s nigh impossible to sell a compiler. People expect a programming language and compiler to be free; without caring how much time, money, and effort that goes into building a tool.
 
@@ -69,4 +78,4 @@ So I ask you fellow internet users:
 
 How the heck do you advertise/market Odin (a systems-level programming language) when it does not have a discernable “killer feature” nor is “hypeable” by its very nature of being a pragmatic language?
 
->Source: https://www.gingerbill.org/article/2024/09/08/odin-weird-to-market
+> Source: https://www.gingerbill.org/article/2024/09/08/odin-weird-to-market

@@ -1,8 +1,17 @@
+---
+title: "A Quine in Odin"
+date: 2019-03-10
+source: "https://www.gingerbill.org/article/2019/03/10/quine-in-odin"
+tags: [OdinRAG, kb, source/gingerbill]
+type: reference
+status: active
+---
+
 # A Quine in Odin
 
 2019-03-10
 
-A [Quine](https://wikipedia.org/wiki/Quine_(computing)) in [Odin](/odin):
+A [Quine](<https://wikipedia.org/wiki/Quine_(computing)>) in [Odin](/odin):
 
 ```odin
 package quine
@@ -10,7 +19,7 @@ package quine
 import "core:fmt"
 
 main :: proc() {
-	fmt.printf("%s%c%s%c;\n", s, 0x60, s, 0x60);
+  fmt.printf("%s%c%s%c;\n", s, 0x60, s, 0x60)
 }
 
 s := `package quine
@@ -21,7 +30,7 @@ main :: proc() {
 	fmt.printf("%s%c%s%c;\n", s, 0x60, s, 0x60);
 }
 
-s := `;
+s := `
 ```
 
->Source: https://www.gingerbill.org/article/2019/03/10/quine-in-odin
+> Source: https://www.gingerbill.org/article/2019/03/10/quine-in-odin

@@ -1,3 +1,11 @@
+---
+title: "What’s been going on in July"
+source: "https://odin-lang.org/news/newsletter-2023-07"
+tags: [OdinRAG, kb, source/newsletters, topic/raylib]
+type: reference
+status: active
+---
+
 ## What’s been going on in July [#](#whats-been-going-on-in-july)
 
 Work has officially started on the new custom backend for Odin using [Tilde](https://github.com/RealNeGate/Cuik/tree/master/tb). This will be an alternative to the current LLVM backend, and not a replacement to it. In case you didn’t know, Odin’s compilation speed is actually quite quick, but LLVM slows down everything. Around ~90% of the compilation time is spent on LLVM.
@@ -18,9 +26,9 @@ GingerBill has been streaming some code sessions on [Twitch](https://www.twitch.
 
 ## Showcase [#](#showcase)
 
-Response to the ***Showcase*** section has been astonishing, so let’s continue in the same fashion.
+Response to the _**Showcase**_ section has been astonishing, so let’s continue in the same fashion.
 
-We have a total of ***21*** videos / images to share this month, we’ll try splitting up by weeks to give a sense of *time*.
+We have a total of _**21**_ videos / images to share this month, we’ll try splitting up by weeks to give a sense of _time_.
 
 ### Week 1 [#](#week-1)
 
@@ -105,4 +113,4 @@ Procedural Generation of levels - Francis\_the\_cat
 
 Vector -> (M)SDF Generation Tool - Skytrias
 
->Source: https://odin-lang.org/news/newsletter-2023-07
+> Source: https://odin-lang.org/news/newsletter-2023-07

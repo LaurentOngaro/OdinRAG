@@ -1,3 +1,11 @@
+---
+title: "General"
+source: "https://odin-lang.org/docs/faq"
+tags: [OdinRAG, kb, source/official, topic/allocator, topic/dod]
+type: reference
+status: active
+---
+
 ## General [#](#general)
 
 ### What is the history of the project? [#](#what-is-the-history-of-the-project)

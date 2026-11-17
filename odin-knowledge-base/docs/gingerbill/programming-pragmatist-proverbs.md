@@ -1,18 +1,27 @@
+---
+title: "Pragmatism in Programming Proverbs"
+date: 2020-05-31
+source: "https://www.gingerbill.org/article/2020/05/31/programming-pragmatist-proverbs"
+tags: [OdinRAG, kb, source/gingerbill]
+type: reference
+status: active
+---
+
 # Pragmatism in Programming Proverbs
 
 2020-05-31
 
-I was originally going to write a normal prose article regarding the topic of *Pragmatism in Programming*, however I thought I’d experiment in style by writing in a proverbial style.
+I was originally going to write a normal prose article regarding the topic of _Pragmatism in Programming_, however I thought I’d experiment in style by writing in a proverbial style.
 
-The following concepts express the school of thought that I subscribe to which I call ***Pragmatism in Programming***.
+The following concepts express the school of thought that I subscribe to which I call _**Pragmatism in Programming**_.
 
 ## Proverbs written by Ginger Bill
 
 ### The concept of programming
 
 - Programming is a tool to solve problems that you have in the domain of computers
-- The purpose of a program *is*, and *ought to be*, something that transforms data into other forms of data
-- Try to solve *the specific* problem you have, not *a general* problem you *might* have
+- The purpose of a program _is_, and _ought to be_, something that transforms data into other forms of data
+- Try to solve _the specific_ problem you have, not _a general_ problem you _might_ have
 - Programming languages, compilers, libraries, etc, are just tools, they are not worldviews nor signals of social status
 
 ### Problem solving
@@ -24,6 +33,7 @@ The following concepts express the school of thought that I subscribe to which I
   - Function
   - Usage
   - Implementation/Form
+
 - Reality is part of your problem
 - The hardest thing about programming is understanding the problem you are trying to solve
 - Try to think locally about your problem
@@ -34,7 +44,7 @@ The following concepts express the school of thought that I subscribe to which I
 
 ### Practice
 
-- Do not worry about the implementation of a program most of the time. If you understand the purpose, function, and usage of your problem, the implementation will *usually* be trivial
+- Do not worry about the implementation of a program most of the time. If you understand the purpose, function, and usage of your problem, the implementation will _usually_ be trivial
 - You cannot become good at programming without practice, experimentation, and failure
 - Do not be afraid to try to new tools, but look for tools that have proven themselves to be useful
 
@@ -47,13 +57,14 @@ The following concepts express the school of thought that I subscribe to which I
   - compared to what? (what other ideas exist?)
   - what hard evidence do you have? (empirical, experiential, quantitative, qualitative, etc)
   - at what cost? (performance, speed, memory, energy, sanity, monetary, etc)
+
 - Be sceptical of any new idea proclaiming to solve all your problems without any evidence nor counter-examples
 - The only thing you should orientate around is the problem you are trying to solve
 - Hard problems are hard
 - The hardware is part of the domain that you are trying to solve
 - Similarities between code and the real world do not imply causal relationships
 - A model is only as good as the predictions it makes and the explanatory power it has
-- Most *“best practices”* rarely have any evidence to back up their claims, especially about being the best
+- Most _“best practices”_ rarely have any evidence to back up their claims, especially about being the best
 - Different people will have different styles which are more productive for them
 
 ### Management
@@ -79,19 +90,19 @@ The following concepts express the school of thought that I subscribe to which I
 
 ### Philosophical concepts
 
-- Not everything can be known *a priori*, experimentation may be necessary to discover solutions and *a posteriori* truths
+- Not everything can be known _a priori_, experimentation may be necessary to discover solutions and _a posteriori_ truths
 - Holistic models rarely exist; reality is more complicated than we expect, do not worry about having specialized models for specific things
-- Knowing whether or not something is useful requires [*skin in the game*](https://en.wikipedia.org/wiki/Skin_in_the_game_(phrase)) in order to get feedback
+- Knowing whether or not something is useful requires [_skin in the game_](<https://en.wikipedia.org/wiki/Skin_in_the_game_(phrase)>) in order to get feedback
 - Object orientated programming is a form of misinterpreted and misapplied Aristotelian Metaphysics applied to a domain it was never meant to model
 - Academic computer science is not an empirical science but a formal science like mathematics
 - Academic computer science rarely has any skin in the game regarding the concepts it espouses
 - Programming is a relatively new craft with very little wisdom
-- People will naturally gravitate towards *flash fads* looking for wisdom in them; there are proven cultural practices that contain wisdom
+- People will naturally gravitate towards _flash fads_ looking for wisdom in them; there are proven cultural practices that contain wisdom
 - Associating behaviour with data implies agency, however this agency is not real and only the cause of an interpretive model of the data
 - Many people do not think beyond the paradigm they embody. They can rarely think beyond the concepts since they do not know realize they think in a (flawed and incomplete) model, and that there are different models of interpreting the world.
 - You cannot teach virtue, you can only learn it. Look towards virtuous programmers for wisdom, and ask about their ideas on virtue.
-- *Bodging* is doing a job out of necessity using whatever tools and materials come to hand and which, whilst not necessarily elegant, is nevertheless serviceable.
-- Most people think they are being pragmatic when programming, however they are usually *bodging* it.
+- _Bodging_ is doing a job out of necessity using whatever tools and materials come to hand and which, whilst not necessarily elegant, is nevertheless serviceable.
+- Most people think they are being pragmatic when programming, however they are usually _bodging_ it.
 - Bodging has a huge cost to it and should be not be relied upon.
 
 ### Other topics
@@ -182,4 +193,4 @@ The following concepts express the school of thought that I subscribe to which I
 
 > Increasingly, people seem to interpret complexity as sophistication, which is baffling - the incomprehensible should cause suspicion, not admiration. Possibly this results from the mistaken belief that using a mysterious device confers [extra] power on the user.
 
->Source: https://www.gingerbill.org/article/2020/05/31/programming-pragmatist-proverbs
+> Source: https://www.gingerbill.org/article/2020/05/31/programming-pragmatist-proverbs

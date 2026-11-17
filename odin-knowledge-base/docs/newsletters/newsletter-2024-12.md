@@ -1,3 +1,11 @@
+---
+title: "Odin release highlights"
+source: "https://odin-lang.org/news/newsletter-2024-12"
+tags: [OdinRAG, kb, source/newsletters, topic/raylib, topic/dod]
+type: reference
+status: active
+---
+
 ## Odin release highlights [#](#odin-release-highlights)
 
 - Suggestion when assigning `enum` to `bit_set`.
@@ -15,7 +23,7 @@ For the rest of the many compiler changes, read the [monthly release](https://gi
 
 ## Understanding the Odin Programming Language [#](#understanding-the-odin-programming-language)
 
-Karl Zylinski wrote the *first* book on Odin, “Understanding the Odin Programming Language”, and it is OUT NOW! ✨
+Karl Zylinski wrote the _first_ book on Odin, “Understanding the Odin Programming Language”, and it is OUT NOW! ✨
 
 ![](/images/news/2024-12-odin-book-cover.jpg)
 
@@ -27,29 +35,29 @@ And also check out the interview with the author at the bottom of this newslette
 
 ## Projects shared this month [#](#projects-shared-this-month)
 
-| Project Name | Description |
-| --- | --- |
-| [fast-noise-lite](https://github.com/itsdanott/fast-noise-lite-odin/blob/master/Odin/FastNoiseLite.odin) | An Odin port of FastNoiseLite |
-| [odin-pbt](https://github.com/zclj/odin-pbt/blob/master/examples/strconv_symmetry/main.odin) | Property based testing in Odin |
-| [odin-wren](https://github.com/NinjasCL/wren-odin) | Wren bindings |
-| [odin-arsenal](https://github.com/odin-arsenal/gungnir) | Odin arsenal |
-| [sds](https://github.com/jakubtomsu/sds) | Static data structures, now with SPSC |
-| [pathrc](https://codeberg.org/anguelesperanza/pathrc) | A tool to manage bashrc |
-| [lsystem](https://github.com/ChrisPHP/odin-lsystem) | L-systems in Odin |
-| [vst3](https://gitlab.com/pan_fx/vst3_odin/-/tree/master) | VST3 API in Odin |
-| [osdialog](https://github.com/ttytm/osdialog-odin) | Cross-platform OS dialogs |
-| [d3d11](https://github.com/Bazzagibbs/odin-beginner-direct3d11) | Odin rewrite of KevinMoran’s Beginner Direct3D11 |
-| [odgpu](https://github.com/sudokit/odgpu) | General purpose GPU computing in Odin |
-| [raylib-ogmo](https://github.com/Z7-Z7L/Raylib-ogmo-importer) | Raylib OGMO importer |
-| [odin-jps](https://github.com/ChrisPHP/odin-jps) | Jump Point Search in Odin |
-| [nexa](https://github.com/SabeDoesThings/Nexa) | Game library by SabeDoesThings |
-| [chip8](https://github.com/Jocabin/chip-8-emulator) | Odin implementation of a Chip8 emulator |
-| [odin-slang](https://github.com/DragosPopse/odin-slang) | Odin bindings for slang |
-| [game-of-life](https://github.com/Jocabin/game-of-life) | Game of Life in Odin |
-| [odin-tiled](https://github.com/SabeDoesThings/odin-tiled) | Tiled loader in Odin |
-| [lite-odin](https://github.com/Waqar144/lite-odin) | Odin port of rxi’s Lite editor |
-| [odin-mqtt](https://github.com/SamratGhale/odin-mqtt) | mqtt-c binding for Odin |
-| [odin-pg\_pool](https://github.com/jon-lipstate/pg_pool/) | PostgreSQL Pool Manager in Odin |
+| Project Name                                                                                             | Description                                      |
+| -------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
+| [fast-noise-lite](https://github.com/itsdanott/fast-noise-lite-odin/blob/master/Odin/FastNoiseLite.odin) | An Odin port of FastNoiseLite                    |
+| [odin-pbt](https://github.com/zclj/odin-pbt/blob/master/examples/strconv_symmetry/main.odin)             | Property based testing in Odin                   |
+| [odin-wren](https://github.com/NinjasCL/wren-odin)                                                       | Wren bindings                                    |
+| [odin-arsenal](https://github.com/odin-arsenal/gungnir)                                                  | Odin arsenal                                     |
+| [sds](https://github.com/jakubtomsu/sds)                                                                 | Static data structures, now with SPSC            |
+| [pathrc](https://codeberg.org/anguelesperanza/pathrc)                                                    | A tool to manage bashrc                          |
+| [lsystem](https://github.com/ChrisPHP/odin-lsystem)                                                      | L-systems in Odin                                |
+| [vst3](https://gitlab.com/pan_fx/vst3_odin/-/tree/master)                                                | VST3 API in Odin                                 |
+| [osdialog](https://github.com/ttytm/osdialog-odin)                                                       | Cross-platform OS dialogs                        |
+| [d3d11](https://github.com/Bazzagibbs/odin-beginner-direct3d11)                                          | Odin rewrite of KevinMoran’s Beginner Direct3D11 |
+| [odgpu](https://github.com/sudokit/odgpu)                                                                | General purpose GPU computing in Odin            |
+| [raylib-ogmo](https://github.com/Z7-Z7L/Raylib-ogmo-importer)                                            | Raylib OGMO importer                             |
+| [odin-jps](https://github.com/ChrisPHP/odin-jps)                                                         | Jump Point Search in Odin                        |
+| [nexa](https://github.com/SabeDoesThings/Nexa)                                                           | Game library by SabeDoesThings                   |
+| [chip8](https://github.com/Jocabin/chip-8-emulator)                                                      | Odin implementation of a Chip8 emulator          |
+| [odin-slang](https://github.com/DragosPopse/odin-slang)                                                  | Odin bindings for slang                          |
+| [game-of-life](https://github.com/Jocabin/game-of-life)                                                  | Game of Life in Odin                             |
+| [odin-tiled](https://github.com/SabeDoesThings/odin-tiled)                                               | Tiled loader in Odin                             |
+| [lite-odin](https://github.com/Waqar144/lite-odin)                                                       | Odin port of rxi’s Lite editor                   |
+| [odin-mqtt](https://github.com/SamratGhale/odin-mqtt)                                                    | mqtt-c binding for Odin                          |
+| [odin-pg\_pool](https://github.com/jon-lipstate/pg_pool/)                                                | PostgreSQL Pool Manager in Odin                  |
 
 Further, Aks [wrote a blogpost](https://akselmo.dev/posts/moving-from-c-to-odin/) about moving a codebase from C to Odin.
 
@@ -151,4 +159,4 @@ Please check out my [Odin book](https://odinbook.com) and my game [CAT & ONION](
 Have a nice day!
 /Karl Zylinski
 
->Source: https://odin-lang.org/news/newsletter-2024-12
+> Source: https://odin-lang.org/news/newsletter-2024-12

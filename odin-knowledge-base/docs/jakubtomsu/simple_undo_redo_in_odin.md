@@ -1,3 +1,12 @@
+---
+title: "Simple Undo/Redo System in Odin"
+date: 2024-05-28
+source: "https://jakubtomsu.github.io/posts/simple_undo_redo_in_odin"
+tags: [OdinRAG, kb, source/jakubtomsu]
+type: reference
+status: active
+---
+
 # Simple Undo/Redo System in Odin
 
 2024-05-28
@@ -36,10 +45,11 @@ First, let’s define the data for our level. In my case it’s very simple, but
 12    size:      IVec3,
 13    fog_color: Vec3,
 14}
-```odin
+```
+
 The goal here is to organize the level representation into a bunch of “chunks” (mostly by size and importance). All miscellaneous level metadata goes into `Level_Info` but other big chunks of data are a separate member.
 
-Note: this assumes all of your level data is statically allocated and trivially copyable. I do this for *all* of my data anyway, I think there isn’t a reason to use any dynamic allocation for the use cases I care about. I might write a blog about this another time, it’s a very useful way to think about data and not many people talk about it. It’s always borrow checker/RAII/Arenas/Custom Allocators…
+Note: this assumes all of your level data is statically allocated and trivially copyable. I do this for _all_ of my data anyway, I think there isn’t a reason to use any dynamic allocation for the use cases I care about. I might write a blog about this another time, it’s a very useful way to think about data and not many people talk about it. It’s always borrow checker/RAII/Arenas/Custom Allocators…
 
 ## Save Points
 
@@ -51,12 +61,13 @@ Now, let’s define a way to store a single “change” to the data. This acts 
 3    Level_Cells,
 4    Level_Detail_Cells,
 5}
-```odin
+```
+
 This stores a change to a part of a level. It’s a [tagged union](https://odin-lang.org/docs/overview/#unions), so the total size is the size of the largest item.
 
-This allows me to easily store a change to any part of a level. That’s why I separated the level into chunks in the previous step, it makes it easier to organize changes into groups. In theory you *could* save the entire level on every change. But this is almost as simple and can save a lot of memory.
+This allows me to easily store a change to any part of a level. That’s why I separated the level into chunks in the previous step, it makes it easier to organize changes into groups. In theory you _could_ save the entire level on every change. But this is almost as simple and can save a lot of memory.
 
-This way every change takes up memory for the “worst-case”, which might seem bad at first but it’s actually completely fine. In my case one undo item is 4 kilobytes, which is almost nothing these days. This system also scales really well in cases where you modify *most or all* of the cells, and doesn’t create unexpected spikes. But the reasons for focusing on worst-case computation is a big topic, let’s leave that for another blog post :)
+This way every change takes up memory for the “worst-case”, which might seem bad at first but it’s actually completely fine. In my case one undo item is 4 kilobytes, which is almost nothing these days. This system also scales really well in cases where you modify _most or all_ of the cells, and doesn’t create unexpected spikes. But the reasons for focusing on worst-case computation is a big topic, let’s leave that for another blog post :)
 
 ## History Buffers
 
@@ -69,7 +80,8 @@ Let’s define a way to store the actual edits within our editor state.
 4    redo:  Queue(2048, Editor_Undo_Item),
 5    // other editor state...
 6}
-```odin
+```
+
 The editor stores two queues (ring buffers) of edits, one for Undo and one for Redo. The reason why I use a queue is to have the ability to “force push” an edit at the end. If I used a regular array/stack, I would need to shift all other items down by one slot. The queue I use comes from my own small library for static datastructures, but you could use something like `core:container/queue` as well.
 
 ```odin
@@ -77,7 +89,8 @@ The editor stores two queues (ring buffers) of edits, one for Undo and one for R
 2    // Makes sure the item is always pushed back into the queue, even if it's full.
 3    queue_push_back_force(&ed.undo, item)
 4}
-```odin
+```
+
 This is the procedure for pushing save points before any edits. I pass the state which will be changed, and then perform the change. Here is an example of placing wall blocks on a mouse click:
 
 ```odin
@@ -86,7 +99,8 @@ This is the procedure for pushing save points before any edits. I pass the state
 3    // Do any modifications to level.cells...
 4    ed.level.cells[cursor.x][cursor.y][cursor.z] = .Wall
 5}
-```odin
+```
+
 ## Ctrl+Z and Ctrl+Shift+Z
 
 This is all I need to implement the actual undo/redo functionality. This logic is the same as in rxi’s article. Pop from one buffer, and before applying the data push the current state to the other buffer.
@@ -130,9 +144,10 @@ This is all I need to implement the actual undo/redo functionality. This logic i
 36        queue_push_back_force(&ed.undo, prev)
 37    }
 38}
-```odin
+```
+
 And that’s it! Turns out this entire system is not many lines of code at all, and is efficient even when you use worst-case-sized statically allocated data structures. That said, it’s not a one-size-fits-all method. If you have gigantic scenes you probably need to look into other approaches (maybe XOR and RLE compressed delta states? LZ4? idk).
 
 But this is fine for basically anything an indie developer might need in 99% of cases. Hope this helps, thank you for reading!
 
->Source: https://jakubtomsu.github.io/posts/simple_undo_redo_in_odin
+> Source: https://jakubtomsu.github.io/posts/simple_undo_redo_in_odin

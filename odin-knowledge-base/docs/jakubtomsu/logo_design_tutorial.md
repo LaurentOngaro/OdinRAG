@@ -1,3 +1,12 @@
+---
+title: "Logo Design behind-the-scenes"
+date: 2024-09-11
+source: "https://jakubtomsu.github.io/posts/logo_design_tutorial"
+tags: [OdinRAG, kb, source/jakubtomsu, topic/rendering]
+type: reference
+status: active
+---
+
 # Logo Design behind-the-scenes
 
 2024-09-11
@@ -72,4 +81,4 @@ I used the following settings to sort of a metal material.
 And here is the settings for light sources, many possibilities here
 ![bling phong lights](/posts/logo_design_tutorial/blinn_phong_lights.png)
 
->Source: https://jakubtomsu.github.io/posts/logo_design_tutorial
+> Source: https://jakubtomsu.github.io/posts/logo_design_tutorial

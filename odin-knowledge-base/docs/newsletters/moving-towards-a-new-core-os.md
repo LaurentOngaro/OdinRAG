@@ -1,6 +1,14 @@
+---
+title: "Transition Period"
+source: "https://odin-lang.org/news/moving-towards-a-new-core-os"
+tags: [OdinRAG, kb, source/newsletters, topic/allocator]
+type: reference
+status: active
+---
+
 Odin has been designed to be a pragmatic and evolutionary language, and as such, most people have come to appreciate the results of that, especially stability of language features. Odin rarely experiences breaking changes, however we have some technical debt to pay.
 
-Packages `base:runtime` and `core:os` are the oldest packages in the core library of Odin, as they were used in bootstrapping the language and the rest of the packages. Over time they became an amalgamation of ideas, added as and when things were needed. `base:runtime` has already been cleaned up, but `core:os`’s general API was poorly designed and inconsistent across platforms. Certain procedures were available only on specific platforms *and* other procedures, while available on all platforms, didn’t have a unified signature across them. Constants and errors messages were all platform-specific, leading to less than ideal cross-platform behaviour.
+Packages `base:runtime` and `core:os` are the oldest packages in the core library of Odin, as they were used in bootstrapping the language and the rest of the packages. Over time they became an amalgamation of ideas, added as and when things were needed. `base:runtime` has already been cleaned up, but `core:os`’s general API was poorly designed and inconsistent across platforms. Certain procedures were available only on specific platforms _and_ other procedures, while available on all platforms, didn’t have a unified signature across them. Constants and errors messages were all platform-specific, leading to less than ideal cross-platform behaviour.
 
 Over the past couple of years, we have been redesigning the entirety of `core:os` (which at the time of writing is `core:os/os2`) to be in keeping with the standards of the core library. We have learnt a lot over the years in terms of library and API design for Odin, and we want to incorporate those lessons into one of its most foundational packages.
 
@@ -56,21 +64,24 @@ data, ok := os.read_entire_file("path/to/file.txt")
 
 // New API
 data, err := os.read_entire_file("path/to/file.txt", context.allocator)
-```odin
+```
+
 ```odin
 // Old API
 fd: os.Handle
 
 // New API
 f: ^os.File
-```odin
+```
+
 ```odin
 // Old API
 err: os.Errno // just an integer
 
 // New API
 err: os.Error // a union of enums
-```odin
+```
+
 ```odin
 // Removed procedures
 get_last_error // not needed since `os.Error` exists
@@ -82,4 +93,4 @@ get_windows_version // etc
 is_windows_* // etc
 ```
 
->Source: https://odin-lang.org/news/moving-towards-a-new-core-os
+> Source: https://odin-lang.org/news/moving-towards-a-new-core-os

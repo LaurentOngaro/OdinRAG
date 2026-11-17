@@ -1,3 +1,12 @@
+---
+title: "The Metaprogramming Dilemma"
+date: 2016-12-01
+source: "https://www.gingerbill.org/article/2016/12/01/the-metaprogramming-dilemma"
+tags: [OdinRAG, kb, source/gingerbill]
+type: reference
+status: active
+---
+
 # The Metaprogramming Dilemma
 
 2016-12-01
@@ -26,4 +35,4 @@ Parametric polymorphism, or commonly referred to as “Generics” (which is a v
 
 This now brings me to the dilemma. How far do I want to go with metaprogramming in this language? How far can I go whilst keeping Odin a simple language? Or is the very definition of metaprogramming not simple? Or should metaprogramming be left to an external (standardized) tool (like `go generate`)?
 
->Source: https://www.gingerbill.org/article/2016/12/01/the-metaprogramming-dilemma
+> Source: https://www.gingerbill.org/article/2016/12/01/the-metaprogramming-dilemma

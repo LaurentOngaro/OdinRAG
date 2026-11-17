@@ -37,26 +37,21 @@ except Exception:
     pass
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
+SCRIPTS_DIR = Path(__file__).resolve().parents[1]
+if str(SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPTS_DIR))
+
+from lib.private_paths import find_violations as find_private_violations  # noqa: E402
+from lib.private_paths import load_private_paths  # noqa: E402
+
 MAIN_REF = "refs/heads/main"
 PUBLIC_REF = "refs/heads/public"
 MAIN_REMOTE = "private"
 PUBLIC_REMOTE = "public"
 
-# Paths to STRIP from the public branch. MUST stay in sync with:
-# - audit_public_safety.py FORBIDDEN_PATTERNS
-# - the pre-push hook pattern
-# - _Helpers/docs/007_mixing_public_and_private_history.md
-# The `code/projects/*` entries are the personal projects exposed as links
-# (see _Helpers/links.jsonc): they are untracked on disk, but they must never
-# appear in the history rewritten for the public branch.
-STRIP_RULES: list[str] = [
-    "code/projects/PVG03_RPG",
-    "code/projects/PVG02_Metroidvania",
-    "code/projects/Odin_Skeleton",
-    "_Private",
-    "odin-knowledge-base/courses",
-    "odin-knowledge-base/docs/karl_zylinski/odin-book",
-]
+# Loaded from `_Helpers/config/private_paths.jsonc` + `_Helpers/links.jsonc`.
+PRIVATE_CONFIG = load_private_paths(repo_root=REPO_ROOT)
+STRIP_RULES: list[str] = list(PRIVATE_CONFIG.strip_rules)
 
 
 def _git(*args: str, check: bool = True) -> subprocess.CompletedProcess[str]:
@@ -140,7 +135,7 @@ def regenerate_public() -> None:
     # Build the index-filter: remove each STRIP_RULE recursively from the index.
     # Joined with `;` so sh -c runs them sequentially.
     filter_inner = "; ".join(
-        f"git rm --cached -r --ignore-unmatch {rule}" for rule in STRIP_RULES
+        f'git rm --cached -r --ignore-unmatch "{rule}"' for rule in STRIP_RULES
     )
     # Pass the full `sh -c '...'` as a single arg to filter-branch.
     _git(
@@ -154,14 +149,10 @@ def regenerate_public() -> None:
 
 
 def find_leaks_in_public() -> list[str]:
-    """Return the list of public-branch paths that match a STRIP_RULE."""
+    """Return the list of public-branch paths that match a private rule."""
     result = _git("ls-tree", "-r", "--name-only", "public", check=False)
-    leaks: list[str] = []
-    for path in result.stdout.splitlines():
-        normalized = path.replace("\\", "/")
-        if any(normalized.startswith(rule + "/") for rule in STRIP_RULES):
-            leaks.append(path)
-    return leaks
+    paths = [path for path in result.stdout.splitlines() if path]
+    return [path for path, _reason in find_private_violations(paths, PRIVATE_CONFIG)]
 
 
 def parse_args(argv: list[str]) -> argparse.Namespace:

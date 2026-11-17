@@ -1,3 +1,11 @@
+---
+title: "Documentation Update"
+source: "https://odin-lang.org/news/newsletter-2024-07"
+tags: [OdinRAG, kb, source/newsletters, topic/allocator, topic/collision, topic/rendering]
+type: reference
+status: active
+---
+
 Read up on the compiler changes in the [monthly release](https://github.com/odin-lang/Odin/releases/tag/dev-2024-07) notes.
 
 ---
@@ -10,16 +18,16 @@ Feoramund has updated the Documentation on the odin test runner <https://odin-la
 
 ## Projects shared this month [#](#projects-shared-this-month)
 
-| Project Name | Description |
-| --- | --- |
-| [odin-bgfx](https://github.com/hitchh1k3r/odin-bgfx/) | bgfx bindings |
-| [odin-d3d11-h264](https://github.com/markersniffen/odin-d3d11-h264-decode) | d3d11 h264 decode reference |
-| [real-time-collision](https://gist.github.com/jakubtomsu/2acd84731d3c2613c91e40c2e064ffe6) | real time collision functions gist |
-| [bml](https://github.com/mabeh19/bml/) | binary parser based on XML schemes |
-| [toml\_parser](https://github.com/Up05/toml_parser) | TOML parser |
-| [serial](https://github.com/jasonKercher/serial) | cross-platform serial communications |
-| [minimal-vulkan](https://gist.github.com/jockus/61a90bef44048a26e056f2d538e67886) | minimal vulkan triangle example using shader objects |
-| [RGFW-Odin](https://github.com/ColleagueRiley/RGFW-Odin) | RGFW cross-platform window abstraction library bindings |
+| Project Name                                                                               | Description                                             |
+| ------------------------------------------------------------------------------------------ | ------------------------------------------------------- |
+| [odin-bgfx](https://github.com/hitchh1k3r/odin-bgfx/)                                      | bgfx bindings                                           |
+| [odin-d3d11-h264](https://github.com/markersniffen/odin-d3d11-h264-decode)                 | d3d11 h264 decode reference                             |
+| [real-time-collision](https://gist.github.com/jakubtomsu/2acd84731d3c2613c91e40c2e064ffe6) | real time collision functions gist                      |
+| [bml](https://github.com/mabeh19/bml/)                                                     | binary parser based on XML schemes                      |
+| [toml\_parser](https://github.com/Up05/toml_parser)                                        | TOML parser                                             |
+| [serial](https://github.com/jasonKercher/serial)                                           | cross-platform serial communications                    |
+| [minimal-vulkan](https://gist.github.com/jockus/61a90bef44048a26e056f2d538e67886)          | minimal vulkan triangle example using shader objects    |
+| [RGFW-Odin](https://github.com/ColleagueRiley/RGFW-Odin)                                   | RGFW cross-platform window abstraction library bindings |
 
 ---
 
@@ -101,7 +109,7 @@ Any more complex higher level features can be built on top of this like multiple
 
 Coming back to the AST editor there are a few questions.
 
-1. How do we *move* around generally
+1. How do we _move_ around generally
 
 - Move by AST Nodes
 - Keep a textual based movement system
@@ -114,7 +122,7 @@ Coming back to the AST editor there are a few questions.
 
 3. Multiselection makes sense but overcomplicates things
 
-- Selecting multiple nodes is easy, but how do we *really* edit them
+- Selecting multiple nodes is easy, but how do we _really_ edit them
 - What kind of restrictions would have to apply
 
 [](/images/news/2024-07-skytrias2.mp4)
@@ -187,7 +195,8 @@ Node_Type :: enum {
     Field_Basic,
   Field_End,
 }
-```odin
+```
+
 The “Start” and “End” enums are just for specifying ranges. Either way it’s quite a lot to cover. For each of these there would have to be specific logic and constraints set.
 
 ### Insertion Feels Good [#](#insertion-feels-good)
@@ -213,7 +222,8 @@ Expr_Ident     ->       Expr_Binary '+'  Expr_Binary '-'
                 Expr_Basic_Lit Expr_Basic_Lit
                                              30 - 30
                                 (Expr_Basic_Lit) Expr_Basic_Lit
-```odin
+```
+
 Those are 7 nodes that had to be “created” and correctly set instead of plainly typed out. The tree is a few levels deep for a simple declaration. Imagine it going more complex anything non trivial and representing insertion/removal/navigation becomes difficult.
 
 ### Supporting Existing Code [#](#supporting-existing-code)
@@ -226,7 +236,7 @@ Maybe it makes more sense to create a new ecosystem around a tiny language that 
 
 ### Ending Notes [#](#ending-notes)
 
-One thing I remember when discussing this with ***GingerBill*** was that, he likes the idea but he would always wish for an “escape”, where you can just type in raw text and it will convert that to the AST representation.
+One thing I remember when discussing this with _**GingerBill**_ was that, he likes the idea but he would always wish for an “escape”, where you can just type in raw text and it will convert that to the AST representation.
 
 While I like the idea I think it feels like a defeat to the whole idea of the editor. In that case you could just have a raw text editor but parse the AST all the time to get IDE like features.
 
@@ -238,6 +248,6 @@ I would still love to see innovation or other examples of an AST editor, so if y
 
 ### Next Month [#](#next-month)
 
-The last part will come out next month, where we’ll look into a middle ground, the ***Token Based Editor***.
+The last part will come out next month, where we’ll look into a middle ground, the _**Token Based Editor**_.
 
->Source: https://odin-lang.org/news/newsletter-2024-07
+> Source: https://odin-lang.org/news/newsletter-2024-07

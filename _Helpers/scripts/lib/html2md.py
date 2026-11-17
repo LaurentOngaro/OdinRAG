@@ -22,6 +22,7 @@ from bs4 import BeautifulSoup
 from markdownify import markdownify as md
 
 from .http_client import fetch
+from .kb_frontmatter import ensure_kb_frontmatter
 
 # Tags to strip before conversion (page chrome, never content).
 _NON_CONTENT_TAGS = ("nav", "script", "style", "aside", "footer")
@@ -111,7 +112,10 @@ def scrape_to_markdown(
 
     output_path = Path(output_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    output_path.write_text(f"{markdown}\n\n>Source: {source_url}\n", encoding="utf-8")
+    raw_doc = f"{markdown}\n\n>Source: {source_url}\n"
+    if output_path.suffix.lower() == ".md" and output_path.name != "README.md":
+        raw_doc, _ = ensure_kb_frontmatter(raw_doc, file_path=output_path, source_url=source_url)
+    output_path.write_text(raw_doc, encoding="utf-8", newline="\n")
 
     if format_odin and output_path.suffix.lower() == ".md":
         # Add _Helpers/scripts/ to sys.path so `from fixes.odin_format import …` works

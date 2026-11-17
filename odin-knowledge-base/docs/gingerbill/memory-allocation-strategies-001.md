@@ -1,3 +1,12 @@
+---
+title: "Memory Allocation Strategies - Part 1"
+date: 2019-02-01
+source: "https://www.gingerbill.org/article/2019/02/01/memory-allocation-strategies-001"
+tags: [OdinRAG, kb, source/gingerbill, topic/allocator]
+type: reference
+status: active
+---
+
 # Memory Allocation Strategies - Part 1
 
 ## Thinking About Memory and Allocation
@@ -12,7 +21,7 @@ Most people are taught to think of memory in terms of the stack and the heap, wh
 
 Most architectures have register dedicated as a pointer to the stack, that is added because it is used frequently and pragmatically makes sense to do so. and that the heap is magical in nature.
 
-Modern operating systems virtualize memory on a per-process basis. This means that the addresses used within your program/process are specific to that program/process only. Due to operating systems virtualizing the memory space for us, this allows us to think about memory in a completely different way. Memory is not longer this dualistic model of *the stack* and *the heap* but rather a monistic model where everything is virtual memory. Some of that virtual address space is reserved for procedure stack frames, some of it is reserved for things required by the operating system, and the rest we can use for whatever we want. This may sound similar to original dualistic model that I stated previously, however, the biggest difference is realizing that the memory is virtually-mapped and linear, and that you can split that linear memory space in sections.
+Modern operating systems virtualize memory on a per-process basis. This means that the addresses used within your program/process are specific to that program/process only. Due to operating systems virtualizing the memory space for us, this allows us to think about memory in a completely different way. Memory is not longer this dualistic model of _the stack_ and _the heap_ but rather a monistic model where everything is virtual memory. Some of that virtual address space is reserved for procedure stack frames, some of it is reserved for things required by the operating system, and the rest we can use for whatever we want. This may sound similar to original dualistic model that I stated previously, however, the biggest difference is realizing that the memory is virtually-mapped and linear, and that you can split that linear memory space in sections.
 
 ![Virtual Memory](/images/memory-allocation-strategies/virtual_memory.svg#center)
 
@@ -26,10 +35,10 @@ When it comes to allocation, there are three main aspects to think about
 
 I usually imagine the first two aspects in the following table, for most problem domains, where the percentages signify what proportion of allocations fall into that category:
 
-|  | Size Known | Size Unknown |
-| --- | --- | --- |
-| **Lifetime Known** | 95% | ~4% |
-| **Lifetime Unknown** | ~1% | <1% |
+|                      | Size Known | Size Unknown |
+| -------------------- | ---------- | ------------ |
+| **Lifetime Known**   | 95%        | ~4%          |
+| **Lifetime Unknown** | ~1%        | <1%          |
 
 In the top-left category (Size Known + Lifetime Known), this is the area in which I will be covering the most in this series. Most of the time, you do know the size of the allocation, or the upper bounds at least, and the lifetime of the allocation in question.
 
@@ -37,7 +46,7 @@ In the top-right category (Size Unknown + Lifetime Known), this is the area in w
 
 In the bottom-left category (Size Known + Lifetime Unknown), this is the area in which you may not know how long that memory needs to be around but you do know how much memory is needed. In this case, you could say that the “ownership” of that memory across multiple systems is ill-defined. A common solution for this domain of problems is reference counting or ownership semantics.
 
-In the bottom-right category (Size Unknown + Lifetime Unknown), this is the area in which you have literally no idea how much memory you need nor how long it will be needed for. In practice, this is quite rare and you *ought* to try and avoid these situations when possible. However, the general solution for this domain of problems is garbage collection
+In the bottom-right category (Size Unknown + Lifetime Unknown), this is the area in which you have literally no idea how much memory you need nor how long it will be needed for. In practice, this is quite rare and you _ought_ to try and avoid these situations when possible. However, the general solution for this domain of problems is garbage collection
 
 Garbage collection is one of the only terms in computers science where the term actually reflects its real world counter part..
 
@@ -45,7 +54,7 @@ Please note that in domain specific areas, these percentages will be completely 
 
 # Generations of Lifetimes
 
-For the common category, the general approach that I take is to think about memory lifetimes in terms of generations. An *allocation generation* is a way to organize memory lifetimes into a hierarchical structure
+For the common category, the general approach that I take is to think about memory lifetimes in terms of generations. An _allocation generation_ is a way to organize memory lifetimes into a hierarchical structure
 
 These generations are not cut-and-dry and allocations can span across this spectrum of lifetimes (like in real life)..
 
@@ -81,4 +90,4 @@ In this series, I will discuss the different kinds of memory models and allocati
 - Automatic Lifetime Allocations
 - Allocation Grouping and Mental Models
 
->Source: https://www.gingerbill.org/article/2019/02/01/memory-allocation-strategies-001
+> Source: https://www.gingerbill.org/article/2019/02/01/memory-allocation-strategies-001

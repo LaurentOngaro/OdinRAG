@@ -1,3 +1,12 @@
+---
+title: "Writing 'Understanding the Odin Programming Language'"
+date: 2025-01-21
+source: "https://zylinski.se/posts/writing-a-book-about-odin"
+tags: [OdinRAG, kb, source/zylinski]
+type: reference
+status: active
+---
+
 # Writing 'Understanding the Odin Programming Language'
 
 January 21, 2025
@@ -86,9 +95,9 @@ My code starts by splitting the markdown into lines and checking what each line 
 - `## Heading` -> `<h2>` tag etc
 - Lines separated by line breaks: Group as paragraphs, meaning surround them with `p` tags: `<p>The line</p>`
 
-There is something to note here: Since I only needed to support the subset of markdown that I actually used, then I could cut *a lot* of corners. I didn’t even write proper tokenization. I just check what a line starts with, if there are line breaks, etc. I will *not* release this tool, because it is so specific to my book. It literally contains hard coded things that are unique for my book, and it will break on some types of markdown. But that’s a good thing: It’s a simple program that just does what it needs to. Making a general purpose markdown -> book converter *would take ages*! Instead I slapped together what I needed for my own purposes.
+There is something to note here: Since I only needed to support the subset of markdown that I actually used, then I could cut _a lot_ of corners. I didn’t even write proper tokenization. I just check what a line starts with, if there are line breaks, etc. I will _not_ release this tool, because it is so specific to my book. It literally contains hard coded things that are unique for my book, and it will break on some types of markdown. But that’s a good thing: It’s a simple program that just does what it needs to. Making a general purpose markdown -> book converter _would take ages_! Instead I slapped together what I needed for my own purposes.
 
-After a while I needed to support `<code></code>`, **strong** and *italic*. For that I wrote a small procedure which looks for symbols such as `, `_` and `*` and turns them into HTML tags. That way, I could just run each paragraph of text through that procedure. I also added link support to it: `[This is a link](https://website.com)`. When it sees `[`, then it tries to assemble a link by looking for the `]` and the `()`. Again, it might break for some malformed links. But I’m not putting malformed links into my book.
+After a while I needed to support `<code></code>`, **strong** and _italic_. For that I wrote a small procedure which looks for symbols such as `, `_`and`*`and turns them into HTML tags. That way, I could just run each paragraph of text through that procedure. I also added link support to it:`[This is a link](https://website.com)`. When it sees `[`, then it tries to assemble a link by looking for the `]`and the`()`. Again, it might break for some malformed links. But I’m not putting malformed links into my book.
 
 Quite soon, I had a program that could output my original blog post, but with full control over how it did it. I then added the table of contents, that went on the side of the screen. That was done by just saving away some metadata each time I parsed a line starting with one or more `#` (the headings).
 
@@ -104,19 +113,22 @@ I was excited about adding “side bubbles”: Extra information that live in a 
 
 ```odin
 > This is a block quote.
-```odin
+```
+
 But I made it so that all those `>` resulted in side bubbles.
 
 I could fine-tune the bubble’s position by writing a number directly after `>`:
 
 ```odin
 >30 This bubble will be pushed up 30 pixels on the screen.
-```odin
+```
+
 There are special “From C / C++” bubbles. Those are created by adding `C` after `>`
 
 ```odin
 >C In C, you can see!
-```odin
+```
+
 ## Responsive CSS[#](#responsive-css)
 
 ![Shows the book with a narrow browser, bubbles are now below the text](/writing_book/bubbles-2.png)
@@ -134,14 +146,16 @@ That’s done using CSS media queries:
 	/* CSS to make side bubbles appear
 	under text instead of on the side */
 }
-```odin
+```
+
 Also note the `print` at the end of that line. I use this format when printing as well. Printing can’t use side bubbles since they are cut off in very awkward ways.
 
 The bubble-under layout is used when reading the book on phone as well, since those screens are naturally narrow. To make your book look good on phones you usually have to add this inside the `<head>` tag of your document:
 
 ```odin
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-```odin
+```
+
 ## Inspiration from Bob Nystrom[#](#inspiration-from-bob-nystrom)
 
 I reached out to Bob Nystrom, author or “Crafting Interpreters”. I asked him about how to publish books. He said that he did almost everything himself and linked to his blog, where there are some posts about how he made his books: <https://journal.stuffwithstuff.com/category/book/>
@@ -158,12 +172,14 @@ The images are added in the markdown as normal markdown image tags:
 
 ```odin
 ![Alt text](swizzle.jpg "Figure caption")
-```odin
+```
+
 When the book-building program runs into this tag, then it loads the image (`swizzle.jpg` in this case). It base64 encodes the image data (my Odin program uses [`"core:encoding/base64"`](https://pkg.odin-lang.org/core/encoding/base64/#encode)). The base64 encoded data is put into an image tag inside the final HTML:
 
 ```odin
 <img src="data:image/FILE_FORMAT;base64,DATA" alt="ALT_TEXT">
-```odin
+```
+
 So for a jpeg it says `image/jpeg` and `DATA` is replaced with the resulting base64 encoded data. That way I was able to embed every single image into the HTML.
 
 It’s also very important to bundle the fonts: If someone’s internet fails, then the book will look very bad. Also, the side-bubbles are positioned quite carefully, so it’s important that the correct font is always used.
@@ -175,37 +191,39 @@ To accomplish this I made a `fonts.css` file, which contains the data of the thr
 	font-family: "Font Name";
 	src: url('data:font/ttf;charset=utf-8;base64,DATA') format('truetype');
 }
-```odin
+```
+
 Replace DATA with your base64 encoded font data. For base64 encoding the font files, I made this Odin program:
 
 ```odin
 package base64_enc
 
 import "core:encoding/base64"
-import "core:os"
 import "core:fmt"
+import "core:os"
 
 main :: proc() {
-	if len(os.args) == 1 {
-		return
-	}
+  if len(os.args) == 1 {
+    return
+  }
 
-	path := os.args[1]
+  path := os.args[1]
 
-	if in_data, in_data_ok := os.read_entire_file(path); in_data_ok {
-		if b64_enc, b64_enc_err := base64.encode(in_data); b64_enc_err == nil {
-			os.write_entire_file(fmt.tprintf("%v.base64", path), transmute([]u8)(b64_enc))
-		}
-	}	
+  if in_data, in_data_ok := os.read_entire_file(path); in_data_ok {
+    if b64_enc, b64_enc_err := base64.encode(in_data); b64_enc_err == nil {
+      os.write_entire_file(fmt.tprintf("%v.base64", path), transmute([]u8)(b64_enc))
+    }
+  }
 }
-```odin
+```
+
 I opened the resulting base64 encoded files and pasted their contents into my `fonts.css` file. With that fixed, I had my whole book in a single, portable HTML file!
 
 ## Non-bundled samples[#](#non-bundled-samples)
 
 The all-in-one HTML file was only for making it easy to download the book when you buy it. Sort-of how you can download a single PDF and get everything.
 
-However, I wanted an online sample that did *not* have the bundled images and fonts. Bundling them inside an online sample would put a lot of stress on the server, since I doubt it can cache the base64 encoded data. You can see the sample here: <https://odinbook.com/sample.html> When I generate the sample page, I feed the build program a special flag. That flag makes it only include the first three chapters (it also does some extra hard-coded stuff, like adding the “End of sample. Thanks for reading! blabla” text). When it comes to images, I just generate normal image tags and copy the images to the output directory. The fonts are supplied by google fonts. That way I minimize traffic for the sample!
+However, I wanted an online sample that did _not_ have the bundled images and fonts. Bundling them inside an online sample would put a lot of stress on the server, since I doubt it can cache the base64 encoded data. You can see the sample here: <https://odinbook.com/sample.html> When I generate the sample page, I feed the build program a special flag. That flag makes it only include the first three chapters (it also does some extra hard-coded stuff, like adding the “End of sample. Thanks for reading! blabla” text). When it comes to images, I just generate normal image tags and copy the images to the output directory. The fonts are supplied by google fonts. That way I minimize traffic for the sample!
 
 ## Checking code[#](#checking-code)
 
@@ -225,7 +243,8 @@ nice_rating := [Nice_People]int {
 }
 
 bobs_niceness := nice_rating[.Bob]
-```odin
+```
+
 I wanted automatic testing of this code. Whenever my book-building program sees the triple backticks ``` that trigger a code block, then it does the following:
 
 - Save the code in an array for later processing, also save the markdown line number number
@@ -233,7 +252,7 @@ I wanted automatic testing of this code. Whenever my book-building program sees 
 - Make the book building program run that Odin file: `odin run test_code.odin -file`
 - Stop the book building if there are errors
 
-This way I could catch *many* errors in the code.
+This way I could catch _many_ errors in the code.
 
 Sometimes I write code that is broken or incomplete. In those cases I add `nt` (short for No Test) after the three backticks. That will avoid testing of that block. I also support putting `e` when the example is an error, which will avoid testing of that code as well (sometimes I want to show something that is incorrect).
 
@@ -271,7 +290,8 @@ if (window.matchMedia) {
 if ((dark_from_media && !light_from_search) || dark_from_search) {
 	document.documentElement.classList.add("dark")
 }
-```odin
+```
+
 Note how it uses dark mode if `window.matchMedia('(prefers-color-scheme: dark)')` is true. That kind-of checks what your OS wants. I also support putting `?dark` and `?light` at the end of the URL. That’s what the `window.location.search.includes("light")` stuff checks for.
 
 The `toggle_dark` function is used by a button on the page that switches between dark and light mode.
@@ -294,14 +314,16 @@ The actual dark/light skinning is done like this in CSS:
 	--contents-code-bg: #242424;
 	/* etc */
 }
-```odin
+```
+
 Where those variables can be used in the rest of the CSS file:
 
 ```odin
 body {
 	background-color: var(--bg-color);
 }
-```odin
+```
+
 Just add or remove the `dark` class from the documentElement (see `toggle_dark` above) to enable/disable dark mode.
 
 I could also have added a cookie that remembers the choice, but cookie laws got me anxious. So I just added the `?light` and `?dark` URL things instead.
@@ -312,7 +334,7 @@ At first I tried to make the book a bit more targeted at programming beginners. 
 
 - Book is for people with basic programming skills.
 - They don’t need to know low-level programming, so coming from something like Python should be OK.
-- If they *do know* C or C++ from before, then there will be extra goodies in special side bubbles.
+- If they _do know_ C or C++ from before, then there will be extra goodies in special side bubbles.
 
 The trickiest thing to write about was manual memory management. I to make a book that’s useful for people coming from automatically memory managed languages. They can learn how to manage memory in Odin, but also learn some fundamental ideas that may be transferable to other languages.
 
@@ -370,8 +392,9 @@ Bob wrote in his blog post that an EPUB is basically a zip. He wrote that you ca
 cd my_awesome_site
 zip -X0 my_awesome_site.epub mimetype
 zip -Xur9D my_awesome_site.epub *
-```odin
-One VERY STRANGE THING about EPUB is that it’s *important* that the mimetype file is added first. Why? Because the EPUB format goes in and looks for it *at the start of the zip*. It needs it to be first as some kind of “header”. Absolutely bonkers.
+```
+
+One VERY STRANGE THING about EPUB is that it’s _important_ that the mimetype file is added first. Why? Because the EPUB format goes in and looks for it _at the start of the zip_. It needs it to be first as some kind of “header”. Absolutely bonkers.
 
 ### What goes into the EPUB?[#](#what-goes-into-the-epub)
 
@@ -381,7 +404,7 @@ I recommend that you go to gutenberg.org and download yourself some public domai
 
 ### EPUB and XHTML[#](#epub-and-xhtml)
 
-While the HTML version of the book uses normal HTML, EPUB *requires* XHTML. XHTML was the standard HTML for a few years, until someone decided it was a mistake.
+While the HTML version of the book uses normal HTML, EPUB _requires_ XHTML. XHTML was the standard HTML for a few years, until someone decided it was a mistake.
 
 One thing about XHTML is that it needs a `/` at the end of tags that don’t have a closing tag:
 
@@ -389,12 +412,14 @@ HTML:
 
 ```odin
 <img src="hello.jpg">
-```odin
+```
+
 XHTML
 
 ```odin
 <img src="hello.jpg"/>
-```odin
+```
+
 So I made a small `single_element` procedure. Just before putting these “non-closed” tags into the HTML, I run them through `single_element`. If the EPUB flag is active, then it finds the closing `>` and replaces it with `/>`.
 
 This way, I could mostly use the same code.
@@ -411,7 +436,7 @@ When I first tried to open my book on a real Kindle, it took like 2 minutes to l
 
 ## The future[#](#the-future)
 
-I still haven’t decided on if I want to make a physical book. I would have to do *a lot* of extra work to get that done. Physical books need to be manually typeset to look good. That means putting the text in and then going over every page and making sure everything is in the right place and looking tidy. It’s much more than just PDF-printing the HTML or EPUB version.
+I still haven’t decided on if I want to make a physical book. I would have to do _a lot_ of extra work to get that done. Physical books need to be manually typeset to look good. That means putting the text in and then going over every page and making sure everything is in the right place and looking tidy. It’s much more than just PDF-printing the HTML or EPUB version.
 
 ## Thanks for reading[#](#thanks-for-reading)
 
@@ -422,4 +447,4 @@ Got a question? Join my Discord: <https://discord.gg/4FsHgtBmFK>
 Have a nice day!
 /Karl Zylinski
 
->Source: https://zylinski.se/posts/writing-a-book-about-odin
+> Source: https://zylinski.se/posts/writing-a-book-about-odin

@@ -1,3 +1,12 @@
+---
+title: "Software Renderer in Odin from Scratch, Part VIII"
+date: 2025-10-16
+source: "https://marianpekar.com/blog/software-renderer-in-odin-from-scratch-part-viii"
+tags: [OdinRAG, kb, source/marianpekar, topic/allocator, topic/rendering, topic/raylib]
+type: reference
+status: active
+---
+
 # Software Renderer in Odin from Scratch, Part VIII
 
 16th October 2025 • 22 min read
@@ -21,14 +30,14 @@ And because, as I already wrote, there are many different image formats, we're n
 Let's start by adding a new file, name it `texture.odin`, and at the top, after specifying the package name as usual, import raylib and define our `Texture` struct.
 
 ```odin
-package main 
+package main
 
 import rl "vendor:raylib"
 
 Texture :: struct {
-    width: i32,
-    height: i32,
-    pixels: [^]rl.Color
+  width:  i32,
+  height: i32,
+  pixels: [^]rl.Color,
 }
 ```
 
@@ -58,7 +67,7 @@ After creating our texture, we have all the data we need, so we can safely remov
 
 I'd like to make a small detour here. You probably already know that Odin is an unmanaged language. This means that when we allocate memory on the heap, we are responsible for freeing that memory when it's no longer needed, so it can be effectively reused for something else, right?
 
-So why is `UnloadImage` the first time we are doing that? After all, we have allocated memory before. The reason is that, in this renderer, the *lifespan* of all objects extends through the entire runtime of the application. While we are inside the main loop, we need all those objects to stay in memory, and we only stop needing them after we exit the main loop, but exiting the main loop means quitting the application. So why don't we free any memory at the end of our `main` procedure?
+So why is `UnloadImage` the first time we are doing that? After all, we have allocated memory before. The reason is that, in this renderer, the _lifespan_ of all objects extends through the entire runtime of the application. While we are inside the main loop, we need all those objects to stay in memory, and we only stop needing them after we exit the main loop, but exiting the main loop means quitting the application. So why don't we free any memory at the end of our `main` procedure?
 
 You might have been taught in school or by other programmers that you should always deallocate any memory you allocate on the heap, probably also with a very strong emphasis on always, and that otherwise you have a memory leak. However, there is no real need to do that here. Once the application quits, the operating system frees all the memory the application has claimed. You can think of the OS as acting like the ultimate garbage collector here.
 
@@ -66,7 +75,7 @@ In fact, explicitly freeing memory right before the application quits would be i
 
 And speaking of memory leaks, not freeing an object from memory when you no longer need it is not necessarily a memory leak per se. A memory leak occurs when your program **repeatedly** allocates memory, typically inside a loop, without freeing it, thus your application demands more and more memory over time, which eventually slows down the system and can lead to a crash once there's no more memory available.
 
-I'd like to clarify this because I've too often heard dogmatic statements about freeing memory allocated for an object as soon as you no longer need it, as well as misconceptions about what a memory leak is. If you have these misconceptions (I had them for a long time), abandoning them allows you to think about memory allocation differently, and you can start thinking, for example, about the common lifespans of multiple objects, which can lead you to the concept of *arena allocators*. That topic is too far from the scope of this post, but I do recommend that you Google it.
+I'd like to clarify this because I've too often heard dogmatic statements about freeing memory allocated for an object as soon as you no longer need it, as well as misconceptions about what a memory leak is. If you have these misconceptions (I had them for a long time), abandoning them allows you to think about memory allocation differently, and you can start thinking, for example, about the common lifespans of multiple objects, which can lead you to the concept of _arena allocators_. That topic is too far from the scope of this post, but I do recommend that you Google it.
 
 ## UV Mapping
 
@@ -100,7 +109,7 @@ I'll explain how UV mapping and texture sampling, which go hand in hand, work in
 
 ```odin
 SortPointsAndUVs :: proc(
-    p1, p2, p3: ^Vector3, 
+    p1, p2, p3: ^Vector3,
     uv1, uv2, uv3: ^Vector2
 ) {
     if p1.y > p2.y {
@@ -142,11 +151,11 @@ Now it's time to implement a new rendering pipeline. Let's start by adding a new
 
 ```odin
 DrawTexturedFlatShaded :: proc(
-    vertices: []Vector3, 
-    triangles: []Triangle, 
-    uvs: []Vector2, 
-    light: Light, 
-    texture: Texture, 
+    vertices: []Vector3,
+    triangles: []Triangle,
+    uvs: []Vector2,
+    light: Light,
+    texture: Texture,
     zBuffer: ^ZBuffer,
     projMat: Matrix4x4,
     ambient:f32 = 0.2
@@ -220,9 +229,9 @@ DrawTexturedTriangleFlatShaded :: proc(
 
             for x := xStart; x <= xEnd; x += 1 {
                 DrawTexelFlatShaded(
-                    x, y, 
-                    p1, p2, p3, 
-                    uv1, uv2, uv3, 
+                    x, y,
+                    p1, p2, p3,
+                    uv1, uv2, uv3,
                     texture, intensity, zBuffer
                 )
             }
@@ -245,8 +254,8 @@ DrawTexturedTriangleFlatShaded :: proc(
             for x := xStart; x <= xEnd; x += 1 {
                 DrawTexelFlatShaded(
                     x, y,
-                    p1, p2, p3, 
-                    uv1, uv2, uv3, 
+                    p1, p2, p3,
+                    uv1, uv2, uv3,
                     texture, intensity, zBuffer
                 )
             }
@@ -255,7 +264,7 @@ DrawTexturedTriangleFlatShaded :: proc(
 }
 ```
 
-As younoticed for sure, the implementation of `DrawTexturedTriangleFlatShaded` is also very similar to the `DrawFilledTriangle` procedure. We still use the flat-top flat-bottom algorithm, but our `Sort` procedure now calls the `SortVerticesAndUVs` overload we prepared just a while ago and instead of `DrawPixel`, we now call `DrawTexelFlatShaded`, another procedure we yet need to implement, passing the X and Y screen coordinates where the *texel* (a pixel of color sampled from a texture) should be drawn, projected points, our depth buffer, and in addition also the UV coordinates for each of the projected points and our texture.
+As younoticed for sure, the implementation of `DrawTexturedTriangleFlatShaded` is also very similar to the `DrawFilledTriangle` procedure. We still use the flat-top flat-bottom algorithm, but our `Sort` procedure now calls the `SortVerticesAndUVs` overload we prepared just a while ago and instead of `DrawPixel`, we now call `DrawTexelFlatShaded`, another procedure we yet need to implement, passing the X and Y screen coordinates where the _texel_ (a pixel of color sampled from a texture) should be drawn, projected points, our depth buffer, and in addition also the UV coordinates for each of the projected points and our texture.
 
 `DrawTexelFlatShaded` is a procedure in which we perform per-pixel texture sampling. In other words, we take a color from our texture and apply it to a specific screen position. As we do this for all positions where we previously drew a predefined color, the triangle, and eventually the entire model, will have the texture image projected onto its surface. Let's start by adding the function signature and declaring `ix` and `iy`, the integer variants of the `x` and `y` coordinates that are floats, since we need both.
 
@@ -309,14 +318,14 @@ if depth <= zBuffer[zIndex] {
 
 Yet, we want the texel to be shaded, and since we have already calculated the `intensity` for the entire triangle, we simply multiply each color channel of the texel by this intensity. Then we finally draw the texel on the screen and update the depth buffer, which concludes the entire implementation of a pipeline for flat-shaded rendering with a texture.
 
-One last thing we're going to add before we leave `draw.odin` for today is the `DrawTexturedUnlit` procedure, an entry point for *unlit* rendering with a texture. This one is going to be super simple. We don't need to calculate intensity, so we can reuse the `IsBackFace` procedure, and as the intensity for the `DrawTexturedTriangleFlatShaded` call, we simply pass `1.0,` and we're done.
+One last thing we're going to add before we leave `draw.odin` for today is the `DrawTexturedUnlit` procedure, an entry point for _unlit_ rendering with a texture. This one is going to be super simple. We don't need to calculate intensity, so we can reuse the `IsBackFace` procedure, and as the intensity for the `DrawTexturedTriangleFlatShaded` call, we simply pass `1.0,` and we're done.
 
 ```odin
 DrawTexturedUnlit :: proc(
-    vertices: []Vector3, 
-    triangles: []Triangle, 
-    uvs: []Vector2, 
-    texture: Texture, 
+    vertices: []Vector3,
+    triangles: []Triangle,
+    uvs: []Vector2,
+    texture: Texture,
     zBuffer: ^ZBuffer,
     projMat: Matrix4x4
 ) {
@@ -344,7 +353,7 @@ DrawTexturedUnlit :: proc(
         DrawTexturedTriangleFlatShaded(
             &p1, &p2, &p3,
             &uv1, &uv2, &uv3,
-            texture, 
+            texture,
             1.0, // Unlit
             zBuffer
         )
@@ -387,7 +396,7 @@ switch renderMode {
 
 That's it for today. If you now compile and run the program (`odin run . -o:speed`), you should see a flat shaded cube with UV checker texture projected on its surface, and if you press the left arrow, you should see the same cube just without shading.
 
-You should still be able to move the cube around with the WSADQD keys, rotate it with the IJKLUO keys, scale it using + and -, and cycle through now six rendering modes with the left and right arrows. If anything doesn't work as expected, compare your implementation with the one in the *Part 8* directory in [this GitHub repository](https://github.com/marianpekar/software-renderer-odin-tutorials).
+You should still be able to move the cube around with the WSADQD keys, rotate it with the IJKLUO keys, scale it using + and -, and cycle through now six rendering modes with the left and right arrows. If anything doesn't work as expected, compare your implementation with the one in the _Part 8_ directory in [this GitHub repository](https://github.com/marianpekar/software-renderer-odin-tutorials).
 
 ## Other Parts of This Series
 
@@ -409,4 +418,4 @@ You should still be able to move the cube around with the WSADQD keys, rotate it
 > Author: Marian Pekar - <https://marianpekar.com>
 > (c) Marian Pekar. The posts stay freely readable on the author's site; this local copy is credited in `SOURCES.md` at the repo root. Please link back to the original article.
 
->Source: https://marianpekar.com/blog/software-renderer-in-odin-from-scratch-part-viii
+> Source: https://marianpekar.com/blog/software-renderer-in-odin-from-scratch-part-viii

@@ -1,3 +1,11 @@
+---
+title: "Overview"
+source: "https://odin-lang.org/docs/inline-asm"
+tags: [OdinRAG, kb, source/official, topic/allocator]
+type: reference
+status: active
+---
+
 > **Note:** Currently amd64 targets only (e.g. `windows_amd64`, `linux_amd64`, `darwin_amd64`).
 
 ## Overview [#](#overview)
@@ -7,8 +15,8 @@ forced-inline procedure. It is not a statement block spliced into a surrounding
 procedure; rather, it behaves like an intrinsic. Some platform-specific intrinsics
 will be replaced by this system in the near future.
 
-The general `instruction [operand{, operand}]` form is intended as a *universal
-syntax* across instruction set architectures: every ISA shares this common grammar
+The general `instruction [operand{, operand}]` form is intended as a _universal
+syntax_ across instruction set architectures: every ISA shares this common grammar
 while still exposing its own instructions and registers. The approach is modeled on
 Go’s Plan 9–derived assembler, which likewise uses one syntax across all its targets
 ([Go’s assembler guide](https://go.dev/doc/asm), [the Plan 9 assembler manual](https://9p.io/sys/doc/asm.html)).
@@ -61,17 +69,17 @@ The `[...]` block holds everything that is not a plain input or output name.
 Ties and pins are edges onto names in the signature; scratch, width-views, and
 clobbers are declared in the block directly.
 
-| Form | Meaning |
-| --- | --- |
-| `in -> out` | tie: `out` is read-write, sharing `in`’s register |
-| `name = %reg` | pin `name` to a physical register |
-| `in -> out = %reg` | in/out pinned to a fixed register |
-| `name: T` | scratch register of type `T` |
-| `name: T = %reg` | scratch register of type `T` pinned to a physical register |
-| `view: T = src` | width-view of `src`’s register at width `T` |
-| `#clobber x` | clobber a register, `flags`, or `memory` |
-| `#volatile` | marks a whole template as volatile |
-| `#align_stack` | forces stack realignment on entry to the template |
+| Form               | Meaning                                                    |
+| ------------------ | ---------------------------------------------------------- |
+| `in -> out`        | tie: `out` is read-write, sharing `in`’s register          |
+| `name = %reg`      | pin `name` to a physical register                          |
+| `in -> out = %reg` | in/out pinned to a fixed register                          |
+| `name: T`          | scratch register of type `T`                               |
+| `name: T = %reg`   | scratch register of type `T` pinned to a physical register |
+| `view: T = src`    | width-view of `src`’s register at width `T`                |
+| `#clobber x`       | clobber a register, `flags`, or `memory`                   |
+| `#volatile`        | marks a whole template as volatile                         |
+| `#align_stack`     | forces stack realignment on entry to the template          |
 
 The right-hand side disambiguates the two `=` forms: `= %reg` (a register) is a
 pin; `= src` (a name) is a width-view of another operand. A bare `->` leaves the
@@ -242,7 +250,7 @@ masking).
 
 Placed within the `[...]` block:
 
-- `#volatile` marks the whole template as *volatile*: it must not be deleted
+- `#volatile` marks the whole template as _volatile_: it must not be deleted
   even if its results are unused, nor reordered. This is distinct from
   `#clobber memory` (an ordering/visibility statement) and from `#clobber flags`.
 - `#align_stack` forces stack realignment on entry to the template, for
@@ -258,13 +266,13 @@ error later.
 
 Checked, per instruction:
 
-- **Unknown mnemonic or prefix.** Reported with a *did-you-mean* suggestion
+- **Unknown mnemonic or prefix.** Reported with a _did-you-mean_ suggestion
   drawn from the target’s mnemonic set (`movsss` → did you mean `movss`,
   `movsd`?). Unknown registers are suggested the same way.
 - **Operand count.** Too few or too many operands names the accepted arity.
 - **Operand kind.** Register vs memory vs immediate vs label, matched against
   each encoding form. A mismatch names the operand and what was expected there
-  (e.g. *operand 2 expected a register, got an immediate*).
+  (e.g. _operand 2 expected a register, got an immediate_).
 - **Operand size and class.** A `u32` into a 64-bit slot, a `#simd[8]f32` into
   an xmm slot, or an integer where a vector register is required is reported
   with the expected and actual widths/classes. A scalar float is accepted in a
@@ -279,7 +287,7 @@ Checked, per instruction:
   or register-valued displacement.
 
 When several encoding forms exist for a mnemonic, the checker reports against
-the *closest* form—the one the operands most nearly satisfied—so the
+the _closest_ form—the one the operands most nearly satisfied—so the
 suggestion points at the encoding you most likely intended rather than an
 unrelated one. Prefix legality (`lock` on a memory destination; `rep`/`repne`
 on a string instruction) is checked against the selected form.
@@ -552,4 +560,4 @@ main :: proc() {
 }
 ```
 
->Source: https://odin-lang.org/docs/inline-asm
+> Source: https://odin-lang.org/docs/inline-asm

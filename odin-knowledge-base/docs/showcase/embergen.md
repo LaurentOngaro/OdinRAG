@@ -1,3 +1,11 @@
+---
+title: "1.0 Release Trailer"
+source: "https://odin-lang.org/showcase/embergen"
+tags: [OdinRAG, kb, source/showcase]
+type: reference
+status: active
+---
+
 [JangaFX](https://jangafx.com/) are the creators of the 3D animation software [EmberGen](https://jangafx.com/software/embergen/) written fully in Odin.
 
 [EmberGen](https://jangafx.com/software/embergen/) is a real-time volumetric fluid simulator that can instantly simulate, render, and export flipbooks, image sequences, and VDB volumes. With EmberGen, you can create anything from fire and smoke, to explosions and magic wisps. EmberGen gives you the creative freedom to iterate on your simulations in a few milliseconds instead of hours.
@@ -35,4 +43,4 @@ Import your FBX cameras and backplates into EmberGen to create composite ready r
 
 Whether you’re painting in 2D, or adding atmospheric effects to a 3D world, EmberGen can help you produce stunning concept art featuring gorgeous visual effects. 3D concept artists love that EmberGen can generate endless VDB volume files or images for compositions. 2D artists can use EmberGen outputs as brushes or items to layer into their work, quickly adding volumetric effects with ease. Using our backplates import feature, import your concept art to properly light and render your simulation before creating your final piece.
 
->Source: https://odin-lang.org/showcase/embergen
+> Source: https://odin-lang.org/showcase/embergen

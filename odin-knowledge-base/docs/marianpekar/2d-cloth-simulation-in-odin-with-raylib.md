@@ -1,3 +1,12 @@
+---
+title: "2D Cloth Simulation in Odin with raylib"
+date: 2025-01-26
+source: "https://marianpekar.com/blog/2d-cloth-simulation-in-odin-with-raylib"
+tags: [OdinRAG, kb, source/marianpekar, topic/raylib]
+type: reference
+status: active
+---
+
 # 2D Cloth Simulation in Odin with raylib
 
 26th January 2025 • 23 min read
@@ -19,27 +28,27 @@ Let’s now look at this implementation, and I’ll explain everything as we go.
 Once you've got everything set up and have looked at the basics of Odin, we can start writing into the `main.odin` file. After the [package](https://odin-lang.org/docs/overview/#packages) declaration and importing [raylib](https://pkg.odin-lang.org/vendor/raylib/) as `rl`, we'll declare three structs: `Point`, `Stick`, and `Cloth`.
 
 ```odin
-package main 
+package main
 
 import rl "vendor:raylib"
 
 Point :: struct {
-     pos: rl.Vector2,
-     prevPos: rl.Vector2,
-     initPos: rl.Vector2,
-     isPinned: bool,
-     isSelected: bool
+  pos:        rl.Vector2,
+  prevPos:    rl.Vector2,
+  initPos:    rl.Vector2,
+  isPinned:   bool,
+  isSelected: bool,
 }
 
 Stick :: struct {
-    p0: ^Point,
-    p1: ^Point,
-    isTeared: bool
+  p0:       ^Point,
+  p1:       ^Point,
+  isTeared: bool,
 }
 
 Cloth :: struct {
-    points: [dynamic]^Point,
-    sticks: [dynamic]^Stick
+  points: [dynamic]^Point,
+  sticks: [dynamic]^Stick,
 }
 ```
 
@@ -121,13 +130,13 @@ cursorSize: f32 = 30.0
 We’re near the end of the main procedure. We just need to implement a main loop that will run until we tell the program we wish to close the window, which we can do by pressing ESC, since our window was set to borderless fullscreen mode. After exiting the loop, we simply close the window.
 
 ```odin
-‎ ‎ ‎ ‎ for !rl.WindowShouldClose() { 
+‎ ‎ ‎ ‎ for !rl.WindowShouldClose() {
         HandleMouseInteraction(&cloth, &cursorSize)
 
         accumulator += rl.GetFrameTime()
         for accumulator >= fixedDeltaTime {
             UpdateCloth(&cloth, fixedDeltaTime, clothSpacing, drag, gravity, elasticity)
-            accumulator -= fixedDeltaTime            
+            accumulator -= fixedDeltaTime
         }
 
         rl.BeginDrawing()
@@ -325,7 +334,7 @@ HandleMouseInteraction :: proc(cloth: ^Cloth, cursorSize: ^f32) {
     SetCursorSize :: proc(cursorSize: ^f32) {
         stepSize :: 5
         if rl.GetMouseWheelMove() > 0 {
-            cursorSize^ += stepSize 
+            cursorSize^ += stepSize
         } else if rl.GetMouseWheelMove() < 0 && !(cursorSize^ <= stepSize) {
             cursorSize^ -= stepSize
         }
@@ -355,7 +364,7 @@ HandleMouseInteraction :: proc(cloth: ^Cloth, cursorSize: ^f32) {
             }
         }
 
-        prevMousePos = mousePos 
+        prevMousePos = mousePos
     }
 }
 ```
@@ -377,4 +386,4 @@ And that's it, just about 200 lines of Odin with raylib, and that makes the enti
 > Author: Marian Pekar - <https://marianpekar.com>
 > (c) Marian Pekar. The posts stay freely readable on the author's site; this local copy is credited in `SOURCES.md` at the repo root. Please link back to the original article.
 
->Source: https://marianpekar.com/blog/2d-cloth-simulation-in-odin-with-raylib
+> Source: https://marianpekar.com/blog/2d-cloth-simulation-in-odin-with-raylib

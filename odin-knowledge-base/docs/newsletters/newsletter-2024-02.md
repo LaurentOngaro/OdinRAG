@@ -1,3 +1,11 @@
+---
+title: "Reddit"
+source: "https://odin-lang.org/news/newsletter-2024-02"
+tags: [OdinRAG, kb, source/newsletters, topic/entity-system, topic/hot-reload, topic/raylib, topic/wasm]
+type: reference
+status: active
+---
+
 Odin is on the journey to 1.0! You can read up on all changes in the [monthly release](https://github.com/odin-lang/Odin/releases/tag/dev-2024-02) notes.
 
 ## Reddit [#](#reddit)
@@ -7,9 +15,9 @@ Personally I’ve left reddit but building up communities other than discord is 
 
 ## Games [#](#games)
 
-We’ve got a whopping ***3 Games*** this month! I’m very excited to show them off here, so please check them out.
+We’ve got a whopping _**3 Games**_ this month! I’m very excited to show them off here, so please check them out.
 
-### ***Solar Storm*** from `Jakub` [#](#solar-storm-from-jakub)
+### _**Solar Storm**_ from `Jakub` [#](#solar-storm-from-jakub)
 
 “Solar Storm steam page is live!
 It’s still fairly work-in-progress, the screenshots are outdated and there is no trailer, but I’m working on it!
@@ -19,7 +27,7 @@ Also I’m also doing a first public playtest this weekend, if anyone is interes
 
 Steam: <https://store.steampowered.com/app/2754920/Solar_Storm/>
 
-### ***The Legend of Ján Ïtor*** from `Colin Bellino` [#](#the-legend-of-ján-ïtor-from-colin-bellino)
+### _**The Legend of Ján Ïtor**_ from `Colin Bellino` [#](#the-legend-of-ján-ïtor-from-colin-bellino)
 
 “Adventurers are spreading a lot of slime and other mess in the dungeon and you are the one tasked to clean it up before it becomes out of hand.
 
@@ -29,7 +37,7 @@ Engine: This game was developed as an experiment and way of dog-fooding a custom
 
 &amp;lt;a href=https://colinbellino.itch.io/the-legend-of-jan-itor&amp;gt;The Legend of Ján Ïtor 💀 by Colin Bellino, Flip, TillerQueen&amp;lt;/a&amp;gt;
 
-### ***CAT & ONION*** from `karl_zylinski` [#](#cat--onion-from-karl_zylinski)
+### _**CAT & ONION**_ from `karl_zylinski` [#](#cat--onion-from-karl_zylinski)
 
 “My game CAT & ONION is now released on itch! <https://zylinski.itch.io/cat-and-onion>
 
@@ -54,37 +62,38 @@ import "core:dynlib"
 import "core:fmt"
 
 Symbols :: struct {
-    // `foo_` is prefixed, so we look for the symbol `foo_add`.
-    add: proc "c" (int, int) -> int,
-    // We use the tag here to override the symbol to look for, namely `bar_sub`.
-    sub: proc "c" (int, int) -> int `dynlib:"bar_sub"`,
+  // `foo_` is prefixed, so we look for the symbol `foo_add`.
+  add:            proc "c" (_: int, _: int) -> int,
+  // We use the tag here to override the symbol to look for, namely `bar_sub`.
+  sub:            proc "c" (_: int, _: int) -> int `dynlib:"bar_sub"`,
 
-    // Exported global (if exporting an i32, the type must be ^i32 because the symbol is a pointer to the export.)
-    // If it's not a pointer or procedure type, we'll skip the struct field.
-    hellope: ^i32,
+  // Exported global (if exporting an i32, the type must be ^i32 because the symbol is a pointer to the export.)
+  // If it's not a pointer or procedure type, we'll skip the struct field.
+  hellope:        ^i32,
 
-    // Handle to free library.
-    // We can have more than one of these so we can match symbols for more than one DLL with one struct.
-    _my_lib_handle: dynlib.Library,
+  // Handle to free library.
+  // We can have more than one of these so we can match symbols for more than one DLL with one struct.
+  _my_lib_handle: dynlib.Library,
 }
 
 main :: proc() {
-    sym: Symbols
+  sym: Symbols
 
-    // Load symbols from `lib.dll` into Symbols struct.
-    // Each struct field is prefixed with `foo_` before lookup in the DLL's symbol table.
-    // The library's Handle (to unload) will be stored in `sym._my_lib_handle`. This way you can load multiple DLLs in one struct.
-    count, ok := dynlib.initialize_symbols(&sym, "lib.dll", "foo_", "_my_lib_handle")
-    defer dynlib.unload_library(sym._my_lib_handle)
-    fmt.printf("ok: %v. %v symbols loaded from lib.dll (%p).\n", ok, count, sym._my_lib_handle)
+  // Load symbols from `lib.dll` into Symbols struct.
+  // Each struct field is prefixed with `foo_` before lookup in the DLL's symbol table.
+  // The library's Handle (to unload) will be stored in `sym._my_lib_handle`. This way you can load multiple DLLs in one struct.
+  count, ok := dynlib.initialize_symbols(&sym, "lib.dll", "foo_", "_my_lib_handle")
+  defer dynlib.unload_library(sym._my_lib_handle)
+  fmt.printf("ok: %v. %v symbols loaded from lib.dll (%p).\n", ok, count, sym._my_lib_handle)
 
-    if count > 0 {
-        fmt.println("42 + 42 =", sym.add(42, 42))
-        fmt.println("84 - 13 =", sym.sub(84, 13))
-        fmt.println("hellope =", sym.hellope^)
-    }
+  if count > 0 {
+    fmt.println("42 + 42 =", sym.add(42, 42))
+    fmt.println("84 - 13 =", sym.sub(84, 13))
+    fmt.println("hellope =", sym.hellope^)
+  }
 }
-```odin
+```
+
 Output
 
 ```odin
@@ -93,7 +102,8 @@ ok: true. 3 symbols loaded from lib.dll (7FFDCF510000).
 42 + 42 = 84
 84 - 13 = 71
 hellope = 42
-```odin
+```
+
 ### Odin / WASM / Webgl by thetarnav [#](#odin--wasm--webgl-by-thetarnav)
 
 “I’ve been slowly getting into learning Odin, WASM and WebGL
@@ -279,4 +289,4 @@ Been getting quite annoyed with the sluggish windows file explorer recently... -
 
 The Focus text editor inspired me to try making my own editor with some things it doesn't have like identifier type coloring. Here's basic demo of it mostly working. Still have a long way to go, this just parses the file you're editing. Will look into parsing packages you declare through import statements now. - CasualKyle
 
->Source: https://odin-lang.org/news/newsletter-2024-02
+> Source: https://odin-lang.org/news/newsletter-2024-02

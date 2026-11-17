@@ -1,3 +1,12 @@
+---
+title: "The Value Propagation Experiment"
+date: 2021-07-05
+source: "https://www.gingerbill.org/article/2021/07/05/value-propagation-experiment"
+tags: [OdinRAG, kb, source/gingerbill]
+type: reference
+status: active
+---
+
 # The Value Propagation Experiment
 
 2021-07-05
@@ -21,7 +30,8 @@ x, err := foo();
 if err != nil {
     return err;
 }
-```odin
+```
+
 where `err` may be an enum, a (discriminated) union, or any other kind of value that has `nil`.
 
 And replace it with 
@@ -30,7 +40,8 @@ The concept of `try` worked by popping off the end value in a multiple valued ex
 
 ```odin
 x := try foo();
-```odin
+```
+
 This construct solves a very specific kind of error handling, of which optimizes for typing code rather than reading code. It also fails because Odin (and Go) are languages with multiple return values rather than single-type returns.
 
 And the more I think about it, the `if err != nil { return err }` and similar stuff may be the least worst option, and the best in terms of readability.
@@ -46,7 +57,8 @@ The research has been fruitful however. I did experiment with a `try x else y` c
 ```odin
 or_else(m["hellope"], 123)
 or_else(x.?, true)
-```odin
+```
+
 ## Degenerate States
 
 Some people may be a little surprised with my experimentation with this exception-like shorthand with error values. Especially since I wrote an article (which was originally two github comments) titled: [Exceptions - And Why Odin Will Never Have Them](/article/2018/09/05/exceptions-and-why-odin-will-never-have-them/).
@@ -55,7 +67,7 @@ One thing I did not comment on in the that article is the cause of the problem (
 
 So in languages with exceptions, all exception values can degenerate to the “base type”. In Rust, it can either go to the base trait or be inferred parametrically. In Zig it can either do `anyerror` or it will infer the error set from usage. Go has the built-in interface type `error` which acts as the common degenerate value.
 
-As I discuss in the article, I am not against error value propagation within a library, but I am pretty much always against it ***across*** library boundaries. A degenerate state has high entropy and a lack of specific information. And due to this form of type erasure, “downcasting” (broad use of term) is a way to recover the information, but it assumes implicit information which is not known in the type system itself.
+As I discuss in the article, I am not against error value propagation within a library, but I am pretty much always against it _**across**_ library boundaries. A degenerate state has high entropy and a lack of specific information. And due to this form of type erasure, “downcasting” (broad use of term) is a way to recover the information, but it assumes implicit information which is not known in the type system itself.
 
 The other issue when people pass the error up the stack for someone else to handle (something I criticize in the previous article already) is that it’s common to see this in many codebases already that have such a type: Go, Rust, and Zig (public) codebases exhibit this a lot.
 
@@ -73,4 +85,4 @@ n.b. I am not criticizing any particular language’s design for doing this, but
 
 [Part 2 of this Experiment](/article/2021/09/06/value-propagation-experiment-part-2/)
 
->Source: https://www.gingerbill.org/article/2021/07/05/value-propagation-experiment
+> Source: https://www.gingerbill.org/article/2021/07/05/value-propagation-experiment

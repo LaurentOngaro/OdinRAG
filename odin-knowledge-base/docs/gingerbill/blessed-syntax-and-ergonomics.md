@@ -1,3 +1,12 @@
+---
+title: "Blessed Syntax and Ergonomics"
+date: 2026-04-29
+source: "https://www.gingerbill.org/article/2026/04/29/blessed-syntax-and-ergonomics"
+tags: [OdinRAG, kb, source/gingerbill, topic/allocator, topic/dod]
+type: reference
+status: active
+---
+
 # Blessed Syntax and Ergonomics
 
 2026-04-29
@@ -6,13 +15,13 @@ I have seen a common remark from people who are not the biggest fans of Odin and
 
 This decision to “bless” built-in types with the “blessed syntax” was not a mistake.
 
-I wanted that explicitly because I know what the alternative is and the problems that arise from having it. Odin isn’t trying to be the next C++ or Rust by allowing for arbitrary syntax for all custom data types. It’s just trying to solve the average common case *very well*, rather than allowing the ability to solve “everything” *poorly* which leads to the problems of dialects and poor defaults.
+I wanted that explicitly because I know what the alternative is and the problems that arise from having it. Odin isn’t trying to be the next C++ or Rust by allowing for arbitrary syntax for all custom data types. It’s just trying to solve the average common case _very well_, rather than allowing the ability to solve “everything” _poorly_ which leads to the problems of dialects and poor defaults.
 
 ## Case Study: String Types
 
-I’ll start with a specific example of a need to swap out the default string type. One such case would be the need for a string type that has inlined-data for small strings but still has the same *interaction* syntax as another/default string type. I’d easily argue that this is an “optimization” of a problem that should not have happened in the first place.
+I’ll start with a specific example of a need to swap out the default string type. One such case would be the need for a string type that has inlined-data for small strings but still has the same _interaction_ syntax as another/default string type. I’d easily argue that this is an “optimization” of a problem that should not have happened in the first place.
 
-It is an indirect consequence of both automatic-memory-management (which means defaulting to “the heap”) *AND* treating strings as an overloaded construct of the string value, string builder, and the backing buffer for a string
+It is an indirect consequence of both automatic-memory-management (which means defaulting to “the heap”) _AND_ treating strings as an overloaded construct of the string value, string builder, and the backing buffer for a string
 
 I’ve written an article on this too: [String Type Distinctions](https://www.gingerbill.org/article/2024/04/05/string-type-distinctions/).. I remember when Facebook did a similar “optimization” for their string
 
@@ -28,7 +37,7 @@ Odin also has ways to allow for struct fields to be interpreted at runtime as if
 
 ## Arrays-What Always Happens
 
-What is interesting is that the common examples of user-level data structures that people want with what you call “blessed syntax” are virtually always some sort of custom array type. It is rare that people want this for anything BUT an array-like data structure, and when they do want something different, I’d argue it is *always* a bad idea to give it any form of “blessed syntax”
+What is interesting is that the common examples of user-level data structures that people want with what you call “blessed syntax” are virtually always some sort of custom array type. It is rare that people want this for anything BUT an array-like data structure, and when they do want something different, I’d argue it is _always_ a bad idea to give it any form of “blessed syntax”
 
 LISP Enjoyers will clearly disagree with me here, but we do have different philosophical approaches to programming in general, and thus this disagreement..
 
@@ -78,7 +87,7 @@ The first example would be slices `[]T`. A lot of the slicing operations would n
 
 ### Hash Maps
 
-Hash maps `map[K]V` are another in which the semantics could not be easily dealt with when it comes how keys are defined. In Odin, a hash map accepts any type that is *comparable* as its key. This is because anything that is *comparable* can be *hashable*. If this was user-definable, the user would either have to:
+Hash maps `map[K]V` are another in which the semantics could not be easily dealt with when it comes how keys are defined. In Odin, a hash map accepts any type that is _comparable_ as its key. This is because anything that is _comparable_ can be _hashable_. If this was user-definable, the user would either have to:
 
 - explicitly pass the comparison function and hashing function manually
 - overload operators and/or traits for or comparisons and hashing
@@ -86,11 +95,11 @@ Hash maps `map[K]V` are another in which the semantics could not be easily dealt
 
 Odin’s approach is to deal with the common case but not making too many assumptions due to it being a manual-memory-managed language
 
-A good example of this is `map[string]V`. `map` does not “manage” the memory of the `string` based keys. The user is responsible for managing that memory. If it did managed it, it would be an exception of the general case which would not be consistent for other things (e.g. strings within a comparable struct).. The way Odin works is that the comparable types will have a default hash function generated for them any time they are used as a `map` key (this hash function *cannot* be overridden, by design). It does mean that the hashing function might not be the optimal one for every use case, but it will be more than good enough for the vast majority of cases. If a user actually needs something more specialized for the hash map, then it is recommend you do not use the default one and use a custom variant, and have that syntax be obvious it is something custom.
+A good example of this is `map[string]V`. `map` does not “manage” the memory of the `string` based keys. The user is responsible for managing that memory. If it did managed it, it would be an exception of the general case which would not be consistent for other things (e.g. strings within a comparable struct).. The way Odin works is that the comparable types will have a default hash function generated for them any time they are used as a `map` key (this hash function _cannot_ be overridden, by design). It does mean that the hashing function might not be the optimal one for every use case, but it will be more than good enough for the vast majority of cases. If a user actually needs something more specialized for the hash map, then it is recommend you do not use the default one and use a custom variant, and have that syntax be obvious it is something custom.
 
 ### Enumerated Arrays
 
-And lastly [enumerated arrays](https://odin-lang.org/docs/overview/#enumerated-array) are a great example of something which is not *trivially* implemented at the user-level. Enumerated arrays allow the user of an `enum` to be used as indices to a fixed-length array. This is a very common idiom in C but is not strongly typed checked by the compiler.
+And lastly [enumerated arrays](https://odin-lang.org/docs/overview/#enumerated-array) are a great example of something which is not _trivially_ implemented at the user-level. Enumerated arrays allow the user of an `enum` to be used as indices to a fixed-length array. This is a very common idiom in C but is not strongly typed checked by the compiler.
 
 ```odin
 Direction :: enum{North, East, South, West}
@@ -105,8 +114,9 @@ Direction_Vectors :: [Direction][2]int {
 assert(Direction_Vectors[.North] == { 0, -1 })
 assert(Direction_Vectors[.East] == { 1, 0 })
 assert(Direction_Vectors[cast(Direction) 2] == { 0, 1 })
-```odin
-The indexing syntax could be trivially allowed with operator overloading however the compound literal syntax would not be. By default, a compound literal for an enumerated array must be *complete*, meaning all of the cases must be initialized, and only use `key=value` pairs. Other arrays in Odin allow for both positional values (which must be complete) and `key=value` paris (which can be “partial”), but enumerated arrays are very different.
+```
+
+The indexing syntax could be trivially allowed with operator overloading however the compound literal syntax would not be. By default, a compound literal for an enumerated array must be _complete_, meaning all of the cases must be initialized, and only use `key=value` pairs. Other arrays in Odin allow for both positional values (which must be complete) and `key=value` paris (which can be “partial”), but enumerated arrays are very different.
 
 ```odin
 arr: [enum {A, B, C}]int
@@ -114,7 +124,8 @@ arr = #partial { // without partial the compiler would complain
     .A = 42,
 }
 fmt.println(arr) // [.A = 42, .B = 0, .C = 0]
-```odin
+```
+
 As I stated, of course all of this is possible in a hypothetical language, but none of it would be “trivial” nor necessarily a good idea.
 
 ### Bit Sets
@@ -136,21 +147,22 @@ I’m using these languages as examples, not an exhaustive list. This could easi
 - The [Pragmatic Programmer](https://www.gingerbill.org/article/2020/05/31/programming-pragmatist-proverbs/) has defaults which use the “blessed syntax” and then anything else beyond that is clear that it is custom/user-level, and it encourages the usage of the built-in data structures over custom ones, which is better most of the time for most people 
 
   Assuming the language isn’t actually C since that it doesn’t even have a proper non-demoting array type..
-- Whilst the Generalizable Programmer wants to have the same syntax for the built-in features/constructs for their user-level types, in order to be able to *hide* the abstractions-optimizing for things like “refactoring”. This means now the user now has to think which “defaults” to use a little more, even if those defaults may be a bad choice.
 
-Both of these camps have different takes on what “ergonomics” means, and I’d argue it’s not merely *just* a syntax thing. Ergonomics is designing for humans and that does not mean just designing for “syntax” or “typing” or any of that. It can even mean designing to slow people down or nudge them to do something different. The act of making something difficult to do in a language, the latter camp would probably class that as “terrible ergonomics”, but interestingly it could be viewed by the former-camp as “brilliant ergonomics”. It’s all about what you are trying to *optimize* for in the domain of *ergonomics*.
+- Whilst the Generalizable Programmer wants to have the same syntax for the built-in features/constructs for their user-level types, in order to be able to _hide_ the abstractions-optimizing for things like “refactoring”. This means now the user now has to think which “defaults” to use a little more, even if those defaults may be a bad choice.
 
-Ergonomics *is* [Design as a Human Endevaour](https://www.gingerbill.org/article/2026/02/23/designing-odins-casting-syntax/#heading-2-6).
+Both of these camps have different takes on what “ergonomics” means, and I’d argue it’s not merely _just_ a syntax thing. Ergonomics is designing for humans and that does not mean just designing for “syntax” or “typing” or any of that. It can even mean designing to slow people down or nudge them to do something different. The act of making something difficult to do in a language, the latter camp would probably class that as “terrible ergonomics”, but interestingly it could be viewed by the former-camp as “brilliant ergonomics”. It’s all about what you are trying to _optimize_ for in the domain of _ergonomics_.
 
-I am clearly in the *Pragmatic Camp*, especially with the design of Odin. And a lot of people who dislike Odin (but not all) are in the Generalizable Camp. It’s absolutely fine for someone to dislike Odin, and I am so glad there are now other choices in languages to choose from in this domain other than C, C++, Ada, and other older Pascals. However, what is interesting is that many people in the Generalizable Camp don’t see to want to understand the other camp’s way of thinking; trivially dismissing the position as if it is a dumb way of thinking. And usually when people take that position, it means that they don’t really understand the trade-offs and compromises of their *OWN* position, let alone other people’s positions.
+Ergonomics _is_ [Design as a Human Endevaour](https://www.gingerbill.org/article/2026/02/23/designing-odins-casting-syntax/#heading-2-6).
 
-n.b. the *Pragmatic Camp* is not equivalent to the [New Jersey Model of “Worse is Better”](https://en.wikipedia.org/wiki/Worse_is_better). I don’t subscribe to that nor the MIT model. I have massive issues with both of them and that should be self-evident with the design of Odin.
+I am clearly in the _Pragmatic Camp_, especially with the design of Odin. And a lot of people who dislike Odin (but not all) are in the Generalizable Camp. It’s absolutely fine for someone to dislike Odin, and I am so glad there are now other choices in languages to choose from in this domain other than C, C++, Ada, and other older Pascals. However, what is interesting is that many people in the Generalizable Camp don’t see to want to understand the other camp’s way of thinking; trivially dismissing the position as if it is a dumb way of thinking. And usually when people take that position, it means that they don’t really understand the trade-offs and compromises of their _OWN_ position, let alone other people’s positions.
+
+n.b. the _Pragmatic Camp_ is not equivalent to the [New Jersey Model of “Worse is Better”](https://en.wikipedia.org/wiki/Worse_is_better). I don’t subscribe to that nor the MIT model. I have massive issues with both of them and that should be self-evident with the design of Odin.
 
 ## Pandora’s Box
 
-Some of the main design goals of Odin have been to minimize the possibility of dialects but also bring the *Joy of Programming* back to a lot of people. Both of these are a problem of ergonomics; a direct consequence of trying to minimize the “Generalizability” aspect. When everything can be generalized and default “idioms” are *not* common place, this does lead to what many call [The Curse of Common Lisp](https://www.winestockwebdesign.com/Essays/Lisp_Curse.html) 
+Some of the main design goals of Odin have been to minimize the possibility of dialects but also bring the _Joy of Programming_ back to a lot of people. Both of these are a problem of ergonomics; a direct consequence of trying to minimize the “Generalizability” aspect. When everything can be generalized and default “idioms” are _not_ common place, this does lead to what many call [The Curse of Common Lisp](https://www.winestockwebdesign.com/Essays/Lisp_Curse.html) 
 
-Please don’t keep submitting the article to Hacker News!. This “power” you get from the *Generalizable camp’s* approach to language design is its downfall. When idiomatic data structures are not encourage/enforced by default, then people tend to try to implement their own or even defaulting to creating even more to the madness. Generalizable approaches tend to lead to worse error messages from the compiler, and for it to struggle optimizing them too.
+Please don’t keep submitting the article to Hacker News!. This “power” you get from the _Generalizable camp’s_ approach to language design is its downfall. When idiomatic data structures are not encourage/enforced by default, then people tend to try to implement their own or even defaulting to creating even more to the madness. Generalizable approaches tend to lead to worse error messages from the compiler, and for it to struggle optimizing them too.
 
 Dialects are a consequence of having too many options to do things in a language or a heavily generalized feature, resulting in different sets of people preferring one approach over another. And in the worse case, everyone has their own dialect making them not possible to use any else’s code. Some LISP derivatives, such as Clojure, have mitigated a lot of the curse of lisp by having a lot of built-in idioms (data structures and functions), but it doesn’t fully fix the problem because it cannot. The C programming language the community has some people who keep to certain dialects which aim to be the most compatible, but even then that does not necessarily aid everyone.
 
@@ -158,8 +170,8 @@ This is why Odin has so many different built-in language-level data types rather
 
 Go is a great example of a language that was explicitly designed for large teams of programmers with varying skill levels. Many of its decisions are brilliant for what it was trying to achieve, but this is also why individuals hate. Things like not allowing unused variables, or enforcing 1TBS braces. Enforcing coding styles at the language-level rather than having it be a secondary vet pass. For a large company like Google, this ergonomics decision makes sense, but for smaller teams (or lone-programmers), this is an extremely unergonomic design choice.
 
-You cannot please everyone with your design choices, nor should you try to. It’s a gentle balance of trade-offs between different groups of people, and trying to maximally please everyone *will* please no one. Fundamentally, everything is a trade-off in design, and that’s your entire point of a language designer: choosing the trade-offs and compromises for your imperfect language.
+You cannot please everyone with your design choices, nor should you try to. It’s a gentle balance of trade-offs between different groups of people, and trying to maximally please everyone _will_ please no one. Fundamentally, everything is a trade-off in design, and that’s your entire point of a language designer: choosing the trade-offs and compromises for your imperfect language.
 
 Be careful with what you choose because you might not like the consequences.
 
->Source: https://www.gingerbill.org/article/2026/04/29/blessed-syntax-and-ergonomics
+> Source: https://www.gingerbill.org/article/2026/04/29/blessed-syntax-and-ergonomics

@@ -1,3 +1,11 @@
+---
+title: "WebAssembly apps without the web."
+source: "https://odin-lang.org/news/orca-odin"
+tags: [OdinRAG, kb, source/newsletters, topic/raylib, topic/wasm]
+type: reference
+status: active
+---
+
 ## WebAssembly apps without the web. [#](#webassembly-apps-without-the-web)
 
 [A brand-new stack for cross-platform apps.](https://orca-app.dev)
@@ -41,9 +49,10 @@ In the following examples you can see how easy it is to create programs now!
 Additionally, you also need to specify the output, as shown below, which will then be used by Orca to bundle up the application. All examples can be built this way.
 
 ```odin
-odin build src -target:orca_wasm32 -out:module.wasm 
+odin build src -target:orca_wasm32 -out:module.wasm
 orca bundle --name output module.wasm
-```odin
+```
+
 I’ve added comments on most lines to describe what is happening, the examples should be read top to bottom.
 
 ### Orca Package (Bindings) [#](#orca-package-bindings)
@@ -56,7 +65,8 @@ I’ve added comments on most lines to describe what is happening, the examples 
 package src
 
 main :: proc() {}
-```odin
+```
+
 ![](/images/news/orca_plain_window.png)
 
 That looks easy! Even simpler than [raylib](https://www.raylib.com) and reminds me of game libraries like [love2d](https://love2d.org) where things just work.
@@ -91,12 +101,13 @@ oc_on_frame_refresh :: proc "c" () {
   // Set a RGBA color and fill a rectangular region on the screen (x y w h).
   oc.set_color_rgba(0, 0, 0, 1)
   oc.rectangle_fill(50, 50, 100, 10)
-  
+
   // Finish all the canvas operations up and render them to the screen.
   oc.canvas_render(renderer, canvas, surface)
-  oc.canvas_present(renderer, surface)    
+  oc.canvas_present(renderer, surface)
 }
-```odin
+```
+
 ![](/images/news/orca_rectangle_fill_fixed.png)
 
 ### Rectangle Fill (Window Sized) [#](#rectangle-fill-window-sized)
@@ -141,9 +152,10 @@ oc_on_frame_refresh :: proc "c" () {
   oc.rectangle_fill(SIZE, SIZE, width, height)
 
   oc.canvas_render(renderer, canvas, surface)
-  oc.canvas_present(renderer, surface)    
+  oc.canvas_present(renderer, surface)
 }
-```odin
+```
+
 ![](/images/news/orca_rectangle_fill_window.png)
 
 ### Text Rendering [#](#text-rendering)
@@ -151,9 +163,10 @@ oc_on_frame_refresh :: proc "c" () {
 The next example uses a resource that needs to be specified:
 
 ```odin
-odin build src -target:orca_wasm32 -out:module.wasm 
+odin build src -target:orca_wasm32 -out:module.wasm
 orca bundle --name output --resource-dir data module.wasm
-```odin
+```
+
 ```odin
 package src
 
@@ -180,7 +193,7 @@ main :: proc() {
   }
 
   // Create the font from a TTF asset that needs to be provided.
-  font = oc.font_create_from_path("segoeui.ttf", 5, &ranges[0])    
+  font = oc.font_create_from_path("segoeui.ttf", 5, &ranges[0])
 }
 
 @(export)
@@ -198,9 +211,10 @@ oc_on_frame_refresh :: proc "c" () {
   oc.text_fill(50, 50, "Hello World")
 
   oc.canvas_render(renderer, canvas, surface)
-  oc.canvas_present(renderer, surface)    
+  oc.canvas_present(renderer, surface)
 }
-```odin
+```
+
 ![](/images/news/orca_text_rendering.png)
 
 ### Rectangle Fill following Mouse [#](#rectangle-fill-following-mouse)
@@ -225,8 +239,8 @@ main :: proc() {
 @(export)
 oc_on_raw_event :: proc "c" (event: ^oc.event) {
   if event.type == .MOUSE_MOVE {
-    mouse = { event.mouse.x, event.mouse.y }
-  }    
+    mouse = {event.mouse.x, event.mouse.y}
+  }
 }
 
 @(export)
@@ -240,8 +254,8 @@ oc_on_frame_refresh :: proc "c" () {
   oc.rectangle_fill(mouse.x - 50, mouse.y - 50, 100, 100)
 
   oc.canvas_render(renderer, canvas, surface)
-  oc.canvas_present(renderer, surface)    
+  oc.canvas_present(renderer, surface)
 }
 ```
 
->Source: https://odin-lang.org/news/orca-odin
+> Source: https://odin-lang.org/news/orca-odin

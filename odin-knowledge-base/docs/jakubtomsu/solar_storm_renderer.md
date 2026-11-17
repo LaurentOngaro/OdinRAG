@@ -1,3 +1,12 @@
+---
+title: "Solar Storm Rendering"
+date: 2024-03-06
+source: "https://jakubtomsu.github.io/posts/solar_storm_renderer"
+tags: [OdinRAG, kb, source/jakubtomsu, topic/collision, topic/rendering, topic/sokol]
+type: reference
+status: active
+---
+
 # Solar Storm Rendering
 
 2024-03-06
@@ -25,7 +34,8 @@ Another nice aspect is that the compiler can generate source code and boilerplat
 
 ```odin
 sokol-shdc.exe -i shaders.glsl -o shaders.odin -l hlsl5:glsl330 -f sokol_odin
-```odin
+```
+
 And here is how a simple sokol-style GLSL looks like:
 
 ```odin
@@ -55,7 +65,8 @@ And here is how a simple sokol-style GLSL looks like:
 24@end
 25
 26@program foo vs fs
-```odin
+```
+
 # Immediate-mode APIs are amazing
 
 A core philosophy of the renderer is to do as much as possible with [immediate-mode APIs](https://caseymuratori.com/blog_0001), and group rendering operations so Instancing is trivial.
@@ -72,7 +83,8 @@ The game uses immediate mode API exposed by the renderer for all drawing operati
 5   color = COLOR_RED,
 6   z = 0.1,
 7   shape = .Octagon)
-```odin
+```
+
 Immediate-mode text drawing has an interesting benefit of dynamic animations. The `draw_text` procedure returns a slice of the text character instances, so you can do any modifications yourself. Here is a simple example:
 
 ```odin
@@ -80,14 +92,15 @@ Immediate-mode text drawing has an interesting benefit of dynamic animations. Th
 2for &ch, i in chars {
 3    ch.pos.y += sin(time_passed() + f32(i)) // animate up and down
 4}
-```odin
-This code runs every frame, and updates the character instances right before being submitted to the GPU and displayed. There is state in the background, but the API is fully immediate-mode. *immediate-mode != stateless*
+```
+
+This code runs every frame, and updates the character instances right before being submitted to the GPU and displayed. There is state in the background, but the API is fully immediate-mode. _immediate-mode != stateless_
 
 # World pass
 
 The terrain is drawn as a single quad. A shader which reads from the terrain SDF texture and a color texture and does the shading. Explaining the terrain in-depth is out of scope for this article, let’s do that another time…
 
-There is also a shader for rendering the background and another one for wind. The background shader draws stars using perlin noise raised to a very high power. The wind is also just perlin noise, but this time it’s stretched horizontally and has some distortion to add some *wiggle*.
+There is also a shader for rendering the background and another one for wind. The background shader draws stars using perlin noise raised to a very high power. The wind is also just perlin noise, but this time it’s stretched horizontally and has some distortion to add some _wiggle_.
 
 ![environment](/posts/solar_storm_renderer/env.png)
 
@@ -110,7 +123,8 @@ Here is the full list of supported shapes in the game as of now.
 6    Hexagon,
 7    Octagon,
 8}
-```odin
+```
+
 > Fun fact: the reason there is both rectangle and a rhombus is because they have different properties when doing non-uniform scaling. Rhombus is primarily used for sparks and other particle effects.
 
 More complex shapes like tanks are made up of multiple shapes.
@@ -121,11 +135,12 @@ This is the shape instance struct, as it is handled both on the CPU and the GPU 
 ```odin
 1Renderer_Shape_Instance :: struct {
 2    pos:   Vec3, // world-space position
-3    right: Vec2, // local-space vector pointing to the right. 
+3    right: Vec2, // local-space vector pointing to the right.
 4    up:    Vec2, // local-space vector pointing up
 5    color: Color8, // RGBA8_UNORM color
 6}
-```odin
+```
+
 Here is all the state renderer keeps for shapes. The pipeline is shared for all shape types, and the buffers are created at load time. `shape_instance_bufs` are filled with instances from `shape_instances` prior to rendering. `Array` is just `struct { data: [N]T, len: int }`, it’s a custom version of odin’s `core:container/small_array`.
 
 ```odin
@@ -134,7 +149,8 @@ Here is all the state renderer keeps for shapes. The pipeline is shared for all 
 3shape_index_bufs:    [Renderer_Shape]sg.Buffer, // mesh indicies for each shape type
 4shape_instance_bufs: [Renderer_Shape]sg.Buffer, // GPU buffer for instance data
 5shape_instances:     [Renderer_Shape]Array(BUDGET_MAX_RENDERER_SHAPE_INSTANCES, Renderer_Shape_Instance),
-```odin
+```
+
 All shapes of certain type are rendered using GPU instancing, this means it takes only about 6 drawcalls to render all shapes in the worst case. Here is how the game dispatches draw calls. Note: this code is a heavily simplified for the sake of clarity.
 
 ```odin
@@ -145,12 +161,12 @@ All shapes of certain type are rendered using GPU instancing, this means it take
  5for &arr, shape in renderer.shape_instances {
  6    // Clear the instances when done, since it's immediate-mode
  7    defer clear(&arr)
- 8    
+ 8
  9    // Upload the instance data for a particular type to the GPU
 10    sg.update_buffer(
 11        renderer.shape_instance_bufs[shape],
 12        {ptr = &arr[0], size = u64(size_of(Renderer_Shape_Instance) * len(arr))})
-13    
+13
 14    // Bind the mesh
 15    sg.apply_bindings({
 16        vertex_buffers = {
@@ -165,7 +181,8 @@ All shapes of certain type are rendered using GPU instancing, this means it take
 25        num_elements = shape_num_elems[shape],
 26        num_instances = len(arr))
 27}
-```odin
+```
+
 Here is an example of one drawcall, in this case hexagons:
 ![shape drawcall](/posts/solar_storm_renderer/shape_drawcall.png)
 
@@ -214,4 +231,4 @@ And here is the entire renderdoc capture of the game. The entire thing is just a
 
 ![renderdoc](/posts/solar_storm_renderer/renderdoc.png)
 
->Source: https://jakubtomsu.github.io/posts/solar_storm_renderer
+> Source: https://jakubtomsu.github.io/posts/solar_storm_renderer

@@ -1,3 +1,11 @@
+---
+title: "Compiler Updates [#compiler-updates]"
+source: "https://odin-lang.org/news/newsletter-2023-09"
+tags: [OdinRAG, kb, source/newsletters, topic/hot-reload]
+type: reference
+status: active
+---
+
 # Compiler Updates [#compiler-updates]
 
 [Monthly Release](https://github.com/odin-lang/Odin/releases/tag/dev-2023-10) including a few new language features and LLVM 17.0.1 support for windows.
@@ -18,9 +26,11 @@ We’ll split up the different social platforms this time around.
 
   - [Rickard Andersson](https://www.youtube.com/watch?v=VLcTrUhSdlg&list=PLEQTpgQ9eFCGlQa2z0j_TQTGggHOIF8Z1) (`gonz` on Discord) has been uploading a video series about Odin!
   - [karl\_zylinski](https://www.youtube.com/@karl_zylinski) is working on their cat game, uploading videos and streaming ocassionally.
+
 - Twitter
 
   - [Charlie](https://twitter.com/charshenton) has been posting lot’s of content on discord but some of his showcase material lands only on his twitter.
+
 - Blogs
 
   - karl\_zylinski has recently posted a blog on [Hot Reload Gameplay Code](http://zylinski.se/posts/hot-reload-gameplay-code/) in Odin!
@@ -39,7 +49,7 @@ Astro Drift is a short roguelike rocket-drifting shooter. Destroy the asteroids 
 
 ## Editors [#editors]
 
-***Sentient Coffee*** has added support for the [focus editor](https://github.com/focus-editor/focus). Check out the discord [link / explanation](https://discord.com/channels/568138951836172421/568871319425515531/1156585773290762341).
+_**Sentient Coffee**_ has added support for the [focus editor](https://github.com/focus-editor/focus). Check out the discord [link / explanation](https://discord.com/channels/568138951836172421/568871319425515531/1156585773290762341).
 
 ---
 
@@ -108,7 +118,8 @@ serialize_bar :: proc(s: ^Serializer, bar: ^Bar, loc := #caller_location) -> boo
     serialize(s, &bar.data) or_return
     return true
 }
-```odin
+```
+
 ### Getopts - `Pix` [#getopts---pix]
 
 [Getopts](https://github.com/Pix-xiP/getopts) A Odin command line argument parser, loosely based on the `getopts_long`.
@@ -138,7 +149,8 @@ for opt in opts.opts {
       // default? Usage!
   }
 }
-```odin
+```
+
 ---
 
 ## Categories [#categories]
@@ -245,4 +257,4 @@ Working on implementing UEFI in Odin! & it's open source right now for you to tr
 
 added GOP (Graphics Output Protocol) support to UEFI implementation - slendi
 
->Source: https://odin-lang.org/news/newsletter-2023-09
+> Source: https://odin-lang.org/news/newsletter-2023-09

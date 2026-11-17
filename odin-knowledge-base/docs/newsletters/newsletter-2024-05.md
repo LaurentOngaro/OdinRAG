@@ -1,3 +1,11 @@
+---
+title: "Quick Shoutouts"
+source: "https://odin-lang.org/news/newsletter-2024-05"
+tags: [OdinRAG, kb, source/newsletters, topic/hot-reload, topic/rendering, topic/raylib]
+type: reference
+status: active
+---
+
 Read up on the compiler changes in the [monthly release](https://github.com/odin-lang/Odin/releases/tag/dev-2024-05) notes.
 
 ## Quick Shoutouts [#](#quick-shoutouts)
@@ -14,18 +22,18 @@ Heres a neat feature I saw they have recently added on the Discord.
 
 ## Projects shared this month [#](#projects-shared-this-month)
 
-| Project Name | Description |
-| --- | --- |
-| [odin-m3d](https://github.com/cr1sth0fer/odin-m3d) | M3D bindings |
-| [hot-reload-template](https://github.com/karl-zylinski/odin-raylib-hot-reload-game-template) | odin / raylib Hot Realoding Template |
-| [odin-aseprite](https://github.com/blob1807/odin-aseprite) | Handler for Aseprite files |
-| [odin-al](https://github.com/elvodqa/odin-al) | OpenAL bindings |
-| [ZTME](https://github.com/Z7-Z7L/ZTME) | Simple Tile Editor |
-| [audio-files](https://gist.github.com/p1xelHer0/abed4728096ea3a88af7802cbe46cf08) | Play audio files from memory |
-| [jamgine](https://github.com/asbott/jamgine) | sandbox / portfolio game graphics library |
-| [duckdb-odin](https://github.com/lionel626/duckdb-odin) | duckdb bindings |
-| [anima](https://github.com/atomicptr/anima) | 2D animation library |
-| [ld55](https://github.com/atomicptr/ld55) | LD55 jam entry game |
+| Project Name                                                                                 | Description                               |
+| -------------------------------------------------------------------------------------------- | ----------------------------------------- |
+| [odin-m3d](https://github.com/cr1sth0fer/odin-m3d)                                           | M3D bindings                              |
+| [hot-reload-template](https://github.com/karl-zylinski/odin-raylib-hot-reload-game-template) | odin / raylib Hot Realoding Template      |
+| [odin-aseprite](https://github.com/blob1807/odin-aseprite)                                   | Handler for Aseprite files                |
+| [odin-al](https://github.com/elvodqa/odin-al)                                                | OpenAL bindings                           |
+| [ZTME](https://github.com/Z7-Z7L/ZTME)                                                       | Simple Tile Editor                        |
+| [audio-files](https://gist.github.com/p1xelHer0/abed4728096ea3a88af7802cbe46cf08)            | Play audio files from memory              |
+| [jamgine](https://github.com/asbott/jamgine)                                                 | sandbox / portfolio game graphics library |
+| [duckdb-odin](https://github.com/lionel626/duckdb-odin)                                      | duckdb bindings                           |
+| [anima](https://github.com/atomicptr/anima)                                                  | 2D animation library                      |
+| [ld55](https://github.com/atomicptr/ld55)                                                    | LD55 jam entry game                       |
 
 ## Project Showcase [#](#project-showcase)
 
@@ -57,11 +65,11 @@ Here is a a short preview of what I got working pretty quickly.
 
 You can see mostly everything is done already? By the time the project was ~1 week old. The thing is, getting raw text editors to work is actually quite simple. As soon as you can edit bytes and navigate around, you’re basically done.
 
-One feature I really missed from [4coder](https://4coder.net/) was *virtual whitespace*, which automatically indents each line. Implementing this for odin was pretty simple.
+One feature I really missed from [4coder](https://4coder.net/) was _virtual whitespace_, which automatically indents each line. Implementing this for odin was pretty simple.
 
 ### The Rest [#](#the-rest)
 
-While syntax highlighting was easy, auto-completion with code *intelligence* turned out to be more trouble. At some point I though about just using OLS LSP but by the time I had already lost interest in the project.
+While syntax highlighting was easy, auto-completion with code _intelligence_ turned out to be more trouble. At some point I though about just using OLS LSP but by the time I had already lost interest in the project.
 
 [](/images/news/2024-05-skytrias2.mp4)
 
@@ -118,15 +126,15 @@ Since this is the Odin newsletter I should probably also mention that the adopti
 
 ## Highest Peak (Skol) [#](#highest-peak-skol)
 
-I’ve been around Handmade Network for a while and heard about Odin there. I don’t remember the first project I’ve done with Odin but I’ve been using Odin as my go to language for about two years. I cannot tell you which part of the language I like the most but writing it is so natural and I don’t have to battle it, it’s a blast. It’s not a recent thing either, writing in Odin felt *correct* right from the start.
+I’ve been around Handmade Network for a while and heard about Odin there. I don’t remember the first project I’ve done with Odin but I’ve been using Odin as my go to language for about two years. I cannot tell you which part of the language I like the most but writing it is so natural and I don’t have to battle it, it’s a blast. It’s not a recent thing either, writing in Odin felt _correct_ right from the start.
 
 ### It’s my peak [#](#its-my-peak)
 
 ![](/images/news/2024-05-sk0l1.png)
 
-This was supposed to be my submission for a [two week game jam](https://itch.io/jam/dreadxp-extraterrestrial-terror-jam) with **horror**, **aliens** and **crop circles** themes. Before the jam I was working on another game and I stripped it of everything relating to that game and I was left with the barebones. So in the beginning, I had controls, soloud library for sounds, debug ui and a d3d11 renderer. I wasn’t able to finish it in time, mostly because of the scope and I haven’t done any real *art* and music before. However most of what I implemented took as long as I thought they would and hey, at least that means I know how much I procrastinate.
+This was supposed to be my submission for a [two week game jam](https://itch.io/jam/dreadxp-extraterrestrial-terror-jam) with **horror**, **aliens** and **crop circles** themes. Before the jam I was working on another game and I stripped it of everything relating to that game and I was left with the barebones. So in the beginning, I had controls, soloud library for sounds, debug ui and a d3d11 renderer. I wasn’t able to finish it in time, mostly because of the scope and I haven’t done any real _art_ and music before. However most of what I implemented took as long as I thought they would and hey, at least that means I know how much I procrastinate.
 
-In the end I had serialization, save games, hexagon tiles, tile editor, dialogue and event system, resource and food gathering, camping, and very simple battles (with **aliens**) and more. There are also **crop circles** around that if you do what’s necessary to complete them, they’ll give you weird abilities that you will retain. Your team consists of some people in the *family* territory and they might die, so uh, that’s a kind of **horror** right?
+In the end I had serialization, save games, hexagon tiles, tile editor, dialogue and event system, resource and food gathering, camping, and very simple battles (with **aliens**) and more. There are also **crop circles** around that if you do what’s necessary to complete them, they’ll give you weird abilities that you will retain. Your team consists of some people in the _family_ territory and they might die, so uh, that’s a kind of **horror** right?
 
 Anyways, the idea was to have a guy reliving the same time frame over and over and had recollection of what happened earlier. It’s a kind of a puzzle game where you try out different paths to either figure out the optimal pathing through the story, or obtain information to use on subsequent runs.
 
@@ -143,7 +151,7 @@ I implemented a system that reads a text file and turns a group of conditions an
 ```odin
 # Meeting the medium after seeing the sniper
 {
-  cond 
+  cond
     Run_Met_Medium = 0
     Loop_Met_Medium >= 2
     Loop_Medium_Appears_At_Distance = 3
@@ -156,12 +164,13 @@ I implemented a system that reads a text file and turns a group of conditions an
     Dial_Meet_Medium_Again_Met_Sniper__Player_Kid
     Proc_rsp_inc_medium_distance_and_draw_medium
 }
-```odin
-This is checked each time you move into a tile. There’s a character internally called *Medium* that can move around in between runs (*spooky*). What the above text says is that if you haven’t yet met the *Medium* in this run, but have met her at least twice before, and if she appears at a distance of 3 tiles from the starting tile, and if you are at that distance too, and if you have met the sniper at least once before but not yet this run, do the following response:
+```
 
-Increment the flags for meeting the *Medium* (so that you don’t meet her again this run as all *Medium* events begin with `Run_Met_Medium = 0`), show the dialogue `Meet_Medium_Again_Met_Sniper__Player_Kid` and call the proc `rsp_inc_medium_distance_and_draw_medium` Might look complicated but very easy to write.
+This is checked each time you move into a tile. There’s a character internally called _Medium_ that can move around in between runs (_spooky_). What the above text says is that if you haven’t yet met the _Medium_ in this run, but have met her at least twice before, and if she appears at a distance of 3 tiles from the starting tile, and if you are at that distance too, and if you have met the sniper at least once before but not yet this run, do the following response:
 
-I have `Run` and `Loop` flags signaling things that happen on this run or had happened in earlier runs. The conditions tagged with `Info` are things that are collected per new tile and don’t make sense to me as flags. Where your characters are, whether they are bored, the amount of hours since they last ate and so on go there. They are also *collected* from different structs so your characters’ health could come from their entity structs, but the pack position comes from the pack struct etc. while the state flags are just two large arrays sitting in my main game struct.
+Increment the flags for meeting the _Medium_ (so that you don’t meet her again this run as all _Medium_ events begin with `Run_Met_Medium = 0`), show the dialogue `Meet_Medium_Again_Met_Sniper__Player_Kid` and call the proc `rsp_inc_medium_distance_and_draw_medium` Might look complicated but very easy to write.
+
+I have `Run` and `Loop` flags signaling things that happen on this run or had happened in earlier runs. The conditions tagged with `Info` are things that are collected per new tile and don’t make sense to me as flags. Where your characters are, whether they are bored, the amount of hours since they last ate and so on go there. They are also _collected_ from different structs so your characters’ health could come from their entity structs, but the pack position comes from the pack struct etc. while the state flags are just two large arrays sitting in my main game struct.
 
 From these files I generate an array containing all events before each compilation. This array is ordered by the amount of conditions, largest first. The more conditions an event has, the more specialized it is and it should be checked first in order to stop the less special/more common events from taking over. And that’s basically it. Text parsed, array generated, the ordered condition groups are run in a loop, if one has all conditions true, its responses are called. If more than one event can happen with the same amount of conditions, I choose randomly which one happens.
 
@@ -169,14 +178,15 @@ Also, I could do more than dialogue by using this system:
 
 ```odin
 {
-  cond 
+  cond
     Info_Tile_Event_Count = 0
     Run_Last_Battle_In_Tiles >= 8
     Info_Tile_Battle_Chance >= 0.1
   response
     Proc_rsp_roll_for_battle
 }
-```odin
+```
+
 If there are no events on that tile, we haven’t had a battle for at least 8 tiles and the tile could roll for battle, roll! Then I don’t have to add extra logic for checking for battle events.
 
 ### `Proc_rsp_do_more` [#](#proc_rsp_do_more)
@@ -231,7 +241,7 @@ There were three things I thought were particularly satisfying to develop: the s
 ### Smoke Trails [#](#smoke-trails)
 
 The original goal was to draw a trail behind the player when they dash. An approach I’ve gotten a lot of mileage out of in the past is to draw objects that should have a trail directly into a render texture.
-Rather than clearing the render texture each frame, it is drawn into *another* render texture using a shader that subtracts a little bit of alpha from the entire image. Using this double-buffered render texture aproach lets you create post-processing-like
+Rather than clearing the render texture each frame, it is drawn into _another_ render texture using a shader that subtracts a little bit of alpha from the entire image. Using this double-buffered render texture aproach lets you create post-processing-like
 effects which accumulate over time.
 
 ![](/images/news/2024-05-beans2.gif)
@@ -276,7 +286,8 @@ for cell in grid
   })
 
 run_jobs()
-```odin
+```
+
 More boids, yay!
 
 ![](/images/news/2024-05-beans5.gif)
@@ -292,7 +303,8 @@ Modifier :: struct {
     is_valid    : proc(game : ^Game) -> bool,   // Function that can be called to check if a modifier is valid
     on_choose   : proc(game : ^Game),           // Function that can be called to apply the modifier to the current game state
 }
-```odin
+```
+
 Each modifier is then authored in a big map so it’s quite easy to throw together interesting modifiers.
 
 ```odin
@@ -300,7 +312,7 @@ ModifierChoices := [ModifierType]Modifier {
   .RangeFinder = {
     name        = "Range Finder",
     description = "Installs a laser sight onto the player ship",
-    on_choose   = proc(game : ^Game) { 
+    on_choose   = proc(game : ^Game) {
         add_action(&game.weapon.on_draw_weapon, proc(draw : ^bool, game : ^Game) {
             rl.DrawLineV(...)
         })
@@ -308,9 +320,10 @@ ModifierChoices := [ModifierType]Modifier {
   },
   ...
 }
-```odin
+```
+
 ### Summary [#](#summary)
 
 I had quite a positive experience learning the basics of Odin and am looking forward to using it for more projects in the future. Odin provides a buttery-smooth entry into low-level programming and I appreciate the lessons its design taught me about writing simpler code. I think there’s some good bones here for a proper game so I may continue hacking on it in the future, but for now I’ve got other projects I need to get back to :)
 
->Source: https://odin-lang.org/news/newsletter-2024-05
+> Source: https://odin-lang.org/news/newsletter-2024-05
